@@ -1,0 +1,113 @@
+import { StyleSheet, Dimensions, StatusBar } from "react-native";
+
+const semiTransparentGray = "rgba(229, 229, 229, 0.7)"; // 这里的0.5表示50%的透明度
+
+export const metaStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  verContainer: {
+    flex: 1,
+    margin: 20,
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  button: {
+    width: 100,
+    height: 50,
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  //image
+  tabImage: {
+    width: 20,
+    height: 20,
+  },
+  splaceImage: {
+    width: 100,
+    height: 100,
+  },
+  // text
+  grayText: {
+    color: "#999999",
+    fontSize: 14,
+  },
+  blueText: {
+    color: "#171AFF",
+    fontSize: 14,
+  },
+  themes: {
+    color: "#171AFF",
+  },
+  titleText: {
+    color: "#333333",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  largeDefaultText: {
+    color: "#333333",
+    fontSize: 20,
+    fontWeight: "bold",
+    lineHeight: 30,
+  },
+  defaultText: {
+    color: "#333333",
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  smallDefaultText: {
+    color: "#333333",
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  smallGrayText: {
+    color: "#999999",
+  },
+  //TextInputs
+
+  textInputDefault: {
+    marginTop: 10,
+    borderRadius: 8,
+    // backgroundColor:'#E5E5E5',
+    backgroundColor: semiTransparentGray,
+    // borderWidth:1,
+    // borderColor:'#E5E5E5',
+    // padding:10,
+    fontSize: 14,
+    color: "#333333",
+    padding: 10,
+    textAlignVertical: "top",
+  },
+
+  //notice red
+  noticeRed: {
+    borderRadius: 8,
+    // backgroundColor:'#E5E5E5',
+    backgroundColor: '#FDF6F6',
+    // borderWidth:1,
+    // borderColor:'#E5E5E5',
+    // padding:10,
+    fontSize: 14,
+    // color: "#FA5151",
+    textAlignVertical: "top",
+    marginTop:20,
+    paddingHorizontal:10,
+    paddingVertical:15
+  },
+ 
+});
+
+export const themeColor = "#171AFF";

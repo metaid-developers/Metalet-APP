@@ -1,0 +1,30 @@
+import React from "react";
+import Toast from "react-native-toast-message";
+
+// 初始化一个navigation对象
+let _navigator;
+
+// 设置navigator的方法
+export function setTopLevelNavigator(navigatorRef) {
+  _navigator = navigatorRef;
+}
+
+// 全局跳转的方法
+export function navigate(routeName) {
+  if (_navigator) {
+    // 对于react-navigation v5+
+    _navigator.navigate(routeName);
+  } else {
+    console.warn("Can't navigate without a navigator!");
+  }
+}
+
+
+export function goBack() {
+  if (_navigator) {
+    // 对于react-navigation v5+
+    _navigator.goBack();
+  } else {
+    console.warn("Can't navigate without a navigator!");
+  }
+}
