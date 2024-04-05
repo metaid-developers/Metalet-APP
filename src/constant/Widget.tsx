@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   ActivityIndicator,
   Modal,
+  LayoutChangeEvent,
 } from "react-native";
 import { metaStyles, themeColor } from "../constant/Constants";
 import { goBack } from "../base/NavigationService";
@@ -14,6 +15,8 @@ import { goBack } from "../base/NavigationService";
 import React, { useRef, useEffect, useState } from "react";
 import EasyToast from "react-native-easy-toast";
 import { LinearGradient } from "expo-linear-gradient";
+import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
+import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 
 const styles = StyleSheet.create({
   centeredView: {
@@ -30,23 +33,21 @@ const styles = StyleSheet.create({
     // elevation: 5,
   },
   avaterContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     width: 50,
     height: 50,
     borderRadius: 50,
-    overflow: 'hidden', // 需要设置 overflow: 'hidden' 来裁剪渐变色
+    overflow: "hidden", // 需要设置 overflow: 'hidden' 来裁剪渐变色
   },
   avaterGradient: {
     flex: 1,
-    width: '100%',
+    width: "100%",
     borderRadius: 50,
   },
 });
 
-
-
-//白色组件填充 "#F3F3FF"
+//1. 白色组件填充 "#F3F3FF"
 export const RoundSimButton = ({
   title,
   event,
@@ -81,7 +82,7 @@ export const RoundSimButton = ({
   );
 };
 
-//title bar
+//2.title bar
 export const TitleBar = ({
   title = "",
   event = (props) => {
@@ -99,9 +100,6 @@ export const TitleBar = ({
           alignItems: "center",
         }}
       >
-
-
-  
         <Image
           source={require("../../image/meta_back_icon.png")}
           style={{ width: 22, height: 22 }}
@@ -112,9 +110,7 @@ export const TitleBar = ({
   );
 };
 
-//hook toast
-
-
+//3.hook toast
 export const useEasyToast = (position: "top" | "bottom" | "center") => {
   const toastRef = useRef<EasyToast>(null);
 
@@ -127,8 +123,13 @@ export const useEasyToast = (position: "top" | "bottom" | "center") => {
   return toastRef;
 };
 
-//loading Modal 弹框来着
-export const LoadingModal = ({ isShow=true, title='',isCancel=true ,event=()=>{} }) => {
+//4.loading Modal 弹框来着
+export const LoadingModal = ({
+  isShow = true,
+  title = "",
+  isCancel = true,
+  event = () => {},
+}) => {
   // const [obj, setObj] = useState({ title: title, isShow: isShow ,isCancel:isCancel});
 
   // animationType="slide"
@@ -138,58 +139,84 @@ export const LoadingModal = ({ isShow=true, title='',isCancel=true ,event=()=>{}
   // setModalVisible(false);
   // }}
 
-
   // const closeModal=()=>{
   //   setObj({...obj,isShow:false})
   // }
 
   return (
-    <Modal transparent={true}
-    visible={isShow}
-    >
-      <TouchableWithoutFeedback onPress={()=>{
-        if(isCancel){
-          event()
-        }
-        // if(isCancel)
-        // setObj({...obj,isShow:false})
-      }}>
-
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          <ActivityIndicator size={"large"} color={"#fff"} />
+    <Modal transparent={true} visible={isShow}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (isCancel) {
+            event();
+          }
+          // if(isCancel)
+          // setObj({...obj,isShow:false})
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <ActivityIndicator size={"large"} color={"#fff"} />
+          </View>
         </View>
-      </View>
       </TouchableWithoutFeedback>
     </Modal>
   );
-  
 };
 
-// avater
-export const GradientAvatar=()=>{
+const defaultAvatarColor = [];
 
-     const getRandomColor=()=>{
-      const letters='0123456789ABCDEF'
-      let color='#'
-      for(let i=0;i<6;i++){
-        color+=letters[Math.floor(Math.random()*16)]
-      }
-      return color
-     }
-   
-     const randomGradientColors=[getRandomColor(),getRandomColor()]
-  
-     return (
-      <View style={styles.avaterContainer}>
-        <LinearGradient
-          colors={randomGradientColors}
-          style={styles.avaterGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        />
-      </View>
-    );
+//5. avater
+export const GradientAvatar = () => {
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+  if (defaultAvatarColor.length == 0) {
+    defaultAvatarColor[0] = getRandomColor();
+    defaultAvatarColor[1] = getRandomColor();
+  }
 
-}
+  // const randomGradientColors = [ defaultAvatarColor[0], defaultAvatarColor[1]];
+  const randomGradientColors = [defaultAvatarColor[0], defaultAvatarColor[1]];
 
+  return (
+    <View style={styles.avaterContainer}>
+      <LinearGradient
+        colors={randomGradientColors}
+        style={styles.avaterGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+    </View>
+  );
+};
+
+// 6. no more data view
+export const NoMoreDataView = ({isShow=false}) => {
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        height: "100%",
+        opacity: isShow?1:0,
+      }}
+     >
+      <Image
+        source={require("../../image/meta_no_more_data_icon.png")}
+        style={{ width: 38, height: 53 }}
+      />
+
+      <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
+        No more data
+      </Text>
+    </View>
+  );
+};

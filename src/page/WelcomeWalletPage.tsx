@@ -58,12 +58,12 @@ export default function WelcomeWalletPage(props) {
       />
 
       <View style={{ height: 30 }} />
-      <Text style={metaStyles.grayText}>
+      <Text style={metaStyles.grayText99}>
         By using Metalet,you agree and consent to our:
       </Text>
       <View style={[styles.row, { marginBottom: 40 }]}>
         <Text style={metaStyles.blueText}>Terms of Service</Text>
-        <Text style={metaStyles.grayText}> and </Text>
+        <Text style={metaStyles.grayText99}> and </Text>
         <Text style={metaStyles.blueText}>Privacy Policy</Text>
       </View>
     </SafeAreaView>

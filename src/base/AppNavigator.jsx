@@ -6,8 +6,10 @@ import { createRef } from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { setTopLevelNavigator } from './NavigationService';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import { metaStyles } from "../constant/Constants";
 import EasyToast from 'react-native-easy-toast';
+
 
 // import { ToastContainer } from 'react-native-toastify';
 // import 'react-native-toastify';
@@ -73,7 +75,7 @@ const TabNavigator = () => (
       headerShown:false,
       tabBarIcon:({focused,color,size})=>{
         let icon;
-            if (route.name === "Home") {
+            if (route.name === "HomePage") {
               icon = focused ? (
                 <Image
                   source={require("../../image/me_index_select_tab.png")}
@@ -102,7 +104,7 @@ const TabNavigator = () => (
       }
     })}
     >
-      <Tab.Screen headerShown={false} name="Home" component={HomePage} />
-      <Tab.Screen name="Settings" component={SettingsPage} />
+      <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
+      <Tab.Screen name="SettingsPage" component={SettingsPage} />
     </Tab.Navigator>
 );

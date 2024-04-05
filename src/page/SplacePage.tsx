@@ -5,15 +5,16 @@ import { metaStyles } from "../constant/Constants";
 export default function SplacePage(props) {
   function goToHome() {
     setTimeout(() => {
-      props.navigation.navigate("SetPasswordPage");
-      // props.navigation.navigate("Tabs");
+      // props.navigation.navigate("SetPasswordPage");
+      props.navigation.navigate("Tabs");
     }, 200);
   }
 
+  
   goToHome();
 
   return (
-    <View style={metaStyles.container}>
+    <View style={metaStyles.centerContainer}>
       <Image
         source={require("../../image/me_app_icon.png")}
         style={metaStyles.splaceImage}
@@ -23,11 +24,6 @@ export default function SplacePage(props) {
       >
         METALET
       </Text>
-      <TextInput
-        placeholder="请输入用户名"
-        onChangeText={(val) => {
-        
-        }}/>
     </View>
   );
 }

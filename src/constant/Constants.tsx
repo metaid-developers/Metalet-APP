@@ -3,16 +3,46 @@ import { StyleSheet, Dimensions, StatusBar } from "react-native";
 const semiTransparentGray = "rgba(229, 229, 229, 0.7)"; // 这里的0.5表示50%的透明度
 
 export const metaStyles = StyleSheet.create({
-  container: {
+  //flex
+  parentContainer:{
+   flex:1,
+   backgroundColor: "#fff",
+  },
+
+  centerContainer: {
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    margin: 20,
+  
   },
-  verContainer: {
+  varContainer:{
+    flex:1,
+  },
+  verMarginContainer: {
     flex: 1,
     margin: 20,
   },
+  rowContainer:{
+    flexDirection:'row'
+  },
+  rowMarginContainer:{
+    flexDirection:'row',
+    margin: 20,
+  },
+  rowCenterContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+  
+    
+    
+    // alignItems:'center',
+    // justifyContent:'center'
+  },
+
+
+  //////
   text: {
     fontSize: 20,
     fontWeight: "bold",
@@ -41,10 +71,19 @@ export const metaStyles = StyleSheet.create({
     height: 100,
   },
   // text
-  grayText: {
+  grayText99: {
     color: "#999999",
     fontSize: 14,
   },
+  grayTextSmall66: {
+    color: "#666666",
+    fontSize: 14,
+  },
+  grayTextdefault66: {
+    color: "#666666",
+    fontSize: 16,
+  },
+
   blueText: {
     color: "#171AFF",
     fontSize: 14,
@@ -55,6 +94,11 @@ export const metaStyles = StyleSheet.create({
   titleText: {
     color: "#333333",
     fontSize: 18,
+    fontWeight: "bold",
+  },
+  bigLargeDefaultText: {
+    color: "#333333",
+    fontSize: 30,
     fontWeight: "bold",
   },
   largeDefaultText: {

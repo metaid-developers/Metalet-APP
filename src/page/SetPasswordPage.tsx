@@ -31,7 +31,7 @@ export default function SetPasswordPage(props) {
     setTimeout(()=>{
       setObj({...obj,isShow:false})
       // props.navigation.navigate('HomePage')
-      props.navigation.navigate('CongratulationsPage',{type:'Imported '})
+      props.navigation.navigate('CongratulationsPage',{type:'Imported Successfully'})
 
     },2000);
   }
@@ -43,7 +43,7 @@ export default function SetPasswordPage(props) {
       <EasyToast ref={toastRef} position="center" />
       <TitleBar />
 
-      <View style={[metaStyles.verContainer, { marginBottom: 50 }]}>
+      <View style={[metaStyles.verMarginContainer, { marginBottom: 50 }]}>
       
       <LoadingModal   isCancel={obj.isCancel} isShow={obj.isShow} title={obj.title} event={closeModal}/>
        
