@@ -40,7 +40,8 @@ export default function WelcomeWalletPage(props) {
       <RoundSimButton
         title={"Import Wallet"}
         event={() => {
-          console.log("import wallet");
+          // props.navigation.navigate('SetPasswordPage')
+          navigate('SetPasswordPage',{destory:true})
         }}
         color="#F3F3FF"
       />

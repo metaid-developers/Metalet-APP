@@ -1,36 +1,39 @@
-import { View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState } from "react";
 import { metaStyles } from "../constant/Constants";
-import { NoMoreDataView } from "../constant/Widget";
+import { CustomTabBar, NoMoreDataView } from "../constant/Widget";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import BtcFtPage from "./BtcFtPage";
 import MvcFtPage from "./MvcFtpage";
 import { Title } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
+import { useData } from "../hooks/MyProvider";
 
 const TabsTop = createMaterialTopTabNavigator();
 
 export default function FtPage() {
-  const [hasData, setHasData] = useState(true);
+
 
   return (
-    <View style={[metaStyles.varContainer]}>
-      {/* {!hasData && <NoMoreDataView/>} */}
-      {hasData && <TabsTopNavigator />}
+    <View style={[metaStyles.varContainer,{backgroundColor:"#fff"}]}>
+     <TabsTopNavigator />
     </View>
   );
 }
 
-const CustomTabBarLabel = ({ label, focused, tabWidth }) => (
-  <View style={{ width: tabWidth }}>
-    <Text style={{ color: focused ? "blue" : "black" }}>{label}</Text>
-  </View>
-);
+
 
 function TabsTopNavigator() {
   return (
     <TabsTop.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />}
+      tabBar={(props) => <CustomTabBar {...props } isShowIndicator={false} isSmallTitle={true} />}
+      style={{ flex: 1,  marginTop: 10 }}
       // <TabsTop.Navigator
       // tabBarPosition="top"
       // screenOptions={{
@@ -62,78 +65,10 @@ function TabsTopNavigator() {
       />
       <TabsTop.Screen
         name="MvcFtPage"
-        options={{ title: "MetaContract" }}
+        options={{ title: "Space" }}
         component={MvcFtPage}
       />
     </TabsTop.Navigator>
   );
 }
 
-const CustomTabBar = ({ state, descriptors, navigation }) => {
-  return (
-    <View style={{ flexDirection: "row", backgroundColor: "white" }}>
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label = options.title !== undefined ? options.title : route.name;
-
-        const isFocused = state.index === index;
-
-        const onPress = () => {
-          const event = navigation.emit({
-            type: "tabPress",
-            target: route.key,
-          });
-
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
-
-        return (
-          <View 
-          key={route.key}
-          style={{alignItems:'center'}}>
-            <Text
-              key={index}
-              style={{
-                fontSize: isFocused ? 13 : 13,
-                marginHorizontal: 10,
-                marginVertical:5,
-                fontWeight: isFocused ? "bold" : "normal",
-              }}
-              onPress={onPress}
-            >
-              {label}
-            </Text>
-            {isFocused && (
-              <LinearGradient
-                colors={["#FFD700", "#FF6347"]}
-                style={styles.indicator}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              />
-            )}
-
-            {/* {isFocused && <View style={styles.indicator2} />} */}
-          </View>
-        );
-      })}
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  indicator2: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: "red",
-  },
-  indicator: {
-    width: 30,
-    height: 2,
-    backgroundColor: "blue",
-  },
-});

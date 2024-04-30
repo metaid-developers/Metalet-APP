@@ -4,12 +4,13 @@ import {
   TextInput,
   Image,
   TouchableWithoutFeedback,
+  NativeModules,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { navigate } from "../base/NavigationService";
 import { metaStyles } from "../constant/Constants";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { GradientAvatar } from "../constant/Widget";
+import { CustomTabBar, GradientAvatar } from "../constant/Widget";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import SplacePage from "./SplacePage";
 import WelcomeWalletPage from "./WelcomeWalletPage";
@@ -17,12 +18,153 @@ import { NavigationContainer } from "@react-navigation/native";
 import AssetsPage from "./AssetsPage";
 import FtPage from "./FtPage";
 import NftPage from "./NftPage";
+import { get, BASE_MVC_API_URL } from "../utils/Api";
+import { useData } from "../hooks/MyProvider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AsyncStorageUtil } from "../utils/AsyncStorageUtil";
+import { AddressType, BtcWallet, CoinType } from "@metalet/utxo-wallet-service";
 
+// import RNFS from "react-native-fs";
 
+// Home 开发
 const TabsTop = createMaterialTopTabNavigator();
-let defaultAvatarColor = "";
+
+type Balance = {
+  // {"address": "1C2XjqoXHRegJNnmJqGDMt3rbAcrYLX4L9", "confirmed": 17190, "unconfirmed": 0}
+  address: string;
+  confirmed: number;
+  unconfirmed: number;
+};
 
 export default function HomePage(props: any) {
+  const { accountIndex, updateAccountIndex } = useData();
+
+  const { metaletWallet, updateMetaletWallet } = useData();
+  const { myWallet, updateMyWallet } = useData();
+
+  // const walletId = "1111";
+  // const accountId = "22222";
+
+  // const walletManager = new WalletManager({
+  //   network: 'mainnet',
+  //   walletsOptions: [
+  //     {
+  //       id: walletId,
+  //       mnemonic:
+  //         'net turn first rare glide patient mask hungry damp cabbage umbrella ostrich',
+  //       // name: "walletName",
+  //       mvcTypes: [ 236],
+  //       accountsOptions: [{addressIndex: 0, id: accountId},{addressIndex: 1, id: "33333"}],
+  //     },
+  //   ],
+  // });
+
+  // const data = walletManager.getWallets();
+  // console.log(JSON.stringify(data));
+
+  // walletManager.addWallet({
+  //   id: walletId,
+  //   mnemonic:
+  //     "dream mammal settle donkey rich crew chicken sign guitar assault poem radio",
+  //   // name: "walletName",
+  //   mvcTypes: [10001, 236],
+  //   accountsOptions: [{ addressIndex: 0, id: accountId }],
+  // });
+
+  // walletManager.addAccount(walletId, { addressIndex: 1, id: "3333" });
+
+  // const chainWallets = walletManager.getAccountChainWallets(
+  //   walletId,
+  //   accountId
+  // );
+  // const mvcCustomWallet = chainWallets.mvc.find(
+  //   (wallet) => wallet.getAddressType() === AddressType.LegacyMvcCustom
+  // )!;
+  // console.log("address", mvcCustomWallet.getAddress());
+
+  // const data = walletManager.getWallets();
+  // console.log(data);
+
+  async function getMVCBalance() {
+    // let data: Balance = await get(
+    //   BASE_MVC_API_URL + "/address/1C2XjqoXHRegJNnmJqGDMt3rbAcrYLX4L9/balance"
+    // );
+    // console.log("请求结果是11： ", data.address);
+    // const dataflutter = await FlutterDatabase.getDatabaseData();
+    // console.log(dataflutter);
+  }
+
+  useEffect(() => {
+    getMVCBalance();
+    // const walletManager = new WalletManager({
+    //     network: "mainnet",
+    //     walletsOptions: [
+    //       {
+    //         id: walletId,
+    //         mnemonic:
+    //           "net turn first rare glide patient mask hungry damp cabbage umbrella ostrich",
+    //         // name: "walletName",
+    //         // mvcTypes: [10001, 236],
+    //         accountsOptions: [{ addressIndex: 0, id: accountId }],
+    //       },
+    //       ,
+    //     ],
+    //   });
+
+    initCurrentWallet();
+  }, []);
+
+  async function initCurrentWallet() {
+    console.log("当前" + JSON.stringify(myWallet));
+    const btcTaprootWallet = new BtcWallet({
+      network: "mainnet",
+      mnemonic: myWallet.mnemonic,
+      addressIndex: 0,
+      addressType: AddressType.Taproot,
+      coinType: CoinType.BTC,
+    });
+    metaletWallet.btcTaprootWallet = btcTaprootWallet;
+
+    const btcNativeSegwitWallet = new BtcWallet({
+      network: "mainnet",
+      mnemonic: myWallet.mnemonic,
+      addressIndex: 0,
+      addressType: AddressType.NativeSegwit,
+      coinType: CoinType.BTC,
+    });
+    metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
+
+    const btcNestedSegwitWallet = new BtcWallet({
+      network: "mainnet",
+      mnemonic: myWallet.mnemonic,
+      addressIndex: 0,
+      addressType: AddressType.NestedSegwit,
+      coinType: CoinType.BTC,
+    });
+    metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
+
+    const btcLegacyWallet = new BtcWallet({
+      network: "mainnet",
+      mnemonic: myWallet.mnemonic,
+      addressIndex: 0,
+      addressType: AddressType.Legacy,
+      coinType: CoinType.BTC,
+    });
+    metaletWallet.btcLegacyWallet = btcLegacyWallet;
+
+    updateMetaletWallet(metaletWallet);
+  }
+
+  const { userData, updateUserData } = useData();
+
+
+  let  userAvater
+  myWallet.accountsOptions.find((account)=>{
+    if(account.isSelect){
+      userAvater=account.defaultAvatarColor
+    }
+   })
+
   return (
     <SafeAreaView style={metaStyles.parentContainer}>
       <View
@@ -49,11 +191,23 @@ export default function HomePage(props: any) {
 
       <View style={[metaStyles.varContainer, { marginHorizontal: 30 }]}>
         <View style={[metaStyles.rowContainer, { alignItems: "center" }]}>
-          <GradientAvatar />
+          <GradientAvatar
+            isRand={false}
+            defaultAvatarColor={userAvater}
+          />
           <View style={{ marginLeft: 10 }}>
             <View style={[metaStyles.rowCenterContainer, { height: 20 }]}>
-              <Text style={metaStyles.grayTextdefault66}>Wallet A-</Text>
-              <Text style={metaStyles.defaultText}>Account 01</Text>
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  navigate("WalletsPage");
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text style={metaStyles.grayTextdefault66}>Wallet A-</Text>
+                  <Text style={metaStyles.defaultText}>Account 01</Text>
+                </View>
+              </TouchableWithoutFeedback>
+
               <Image
                 source={require("../../image/meta_last_icon.png")}
                 style={{ width: 8, height: 6, marginLeft: 5 }}
@@ -77,7 +231,7 @@ export default function HomePage(props: any) {
         >
           <TouchableWithoutFeedback
             onPress={() => {
-              console.log("click");
+              updateUserData({ ...userData, name: "校长" });
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -94,6 +248,7 @@ export default function HomePage(props: any) {
           <TouchableWithoutFeedback
             onPress={() => {
               console.log("click");
+              navigate("SetPasswordPage");
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -110,6 +265,7 @@ export default function HomePage(props: any) {
           <TouchableWithoutFeedback
             onPress={() => {
               console.log("click");
+              AsyncStorageUtil.clear();
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -125,6 +281,8 @@ export default function HomePage(props: any) {
           <TouchableWithoutFeedback
             onPress={() => {
               console.log("click");
+              updateAccountIndex(1);
+              AsyncStorageUtil.setItem("account_select", 0);
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -139,7 +297,16 @@ export default function HomePage(props: any) {
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={() => {
-              console.log("click");
+              console.log(
+                "click   " + metaletWallet.btcTaprootWallet.getAddress()
+              );
+              console.log(
+                "click   " + metaletWallet.currentBtcWallet.getAddress()
+              );
+
+              console.log(
+                "click   " + metaletWallet.btcNestedSegwitWallet.getAddress()
+              );
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -160,33 +327,34 @@ export default function HomePage(props: any) {
   );
 }
 
-
 function MyTabs() {
   return (
     <TabsTop.Navigator
       tabBarPosition="top"
-      // screenOptions={({ route }) => ({
+      tabBar={(props) => <CustomTabBar {...props} />}
+      style={{ flex: 1, marginBottom: 20, marginTop: 10 }}
+
+      // screenOptions={{
+      //   tabBarLabelStyle:{fontSize:15,fontWeight:'bold',textTransform: 'none',},
+      //   tabBarInactiveTintColor:'#666666',
+      //   tabBarActiveTintColor:'#000000',
       //   tabBarStyle:{backgroundColor:'#fff',height:50,elevation: 0 },
       //   tabBarIndicatorStyle:{backgroundColor:'#1F2CFF',height:3,width:20,marginLeft:40},
       //   tabBarItemStyle:{height:50,width:100,},//每个item 宽度
-      //   tabBarLabel: ({ focused }) => {
-      //     const fontSize = focused ? 14 : 12; // 控制选中和非选中状态的文字大小
-      //     return <Text style={{fontWeight:focused?'bold':'normal',color:focused?'#333333':'#666666',fontSize:fontSize,textTransform: 'none',}}> {route.name}</Text>
-      //   },
-      // })}
-      screenOptions={{
-        tabBarLabelStyle:{fontSize:15,fontWeight:'bold',textTransform: 'none',},
-        tabBarInactiveTintColor:'#666666',
-        tabBarActiveTintColor:'#000000',
-        tabBarStyle:{backgroundColor:'#fff',height:50,elevation: 0 },
-        tabBarIndicatorStyle:{backgroundColor:'#1F2CFF',height:3,width:20,marginLeft:40},
-        tabBarItemStyle:{height:50,width:100,},//每个item 宽度
-      }}
-      style={{ flex: 1, marginBottom: 20,marginTop: 10 }}
+      // }}
+      // style={{ flex: 1, marginBottom: 20,marginTop: 10 }}
     >
-      <TabsTop.Screen name="Assets" options={{ title: "Assets"}} component={AssetsPage} />
-      <TabsTop.Screen name="FT" options={{ title: "FT" }} component={FtPage} />
-      <TabsTop.Screen name="NFT" options={{ title: "NFT" } }component={NftPage} />
+      <TabsTop.Screen
+        name="Assets"
+        options={{ title: "Assets" }}
+        component={AssetsPage}
+      />
+      <TabsTop.Screen name="FT" options={{ title: "FTs" }} component={FtPage} />
+      <TabsTop.Screen
+        name="NFT"
+        options={{ title: "NFTs" }}
+        component={NftPage}
+      />
     </TabsTop.Navigator>
   );
 }

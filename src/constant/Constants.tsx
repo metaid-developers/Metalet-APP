@@ -110,7 +110,7 @@ export const metaStyles = StyleSheet.create({
   defaultText: {
     color: "#333333",
     fontSize: 16,
-    lineHeight: 24,
+    // lineHeight: 24,
   },
   smallDefaultText: {
     color: "#333333",
@@ -133,7 +133,23 @@ export const metaStyles = StyleSheet.create({
     fontSize: 14,
     color: "#333333",
     padding: 10,
-    textAlignVertical: "top",
+    // textAlignVertical:'auto',
+    alignItems:'center',
+    alignContent:'center',
+    justifyContent:'center'
+  },
+  textInputBorderLine: {
+    marginTop: 10,
+    borderRadius: 8,
+    backgroundColor:'#ffffff',
+    // backgroundColor: semiTransparentGray,
+    borderWidth:1,
+    borderColor:'red',
+    // padding:10,
+    fontSize: 14,
+    color: "#333333",
+    padding: 10,
+    // textAlignVertical: "top",
   },
 
   //notice red
@@ -150,6 +166,18 @@ export const metaStyles = StyleSheet.create({
     marginTop:20,
     paddingHorizontal:10,
     paddingVertical:15
+  },
+
+  //listview item
+  flatListStyle: {
+    width: "100%",
+    backgroundColor: "#F5F7F9",
+    marginTop: 10,
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    marginHorizontal:20, marginVertical:20,
   },
  
 });

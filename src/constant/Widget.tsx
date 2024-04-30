@@ -18,7 +18,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: "center",
@@ -45,6 +45,11 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 50,
   },
+  indicator: {
+    // width: 30,
+    height: 3,
+    backgroundColor: "blue",
+  },
 });
 
 //1. 白色组件填充 "#F3F3FF"
@@ -53,20 +58,62 @@ export const RoundSimButton = ({
   event,
   color = themeColor,
   textColor = themeColor,
+  roundStytle = {},
 }) => {
   return (
     <TouchableWithoutFeedback onPress={event}>
       <View
-        style={{
-          flexDirection: "row",
-          height: 48,
-          width: "100%",
-          backgroundColor: color,
-          borderRadius: 25,
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 20,
-        }}
+        style={[
+          roundStytle,
+          {
+            flexDirection: "row",
+            height: 48,
+            width: "100%",
+            backgroundColor: color,
+            borderRadius: 23,
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 20,
+          },
+        ]}
+      >
+        <Text
+          style={[
+            { textAlign: "center" },
+            { color: textColor },
+            { fontSize: 16 },
+          ]}
+        >
+          {title}
+        </Text>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+};
+
+export const RoundSimButtonFlee = ({
+  title,
+  event,
+  color = themeColor,
+  textColor = themeColor,
+  style = {},
+}) => {
+  return (
+    <TouchableWithoutFeedback onPress={event}>
+      <View
+        style={[
+          {
+            flexDirection: "row",
+            height: 48,
+            width: "100%",
+            backgroundColor: color,
+            borderRadius: 23,
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 20,
+          },
+          style,
+        ]}
       >
         <Text
           style={[
@@ -95,7 +142,7 @@ export const TitleBar = ({
         style={{
           flexDirection: "row",
           marginLeft: 20,
-          marginTop: 20,
+          marginTop: 5,
           height: 44,
           alignItems: "center",
         }}
@@ -104,7 +151,18 @@ export const TitleBar = ({
           source={require("../../image/meta_back_icon.png")}
           style={{ width: 22, height: 22 }}
         />
-        <Text style={[{ marginLeft: 10 }, metaStyles.titleText]}>{title}</Text>
+        <Text
+          style={[
+            { textAlign: "center", flex: 1, marginRight: 40 },
+            metaStyles.titleText,
+          ]}
+        >
+          Edit
+          {/* {title} */}
+        </Text>
+       
+       <Text style={{marginRight:20,color:"#333",fontSize:16}}> </Text>
+
       </View>
     </TouchableWithoutFeedback>
   );
@@ -165,10 +223,12 @@ export const LoadingModal = ({
 };
 
 const defaultAvatarColor = [];
-
+// const defaultAvatarColor2 = [];
 //5. avater
-export const GradientAvatar = () => {
-  const getRandomColor = () => {
+// export const GradientAvatar = ({ isRand = false, userStyle = {} }) => {
+//  export const GradientAvatar = React.memo(({ userStyle = {}, isRand = false , defaultAvatarColor = []}: { userStyle?: object; isRand?: boolean ;defaultAvatarColor?:string []}) => {
+ export const GradientAvatar = ({ userStyle = {}, isRand = false , defaultAvatarColor = []}: { userStyle?: object; isRand?: boolean ;defaultAvatarColor?:string []}) => {
+    const getRandomColor = () => {
     const letters = "0123456789ABCDEF";
     let color = "#";
     for (let i = 0; i < 6; i++) {
@@ -179,13 +239,23 @@ export const GradientAvatar = () => {
   if (defaultAvatarColor.length == 0) {
     defaultAvatarColor[0] = getRandomColor();
     defaultAvatarColor[1] = getRandomColor();
+  } else {
+    // if (isRand) {
+    //   defaultAvatarColor2[0] = getRandomColor();
+    //   defaultAvatarColor2[1] = getRandomColor();
+    // }
   }
 
-  // const randomGradientColors = [ defaultAvatarColor[0], defaultAvatarColor[1]];
-  const randomGradientColors = [defaultAvatarColor[0], defaultAvatarColor[1]];
+  const randomGradientColors = [ defaultAvatarColor[0], defaultAvatarColor[1]];
+  // let randomGradientColors;
+  // if (isRand) {
+  //   randomGradientColors = [defaultAvatarColor2[0], defaultAvatarColor2[1]];
+  // } else {
+  //   randomGradientColors = [defaultAvatarColor[0], defaultAvatarColor[1]];
+  // }
 
   return (
-    <View style={styles.avaterContainer}>
+    <View style={[styles.avaterContainer, userStyle]}>
       <LinearGradient
         colors={randomGradientColors}
         style={styles.avaterGradient}
@@ -194,10 +264,11 @@ export const GradientAvatar = () => {
       />
     </View>
   );
-};
+}
+// )
 
 // 6. no more data view
-export const NoMoreDataView = ({isShow=false}) => {
+export const NoMoreDataView = ({ isShow = false }) => {
   return (
     <View
       style={{
@@ -206,9 +277,9 @@ export const NoMoreDataView = ({isShow=false}) => {
         alignItems: "center",
         width: "100%",
         height: "100%",
-        opacity: isShow?1:0,
+        // opacity: isShow?1:0,
       }}
-     >
+    >
       <Image
         source={require("../../image/meta_no_more_data_icon.png")}
         style={{ width: 38, height: 53 }}
@@ -216,6 +287,127 @@ export const NoMoreDataView = ({isShow=false}) => {
 
       <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
         No more data
+      </Text>
+    </View>
+  );
+};
+
+//7.custom tabbar 自定义切换头部
+export const CustomTabBar = ({
+  state,
+  descriptors,
+  navigation,
+  isShowIndicator = true,
+  isSmallTitle = false,
+}) => {
+  return (
+    <View style={{ flexDirection: "row", backgroundColor: "white" }}>
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const label = options.title !== undefined ? options.title : route.name;
+
+        const isFocused = state.index === index;
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: "tabPress",
+            target: route.key,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
+        let fontSize = isSmallTitle ? 12 : 16;
+        return (
+          <TouchableOpacity activeOpacity={1} key={route.key} onPress={onPress}>
+            <View style={{ alignItems: "center" }}>
+              <Text
+                key={index}
+                style={{
+                  fontSize: isFocused ? fontSize : fontSize,
+                  marginHorizontal: 10,
+                  marginVertical: 5,
+                  fontWeight: isFocused ? "bold" : "normal",
+                  color: isFocused ? "#333333" : "#666666",
+                }}
+              >
+                {label}
+              </Text>
+              {isFocused && isShowIndicator && (
+                <LinearGradient
+                  // colors={["#FFD700", "#FF6347"]}
+                  colors={["#6CE5F7", "#1F2CFF"]}
+                  style={[styles.indicator, { width: label.length * 5 }]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                />
+              )}
+
+              {/* {isFocused && <View style={styles.indicator2} />} */}
+            </View>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+};
+
+/////////////////////////////////////////////////////////////////////////////////
+// 8.圆形头像 组件
+export const CircleAvatar = ({
+  imageUrl,
+  widthC = 50,
+  heightC = 50,
+  event = () => {},
+}) => {
+  return (
+    <View
+      style={{
+        width: widthC,
+        height: heightC,
+        borderRadius: 50,
+        overflow: "hidden",
+      }}
+    >
+      <Image
+        style={{ width: "100%", height: "100%" }}
+        source={{ uri: imageUrl }}
+        onError={event}
+      />
+    </View>
+  );
+};
+
+/////////////////////////////////////////////////////////////////////////////////
+// 8.圆形头像 首字母
+export const CircleAvatarLetter = ({
+  letterStr,
+  widthC = 50,
+  heightC = 50,
+}) => {
+  return (
+    <View
+      style={{
+        width: widthC,
+        height: heightC,
+        borderRadius: 50,
+        overflow: "hidden",
+        backgroundColor: "#171AFF",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Text
+        style={{
+          textAlign: "center",
+          color: "#fff",
+          fontSize: 16,
+          fontWeight: "bold",
+        }}
+      >
+        {letterStr.toUpperCase()}
       </Text>
     </View>
   );

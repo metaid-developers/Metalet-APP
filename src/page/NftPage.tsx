@@ -1,12 +1,52 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { metaStyles } from '../constant/Constants'
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from "react-native";
+import React, { useState } from "react";
+import { metaStyles } from "../constant/Constants";
+import { CustomTabBar, NoMoreDataView } from "../constant/Widget";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import BtcFtPage from "./BtcFtPage";
+import MvcFtPage from "./MvcFtpage";
+import { Title } from "react-native-paper";
+import { LinearGradient } from "expo-linear-gradient";
+import BtcNftPage from "./BtcNftPage";
+import MvcNftPage from "./MvcNftPage";
 
+
+
+const TabsTop = createMaterialTopTabNavigator();
 
 export default function NftPage() {
   return (
-    <View style={metaStyles.centerContainer}>
-      <Text>NftPage</Text>
+    <View style={[metaStyles.varContainer,{backgroundColor:"#fff"}]}>
+       <TabsTopNavigator />
     </View>
   )
+}
+
+
+
+
+function TabsTopNavigator() {
+  return (
+    <TabsTop.Navigator
+      tabBar={(props) => <CustomTabBar {...props } isShowIndicator={false} isSmallTitle={true} />}
+      style={{ flex: 1,  marginTop: 10 }}
+    >
+      <TabsTop.Screen
+        name="BtcNftPage"
+        options={{ title: "Bitcoin" }}
+        component={BtcNftPage}
+      />
+      <TabsTop.Screen
+        name="MvcNftPage"
+        options={{ title: "Space" }}
+        component={MvcNftPage}
+      />
+    </TabsTop.Navigator>
+  );
 }

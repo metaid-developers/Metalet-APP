@@ -1,5 +1,13 @@
-import { View, Text, TextInput, Image ,Modal,Button,StyleSheet} from "react-native";
-import React, { useCallback ,useState} from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Image,
+  Modal,
+  Button,
+  StyleSheet,
+} from "react-native";
+import React, { useCallback, useState } from "react";
 import {
   RoundSimButton,
   TitleBar,
@@ -13,30 +21,167 @@ import EasyToast from "react-native-easy-toast";
 import { ActivityIndicator } from "react-native-paper";
 
 import { LinearGradient } from "expo-linear-gradient";
+import {AsyncStorageUtil, wallets_key} from "../utils/AsyncStorageUtil";
+
+import { useData } from "../hooks/MyProvider";
+import { AccountsOptions, WalletBean } from "../bean/WalletBean";
+import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
+import { AddressType } from "@metalet/utxo-wallet-service";
+import { getRandomColorList } from "../utils/MetaFunUiils";
 
 export default function SetPasswordPage(props) {
   const toastRef = useEasyToast("center");
+  const [mnemonic, setMneMonic] = useState("");
+  const { walletManager, updateWalletManager } = useData();
 
   // const showToast = useCallback(() => {
   //   toastRef.current?.show('Hello World!', 2000, () => console.log('Toast dismissed'));
   // }, [toastRef]);
-  const closeModal=()=>{
-    setObj({...obj,isShow:false})
-    setTimeout(()=>{
-      setObj({...obj,isShow:true})
-    },2000);
-  }
-  const OpenModal=()=>{
-    setObj({...obj,isShow:true})
-    setTimeout(()=>{
-      setObj({...obj,isShow:false})
+  const closeModal = () => {
+    setObj({ ...obj, isShow: false });
+    setTimeout(() => {
+      setObj({ ...obj, isShow: true });
+    }, 2000);
+  };
+  const OpenModal = () => {
+    setObj({ ...obj, isShow: true });
+
+    AsyncStorageUtil.getItem(wallets_key).then(async (value) => {
+
+      console.log(value);
+      //wallet
+      let walletName;
+      let walletID = Math.random().toString(36).substr(2, 8);
+      let mvcTypes = 236;
+
+      //account
+      let accountName = "Account 1";
+      let accountID = Math.random().toString(36).substr(2, 8);
+      let accountAddressIndex = 0;
+
+      if (value != null && value.length > 0) {
+
+        //插入Wallet 写法
+        walletName = "Wallet " + (value.length + 1);
+        let walletBean: WalletBean = {
+          id: walletID,
+          name: walletName,
+          mnemonic,
+          mvcTypes,
+          isOpen: true,
+          addressTpye:AddressType.Legacy,
+          accountsOptions: [
+            {
+              id: accountID,
+              name: accountName,
+              addressIndex: accountAddressIndex,
+              isSelect: true,
+              defaultAvatarColor:getRandomColorList()
+            },
+          ],
+        };
+
+        // const updataWallets=[...value,walletBean]
+        const updataWallets=addWallet(value,walletBean)
+        await AsyncStorageUtil.updateItem(wallets_key, updataWallets);
+  
+        // const myWalletManager = new MetaletWalletManager({
+        //   network: "mainnet",
+        //   walletsOptions: [
+        //     {
+        //       id: walletID,
+        //       mnemonic: mnemonic,
+        //       name: walletName,
+        //       mvcTypes: [mvcTypes],
+        //       accountsOptions: [
+        //         {
+        //           id: accountID,
+        //           name: accountName,
+        //           addressIndex: accountAddressIndex,
+        //         },
+        //       ],
+        //     },
+        //   ],
+        // });
+  
+        // updateWalletManager(myWalletManager);
+
+
+      } else {
+        walletName = "Wallet 1";
+        //新增的写法
+        let walletBean: WalletBean = {
+          id: walletID,
+          name: walletName,
+          mnemonic,
+          mvcTypes,
+          isOpen: true,
+          addressTpye:AddressType.Legacy,
+          accountsOptions: [
+            {
+              id: accountID,
+              name: accountName,
+              addressIndex: accountAddressIndex,
+              isSelect: true,
+              defaultAvatarColor:getRandomColorList()
+
+            },
+          ],
+        };
+        let initWallets = [walletBean];
+        await AsyncStorageUtil.updateItem(wallets_key, initWallets);
+  
+        const myWalletManager = new MetaletWalletManager({
+          network: "mainnet",
+          walletsOptions: [
+            {
+              id: walletID,
+              mnemonic: mnemonic,
+              name: walletName,
+              mvcTypes: [mvcTypes],
+              accountsOptions: [
+                {
+                  id: accountID,
+                  name: accountName,
+                  addressIndex: accountAddressIndex,
+                },
+              ],
+            },
+          ],
+        });
+  
+        updateWalletManager(myWalletManager);
+
+      }
+
+     
+
+    });
+
+    setTimeout(() => {
+      setObj({ ...obj, isShow: false });
       // props.navigation.navigate('HomePage')
-      props.navigation.navigate('CongratulationsPage',{type:'Imported Successfully'})
 
-    },2000);
+      props.navigation.navigate("CongratulationsPage", {
+        type: "Imported Successfully",
+        type3: ":sldkfj",
+      });
+    }, 4000);
+  };
+
+
+  const addWallet=(wallets, newWallet)=>{
+    wallets.forEach(wallet => {
+      wallet.accountsOptions.forEach(account => {
+        account.isSelect = false;
+      });
+    });
+
+    return [...wallets,newWallet];
   }
 
-  const [obj, setObj] = useState({ title: "", isShow: false ,isCancel:false});
+
+  const [obj, setObj] = useState({ title: "", isShow: false, isCancel: false });
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -44,16 +189,19 @@ export default function SetPasswordPage(props) {
       <TitleBar />
 
       <View style={[metaStyles.verMarginContainer, { marginBottom: 50 }]}>
-      
-      <LoadingModal   isCancel={obj.isCancel} isShow={obj.isShow} title={obj.title} event={closeModal}/>
-       
+        <LoadingModal
+          isCancel={obj.isCancel}
+          isShow={obj.isShow}
+          title={obj.title}
+          event={closeModal}
+        />
+
         <Text style={metaStyles.largeDefaultText}>
-          Enter your mnemonic phrase or private key
+          Enter your mnemonic phrase
         </Text>
         <Text style={[metaStyles.smallDefaultText, { marginTop: 20 }]}>
           Separate mnemonic words with spaces. Supports the import of 12-digit,
-          18-digit, and 24-digit mnemonic phrases or private keys from any
-          wallet.
+          18-digit, and 24-digit mnemonic phrases from any wallet.
         </Text>
         <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>
           Please Enter
@@ -61,10 +209,16 @@ export default function SetPasswordPage(props) {
 
         <View>
           <TextInput
-            placeholder="Enter your mnemonic phrase or private key"
+            placeholder="Enter your mnemonic phrase"
             multiline={true}
             numberOfLines={6}
-            style={metaStyles.textInputDefault}
+            style={[
+              metaStyles.textInputDefault,
+              { paddingVertical: 30, height: 135 },
+            ]}
+            onChangeText={(text) => {
+              setMneMonic(text);
+            }}
           />
         </View>
 
@@ -81,7 +235,7 @@ export default function SetPasswordPage(props) {
                 fontWeight: "bold",
                 marginLeft: 5,
               }}
-             >
+            >
               Warning!{" "}
             </Text>
           </View>
@@ -92,7 +246,7 @@ export default function SetPasswordPage(props) {
         </View>
 
         <View style={{ flex: 1 }} />
-   
+
         {/* <GradientAvatar/> */}
         <RoundSimButton
           title="Confirm"
@@ -105,9 +259,7 @@ export default function SetPasswordPage(props) {
             // toastRef.current?.show('Hello World!', 2000, () => console.log('Toast dismissed'));
 
             // showToast()
-            OpenModal()
-            
-
+            OpenModal();
           }}
         />
       </View>
@@ -116,21 +268,17 @@ export default function SetPasswordPage(props) {
 }
 
 const styles = StyleSheet.create({
-  
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     // backgroundColor: 'rgba(0, 0, 0, 0.1)',
-  
   },
   modalView: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
     // elevation: 5,
-    
   },
-  
 });

@@ -24,7 +24,18 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.show.mvc.mvcwallet",
-      "versionCode": 1
+      "versionCode": 16,
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA_ROLL"
+      ],
+      "keystore":{
+        "keystorePath":"/Users/simkeep/RN/Metalet/metalet.jks",
+        "keystorePassword": "123456",
+        "keyAlias": "key0",
+        "keyPassword": "123456"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

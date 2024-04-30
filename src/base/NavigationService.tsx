@@ -10,10 +10,10 @@ export function setTopLevelNavigator(navigatorRef) {
 }
 
 // 全局跳转的方法
-export function navigate(routeName) {
+export function navigate(routeName,myObject?) {
   if (_navigator) {
     // 对于react-navigation v5+
-    _navigator.navigate(routeName);
+    _navigator.navigate(routeName,myObject);
   } else {
     console.warn("Can't navigate without a navigator!");
   }
