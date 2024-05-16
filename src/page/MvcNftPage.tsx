@@ -8,28 +8,34 @@ import { MvcGenesisItem ,MvcNftDetailItemList,RootMvcNftObject} from "../bean/Mv
 import { getShowImageUrl } from "../utils/MetaFunUiils";
 import { useFocusEffect } from "@react-navigation/native";
 import { useData } from "../hooks/MyProvider";
+import { eventBus, refreshMvcFtEvent } from "../utils/EventBus";
 export default function MvcNftPage(props) {
   let [nftList, setNftList] = useState<MvcGenesisItem[]>([]);
   const { walletManager, updateWalletManager } = useData();
   const {accountIndex,updateAccountIndex}=useData();
-  const { metaletWallet, updateMetaletWallet } = useData();
+  const { mvcAddress, updateMvcAddress } = useData();
 
   useEffect(() => {
-    getMvcNft();
+    getMvcNft(mvcAddress);
   }, []);
 
-  useFocusEffect(
-    React.useCallback(() => {
-     console.log('获取焦点');
-    setTimeout(() => {
-      getMvcNft();
-    }, 1000)
-    // nftList.splice(2,1)
-    // setNftList([...nftList])
-    }, [])
-  );
+  useEffect(() => {
+    getMvcNft(mvcAddress);
+  }, [mvcAddress]);
 
-  async function getMvcNft() {
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //    console.log("MvcNftPage  useFocusEffect :"+mvcAddress);
+  //   setTimeout(() => {
+  //     getMvcNft(mvcAddress);
+  //   }, 1000)
+  //   // nftList.splice(2,1)
+  //   // setNftList([...nftList])
+  //   }, [])
+  // );
+
+  async function getMvcNft(address:string) {
     let params = {
       page: 1,
       pageSize: 300,
@@ -38,13 +44,19 @@ export default function MvcNftPage(props) {
     let data: RootMvcNftObject = await get(
       BASE_METALET_URL +
         "/aggregation/v2/app/show/nft/" +
-        metaletWallet.currentMvcWallet.getAddress() +
+        address+
         "/summary",
       false,
       params
     );
     if (data.data.results.items != null) {
-      setNftList(data.data.results.items);
+       // setNftList(data.data.results.items);
+      console.log('有数据刷新');
+      setNftList([...data.data.results.items]);
+      // setBtcFtList([...data.data.list]);
+    }else{
+      console.log('无有数据刷新');
+      setNftList([]);
     }
   }
 
@@ -111,7 +123,7 @@ export default function MvcNftPage(props) {
             renderItem={ListItem}
             refreshing={false}
             onRefresh={()=>{
-              getMvcNft()
+              getMvcNft(mvcAddress)
             }}
           />
         </View>

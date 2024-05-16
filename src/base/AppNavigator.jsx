@@ -26,7 +26,21 @@ import MvcNftDetailPage from "../page/MvcNftDetailPage";
 import TransferMvcNftPage from "../page/TransferMvcNftPage";
 import WalletsPage from "../page/WalletsPage";
 import AddWalletPage from "../page/wallet/AddWalletPage";
-
+import WalletDetailPage from "../page/wallet/WalletDetailPage";
+import WalletDetelePage from "../page/wallet/WalletDetelePage";
+import WalletAccountDetailPage from "../page/wallet/WalletAccountDetailPage";
+import AccountAddressPage from "../page/wallet/AccountAddressPage";
+import NetWorkPage from "../page/NetWorkPage";
+import FtMvcPage from "../page/nft/FtMvcPage";
+import FtBtcPage from "../page/nft/FtBtcPage";
+import FtParentPage from "../page/nft/FtParentPage";
+import SelectReceivePage from "../page/receive/SelectReceivePage";
+import ReceivePage from "../page/receive/ReceivePage";
+import WebPage from "../webs/WebPage";
+import WebPageTest from "../webs/WebPageTest";
+import WebsPage from "../webs/WebsPage";
+import AssetsMvcDetailPage from "../page/home/AssetsMvcDetailPage";
+import AssetsBtcDetailPage from "../page/home/AssetsBtcDetailPage";
 
 ////////
 
@@ -62,12 +76,28 @@ const StackNavigator = () => (
     <Stack.Screen name="SplacePage" component={SplacePage} />
     <Stack.Screen name="WelcomeWalletPage" component={WelcomeWalletPage} />
     <Stack.Screen name="CongratulationsPage" component={CongratulationsPage} />
-    <Stack.Screen name="Tabs" component={TabNavigator} />
+    <Stack.Screen name="Tabs" component={TabNavigator} options={{ unmountOnBlur: false }} />
     <Stack.Screen name="MvcNftListPage" component={MvcNftListPage} />
     <Stack.Screen name="MvcNftDetailPage" component={MvcNftDetailPage} />
     <Stack.Screen name="TransferMvcNftPage" component={TransferMvcNftPage} />
     <Stack.Screen name="WalletsPage" component={WalletsPage} />
     <Stack.Screen name="AddWalletPage" component={AddWalletPage} />
+    <Stack.Screen name="WalletDetailPage" component={WalletDetailPage} />
+    <Stack.Screen name="WalletDetelePage" component={WalletDetelePage} />
+    <Stack.Screen name="WalletAccountDetailPage" component={WalletAccountDetailPage} />
+    <Stack.Screen name="AccountAddressPage" component={AccountAddressPage} />
+    <Stack.Screen name="NetWorkPage" component={NetWorkPage} />
+    <Stack.Screen name="SelectReceivePage" component={SelectReceivePage} />
+    <Stack.Screen name="ReceivePage" component={ReceivePage} />
+    <Stack.Screen name="WebPage" component={WebPage} />
+    <Stack.Screen name="WebPageTest" component={WebPageTest} />
+    <Stack.Screen name="WebsPage" component={WebsPage} />
+    <Stack.Screen name="AssetsMvcDetailPage" component={AssetsMvcDetailPage} />
+    <Stack.Screen name="AssetsBtcDetailPage" component={AssetsBtcDetailPage} />
+
+
+
+
   </Stack.Navigator>
 );
 

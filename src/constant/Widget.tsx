@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Modal,
   LayoutChangeEvent,
+  TextInput,
 } from "react-native";
 import { metaStyles, themeColor } from "../constant/Constants";
 import { goBack } from "../base/NavigationService";
@@ -17,12 +18,22 @@ import EasyToast from "react-native-easy-toast";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
+import QRCode from "react-native-qrcode-svg";
 
 export const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+
+    // backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  centeredView2: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginBottom: 30,
+
     // backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
   modalView: {
@@ -49,6 +60,8 @@ export const styles = StyleSheet.create({
     // width: 30,
     height: 3,
     backgroundColor: "blue",
+    marginRight: 20,
+    alignItems: "center",
   },
 });
 
@@ -153,20 +166,64 @@ export const TitleBar = ({
         />
         <Text
           style={[
-            { textAlign: "center", flex: 1, marginRight: 40 },
+            { textAlign: "center", marginRight: 40, marginLeft: 15 },
             metaStyles.titleText,
           ]}
         >
-          Edit
-          {/* {title} */}
+          {title}
         </Text>
-       
-       <Text style={{marginRight:20,color:"#333",fontSize:16}}> </Text>
 
+        <Text style={{ marginRight: 20, color: "#333", fontSize: 16 }}> </Text>
       </View>
     </TouchableWithoutFeedback>
   );
 };
+
+// export const TitleImgBar = ({
+//   title = "",
+//   rightImg="",
+//   event = (props) => {
+//     goBack();
+//   },
+//   rightevent = () => {},
+ 
+// }) => {
+//   return (
+//     <View
+//       style={{
+//         flexDirection: "row",
+//         marginLeft: 20,
+//         marginTop: 5,
+//         height: 44,
+//         alignItems: "center",
+//       }}
+//     >
+//       <TouchableWithoutFeedback onPress={event}>
+//         <Image
+//           source={require("../../image/meta_back_icon.png")}
+//           style={{ width: 22, height: 22 }}
+//         />
+//       </TouchableWithoutFeedback>
+//       <Text
+//         style={[
+//           { textAlign: "center", marginRight: 40, marginLeft: 15, flex: 1 },
+//           metaStyles.titleText,
+//         ]}
+//       >
+//         {title}
+//       </Text>
+
+//       <TouchableWithoutFeedback onPress={rightevent}>
+//         <Image
+//           source={require(rightImg)}
+//           style={{ width: 22, height: 22 }}
+//         />
+//       </TouchableWithoutFeedback>
+
+//       <Text style={{ marginRight: 20, color: "#333", fontSize: 16 }}> </Text>
+//     </View>
+//   );
+// };
 
 //3.hook toast
 export const useEasyToast = (position: "top" | "bottom" | "center") => {
@@ -222,13 +279,47 @@ export const LoadingModal = ({
   );
 };
 
+//5.loading Modal 弹框来着
+export const LoadingNoticeModal = ({
+  isShow = true,
+  title = "",
+  isCancel = true,
+  event = () => {},
+}) => {
+  return (
+    <Modal transparent={true} visible={isShow}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (isCancel) {
+            event();
+          }
+        }}
+      >
+        <View style={styles.centeredView2}>
+          <View style={styles.modalView}>
+            <Text style={{ color: "#fff", fontSize: 16 }}>{title}</Text>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
+  );
+};
+
 const defaultAvatarColor = [];
 // const defaultAvatarColor2 = [];
-//5. avater
+//6. avater
 // export const GradientAvatar = ({ isRand = false, userStyle = {} }) => {
 //  export const GradientAvatar = React.memo(({ userStyle = {}, isRand = false , defaultAvatarColor = []}: { userStyle?: object; isRand?: boolean ;defaultAvatarColor?:string []}) => {
- export const GradientAvatar = ({ userStyle = {}, isRand = false , defaultAvatarColor = []}: { userStyle?: object; isRand?: boolean ;defaultAvatarColor?:string []}) => {
-    const getRandomColor = () => {
+export const GradientAvatar = ({
+  userStyle = {},
+  isRand = false,
+  defaultAvatarColor = [],
+}: {
+  userStyle?: object;
+  isRand?: boolean;
+  defaultAvatarColor?: string[];
+}) => {
+  const getRandomColor = () => {
     const letters = "0123456789ABCDEF";
     let color = "#";
     for (let i = 0; i < 6; i++) {
@@ -246,7 +337,7 @@ const defaultAvatarColor = [];
     // }
   }
 
-  const randomGradientColors = [ defaultAvatarColor[0], defaultAvatarColor[1]];
+  const randomGradientColors = [defaultAvatarColor[0], defaultAvatarColor[1]];
   // let randomGradientColors;
   // if (isRand) {
   //   randomGradientColors = [defaultAvatarColor2[0], defaultAvatarColor2[1]];
@@ -264,10 +355,10 @@ const defaultAvatarColor = [];
       />
     </View>
   );
-}
+};
 // )
 
-// 6. no more data view
+// 7. no more data view
 export const NoMoreDataView = ({ isShow = false }) => {
   return (
     <View
@@ -292,7 +383,7 @@ export const NoMoreDataView = ({ isShow = false }) => {
   );
 };
 
-//7.custom tabbar 自定义切换头部
+//8.custom tabbar 自定义切换头部
 export const CustomTabBar = ({
   state,
   descriptors,
@@ -327,10 +418,13 @@ export const CustomTabBar = ({
                 key={index}
                 style={{
                   fontSize: isFocused ? fontSize : fontSize,
-                  marginHorizontal: 10,
+                  // marginHorizontal: 10,
+                  // paddingRight: 15,
                   marginVertical: 5,
                   fontWeight: isFocused ? "bold" : "normal",
                   color: isFocused ? "#333333" : "#666666",
+                  paddingRight: 20,
+                  textAlign: "center",
                 }}
               >
                 {label}
@@ -339,7 +433,7 @@ export const CustomTabBar = ({
                 <LinearGradient
                   // colors={["#FFD700", "#FF6347"]}
                   colors={["#6CE5F7", "#1F2CFF"]}
-                  style={[styles.indicator, { width: label.length * 5 }]}
+                  style={[styles.indicator, { width: label.length * 4 }]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                 />
@@ -355,7 +449,7 @@ export const CustomTabBar = ({
 };
 
 /////////////////////////////////////////////////////////////////////////////////
-// 8.圆形头像 组件
+// 9.圆形头像 组件
 export const CircleAvatar = ({
   imageUrl,
   widthC = 50,
@@ -381,7 +475,7 @@ export const CircleAvatar = ({
 };
 
 /////////////////////////////////////////////////////////////////////////////////
-// 8.圆形头像 首字母
+// 10.圆形头像 首字母
 export const CircleAvatarLetter = ({
   letterStr,
   widthC = 50,
@@ -409,6 +503,139 @@ export const CircleAvatarLetter = ({
       >
         {letterStr.toUpperCase()}
       </Text>
+    </View>
+  );
+};
+
+//11.loading Modal 弹框来着
+export const VerifyModal = ({
+  isShow = true,
+  title = "",
+  isCancel = true,
+  event = (inputText: string) => {},
+  eventCancel = () => {},
+}) => {
+  const [inputText, setInputText] = useState("");
+
+  return (
+    <Modal transparent={true} visible={isShow}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "flex-end",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "#fff",
+            borderRadius: 10,
+            padding: 20,
+            marginBottom: 20,
+          }}
+        >
+          <View style={{ flexDirection: "row" }}>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              Verify Password
+            </Text>
+            <View style={{ flex: 1 }} />
+
+            <TouchableWithoutFeedback
+              onPress={() => {
+                eventCancel();
+              }}
+            >
+              <Image
+                source={require("../../image/metalet_close_big_icon.png")}
+                style={{ width: 15, height: 15 }}
+              />
+            </TouchableWithoutFeedback>
+          </View>
+
+          <Text style={{ marginTop: 20, color: "#666", fontSize: 14 }}>
+            Please enter your wallet password
+          </Text>
+
+          <View
+            style={{
+              alignItems: "center",
+              borderColor: "#171AFF",
+              // backgroundColor:'#F5F7F9',
+              flexDirection: "row",
+              borderWidth: 1,
+              height: 50,
+              borderRadius: 30,
+              marginTop: 20,
+            }}
+          >
+            <TextInput
+              multiline={true}
+              // placeholder={editWalletName}
+              autoCapitalize={"none"}
+              onChangeText={setInputText}
+              style={{
+                width: "100%",
+                backgroundColor: "transparent",
+                marginLeft: 10,
+                paddingRight: 20,
+              }}
+            />
+          </View>
+
+          <TouchableWithoutFeedback
+            onPress={async () => {
+              event(inputText);
+            }}
+          >
+            <View
+              style={{
+                marginTop: 20,
+                marginBottom: 20,
+                height: 20,
+                width: "100%",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={[
+                  {
+                    flexDirection: "row",
+                    height: 48,
+                    width: 200,
+                    backgroundColor: "rgba(23, 26, 255, 1)",
+                    // backgroundColor: isCanReName
+                    //   ? "rgba(23, 26, 255, 1)"
+                    // : "rgba(23, 26, 255, 0.5)",
+                    borderRadius: 30,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 20,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    { textAlign: "center" },
+                    { color: "#fff" },
+                    { fontSize: 16 },
+                  ]}
+                >
+                  Confirm
+                </Text>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+// 12 显示二维码
+export const MyQrCode = ({ qrData, size }) => {
+  return (
+    <View style={{ justifyContent: "center", alignItems: "center" }}>
+      <QRCode value={qrData} size={size} />
     </View>
   );
 };

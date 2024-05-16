@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput } from "react-native";
+import { View, Text, Image, TextInput, ImageBackground, Dimensions } from "react-native";
 import React, { useEffect } from "react";
 import { metaStyles } from "../constant/Constants";
 import { useData } from "../hooks/MyProvider";
@@ -18,11 +18,15 @@ import {
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { TypeTest } from "../wallet/TypeTest";
 import MetaletWallet from "../wallet/MetaletWallet";
+import { WalletBean } from "../bean/WalletBean";
+
 
 export default function SplacePage(props) {
   const { myWallet, updateMyWallet } = useData();
   const { walletManager, updateWalletManager } = useData();
   const { accountIndex, updateAccountIndex } = useData();
+  const {width,height} =Dimensions.get('window');
+
 
   //钱包
   const { metaletWallet, updateMetaletWallet } = useData();
@@ -42,10 +46,10 @@ export default function SplacePage(props) {
     });
 
     AsyncStorageUtil.getItem(wallets_key).then((value) => {
-      if (value != null) {
+      if (value != null&&value.length>0) {
         // console.log("value", value);
         for (let i = 0; i < value.length; i++) {
-          let wallet = value[i];
+          let wallet : WalletBean = value[i];
           for (let q = 0; q < wallet.accountsOptions.length; q++) {
             let account = wallet.accountsOptions[q];
             // console.log("account", account);
@@ -71,7 +75,8 @@ export default function SplacePage(props) {
                 network: "mainnet",
                 mnemonic: wallet.mnemonic,
                 addressIndex: account.addressIndex,
-                addressType: AddressType.SameAsMvc,
+                addressType: wallet.addressTpye,
+                //选中跟mvc 路径一致
                 coinType: wallet.mvcTypes,
               });
               // console.log(btcWallet.getAddress());
@@ -157,6 +162,10 @@ export default function SplacePage(props) {
   }
 
   return (
+    // <ImageBackground source={require("../../assets/splash.png")}>
+
+    // <View style={{ flex: 1 }} />
+    // </ImageBackground>
     <View
       style={{
         flex: 1,
@@ -166,14 +175,15 @@ export default function SplacePage(props) {
       }}
     >
       <Image
-        source={require("../../image/me_app_icon.png")}
-        style={metaStyles.splaceImage}
+        source={require("../../assets/splash.png")}
+        style={{width:'100%',height:'100%'}}
+
       />
-      <Text
+      {/* <Text
         style={[{ marginTop: 10 }, { fontWeight: "bold" }, { fontSize: 22 }]}
       >
         METALET
-      </Text>
+      </Text> */}
     </View>
   );
 }

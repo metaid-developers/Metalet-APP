@@ -5,7 +5,7 @@ import {
   TouchableWithoutFeedback,
   StyleSheet,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   CircleAvatar,
   CircleAvatarLetter,
@@ -15,32 +15,66 @@ import { metaStyles } from "../constant/Constants";
 import { BtcFtBean, RootBtcFtObject } from "../bean/BtcFtBean";
 import { BTC_FT_URL, get } from "../utils/Api";
 import { useData } from "../hooks/MyProvider";
+import { useFocusEffect } from "@react-navigation/native";
+import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
 
 export default function BtcFtPage() {
   let [btcFtList, setBtcFtList] = useState<BtcFtBean[]>([]);
   const { walletManager, updateWalletManager } = useData();
-  const {accountIndex,updateAccountIndex}=useData();
+  const { accountIndex, updateAccountIndex } = useData();
 
   const { metaletWallet, updateMetaletWallet } = useData();
-  
+  const { btcAddress, updateBtcAddress } = useData();
+  const { netWork, updateNetWork } = useData();
+
+  // const isFocused = useIsFocused(); // 使用useIsFocused钩子
+
   useEffect(() => {
-    getBtcFtData();
+    getBtcFtData(btcAddress);
   }, []);
 
-  const getBtcFtData = async () => {
+  useEffect(() => {
+    getBtcFtData(btcAddress);
+  }, [btcAddress]);
+
+
+  // useEffect(() => {
+  
+
+  //   // getBtcFtData(btcAddress);
+  // }, [btcAddress]);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     console.log('地址变化加载中 ',{ btcAddress });
+  //     getBtcFtData(btcAddress);
+  //   }, [btcAddress])
+  // );
+
+  const getBtcFtData = async (address: string) => {
     let params = {
       net: "mainnet",
-      address: metaletWallet.currentBtcWallet.getAddress(),
+      // address: metaletWallet.currentBtcWallet.getAddress(),
+      address: address,
       ticker: "btc",
       cursor: 0,
       size: 10000,
     };
 
     let data: RootBtcFtObject = await get(BTC_FT_URL, false, params);
-      if(data.data!=null){
-        if (data.data.list != null) {
-        setBtcFtList(data.data.list);
+    if (data.data != null) {
+      if (data.data.list != null) {
+        console.log(
+          "getBtcFtData  重新获取接口数据： ",
+          data.data.list,
+          data.data.list.length
+        );
+        setBtcFtList([...data.data.list]);
+      } else {
+        setBtcFtList([]);
       }
+    } else {
+      setBtcFtList([]);
     }
   };
 
@@ -70,44 +104,49 @@ export default function BtcFtPage() {
             </View>
           </View>
 
-
           <View style={{ flex: 1 }} />
 
           <View style={{ marginLeft: 10, marginRight: 10 }}>
-          <Text
-            numberOfLines={2}
-            ellipsizeMode="tail"
-            style={{ fontSize: 16, color: "#000000", textAlign:'right' }}
-          >
-            {item.overallBalance!}
-          </Text>
-          <Text style={[metaStyles.grayTextSmall66,{textAlign:'right'}]}>- - - - - - - - - - </Text>
-          <Text style={[metaStyles.grayTextSmall66,{textAlign:'right'}]}>Transferable: </Text>
-          <Text style={[metaStyles.defaultText,{textAlign:'right'}]}>{item.transferableBalance!} </Text>
-          <Text style={[metaStyles.grayTextSmall66,{textAlign:'right'}]}>Available: </Text>
-          <Text style={[metaStyles.defaultText,{textAlign:'right'}]}>{item.availableBalance!} </Text>
+            <Text
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={{ fontSize: 16, color: "#000000", textAlign: "right" }}
+            >
+              {item.overallBalance!}
+            </Text>
+            <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>
+              - - - - - - - - - -{" "}
+            </Text>
+            <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>
+              Transferable:{" "}
+            </Text>
+            <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
+              {item.transferableBalance!}{" "}
+            </Text>
+            <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>
+              Available:{" "}
+            </Text>
+            <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
+              {item.availableBalance!}{" "}
+            </Text>
+          </View>
         </View>
-
-        </View>
-
-    
       </TouchableWithoutFeedback>
     );
   };
 
   return (
     <View style={[metaStyles.varContainer, { backgroundColor: "#fff" }]}>
-      {btcFtList == null || (btcFtList.length == 0 && <NoMoreDataView />)}
 
-      {btcFtList != null && (
-        <View>
-          <FlatList
-            data={btcFtList}
-            keyExtractor={(item, index) => index.toString()}
-            showsVerticalScrollIndicator={false}
-            renderItem={ListItem}
-          />
-        </View>
+      {btcFtList.length == 0 ? (
+        <NoMoreDataView />
+      ) : (
+        <FlatList
+          data={btcFtList}
+          keyExtractor={(item, index) => index.toString()}
+          showsVerticalScrollIndicator={false}
+          renderItem={ListItem}
+        />
       )}
     </View>
   );
@@ -116,7 +155,7 @@ export default function BtcFtPage() {
 const styles = StyleSheet.create({
   flatListStyle: {
     width: "100%",
-    height: 'auto',
+    height: "auto",
     backgroundColor: "#F5F7F9",
     marginTop: 10,
     borderRadius: 10,

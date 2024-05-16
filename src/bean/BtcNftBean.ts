@@ -28,4 +28,8 @@ export interface BtcNftBean {
   utxoHeight: number;
   utxoConfirmation: string;
   nftShowContent:string;
+   
+  //dev
+  id:number
+
 }

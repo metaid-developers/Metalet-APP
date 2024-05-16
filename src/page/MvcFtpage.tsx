@@ -7,7 +7,7 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   CircleAvatar,
   CircleAvatarLetter,
@@ -21,25 +21,50 @@ import { MvcFtBeans, RootObject } from "../bean/DataBean";
 import { List } from "react-native-paper";
 import { removeTrailingZeros } from "../utils/StringUtils";
 import { checkImage, getShowImageUrl } from "../utils/MetaFunUiils";
+import { useFocusEffect } from "@react-navigation/native";
+import { EventBus, eventBus, refreshMvcFtEvent } from "../utils/EventBus";
 
 export default function MvcFtPage() {
   const { userData, updateUserData } = useData();
   const { walletManager, updateWalletManager } = useData();
-  const {accountIndex,updateAccountIndex}=useData();
+  const { accountIndex, updateAccountIndex } = useData();
 
   let [ftList, setftList] = useState<MvcFtBeans[]>();
   const { metaletWallet, updateMetaletWallet } = useData();
+  const { mvcAddress, updateMvcAddress } = useData();
 
-  let mvcAddress
-  
+  // let mvcAddress;
 
   useEffect(() => {
-    mvcAddress=metaletWallet.currentMvcWallet.getAddress()
+    // mvcAddress = metaletWallet.currentMvcWallet.getAddress();
+    console.log("mvc ft page useEffect 页面初始");
+    getMvcFtData(mvcAddress);
+    // eventBus.subscribe(refreshMvcFtEvent, (message) => {
+    //   console.log("mvc ft page 收到刷新" + message.data);
 
-    getMvcFtData();
+    //   updateMvcAddress(message.data);
+    //   getMvcFtData(message.data);
+    // });
+    // return () => {
+    //   eventBus.unsubscribe(refreshMvcFtEvent, (message) => {
+    //     console.log("mvc nft page 取消订阅" + message.data);
+    //   });
+    // };
+
   }, []);
+  
+  useEffect(() => {
+    getMvcFtData(mvcAddress);
+  }, [mvcAddress]);
 
-  async function getMvcFtData() {
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     console.log("useFocusEffect MVCFtPage"+mvcAddress);
+  //     getMvcFtData(mvcAddress);
+  //   }, [])
+  // );
+
+  async function getMvcFtData(address: string) {
     let param = {
       page: 1,
       pageSize: 30,
@@ -47,8 +72,8 @@ export default function MvcFtPage() {
     };
     let data: RootObject = await get(
       BASE_METALET_URL +
-        "/aggregation/v2/app/show/ft/"+
-        mvcAddress+
+        "/aggregation/v2/app/show/ft/" +
+        address +
         "/summaries",
       false,
       param
@@ -56,12 +81,14 @@ export default function MvcFtPage() {
     //可以设置任何对象到全局变量
     // updateUserData(data);
     if (data.data.results.items != null) {
-      setftList(data.data.results.items);
+      // console.log("data.data.results.items", data.data.results.items);
+      setftList([...data.data.results.items]);
+    } else {
+      setftList([]);
     }
   }
 
   const [data, setData] = useState([]);
-
 
   const refreshData = (id) => {
     setftList((prevList) =>
@@ -76,47 +103,55 @@ export default function MvcFtPage() {
     //  const resut=await checkImage(ImageUrl)
     //  setICanLoadImage(resut)
     return (
-     <TouchableWithoutFeedback onPress={()=>{
-      console.log("item.name",item.name)
-     }}>
-       <View style={styles.flatListStyle}>
-        {item.imageError ? (
-          <CircleAvatarLetter letterStr={item.name.substring(0, 1)} />
-        ) : (
-          <CircleAvatar
-            imageUrl={ImageUrl}
-            event={() => {
-              refreshData(item.name);
-            }}
-          />
-        )}
-        <View style={{ marginLeft: 10 }}>
-          <Text style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}>
-            {item.symbol.toUpperCase()}
-          </Text>
-          <Text style={metaStyles.grayTextSmall66}>{item.name}</Text>
-        </View>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          console.log("item.name", item.name);
+        }}
+      >
+        <View style={styles.flatListStyle}>
+          {item.imageError ? (
+            <CircleAvatarLetter letterStr={item.name.substring(0, 1)} />
+          ) : (
+            <CircleAvatar
+              imageUrl={ImageUrl}
+              event={() => {
+                refreshData(item.name);
+              }}
+            />
+          )}
+          <View style={{ marginLeft: 10 }}>
+            <Text style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}>
+              {item.symbol.toUpperCase()}
+            </Text>
+            <Text style={metaStyles.grayTextSmall66}>{item.name}</Text>
+          </View>
 
-        <View style={{ flex: 1 }} />
-        <View style={{ marginLeft: 10, marginRight: 10 }}>
-          <Text
-            numberOfLines={2}
-            ellipsizeMode="tail"
-            style={{ fontSize: 16, color: "#000000", marginBottom: 10 ,textAlign:'right' }}
-          >
-            {removeTrailingZeros(item.balance)}
-          </Text>
-          <Text style={[metaStyles.grayTextSmall66,{textAlign:'right'}]}>$32983.99</Text>
+          <View style={{ flex: 1 }} />
+          <View style={{ marginLeft: 10, marginRight: 10 }}>
+            <Text
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={{
+                fontSize: 16,
+                color: "#000000",
+                marginBottom: 10,
+                textAlign: "right",
+              }}
+            >
+              {removeTrailingZeros(item.balance)}
+            </Text>
+            <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>
+              $32983.99
+            </Text>
+          </View>
         </View>
-      </View>
-     </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
     );
   };
 
   return (
     <View style={[metaStyles.varContainer, { backgroundColor: "#fff" }]}>
-      {ftList == null ||
-        (ftList.length == 0 && <NoMoreDataView  />)}
+      {ftList == null || (ftList.length == 0 && <NoMoreDataView />)}
       {/* {hasData && userData!=null &&<Text>名称： {ftList[0]}  年龄：{11}</Text>} */}
       {ftList != null && (
         <View>

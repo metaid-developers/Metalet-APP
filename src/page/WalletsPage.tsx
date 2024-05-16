@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   GradientAvatar,
   LoadingModal,
+  LoadingNoticeModal,
   RoundSimButton,
   TitleBar,
   styles,
@@ -22,6 +23,9 @@ import { wallets_key, AsyncStorageUtil } from "../utils/AsyncStorageUtil";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { goBack, navigate } from "../base/NavigationService";
 import { useData } from "../hooks/MyProvider";
+import { useFocusEffect } from "@react-navigation/native";
+import { chooseMyWallet } from "../utils/WalletUtils";
+import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 
 export default function WalletsPage() {
   let [walletList, setWalletList] = useState<WalletBean[]>([]);
@@ -30,15 +34,25 @@ export default function WalletsPage() {
   let [isEdit, setIsEdit] = useState(false);
   let [editWalletName, setEditWalletName] = useState("");
   const [isShowEditWallet, setIsShowEditWallet] = useState(false);
-  const [isCanReName,setIsCanReName]=useState(false);
+  const [isCanReName, setIsCanReName] = useState(false);
   const [changeWalletName, setChangeWalletName] = useState("");
   const [changeWallet, setChangeWallet] = useState<WalletBean>();
+
+  //编辑account
+  const [isShowEditAccount, setIsShowEditAccount] = useState(false);
+  const [isCanReAccountName, setIsCanReAccountName] = useState(false);
+  const [changeAccountName, setChangeAccountName] = useState("");
+  const [parentIndex, setParentIndex] = useState<number>();
+  const [accountIndex, setAccountIndex] = useState<number>();
+
+  //提示
+  const [isShowNotice, setIsShowNotice] = useState(false);
 
   // let changeWallet:WalletBean;
 
   async function getWalletData() {
-    await AsyncStorageUtil.getItem("wallets").then((res) => {
-      console.log(res);
+    await AsyncStorageUtil.getItem(wallets_key).then((res) => {
+      console.log(JSON.stringify(res));
       setWalletList(res);
     });
   }
@@ -46,6 +60,16 @@ export default function WalletsPage() {
   useEffect(() => {
     getWalletData();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // setTimeout(() => {
+      getWalletData();
+      // }, 1000)
+      // nftList.splice(2,1)
+      // setNftList([...nftList])
+    }, [])
+  );
 
   async function addAccount(postion: number) {
     console.log("当前位置是 " + postion);
@@ -58,7 +82,7 @@ export default function WalletsPage() {
           account.isSelect = false;
         });
       });
-      const nowWallet = wallets[postion];
+      const nowWallet: WalletBean = wallets[postion];
       //   const newAccountsOptions = nowWallet.accountsOptions.map((account) => {
       //     // 修改账户属性
       //     return { ...account, isSelect: false };
@@ -86,11 +110,13 @@ export default function WalletsPage() {
         defaultAvatarColor: defaultAvatarColor,
       };
 
-      console.log("newAccount", newAccount);
-
+     
       nowWallet.accountsOptions.push(newAccount);
+      nowWallet.isCurrentPathIndex=nowWallet.accountsOptions.length-1;
       await AsyncStorageUtil.updateItem(wallets_key, wallets);
       getWalletData();
+      eventBus.publish(refreshHomeLoadingEvent,{data:''})
+
     });
   }
 
@@ -109,10 +135,18 @@ export default function WalletsPage() {
       });
 
       const nowWallet = wallets[walletIndex];
+      nowWallet.isCurrentPathIndex=accountIndex;
       nowWallet.accountsOptions[accountIndex].isSelect = true;
       updateMyWallet(nowWallet);
+
+      // console.log("wallets", "调整后的： "+JSON.stringify(wallets));
+      
       await AsyncStorageUtil.updateItem(wallets_key, wallets);
       getWalletData();
+      navigate('Tabs')
+      eventBus.publish(refreshHomeLoadingEvent,{data:''})
+
+      // chooseMyWallet(nowWallet);
     });
   }
 
@@ -154,13 +188,39 @@ export default function WalletsPage() {
               {/* <Text style={{ marginTop: 10 }}>{}</Text> */}
             </View>
 
+            {isEdit && (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setParentIndex(parentIndex);
+                  setIsShowEditAccount(true);
+                  setAccountIndex(index);
+                  setChangeAccountName(item.name);
+                  // setEditWalletName(item.name);
+                  // setIsShowEditWallet(true);
+                }}
+              >
+                <Image
+                  source={require("../../image/metalet_edit_icon.png")}
+                  style={{ marginLeft: 10, width: 15, height: 15 }}
+                />
+              </TouchableWithoutFeedback>
+            )}
+
             <View style={{ flex: 1 }} />
 
+            {/* 暂不显示更多 */}
             {isEdit && (
-              <Image
-                source={require("../../image/metalet_more_icon.png")}
-                style={{ width: 15, height: 15 }}
-              />
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setIsEdit(false);
+                  navigate("WalletDetailPage", { postion: parentIndex });
+                }}
+              >
+                <Image
+                  source={require("../../image/metalet_more_icon.png")}
+                  style={{ width: 15, height: 15 }}
+                />
+              </TouchableWithoutFeedback>
             )}
 
             {item.isSelect && isEdit == false && (
@@ -228,7 +288,12 @@ export default function WalletsPage() {
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View style={{ flexDirection: "row" }}>
             {isEdit && (
-              <TouchableWithoutFeedback onPress={() => {}}>
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setIsEdit(false);
+                  navigate("WalletDetelePage", { postion: index });
+                }}
+              >
                 <Image
                   source={require("../../image/metalet_delete_icon.png")}
                   style={{ marginRight: 10, width: 15, height: 15 }}
@@ -239,8 +304,7 @@ export default function WalletsPage() {
             {isEdit && (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  console.log("ddd" + item.name);
-                  setChangeWallet(item)
+                  setChangeWallet(item);
                   setEditWalletName(item.name);
                   setIsShowEditWallet(true);
                 }}
@@ -408,6 +472,7 @@ export default function WalletsPage() {
           </View>
         </TouchableWithoutFeedback>
 
+        {/* 修改钱包 */}
         <Modal transparent={true} visible={isShowEditWallet}>
           <View
             style={{
@@ -461,17 +526,15 @@ export default function WalletsPage() {
                   multiline={true}
                   placeholder={editWalletName}
                   autoCapitalize={"none"}
-                  onChangeText={(text)=>{
-                    setChangeWalletName(text)
-                   if(text.length>0){
-                    setIsCanReName(true)
-                   }else{
-                    setIsCanReName(false)
-                   }
-                    
+                  onChangeText={(text) => {
+                    setChangeWalletName(text);
+                    if (text.length > 0) {
+                      setIsCanReName(true);
+                    } else {
+                      setIsCanReName(false);
+                    }
                   }}
                   style={{
-                    
                     width: "100%",
                     backgroundColor: "transparent",
                     marginLeft: 10,
@@ -480,20 +543,36 @@ export default function WalletsPage() {
                 />
               </View>
 
-              <TouchableWithoutFeedback onPress={async () => {
-                changeWallet.name=changeWalletName;
-                setWalletList([...walletList])
-                await AsyncStorageUtil.updateItem(wallets_key,walletList)
-               setIsShowEditWallet(false)
-              }}>
-                <View style={{marginTop:20, marginBottom:20,  height: 20,width:"100%",alignItems:"center",}}>
+              <TouchableWithoutFeedback
+                onPress={async () => {
+                  changeWallet.name = changeWalletName;
+                  setWalletList([...walletList]);
+                  await AsyncStorageUtil.updateItem(wallets_key, walletList);
+                  setIsShowEditWallet(false);
+                  setIsShowNotice(true);
+                  setTimeout(() => {
+                    setIsShowNotice(false);
+                  }, 800);
+                }}
+              >
+                <View
+                  style={{
+                    marginTop: 20,
+                    marginBottom: 20,
+                    height: 20,
+                    width: "100%",
+                    alignItems: "center",
+                  }}
+                >
                   <View
                     style={[
                       {
                         flexDirection: "row",
                         height: 48,
-                        width:200,
-                        backgroundColor: isCanReName?'rgba(23, 26, 255, 1)':'rgba(23, 26, 255, 0.5)',
+                        width: 200,
+                        backgroundColor: isCanReName
+                          ? "rgba(23, 26, 255, 1)"
+                          : "rgba(23, 26, 255, 0.5)",
                         borderRadius: 30,
                         alignItems: "center",
                         justifyContent: "center",
@@ -516,6 +595,144 @@ export default function WalletsPage() {
             </View>
           </View>
         </Modal>
+
+        {/* 修改account */}
+        <Modal transparent={true} visible={isShowEditAccount}>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "flex-end",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: 10,
+                padding: 20,
+                marginBottom: 20,
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                  Edit Name
+                </Text>
+                <View style={{ flex: 1 }} />
+
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setIsShowEditAccount(false);
+                  }}
+                >
+                  <Image
+                    source={require("../../image/metalet_close_big_icon.png")}
+                    style={{ width: 15, height: 15 }}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+
+              <Text style={{ marginTop: 20, color: "#666", fontSize: 14 }}>
+                Account Name
+              </Text>
+
+              <View
+                style={{
+                  alignItems: "center",
+                  borderColor: "#171AFF",
+                  flexDirection: "row",
+                  borderWidth: 1,
+                  height: 50,
+                  borderRadius: 30,
+                  marginTop: 20,
+                }}
+              >
+                <TextInput
+                  multiline={true}
+                  placeholder={changeAccountName}
+                  autoCapitalize={"none"}
+                  onChangeText={(text) => {
+                    setChangeAccountName(text);
+                    if (text.length > 0) {
+                      setIsCanReAccountName(true);
+                    } else {
+                      setIsCanReAccountName(false);
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    backgroundColor: "transparent",
+                    marginLeft: 10,
+                    paddingRight: 20,
+                  }}
+                />
+              </View>
+
+              <TouchableWithoutFeedback
+                onPress={async () => {
+                  await AsyncStorageUtil.getItem(wallets_key).then(
+                    async (wallets) => {
+                      const nowWallet = wallets[parentIndex];
+                      nowWallet.accountsOptions[accountIndex].name =
+                        changeAccountName;
+                      setWalletList([...wallets]);
+                      setIsShowEditAccount(false);
+                      setIsEdit(false);
+                      await AsyncStorageUtil.updateItem(wallets_key, wallets);
+                    }
+                  );
+
+                  setIsShowNotice(true);
+                  setTimeout(() => {
+                    setIsShowNotice(false);
+                  }, 800);
+                  // changeWallet.name = changeWalletName;
+                  // setWalletList([...walletList]);
+                  // await AsyncStorageUtil.updateItem(wallets_key, walletList);
+                  // setIsShowEditWallet(false);
+                }}
+              >
+                <View
+                  style={{
+                    marginTop: 20,
+                    marginBottom: 20,
+                    height: 20,
+                    width: "100%",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={[
+                      {
+                        flexDirection: "row",
+                        height: 48,
+                        width: 200,
+                        backgroundColor: isCanReAccountName
+                          ? "rgba(23, 26, 255, 1)"
+                          : "rgba(23, 26, 255, 0.5)",
+                        borderRadius: 30,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: 20,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        { textAlign: "center" },
+                        { color: "#fff" },
+                        { fontSize: 16 },
+                      ]}
+                    >
+                      Confirm
+                    </Text>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </View>
+        </Modal>
+
+        <LoadingNoticeModal title="Successful" isShow={isShowNotice} />
 
         <View>
           {/* <RoundSimButton title={"Add Wallet"}  textColor="#fff" event={()=>{}}  roundStytle={{marginLeft:20,marginRight:40,marginTop:20}}/> */}

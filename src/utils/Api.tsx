@@ -12,6 +12,10 @@ export const BTC_FT_URL=BASE_METALET_URL+"/wallet-api/v3/brc20/tokens"
 export const BTC_NFT_URL=BASE_METALET_URL+"/wallet-api/v3/address/inscriptions"
 
 
+//资产价格
+export const BALANCE_PRICE_URL=BASE_METALET_URL+"/wallet-api/v3/coin/price"
+
+
 //get
 export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => {
   // 将参数拼接到URL中
@@ -26,7 +30,7 @@ export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => 
 
   const fullUrl = isFullUrl ? url : `${url}?${queryString}`;
   //   const fullUrl = `${BASE_MVC_API_URL}${url}?${queryString}`;
-  console.log("fullUrl", fullUrl);
+  // console.log("fullUrl", fullUrl);
 
   try {
     const response = await fetch(fullUrl, {
@@ -37,6 +41,7 @@ export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => 
       // body:JSON.stringify(params)
     });
     if (!response.ok) {
+      console.log("fullUrl请求出错的接口 ： ", fullUrl);
       throw new Error(response.statusText);
     }
 

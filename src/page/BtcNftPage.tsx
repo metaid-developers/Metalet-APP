@@ -1,11 +1,13 @@
 import { View, Text, FlatList ,StyleSheet, Dimensions} from 'react-native'
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NoMoreDataView } from '../constant/Widget';
 import { metaStyles } from '../constant/Constants';
 import { BtcNftBean, RootBtcNftObject } from '../bean/BtcNftBean';
 import { BTC_NFT_URL, get } from '../utils/Api';
 import { useData } from '../hooks/MyProvider';
 import {MetaletWalletManager} from '../wallet/MetaletWalletManager';
+import { eventBus, refreshBtcFtEvent } from '../utils/EventBus';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 
@@ -13,17 +15,30 @@ export default function BtcNftPage() {
 
   let [nftList,setNftList]=useState<BtcNftBean[]>([]);
   const {accountIndex,updateAccountIndex}=useData();
-  const { walletManager, updateWalletManager } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
+  const { btcAddress, updateBtcAddress } = useData();
 
+ 
+  
   useEffect(()=>{
-    getBtcNftData();
+    getBtcNftData(btcAddress);
   },[])
 
-   const getBtcNftData=async ()=>{
+  useEffect(()=>{
+    getBtcNftData(btcAddress);
+  },[btcAddress])
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getBtcNftData(btcAddress);
+  //   }, [])
+  // );
+
+   const getBtcNftData=async (address:string)=>{
     let params={
       net:'mainnet',
-      address:metaletWallet.currentBtcWallet.getAddress(),
+      address:address,
+      // address:metaletWallet.currentBtcWallet.getAddress(),
       cursor:0,
       size:10000
     }
@@ -38,8 +53,15 @@ export default function BtcNftPage() {
          nftData.nftShowContent=reslut
          list.push(nftData)
         }
-        setNftList(list)
+        // const newData=[...list,{id:+1}]
+        // setNftList(newData)
+        setNftList([...list])
+       
+      }else{
+        setNftList([])
       }
+    }else{
+      setNftList([])
     }
 
    }

@@ -5,25 +5,71 @@ import {
   Image,
   TouchableWithoutFeedback,
   NativeModules,
+  Modal,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { navigate } from "../base/NavigationService";
 import { metaStyles } from "../constant/Constants";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { CustomTabBar, GradientAvatar } from "../constant/Widget";
+import {
+  CustomTabBar,
+  GradientAvatar,
+  LoadingModal,
+  LoadingNoticeModal,
+} from "../constant/Widget";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import SplacePage from "./SplacePage";
 import WelcomeWalletPage from "./WelcomeWalletPage";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 import AssetsPage from "./AssetsPage";
 import FtPage from "./FtPage";
 import NftPage from "./NftPage";
-import { get, BASE_MVC_API_URL } from "../utils/Api";
+import {
+  get,
+  BASE_MVC_API_URL,
+  BALANCE_PRICE_URL,
+  BASE_METALET_URL,
+} from "../utils/Api";
 import { useData } from "../hooks/MyProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AsyncStorageUtil } from "../utils/AsyncStorageUtil";
-import { AddressType, BtcWallet, CoinType } from "@metalet/utxo-wallet-service";
-
+import {
+  AsyncStorageUtil,
+  network_all,
+  network_btc,
+  network_key,
+  network_mvc,
+  wallets_key,
+} from "../utils/AsyncStorageUtil";
+import {
+  AddressType,
+  BtcWallet,
+  CoinType,
+  MvcWallet,
+} from "@metalet/utxo-wallet-service";
+import { RootPriceObject } from "../bean/PriceBean";
+import { RootBtcBalanceObject } from "../bean/BtcBalanceBean";
+import * as Clipboard from "expo-clipboard";
+import { WalletBean } from "../bean/WalletBean";
+import { chooseMyWallet } from "../utils/WalletUtils";
+import {
+  EventBus,
+  eventBus,
+  refreshBtcFtEvent,
+  refreshHomeLoadingEvent,
+  refreshMvcFtEvent,
+} from "../utils/EventBus";
+import FtParentPage from "./nft/FtParentPage";
+import FtMvcPage from "./nft/FtMvcPage";
+import FtBtcPage from "./nft/FtBtcPage";
+import NftParentPage from "./nft/NftParentPage";
+import NftBtcPage from "./nft/NftBtcPage";
+import NftMvcPage from "./nft/NftMvcPage";
+import {
+  fetchAssetsPrice,
+  fetchBtcActivityRecord,
+  fetchMvcActivityComfird,
+} from "../api/metaletservice";
+import { getCurrentBtcWallet, getCurrentMvcWallet } from "../wallet/wallet";
 // import RNFS from "react-native-fs";
 
 // Home 开发
@@ -41,132 +87,753 @@ export default function HomePage(props: any) {
 
   const { metaletWallet, updateMetaletWallet } = useData();
   const { myWallet, updateMyWallet } = useData();
+  // const [sumBalance, setSumBalance] = useState<string>("0.0");
+  const { currentSumBalance, updateCurrentSumBalance } = useData();
 
-  // const walletId = "1111";
-  // const accountId = "22222";
+  //提示
+  const [isShowNotice, setIsShowNotice] = useState(false);
+  const [isShowLoading, setIsShowLoading] = useState(false);
+  const [noticeContent, setNoticeContent] = useState("Successful");
+  //复制地址
+  const [isShowCopy, setIsShowCopy] = useState(false);
+  const [legacyAddress, setLegacyAddress] = useState<string>();
+  const [taprootAddress, setTaprootAddress] = useState<string>();
+  const [nestedSegwitAddress, setNestedSegwitAddress] = useState<string>();
+  const [nativeSegwitAddress, setNativeSegwitAddress] = useState<string>();
+  const [sameBtcAsMvcAddress, setSameBtcAsMvcAddress] = useState<string>();
+  
+  // const [mvcAddress, setMvcAddress] = useState<string>();
 
-  // const walletManager = new WalletManager({
-  //   network: 'mainnet',
-  //   walletsOptions: [
-  //     {
-  //       id: walletId,
-  //       mnemonic:
-  //         'net turn first rare glide patient mask hungry damp cabbage umbrella ostrich',
-  //       // name: "walletName",
-  //       mvcTypes: [ 236],
-  //       accountsOptions: [{addressIndex: 0, id: accountId},{addressIndex: 1, id: "33333"}],
-  //     },
-  //   ],
-  // });
+  // 当前网络
+  const { netWork, updateNetWork } = useData();
+  //当前网络地址
+  const { mvcAddress, updateMvcAddress } = useData();
+  const { btcAddress, updateBtcAddress } = useData();
 
-  // const data = walletManager.getWallets();
-  // console.log(JSON.stringify(data));
-
-  // walletManager.addWallet({
-  //   id: walletId,
-  //   mnemonic:
-  //     "dream mammal settle donkey rich crew chicken sign guitar assault poem radio",
-  //   // name: "walletName",
-  //   mvcTypes: [10001, 236],
-  //   accountsOptions: [{ addressIndex: 0, id: accountId }],
-  // });
-
-  // walletManager.addAccount(walletId, { addressIndex: 1, id: "3333" });
-
-  // const chainWallets = walletManager.getAccountChainWallets(
-  //   walletId,
-  //   accountId
-  // );
-  // const mvcCustomWallet = chainWallets.mvc.find(
-  //   (wallet) => wallet.getAddressType() === AddressType.LegacyMvcCustom
-  // )!;
-  // console.log("address", mvcCustomWallet.getAddress());
-
-  // const data = walletManager.getWallets();
-  // console.log(data);
-
-  async function getMVCBalance() {
-    // let data: Balance = await get(
-    //   BASE_MVC_API_URL + "/address/1C2XjqoXHRegJNnmJqGDMt3rbAcrYLX4L9/balance"
-    // );
+  const getMVCBalance = async () => {
     // console.log("请求结果是11： ", data.address);
     // const dataflutter = await FlutterDatabase.getDatabaseData();
     // console.log(dataflutter);
-  }
+    // let data: RootPriceObject = await get(BALANCE_PRICE_URL);
+    // metaletWallet.currentBtcPrice = data.data.priceInfo.btc;
+    // metaletWallet.currentMVCPrice = data.data.priceInfo.space;
+
+    const assertPrice = await fetchAssetsPrice();
+    metaletWallet.currentBtcPrice = assertPrice.data.priceInfo.btc;
+    metaletWallet.currentMVCPrice = assertPrice.data.priceInfo.space;
+
+    // console.log("请求结果是11： ", data);
+
+    let dataMvcBalance: Balance = await get(
+      BASE_MVC_API_URL +
+        "/address/" +
+        metaletWallet.currentMvcWallet.getAddress() +
+        "/balance"
+    );
+
+    metaletWallet.currentMvcBalance = dataMvcBalance.confirmed;
+    // console.log("mvc余额 ", dataMvcBalance);
+
+    let btcParams = {
+      address: metaletWallet.currentBtcWallet.getAddress(),
+      net: "livenet",
+    };
+
+    let dataBtcBalance: RootBtcBalanceObject = await get(
+      BASE_METALET_URL + "/wallet-api/v3/address/btc-balance",
+      false,
+      btcParams
+    );
+    console.log("btc余额 ", dataBtcBalance);
+    metaletWallet.currentBtcBalance = dataBtcBalance.data.balance;
+
+    metaletWallet.currentSumBalance =
+      (metaletWallet.currentMvcBalance * metaletWallet.currentMVCPrice) /
+        100000000 +
+      metaletWallet.currentBtcBalance * metaletWallet.currentBtcPrice;
+    // console.log("当前btc", metaletWallet.currentBtcBalance);
+    // console.log("当前btc价格", metaletWallet.currentBtcPrice);
+    // console.log("当前mvc", metaletWallet.currentMvcBalance);
+    // console.log("当前mvc价格", metaletWallet.currentMVCPrice);
+    // console.log("当前mvc+btc", metaletWallet.currentSumBalance.toFixed(2));
+    updateCurrentSumBalance(metaletWallet.currentSumBalance.toFixed(2));
+    updateMetaletWallet(metaletWallet);
+  };
 
   useEffect(() => {
-    getMVCBalance();
-    // const walletManager = new WalletManager({
-    //     network: "mainnet",
-    //     walletsOptions: [
-    //       {
-    //         id: walletId,
-    //         mnemonic:
-    //           "net turn first rare glide patient mask hungry damp cabbage umbrella ostrich",
-    //         // name: "walletName",
-    //         // mvcTypes: [10001, 236],
-    //         accountsOptions: [{ addressIndex: 0, id: accountId }],
-    //       },
-    //       ,
-    //     ],
-    //   });
+    console.log("HomePage useEffect");
 
     initCurrentWallet();
+
+    eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
+      initCurrentWallet();
+      setIsShowLoading(true);
+      setTimeout(() => {
+        setIsShowLoading(false);
+      }, 1000);
+    });
   }, []);
 
+
+  useEffect(() => {
+    console.log("HomePage useEffect  btc 地址变化");
+
+    getMVCBalance()
+
+    setIsShowLoading(true);
+      setTimeout(() => {
+        setIsShowLoading(false);
+      }, 1000);
+  }, [btcAddress]);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // initCurrentWallet();
+  //     // console.log("HomePage useFocusEffect");
+  //     // eventBus.publish(refreshMvcFtEvent, {
+  //     //   data: metaletWallet.currentMvcWallet.getAddress(),
+  //     // });
+  //     // changeNetwork();
+
+  //     eventBus.publish(refreshMvcFtEvent, {
+  //       data: metaletWallet.currentMvcWallet.getAddress(),
+  //     });
+  //     eventBus.publish(refreshBtcFtEvent, {
+  //       data: metaletWallet.currentBtcWallet.getAddress(),
+  //     });
+
+  //   }, [])
+  // );
+
+  function ShowNotice(notice) {
+    setIsShowCopy(false);
+    Clipboard.setString(notice);
+    setNoticeContent("Copy Successful");
+    setIsShowNotice(true);
+    setTimeout(() => {
+      setIsShowNotice(false);
+    }, 800);
+  }
+
+  //初始化所有钱包
   async function initCurrentWallet() {
-    console.log("当前" + JSON.stringify(myWallet));
-    const btcTaprootWallet = new BtcWallet({
-      network: "mainnet",
-      mnemonic: myWallet.mnemonic,
-      addressIndex: 0,
-      addressType: AddressType.Taproot,
-      coinType: CoinType.BTC,
-    });
-    metaletWallet.btcTaprootWallet = btcTaprootWallet;
+    let wallets = await AsyncStorageUtil.getItem(wallets_key);
+    for (let i = 0; i < wallets.length; i++) {
+      let wallet = wallets[i];
+      for (let q = 0; q < wallet.accountsOptions.length; q++) {
+        let account = wallet.accountsOptions[q];
+        if (account.isSelect == true) {
+          updateMyWallet(wallet);
 
-    const btcNativeSegwitWallet = new BtcWallet({
-      network: "mainnet",
-      mnemonic: myWallet.mnemonic,
-      addressIndex: 0,
-      addressType: AddressType.NativeSegwit,
-      coinType: CoinType.BTC,
-    });
-    metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
+          console.log("accountIndex: " + account.addressIndex);
 
-    const btcNestedSegwitWallet = new BtcWallet({
-      network: "mainnet",
-      mnemonic: myWallet.mnemonic,
-      addressIndex: 0,
-      addressType: AddressType.NestedSegwit,
-      coinType: CoinType.BTC,
-    });
-    metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
+          const btcTaprootWallet = new BtcWallet({
+            network: "mainnet",
+            mnemonic: myWallet.mnemonic,
+            addressIndex: account.addressIndex,
+            addressType: AddressType.Taproot,
+            coinType: CoinType.BTC,
+          });
+          metaletWallet.btcTaprootWallet = btcTaprootWallet;
+          setTaprootAddress(btcTaprootWallet.getAddress());
 
-    const btcLegacyWallet = new BtcWallet({
-      network: "mainnet",
-      mnemonic: myWallet.mnemonic,
-      addressIndex: 0,
-      addressType: AddressType.Legacy,
-      coinType: CoinType.BTC,
-    });
-    metaletWallet.btcLegacyWallet = btcLegacyWallet;
+          const btcNativeSegwitWallet = new BtcWallet({
+            network: "mainnet",
+            mnemonic: myWallet.mnemonic,
+            addressIndex: account.addressIndex,
+            addressType: AddressType.NativeSegwit,
+            coinType: CoinType.BTC,
+          });
+          metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
+          setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
 
-    updateMetaletWallet(metaletWallet);
+          const btcNestedSegwitWallet = new BtcWallet({
+            network: "mainnet",
+            mnemonic: myWallet.mnemonic,
+            addressIndex: account.addressIndex,
+            addressType: AddressType.NestedSegwit,
+            coinType: CoinType.BTC,
+          });
+          metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
+          setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
+
+          const btcLegacyWallet = new BtcWallet({
+            network: "mainnet",
+            mnemonic: myWallet.mnemonic,
+            addressIndex: account.addressIndex,
+            addressType: AddressType.Legacy,
+            coinType: CoinType.BTC,
+          });
+          metaletWallet.btcLegacyWallet = btcLegacyWallet;
+          setLegacyAddress(btcLegacyWallet.getAddress());
+
+          const btcSameAsLegacyWallet = new BtcWallet({
+            network: "mainnet",
+            mnemonic: myWallet.mnemonic,
+            addressIndex: account.addressIndex,
+            addressType: AddressType.LegacyMvc,
+            coinType: wallet.mvcTypes,
+          });
+
+          metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
+          setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
+          console.log("切换后的btc地址btSameAsLegacyWallet  ", btcSameAsLegacyWallet.getAddress());
+
+          const mvcWallet = new MvcWallet({
+            network: "mainnet",
+            mnemonic: wallet.mnemonic,
+            addressIndex: account.addressIndex,
+            addressType: AddressType.LegacyMvc,
+            coinType: wallet.mvcTypes,
+          });
+
+          updateMvcAddress(mvcWallet.getAddress());
+          updateBtcAddress(btcLegacyWallet.getAddress());
+
+       
+
+          metaletWallet.currentBtcWallet = btcSameAsLegacyWallet;
+          metaletWallet.currentMvcWallet = mvcWallet;
+          updateMetaletWallet(metaletWallet);
+
+          // myTestMvc= mvcWallet.getAddress();
+
+          // //通知更新
+          // eventBus.publish(refreshMvcFtEvent, {
+          //   data: metaletWallet.currentMvcWallet.getAddress(),
+          // });
+          // eventBus.publish(refreshBtcFtEvent, {
+          //   data: metaletWallet.currentBtcWallet.getAddress(),
+          // });
+        }
+      }
+    }
+
+    // // console.log("当前" + JSON.stringify(myWallet));
+    // const btcTaprootWallet = new BtcWallet({
+    //   network: "mainnet",
+    //   mnemonic: myWallet.mnemonic,
+    //   addressIndex: 0,
+    //   addressType: AddressType.Taproot,
+    //   coinType: CoinType.BTC,
+    // });
+    // metaletWallet.btcTaprootWallet = btcTaprootWallet;
+    // setTaprootAddress(btcTaprootWallet.getAddress());
+
+    // const btcNativeSegwitWallet = new BtcWallet({
+    //   network: "mainnet",
+    //   mnemonic: myWallet.mnemonic,
+    //   addressIndex: 0,
+    //   addressType: AddressType.NativeSegwit,
+    //   coinType: CoinType.BTC,
+    // });
+    // metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
+    // setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
+
+    // const btcNestedSegwitWallet = new BtcWallet({
+    //   network: "mainnet",
+    //   mnemonic: myWallet.mnemonic,
+    //   addressIndex: 0,
+    //   addressType: AddressType.NestedSegwit,
+    //   coinType: CoinType.BTC,
+    // });
+    // metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
+    // setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
+
+    // const btcLegacyWallet = new BtcWallet({
+    //   network: "mainnet",
+    //   mnemonic: myWallet.mnemonic,
+    //   addressIndex: 0,
+    //   addressType: AddressType.Legacy,
+    //   coinType: CoinType.BTC,
+    // });
+    // metaletWallet.btcLegacyWallet = btcLegacyWallet;
+    // setLegacyAddress(btcLegacyWallet.getAddress());
+
+    // await chooseMyWallet(myWallet);
+    // setLegacyAddress(metaletWallet.btcLegacyWallet.getAddress());
+    // setNestedSegwitAddress(metaletWallet.btcNestedSegwitWallet.getAddress());
+    // setTaprootAddress(metaletWallet.btcTaprootWallet.getAddress());
+    // setNativeSegwitAddress(metaletWallet.btcNativeSegwitWallet.getAddress());
+    // setMvcAddress(metaletWallet.currentMvcWallet.getAddress());
+
+    // updateMetaletWallet(metaletWallet);
+
+    getMVCBalance();
+
+    await AsyncStorageUtil.getItem(network_key).then(async (saveNet) => {
+      if (saveNet == null) {
+        console.log("saveNet is null" + saveNet);
+        await AsyncStorageUtil.setItem(network_key, network_all);
+        updateNetWork(network_all);
+      } else {
+        console.log(saveNet);
+
+        updateNetWork(saveNet);
+      }
+    });
   }
 
   const { userData, updateUserData } = useData();
 
-
-  let  userAvater
-  myWallet.accountsOptions.find((account)=>{
-    if(account.isSelect){
-      userAvater=account.defaultAvatarColor
+  let userAvater;
+  myWallet!.accountsOptions!.find((account) => {
+    if (account.isSelect) {
+      userAvater = account.defaultAvatarColor;
     }
-   })
+  });
+
+  let accountName;
+  myWallet!.accountsOptions!.forEach((element) => {
+    if (element.isSelect) {
+      accountName = element.name;
+    }
+  });
 
   return (
     <SafeAreaView style={metaStyles.parentContainer}>
+      <LoadingModal
+        isShow={isShowLoading}
+        isCancel={true}
+        event={() => {
+          setIsShowLoading(false);
+        }}
+      />
+      <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
+
+      {/* 底部地址 */}
+      <Modal transparent={true} visible={isShowCopy}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              borderTopRightRadius:10,
+              borderTopLeftRadius:10,
+
+              paddingLeft: 20,
+              paddingRight: 20,
+              paddingTop: 20,
+              paddingBottom: 30,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  flex: 1,
+                }}
+              >
+                Select Wallet Address
+              </Text>
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setIsShowCopy(false);
+                }}
+              >
+                <Image
+                  source={require("../../image/metalet_close_big_icon.png")}
+                  style={{ width: 15, height: 15 }}
+                />
+              </TouchableWithoutFeedback>
+            </View>
+
+           
+            {/* btc Legacy */}
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                marginHorizontal: 10,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../../image/logo_btc.png")}
+                style={{ width: 35, height: 35, marginLeft: 20 }}
+              />
+
+              <View style={{ marginLeft: 10, flex: 1 }}>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                    Bitcoin
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginLeft: 5,
+                      backgroundColor: "#F5F7F9",
+                      paddingHorizontal: 5,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#666",
+                        fontSize: 10,
+                        textAlign: "center",
+                      }}
+                    >
+                      Legacy
+                    </Text>
+                  </View>
+                </View>
+                <Text
+                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {legacyAddress}
+                </Text>
+              </View>
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  ShowNotice(legacyAddress);
+                }}
+              >
+                <Image
+                  source={require("../../image/meta_copy_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              </TouchableWithoutFeedback>
+            </View>
+
+            {/* btc nested segwit */}
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                marginHorizontal: 10,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../../image/logo_btc.png")}
+                style={{ width: 35, height: 35, marginLeft: 20 }}
+              />
+
+              <View style={{ marginLeft: 10, flex: 1 }}>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                    Bitcoin
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginLeft: 5,
+                      backgroundColor: "#F5F7F9",
+                      paddingHorizontal: 5,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#666",
+                        fontSize: 10,
+                        textAlign: "center",
+                      }}
+                    >
+                      Nested SegWit
+                    </Text>
+                  </View>
+                </View>
+                <Text
+                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {nestedSegwitAddress}
+                </Text>
+              </View>
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  ShowNotice(nestedSegwitAddress);
+                }}
+              >
+                <Image
+                  source={require("../../image/meta_copy_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              </TouchableWithoutFeedback>
+            </View>
+
+            {/* native segwit */}
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                marginHorizontal: 10,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../../image/logo_btc.png")}
+                style={{ width: 35, height: 35, marginLeft: 20 }}
+              />
+
+              <View style={{ marginLeft: 10, flex: 1 }}>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                    Bitcoin
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginLeft: 5,
+                      backgroundColor: "#F5F7F9",
+                      paddingHorizontal: 5,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#666",
+                        fontSize: 10,
+                        textAlign: "center",
+                      }}
+                    >
+                      Native SegWit
+                    </Text>
+                  </View>
+                </View>
+                <Text
+                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {nativeSegwitAddress}
+                </Text>
+              </View>
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  ShowNotice(nativeSegwitAddress);
+                }}
+              >
+                <Image
+                  source={require("../../image/meta_copy_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              </TouchableWithoutFeedback>
+            </View>
+            {/* taproot */}
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                marginHorizontal: 10,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../../image/logo_btc.png")}
+                style={{ width: 35, height: 35, marginLeft: 20 }}
+              />
+
+              <View style={{ marginLeft: 10, flex: 1 }}>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                    Bitcoin
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginLeft: 5,
+                      backgroundColor: "#F5F7F9",
+                      paddingHorizontal: 5,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#666",
+                        fontSize: 10,
+                        textAlign: "center",
+                      }}
+                    >
+                      Taproot
+                    </Text>
+                  </View>
+                </View>
+                <Text
+                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {taprootAddress}
+                </Text>
+              </View>
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  if (
+                    metaletWallet.btcTaprootWallet &&
+                    metaletWallet.btcTaprootWallet.getAddress()
+                  ) {
+                    ShowNotice(taprootAddress);
+                  }
+                }}
+              >
+                <Image
+                  source={require("../../image/meta_copy_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              </TouchableWithoutFeedback>
+            </View>
+
+              {/* sameAsMvc */}
+              <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                marginHorizontal: 10,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../../image/logo_btc.png")}
+                style={{ width: 35, height: 35, marginLeft: 20 }}
+              />
+
+              <View style={{ marginLeft: 10, flex: 1 }}>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                    Bitcoin
+                  </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginLeft: 5,
+                      backgroundColor: "#F5F7F9",
+                      paddingHorizontal: 5,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#666",
+                        fontSize: 10,
+                        textAlign: "center",
+                      }}
+                    >
+                      Same as MVC
+                    </Text>
+                  </View>
+                </View>
+                <Text
+                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {sameBtcAsMvcAddress}
+                </Text>
+              </View>
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  ShowNotice(sameBtcAsMvcAddress);
+                }}
+              >
+                <Image
+                  source={require("../../image/meta_copy_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              </TouchableWithoutFeedback>
+            </View>
+
+
+            {/* mvc */}
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                marginHorizontal: 10,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../../image/logo_space.png")}
+                style={{ width: 35, height: 35, marginLeft: 20 }}
+              />
+
+              <View style={{ marginLeft: 10, flex: 1 }}>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>MVC</Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginLeft: 5,
+                      backgroundColor: "#F5F7F9",
+                      paddingHorizontal: 5,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#666",
+                        fontSize: 10,
+                        textAlign: "center",
+                      }}
+                    >
+                      MVC
+                    </Text>
+                  </View>
+                </View>
+                <Text
+                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {mvcAddress}
+                </Text>
+              </View>
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  ShowNotice(mvcAddress);
+                }}
+              >
+                <Image
+                  source={require("../../image/meta_copy_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              </TouchableWithoutFeedback>
+            </View>
+
+            {/* over */}
+          </View>
+        </View>
+      </Modal>
+
+      {/* 中部 */}
       <View
         style={[
           metaStyles.rowMarginContainer,
@@ -179,10 +846,45 @@ export default function HomePage(props: any) {
           style={{ width: 44, height: 44 }}
         />
         <View style={{ flex: 1 }} />
-        <Image
-          source={require("../../image/meta_btc_icon.png")}
-          style={{ width: 24, height: 24 }}
-        />
+        {netWork == null ||
+          (netWork == network_all && (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                navigate("NetWorkPage");
+              }}
+            >
+              <Image
+                source={require("../../image/metalet_network_all_icon.png")}
+                style={{ width: 24, height: 24 }}
+              />
+            </TouchableWithoutFeedback>
+          ))}
+
+        {netWork == network_btc && (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigate("NetWorkPage");
+            }}
+          >
+            <Image
+              source={require("../../image/meta_btc_icon.png")}
+              style={{ width: 24, height: 24 }}
+            />
+          </TouchableWithoutFeedback>
+        )}
+
+        {netWork == network_mvc && (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigate("NetWorkPage");
+            }}
+          >
+            <Image
+              source={require("../../image/logo_space.png")}
+              style={{ width: 24, height: 24 }}
+            />
+          </TouchableWithoutFeedback>
+        )}
         <Image
           source={require("../../image/meta_last_icon.png")}
           style={{ width: 8, height: 6, marginLeft: 5 }}
@@ -191,10 +893,7 @@ export default function HomePage(props: any) {
 
       <View style={[metaStyles.varContainer, { marginHorizontal: 30 }]}>
         <View style={[metaStyles.rowContainer, { alignItems: "center" }]}>
-          <GradientAvatar
-            isRand={false}
-            defaultAvatarColor={userAvater}
-          />
+          <GradientAvatar isRand={false} defaultAvatarColor={userAvater} />
           <View style={{ marginLeft: 10 }}>
             <View style={[metaStyles.rowCenterContainer, { height: 20 }]}>
               <TouchableWithoutFeedback
@@ -203,8 +902,10 @@ export default function HomePage(props: any) {
                 }}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text style={metaStyles.grayTextdefault66}>Wallet A-</Text>
-                  <Text style={metaStyles.defaultText}>Account 01</Text>
+                  <Text style={metaStyles.grayTextdefault66}>
+                    {myWallet.name}-
+                  </Text>
+                  <Text style={metaStyles.defaultText}>{accountName}</Text>
                 </View>
               </TouchableWithoutFeedback>
 
@@ -212,13 +913,20 @@ export default function HomePage(props: any) {
                 source={require("../../image/meta_last_icon.png")}
                 style={{ width: 8, height: 6, marginLeft: 5 }}
               />
-              <Image
-                source={require("../../image/meta_copy_icon.png")}
-                style={{ width: 14, height: 14, marginLeft: 10 }}
-              />
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  if (metaletWallet.currentMvcWallet != null)
+                    setIsShowCopy(true);
+                }}
+              >
+                <Image
+                  source={require("../../image/meta_copy_icon.png")}
+                  style={{ width: 14, height: 14, marginLeft: 10 }}
+                />
+              </TouchableWithoutFeedback>
             </View>
             <Text style={[metaStyles.bigLargeDefaultText, { marginTop: 3 }]}>
-              $82,352.31
+              {"$ " + currentSumBalance}
             </Text>
           </View>
         </View>
@@ -231,7 +939,9 @@ export default function HomePage(props: any) {
         >
           <TouchableWithoutFeedback
             onPress={() => {
-              updateUserData({ ...userData, name: "校长" });
+              // updateUserData({ ...userData, name: "校长" });
+              //  AsyncStorage.removeItem(network_key);
+              console.log(metaletWallet.btcLegacyWallet.getAddress());
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -247,8 +957,8 @@ export default function HomePage(props: any) {
 
           <TouchableWithoutFeedback
             onPress={() => {
-              console.log("click");
-              navigate("SetPasswordPage");
+              // navigate("SetPasswordPage");
+              navigate("SelectReceivePage");
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -261,7 +971,7 @@ export default function HomePage(props: any) {
               </Text>
             </View>
           </TouchableWithoutFeedback>
-
+          {/* 
           <TouchableWithoutFeedback
             onPress={() => {
               console.log("click");
@@ -277,12 +987,14 @@ export default function HomePage(props: any) {
                 Record
               </Text>
             </View>
-          </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback> */}
+
           <TouchableWithoutFeedback
             onPress={() => {
-              console.log("click");
-              updateAccountIndex(1);
-              AsyncStorageUtil.setItem("account_select", 0);
+              // updateAccountIndex(1);
+              // AsyncStorageUtil.setItem("account_select", 0);
+              navigate("WebsPage");
+              // navigate("WebPageTest");
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -296,17 +1008,24 @@ export default function HomePage(props: any) {
             </View>
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
-            onPress={() => {
-              console.log(
-                "click   " + metaletWallet.btcTaprootWallet.getAddress()
-              );
-              console.log(
-                "click   " + metaletWallet.currentBtcWallet.getAddress()
-              );
+            onPress={async () => {
+              // getCurrentMvcWallet().then((wallet) => {
+              //   console.log(" 获取的封装mvc 地址是： "+wallet.getAddress());
+              // });
+              // getCurrentBtcWallet().then((wallet) => {
+              //   console.log(" 获取的封装btc 地址是： "+wallet.getAddress());
+              //   console.log(" 获取的封装btc 地址是： "+wallet.getPath());
+              // });
 
-              console.log(
-                "click   " + metaletWallet.btcNestedSegwitWallet.getAddress()
-              );
+              // fetchBtcActivityRecord("bc1qxwul4ktslh9zumv8nvp2seyukz0jcmdxzq8kx6").then((res) => {
+
+              //   console.log(" 获取的封装btc 地址是： "+res);
+                
+              // });
+
+              let data= await fetchBtcActivityRecord("bc1qxwul4ktslh9zumv8nvp2seyukz0jcmdxzq8kx6");
+              console.log(" 获取的封装btc 地址是： "+JSON.stringify(data));
+              
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -321,11 +1040,22 @@ export default function HomePage(props: any) {
           </TouchableWithoutFeedback>
         </View>
 
-        <MyTabs />
+        {/* <MyTabs /> */}
+        {/* {[network_all].includes(netWork) && <MyTabs01 />}
+        {[, network_btc].includes(netWork) && <MyTabs02 />}
+        {[, network_mvc].includes(netWork) && <MyTabs03 />} */}
+
+        {netWork == network_all && <MyTabs01 />}
+
+        {netWork == network_btc && <MyTabs02 />}
+
+        {netWork == network_mvc && <MyTabs03 />}
       </View>
     </SafeAreaView>
   );
 }
+
+//底部
 
 function MyTabs() {
   return (
@@ -333,6 +1063,10 @@ function MyTabs() {
       tabBarPosition="top"
       tabBar={(props) => <CustomTabBar {...props} />}
       style={{ flex: 1, marginBottom: 20, marginTop: 10 }}
+      screenOptions={{
+        tabBarScrollEnabled: true,
+        swipeEnabled: false,
+      }}
 
       // screenOptions={{
       //   tabBarLabelStyle:{fontSize:15,fontWeight:'bold',textTransform: 'none',},
@@ -354,6 +1088,87 @@ function MyTabs() {
         name="NFT"
         options={{ title: "NFTs" }}
         component={NftPage}
+      />
+    </TabsTop.Navigator>
+  );
+}
+
+function MyTabs01() {
+  return (
+    <TabsTop.Navigator
+      tabBarPosition="top"
+      tabBar={(props) => <CustomTabBar {...props} />}
+      style={{ flex: 1, marginBottom: 20, marginTop: 20 }}
+    >
+      <TabsTop.Screen
+        name="Assets"
+        options={{ title: "Assets" }}
+        component={AssetsPage}
+      />
+
+      <TabsTop.Screen
+        name="FT1"
+        options={{ title: "FTs" }}
+        component={FtParentPage}
+      />
+      <TabsTop.Screen
+        name="NFT1"
+        options={{ title: "NFTs" }}
+        component={NftParentPage}
+      />
+    </TabsTop.Navigator>
+  );
+}
+
+function MyTabs02() {
+  return (
+    <TabsTop.Navigator
+      tabBarPosition="top"
+      tabBar={(props) => <CustomTabBar {...props} />}
+      style={{ flex: 1, marginBottom: 20, marginTop: 20 }}
+    >
+      <TabsTop.Screen
+        name="Assets"
+        options={{ title: "Assets" }}
+        component={AssetsPage}
+      />
+
+      <TabsTop.Screen
+        name="FT2"
+        options={{ title: "FTs" }}
+        component={FtBtcPage}
+      />
+      <TabsTop.Screen
+        name="NFT2"
+        options={{ title: "NFTs" }}
+        component={NftBtcPage}
+      />
+    </TabsTop.Navigator>
+  );
+}
+
+function MyTabs03() {
+  return (
+    <TabsTop.Navigator
+      tabBarPosition="top"
+      tabBar={(props) => <CustomTabBar {...props} />}
+      style={{ flex: 1, marginBottom: 20, marginTop: 20 }}
+    >
+      <TabsTop.Screen
+        name="Assets3"
+        options={{ title: "Assets" }}
+        component={AssetsPage}
+      />
+
+      <TabsTop.Screen
+        name="FT3"
+        options={{ title: "FTs" }}
+        component={FtMvcPage}
+      />
+      <TabsTop.Screen
+        name="NFT3"
+        options={{ title: "NFTs" }}
+        component={NftMvcPage}
       />
     </TabsTop.Navigator>
   );

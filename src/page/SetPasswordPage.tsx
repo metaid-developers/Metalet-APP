@@ -21,7 +21,7 @@ import EasyToast from "react-native-easy-toast";
 import { ActivityIndicator } from "react-native-paper";
 
 import { LinearGradient } from "expo-linear-gradient";
-import {AsyncStorageUtil, wallets_key} from "../utils/AsyncStorageUtil";
+import {AsyncStorageUtil, wallets_key, walllet_address_type_key} from "../utils/AsyncStorageUtil";
 
 import { useData } from "../hooks/MyProvider";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
@@ -52,6 +52,7 @@ export default function SetPasswordPage(props) {
       //wallet
       let walletName;
       let walletID = Math.random().toString(36).substr(2, 8);
+      let wallet_addressType=AddressType.Legacy;
       let mvcTypes = 236;
 
       //account
@@ -69,7 +70,9 @@ export default function SetPasswordPage(props) {
           mnemonic,
           mvcTypes,
           isOpen: true,
-          addressTpye:AddressType.Legacy,
+          addressTpye:wallet_addressType,
+          isBackUp:false,
+          isCurrentPathIndex:0,
           accountsOptions: [
             {
               id: accountID,
@@ -84,6 +87,7 @@ export default function SetPasswordPage(props) {
         // const updataWallets=[...value,walletBean]
         const updataWallets=addWallet(value,walletBean)
         await AsyncStorageUtil.updateItem(wallets_key, updataWallets);
+        await AsyncStorageUtil.setItem(walllet_address_type_key,wallet_addressType)
   
         // const myWalletManager = new MetaletWalletManager({
         //   network: "mainnet",
@@ -116,7 +120,9 @@ export default function SetPasswordPage(props) {
           mnemonic,
           mvcTypes,
           isOpen: true,
-          addressTpye:AddressType.Legacy,
+          addressTpye:wallet_addressType,
+          isBackUp:false,
+          isCurrentPathIndex:0,
           accountsOptions: [
             {
               id: accountID,
@@ -130,27 +136,28 @@ export default function SetPasswordPage(props) {
         };
         let initWallets = [walletBean];
         await AsyncStorageUtil.updateItem(wallets_key, initWallets);
+        await AsyncStorageUtil.setItem(walllet_address_type_key,wallet_addressType)
+        
+        // const myWalletManager = new MetaletWalletManager({
+        //   network: "mainnet",
+        //   walletsOptions: [
+        //     {
+        //       id: walletID,
+        //       mnemonic: mnemonic,
+        //       name: walletName,
+        //       mvcTypes: [mvcTypes],
+        //       accountsOptions: [
+        //         {
+        //           id: accountID,
+        //           name: accountName,
+        //           addressIndex: accountAddressIndex,
+        //         },
+        //       ],
+        //     },
+        //   ],
+        // });
   
-        const myWalletManager = new MetaletWalletManager({
-          network: "mainnet",
-          walletsOptions: [
-            {
-              id: walletID,
-              mnemonic: mnemonic,
-              name: walletName,
-              mvcTypes: [mvcTypes],
-              accountsOptions: [
-                {
-                  id: accountID,
-                  name: accountName,
-                  addressIndex: accountAddressIndex,
-                },
-              ],
-            },
-          ],
-        });
-  
-        updateWalletManager(myWalletManager);
+        // updateWalletManager(myWalletManager);
 
       }
 
