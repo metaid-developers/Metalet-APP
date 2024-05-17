@@ -49,6 +49,7 @@ export default function App() {
     <UserProvider>
       <AppNavigator />
     </UserProvider>
+   
   );
 }
 

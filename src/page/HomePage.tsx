@@ -16,6 +16,7 @@ import {
   GradientAvatar,
   LoadingModal,
   LoadingNoticeModal,
+  
 } from "../constant/Widget";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import SplacePage from "./SplacePage";
@@ -70,6 +71,7 @@ import {
   fetchMvcActivityComfird,
 } from "../api/metaletservice";
 import { getCurrentBtcWallet, getCurrentMvcWallet } from "../wallet/wallet";
+
 // import RNFS from "react-native-fs";
 
 // Home 开发
@@ -101,7 +103,7 @@ export default function HomePage(props: any) {
   const [nestedSegwitAddress, setNestedSegwitAddress] = useState<string>();
   const [nativeSegwitAddress, setNativeSegwitAddress] = useState<string>();
   const [sameBtcAsMvcAddress, setSameBtcAsMvcAddress] = useState<string>();
-  
+
   // const [mvcAddress, setMvcAddress] = useState<string>();
 
   // 当前网络
@@ -144,7 +146,7 @@ export default function HomePage(props: any) {
       false,
       btcParams
     );
-    console.log("btc余额 ", dataBtcBalance);
+    // console.log("btc余额 ", dataBtcBalance);
     metaletWallet.currentBtcBalance = dataBtcBalance.data.balance;
 
     metaletWallet.currentSumBalance =
@@ -160,30 +162,34 @@ export default function HomePage(props: any) {
     updateMetaletWallet(metaletWallet);
   };
 
-  useEffect(() => {
-    console.log("HomePage useEffect");
+  // useEffect(() => {
+  //   console.log("HomePage useEffect");
 
-    initCurrentWallet();
+  //   initCurrentWallet();
 
-    eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
-      initCurrentWallet();
-      setIsShowLoading(true);
-      setTimeout(() => {
-        setIsShowLoading(false);
-      }, 1000);
-    });
-  }, []);
-
+  //   eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
+  //     initCurrentWallet();
+  //     setIsShowLoading(true);
+  //     setTimeout(() => {
+  //       setIsShowLoading(false);
+  //     }, 1000);
+  //   });
+  // }, []);
 
   useEffect(() => {
     console.log("HomePage useEffect  btc 地址变化");
 
-    getMVCBalance()
-
+    getMVCBalance();
+    initCurrentWallet();
     setIsShowLoading(true);
-      setTimeout(() => {
-        setIsShowLoading(false);
-      }, 1000);
+    console.log('showing')
+    const timeout = setTimeout(() => {
+      console.log('hiding')
+      setIsShowLoading(false);
+    }, 1);
+
+    return () => clearTimeout(timeout)
+
   }, [btcAddress]);
 
   // useFocusEffect(
@@ -225,8 +231,6 @@ export default function HomePage(props: any) {
         if (account.isSelect == true) {
           updateMyWallet(wallet);
 
-          console.log("accountIndex: " + account.addressIndex);
-
           const btcTaprootWallet = new BtcWallet({
             network: "mainnet",
             mnemonic: myWallet.mnemonic,
@@ -236,6 +240,7 @@ export default function HomePage(props: any) {
           });
           metaletWallet.btcTaprootWallet = btcTaprootWallet;
           setTaprootAddress(btcTaprootWallet.getAddress());
+
 
           const btcNativeSegwitWallet = new BtcWallet({
             network: "mainnet",
@@ -277,7 +282,10 @@ export default function HomePage(props: any) {
 
           metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
           setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
-          console.log("切换后的btc地址btSameAsLegacyWallet  ", btcSameAsLegacyWallet.getAddress());
+          // console.log(
+          //   "切换后的btc地址btSameAsLegacyWallet  ",
+          //   btcSameAsLegacyWallet.getAddress()
+          // );
 
           const mvcWallet = new MvcWallet({
             network: "mainnet",
@@ -289,8 +297,6 @@ export default function HomePage(props: any) {
 
           updateMvcAddress(mvcWallet.getAddress());
           updateBtcAddress(btcLegacyWallet.getAddress());
-
-       
 
           metaletWallet.currentBtcWallet = btcSameAsLegacyWallet;
           metaletWallet.currentMvcWallet = mvcWallet;
@@ -392,6 +398,7 @@ export default function HomePage(props: any) {
 
   return (
     <SafeAreaView style={metaStyles.parentContainer}>
+     
       <LoadingModal
         isShow={isShowLoading}
         isCancel={true}
@@ -413,8 +420,8 @@ export default function HomePage(props: any) {
           <View
             style={{
               backgroundColor: "#fff",
-              borderTopRightRadius:10,
-              borderTopLeftRadius:10,
+              borderTopRightRadius: 10,
+              borderTopLeftRadius: 10,
 
               paddingLeft: 20,
               paddingRight: 20,
@@ -452,7 +459,6 @@ export default function HomePage(props: any) {
               </TouchableWithoutFeedback>
             </View>
 
-           
             {/* btc Legacy */}
             <View
               style={{
@@ -705,8 +711,8 @@ export default function HomePage(props: any) {
               </TouchableWithoutFeedback>
             </View>
 
-              {/* sameAsMvc */}
-              <View
+            {/* sameAsMvc */}
+            <View
               style={{
                 flexDirection: "row",
                 marginTop: 20,
@@ -766,7 +772,6 @@ export default function HomePage(props: any) {
                 />
               </TouchableWithoutFeedback>
             </View>
-
 
             {/* mvc */}
             <View
@@ -941,7 +946,9 @@ export default function HomePage(props: any) {
             onPress={() => {
               // updateUserData({ ...userData, name: "校长" });
               //  AsyncStorage.removeItem(network_key);
-              console.log(metaletWallet.btcLegacyWallet.getAddress());
+              // console.log(metaletWallet.btcLegacyWallet.getAddress());
+              // navigate("SendSelectAssertPage");
+              navigate("PasswordPage");
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -1020,12 +1027,13 @@ export default function HomePage(props: any) {
               // fetchBtcActivityRecord("bc1qxwul4ktslh9zumv8nvp2seyukz0jcmdxzq8kx6").then((res) => {
 
               //   console.log(" 获取的封装btc 地址是： "+res);
-                
+
               // });
 
-              let data= await fetchBtcActivityRecord("bc1qxwul4ktslh9zumv8nvp2seyukz0jcmdxzq8kx6");
-              console.log(" 获取的封装btc 地址是： "+JSON.stringify(data));
-              
+              let data = await fetchBtcActivityRecord(
+                "bc1qxwul4ktslh9zumv8nvp2seyukz0jcmdxzq8kx6"
+              );
+              console.log(" 获取的封装btc 地址是： " + JSON.stringify(data));
             }}
           >
             <View style={{ marginTop: 20 }}>

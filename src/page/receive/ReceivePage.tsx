@@ -139,6 +139,7 @@ export default function ReceivePage({ route }) {
                 style={{ width: 70, height: 70 }}
               />
             )}
+
             <Text
               style={{
                 color: "#333",

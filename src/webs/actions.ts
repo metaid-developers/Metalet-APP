@@ -29,7 +29,4 @@ window.metaidwallet = {
     postMessage("getPublick", "*");
   },
 
-
-
-
 };`;

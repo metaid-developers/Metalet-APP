@@ -11,7 +11,7 @@ import {
   NoMoreDataView,
   TitleBar,
 } from "../../constant/Widget";
-import { goBack } from "../../base/NavigationService";
+import { goBack, navigate } from "../../base/NavigationService";
 import { metaStyles, themeColor } from "../../constant/Constants";
 import { MvcActivityRecord } from "../../types/mvcrecord";
 import { fetchMvcActivityComfird } from "../../api/metaletservice";
@@ -30,25 +30,24 @@ export default function AssetsMvcDetailPage({ route }) {
   const [isShowNotice, setIsShowNotice] = useState(false);
   const { metaletWallet, updateMetaletWallet } = useData();
 
-
   useEffect(() => {
     getActivityList();
   }, []);
 
   async function getActivityList() {
     let mvcActivityListData = await fetchMvcActivityComfird(mvcAddress, true);
-    
+
     if (mvcActivityListData.length == 0) {
-    let record: MvcActivityRecord = {
-      flag: "1",
-      address: "1",
-      time: 1712334223000,
-      height: 1,
-      income: 1,
-      outcome: 1,
-      txid: "",
-    };
-    setMvcActivityList([...mvcActivityList, record]);
+      let record: MvcActivityRecord = {
+        flag: "1",
+        address: "1",
+        time: 1712334223000,
+        height: 1,
+        income: 1,
+        outcome: 1,
+        txid: "",
+      };
+      setMvcActivityList([...mvcActivityList, record]);
     } else {
       setMvcActivityList([...mvcActivityListData]);
     }
@@ -256,36 +255,40 @@ export default function AssetsMvcDetailPage({ route }) {
             </Text>
           </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: themeColor,
-              borderRadius: 30,
-              paddingVertical: 20,
-              paddingHorizontal: 30,
-              alignItems: "center",
-              justifyContent: "center",
-              marginLeft: 20,
-              width: "40%",
-            }}
-          >
-            <Image
-              source={require("../../../image/assert_receive_icon.png")}
-              style={{ width: 15, height: 15 }}
-            />
-
-            <Text
+          <TouchableWithoutFeedback onPress={() => {
+            navigate('ReceivePage',{myCoinType:'SPACE'})
+          }}>
+            <View
               style={{
-                color: "#fff",
-                textAlign: "center",
-                marginLeft: 10,
-                lineHeight: 20,
-                fontSize: 18,
+                flexDirection: "row",
+                backgroundColor: themeColor,
+                borderRadius: 30,
+                paddingVertical: 20,
+                paddingHorizontal: 30,
+                alignItems: "center",
+                justifyContent: "center",
+                marginLeft: 20,
+                width: "40%",
               }}
             >
-              Receive
-            </Text>
-          </View>
+              <Image
+                source={require("../../../image/assert_receive_icon.png")}
+                style={{ width: 15, height: 15 }}
+              />
+
+              <Text
+                style={{
+                  color: "#fff",
+                  textAlign: "center",
+                  marginLeft: 10,
+                  lineHeight: 20,
+                  fontSize: 18,
+                }}
+              >
+                Receive
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
         </View>
       </View>
     );

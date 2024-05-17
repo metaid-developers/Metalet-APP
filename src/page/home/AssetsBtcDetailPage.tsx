@@ -13,7 +13,7 @@ import {
   NoMoreDataView,
   TitleBar,
 } from "../../constant/Widget";
-import { goBack } from "../../base/NavigationService";
+import { goBack, navigate } from "../../base/NavigationService";
 import { metaStyles, themeColor } from "../../constant/Constants";
 import {
   BtcRootRecord,
@@ -339,6 +339,9 @@ export default function AssetsBtcDetailPage({ route }) {
             </Text>
           </View>
 
+          <TouchableWithoutFeedback onPress={() => {
+            navigate('ReceivePage',{myCoinType:'BTC'})
+          }}>
           <View
             style={{
               flexDirection: "row",
@@ -369,6 +372,7 @@ export default function AssetsBtcDetailPage({ route }) {
               Receive
             </Text>
           </View>
+          </TouchableWithoutFeedback>
         </View>
       </View>
     );

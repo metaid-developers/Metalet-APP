@@ -41,6 +41,8 @@ import WebPageTest from "../webs/WebPageTest";
 import WebsPage from "../webs/WebsPage";
 import AssetsMvcDetailPage from "../page/home/AssetsMvcDetailPage";
 import AssetsBtcDetailPage from "../page/home/AssetsBtcDetailPage";
+import SendSelectAssertPage from "../page/home/SendSelectAssertPage";
+import PasswordPage from "../page/home/PasswordPage";
 
 ////////
 
@@ -94,6 +96,8 @@ const StackNavigator = () => (
     <Stack.Screen name="WebsPage" component={WebsPage} />
     <Stack.Screen name="AssetsMvcDetailPage" component={AssetsMvcDetailPage} />
     <Stack.Screen name="AssetsBtcDetailPage" component={AssetsBtcDetailPage} />
+    <Stack.Screen name="SendSelectAssertPage" component={SendSelectAssertPage} />
+    <Stack.Screen name="PasswordPage" component={PasswordPage} />
 
 
 

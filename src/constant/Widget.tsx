@@ -9,6 +9,7 @@ import {
   Modal,
   LayoutChangeEvent,
   TextInput,
+  Button,
 } from "react-native";
 import { metaStyles, themeColor } from "../constant/Constants";
 import { goBack } from "../base/NavigationService";
@@ -19,6 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import QRCode from "react-native-qrcode-svg";
+import PasswordPay from "react-native-password-pay";
 
 export const styles = StyleSheet.create({
   centeredView: {
@@ -186,7 +188,7 @@ export const TitleBar = ({
 //     goBack();
 //   },
 //   rightevent = () => {},
- 
+
 // }) => {
 //   return (
 //     <View
@@ -529,9 +531,14 @@ export const VerifyModal = ({
         <View
           style={{
             backgroundColor: "#fff",
-            borderRadius: 10,
-            padding: 20,
-            marginBottom: 20,
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            paddingBottom: 40,
+            paddingTop: 30,
+            paddingHorizontal:20
+            
+
+
           }}
         >
           <View style={{ flexDirection: "row" }}>
@@ -555,7 +562,7 @@ export const VerifyModal = ({
           <Text style={{ marginTop: 20, color: "#666", fontSize: 14 }}>
             Please enter your wallet password
           </Text>
-
+          {/* 
           <View
             style={{
               alignItems: "center",
@@ -568,7 +575,7 @@ export const VerifyModal = ({
               marginTop: 20,
             }}
           >
-            <TextInput
+          <TextInput
               multiline={true}
               // placeholder={editWalletName}
               autoCapitalize={"none"}
@@ -579,10 +586,29 @@ export const VerifyModal = ({
                 marginLeft: 10,
                 paddingRight: 20,
               }}
+            /> */}
+
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 30,
+            }}
+          >
+            <PasswordPay
+              maxLength={6}
+              onChange={(value) => {
+                console.log("输入的密码：", value);
+                if (value.length == 6) {
+                  event(inputText);
+                }
+              }}
             />
           </View>
 
-          <TouchableWithoutFeedback
+          {/* </View> 
+
+           <TouchableWithoutFeedback
             onPress={async () => {
               event(inputText);
             }}
@@ -624,7 +650,7 @@ export const VerifyModal = ({
                 </Text>
               </View>
             </View>
-          </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback> */}
         </View>
       </View>
     </Modal>
