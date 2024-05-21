@@ -38,6 +38,8 @@ export default function AssetsMvcDetailPage({ route }) {
     let mvcActivityListData = await fetchMvcActivityComfird(mvcAddress, true);
 
     if (mvcActivityListData.length == 0) {
+      console.log("mvcActivityListData.length == 0");
+      
       let record: MvcActivityRecord = {
         flag: "1",
         address: "1",
@@ -47,7 +49,7 @@ export default function AssetsMvcDetailPage({ route }) {
         outcome: 1,
         txid: "",
       };
-      setMvcActivityList([...mvcActivityList, record]);
+      setMvcActivityList([...mvcActivityListData, record]);
     } else {
       setMvcActivityList([...mvcActivityListData]);
     }
@@ -74,6 +76,9 @@ export default function AssetsMvcDetailPage({ route }) {
     } else {
       isIncome = false;
     }
+
+    console.log(item.address);
+    
 
     return (
       <View>
@@ -157,14 +162,14 @@ export default function AssetsMvcDetailPage({ route }) {
             style={{
               justifyContent: "center",
               alignItems: "center",
-              width: "100%",
-              height: "100%",
+              // width: "100%",
+              // height: "100%",
               // opacity: isShow?1:0,
             }}
           >
             <Image
               source={require("../../../image/assert_record_nodata_icon.png")}
-              style={{ width: 38, height: 53 }}
+              style={{ width: 38, height: 53,marginTop: 100  }}
             />
 
             <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
@@ -225,7 +230,13 @@ export default function AssetsMvcDetailPage({ route }) {
             alignItems: "center",
           }}
         >
-          <View
+        
+        <TouchableWithoutFeedback
+        onPress={()=>{
+          navigate("SendSpacePage");
+        }}
+        >
+        <View
             style={{
               flexDirection: "row",
               backgroundColor: "#F3F3FF",
@@ -254,6 +265,7 @@ export default function AssetsMvcDetailPage({ route }) {
               Send
             </Text>
           </View>
+        </TouchableWithoutFeedback>
 
           <TouchableWithoutFeedback onPress={() => {
             navigate('ReceivePage',{myCoinType:'SPACE'})

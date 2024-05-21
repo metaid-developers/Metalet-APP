@@ -1,4 +1,11 @@
-import { View, Text, Image, TextInput, ImageBackground, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  ImageBackground,
+  Dimensions,
+} from "react-native";
 import React, { useEffect } from "react";
 import { metaStyles } from "../constant/Constants";
 import { useData } from "../hooks/MyProvider";
@@ -8,25 +15,18 @@ import {
   wallets_key,
 } from "../utils/AsyncStorageUtil";
 
-import {
-  BtcWallet,
-  AddressType,
-  CoinType,
-  MvcWallet,
-} from "@metalet/utxo-wallet-service";
-
+import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
+import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { TypeTest } from "../wallet/TypeTest";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { WalletBean } from "../bean/WalletBean";
 
-
 export default function SplacePage(props) {
   const { myWallet, updateMyWallet } = useData();
   const { walletManager, updateWalletManager } = useData();
   const { accountIndex, updateAccountIndex } = useData();
-  const {width,height} =Dimensions.get('window');
-
+  const { width, height } = Dimensions.get("window");
 
   //钱包
   const { metaletWallet, updateMetaletWallet } = useData();
@@ -45,11 +45,11 @@ export default function SplacePage(props) {
       }
     });
 
-    AsyncStorageUtil.getItem(wallets_key).then((value) => {
-      if (value != null&&value.length>0) {
+    AsyncStorageUtil.getItem(wallets_key).then(async (value) => {
+      if (value != null && value.length > 0) {
         // console.log("value", value);
         for (let i = 0; i < value.length; i++) {
-          let wallet : WalletBean = value[i];
+          let wallet: WalletBean = value[i];
           for (let q = 0; q < wallet.accountsOptions.length; q++) {
             let account = wallet.accountsOptions[q];
             // console.log("account", account);
@@ -79,11 +79,13 @@ export default function SplacePage(props) {
                 //选中跟mvc 路径一致
                 coinType: wallet.mvcTypes,
               });
+              const seed = btcWallet.getSeed();
               // console.log(btcWallet.getAddress());
               console.log(
                 "对应的BTC 地址 ：" + btcWallet.getAddress(),
                 btcWallet.getPath()
               );
+            
               // const btcWallet1 = new BtcWallet({
               //   network: "mainnet",
               //   mnemonic: wallet.mnemonic,
@@ -124,8 +126,9 @@ export default function SplacePage(props) {
                 addressIndex: account.addressIndex,
                 addressType: AddressType.LegacyMvc,
                 coinType: wallet.mvcTypes,
+                seed: seed,
               });
-            
+
               // mvcWallet.send({
 
               //   toAddress: "MvC1LJK2K3yJJYQVzQKZ3vZgV1vKJZgKV",
@@ -138,6 +141,13 @@ export default function SplacePage(props) {
               metaletWallet.currentMvcWallet = mvcWallet;
 
               updateMetaletWallet(metaletWallet);
+
+              // const encoder = new TextEncoder();
+              const decoder = new TextDecoder();
+              const seedString = decoder.decode(seed);
+              console.log(seedString);
+              // const seedString = Buffer.from(seed, "hex").toString();
+              await AsyncStorageUtil.setItem("seed_key", seedString);
 
               props.navigation.navigate("Tabs");
             }
@@ -176,8 +186,7 @@ export default function SplacePage(props) {
     >
       <Image
         source={require("../../assets/splash.png")}
-        style={{width:'100%',height:'100%'}}
-
+        style={{ width: "100%", height: "100%" }}
       />
       {/* <Text
         style={[{ marginTop: 10 }, { fontWeight: "bold" }, { fontSize: 22 }]}

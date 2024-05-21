@@ -484,9 +484,10 @@ export default function WalletsPage() {
             <View
               style={{
                 backgroundColor: "#fff",
-                borderRadius: 10,
                 padding: 20,
-                marginBottom: 20,
+                borderTopRightRadius: 10,
+                borderTopLeftRadius: 10,
+                paddingBottom:40
               }}
             >
               <View style={{ flexDirection: "row" }}>
@@ -608,9 +609,10 @@ export default function WalletsPage() {
             <View
               style={{
                 backgroundColor: "#fff",
-                borderRadius: 10,
                 padding: 20,
-                marginBottom: 20,
+                borderTopRightRadius: 10,
+                borderTopLeftRadius: 10,
+                paddingBottom:40
               }}
             >
               <View style={{ flexDirection: "row" }}>

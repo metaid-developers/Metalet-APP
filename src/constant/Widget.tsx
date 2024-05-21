@@ -10,6 +10,7 @@ import {
   LayoutChangeEvent,
   TextInput,
   Button,
+  Alert,
 } from "react-native";
 import { metaStyles, themeColor } from "../constant/Constants";
 import { goBack } from "../base/NavigationService";
@@ -21,6 +22,7 @@ import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import QRCode from "react-native-qrcode-svg";
 import PasswordPay from "react-native-password-pay";
+import { Camera, CameraType } from "expo-camera";
 
 export const styles = StyleSheet.create({
   centeredView: {
@@ -143,6 +145,72 @@ export const RoundSimButtonFlee = ({
     </TouchableWithoutFeedback>
   );
 };
+
+// export const RoundColorButton = ({
+//   title,
+//   event,
+//   color = themeColor,
+//   textColor = themeColor,
+//   style = {},
+// }) => {
+//   return (
+//     <TouchableWithoutFeedback onPress={event}>
+
+// <View
+//                     style={[
+//                       {
+//                         flexDirection: "row",
+//                         height: 48,
+//                         width: 200,
+//                         backgroundColor: isCanReName
+//                           ? "rgba(23, 26, 255, 1)"
+//                           : "rgba(23, 26, 255, 0.5)",
+//                         borderRadius: 30,
+//                         alignItems: "center",
+//                         justifyContent: "center",
+//                         marginBottom: 20,
+//                       },
+//                     ]}
+//                   >
+//                     <Text
+//                       style={[
+//                         { textAlign: "center" },
+//                         { color: "#fff" },
+//                         { fontSize: 16 },
+//                       ]}
+//                     >
+//                       Confirm
+//                     </Text>
+//                   </View>
+
+//       <View
+//         style={[
+//           {
+//             flexDirection: "row",
+//             height: 48,
+//             width: "100%",
+//             backgroundColor: color,
+//             borderRadius: 23,
+//             alignItems: "center",
+//             justifyContent: "center",
+//             marginBottom: 20,
+//           },
+//           style,
+//         ]}
+//       >
+//         <Text
+//           style={[
+//             { textAlign: "center" },
+//             { color: textColor },
+//             { fontSize: 16 },
+//           ]}
+//         >
+//           {title}
+//         </Text>
+//       </View>
+//     </TouchableWithoutFeedback>
+//   );
+// };
 
 //2.title bar
 export const TitleBar = ({
@@ -535,10 +603,7 @@ export const VerifyModal = ({
             borderTopRightRadius: 10,
             paddingBottom: 40,
             paddingTop: 30,
-            paddingHorizontal:20
-            
-
-
+            paddingHorizontal: 20,
           }}
         >
           <View style={{ flexDirection: "row" }}>
@@ -662,6 +727,138 @@ export const MyQrCode = ({ qrData, size }) => {
   return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>
       <QRCode value={qrData} size={size} />
+    </View>
+  );
+};
+
+// 扫一扫
+export const QRScanner = ({handleScan}) => {
+  const [hasPermission, setHasPermission] = useState(null);
+  //扫描状态
+  const [scanned, setScanned] = useState(false);
+
+  const [showCamera, setShowCamera] = useState(false);
+
+  const [cameraRef, setCameraRef] = useState(null);
+
+  let satrtScan:boolean=false
+
+  useEffect(() => {
+    // 组件加载时请求摄像头权限
+    requestCameraPermission();
+
+    return () => {
+      releaseCamera(); // 组件卸载时释放相机资源
+    };
+  }, []);
+
+
+  async function getHasPermission(){
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    if (status === 'granted') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  // 请求摄像头权限
+  const requestCameraPermission = async () => {
+    // const { status } = await Camera.requestPermissionsAsync();
+    // const { status } = await Camera.requestCameraPermissionsAsync();
+    console.log("status");
+    
+    // if(status === "granted"){
+    //   setHasPermission(true);
+    //   if(!showCamera&&satrtScan==false){
+    //     console.log("startScanning");
+    //     satrtScan=true
+    //     startScanning()
+    //   }
+    // }
+
+
+    const hasPer=await getHasPermission()
+    if(hasPer&&satrtScan==false){
+      console.log('开始');
+      setHasPermission(true);
+      satrtScan=true
+      startScanning()
+    }
+    // setHasPermission(status === "granted");
+    
+  };
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    // setScanned(true);
+    // Alert.alert(`扫描结果`, `类型: ${type}\n数据: ${data}`);
+    console.log(type, data);
+    if(data!=null){
+      handleScan(data)
+      stopScanning()
+    }
+    
+  };
+
+  const startScanning = async () => {
+    setShowCamera(true);
+    // if (!hasPermission) {
+    //   await requestCameraPermission();
+    // }else{
+    //   console.log('开始');
+      
+    //   setShowCamera(true);
+    // } 
+  };
+
+  const stopScanning = () => {
+    setScanned(true);
+    setShowCamera(false);
+    if (cameraRef) {
+      cameraRef.pausePreview(); // 暂停相机预览
+    }
+  };
+
+  // const scanQRCode = async () => {
+  //   if (!hasPermission) {
+  //     // 请求摄像头权限
+  //     await requestCameraPermission();
+  //   }
+  //   // 如果有权限，显示摄像头
+  //   if (hasPermission) {
+  //     return (
+  //       <Camera
+  //         style={{ flex: 1 }}
+  //         type={CameraType.back}
+  //         // 扫描二维码时触发的回调函数
+  //         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+  //       />
+  //     );
+  //   } else {
+  //     return (
+  //       <View style={{ flex: 1 }}>
+  //         <Text>没有权限</Text>
+  //       </View>
+  //     );
+  //   }
+  // };
+
+  const releaseCamera = () => {
+    if (cameraRef) {
+      cameraRef.release(); // 释放相机资源
+    }
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      {showCamera && hasPermission && (
+        <Camera
+          style={{ flex: 1 }}
+          type={CameraType.back}
+          ref={(ref) => setCameraRef(ref)}
+          // 扫描二维码时触发的回调函数
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        />
+      )}
     </View>
   );
 };

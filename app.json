@@ -16,7 +16,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.show.mvc.mvcwallet"
+      "bundleIdentifier": "com.show.mvc.mvcwallet",
+      "permissions": ["CAMERA", "PHOTO_LIBRARY_ADD_ONLY"]
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +29,8 @@
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
-        "CAMERA_ROLL"
+        "CAMERA_ROLL",
+        "CAMERA"
       ],
       "keystore":{
         "keystorePath":"/Users/simkeep/RN/Metalet/metalet.jks",

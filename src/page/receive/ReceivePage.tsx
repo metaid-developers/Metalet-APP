@@ -76,7 +76,7 @@ export default function ReceivePage({ route }) {
             </Text>
 
             <View style={{ marginTop: 40 }}>
-              <MyQrCode qrData={"qrDatasdffdsfsfdsf"} size={width - 130} />
+              <MyQrCode qrData={metaletWallet.currentBtcWallet.getAddress()} size={width - 130} />
             </View>
 
             <TouchableWithoutFeedback
@@ -166,7 +166,7 @@ export default function ReceivePage({ route }) {
             </Text>
 
             <View style={{ marginTop: 40 }}>
-              <MyQrCode qrData={"qrDatasdffdsfsfdsf"} size={width - 130} />
+              <MyQrCode qrData={metaletWallet.currentMvcWallet.getAddress()} size={width - 130} />
             </View>
             <TouchableWithoutFeedback
               onPress={() => {

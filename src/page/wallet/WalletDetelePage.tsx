@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { LoadingNoticeModal, TitleBar, VerifyModal } from "../../constant/Widget";
 import { AsyncStorageUtil, wallets_key } from "../../utils/AsyncStorageUtil";
 import { navigate } from "../../base/NavigationService";
+import { eventBus, refreshHomeLoadingEvent } from "../../utils/EventBus";
 
 export default function WalletDetelePage({ route }) {
   const [isAgree, setIsAgree] = useState(false);
@@ -33,6 +34,7 @@ export default function WalletDetelePage({ route }) {
         setIsDelete(false)
         navigate('WalletsPage')
       }, 1000);
+
 
       });
     });

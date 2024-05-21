@@ -16,7 +16,6 @@ import {
   GradientAvatar,
   LoadingModal,
   LoadingNoticeModal,
-  
 } from "../constant/Widget";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import SplacePage from "./SplacePage";
@@ -41,12 +40,8 @@ import {
   network_mvc,
   wallets_key,
 } from "../utils/AsyncStorageUtil";
-import {
-  AddressType,
-  BtcWallet,
-  CoinType,
-  MvcWallet,
-} from "@metalet/utxo-wallet-service";
+import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
+import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 import { RootPriceObject } from "../bean/PriceBean";
 import { RootBtcBalanceObject } from "../bean/BtcBalanceBean";
 import * as Clipboard from "expo-clipboard";
@@ -146,7 +141,7 @@ export default function HomePage(props: any) {
       false,
       btcParams
     );
-    // console.log("btc余额 ", dataBtcBalance);
+    console.log("btc余额 ", dataBtcBalance);
     metaletWallet.currentBtcBalance = dataBtcBalance.data.balance;
 
     metaletWallet.currentSumBalance =
@@ -162,34 +157,30 @@ export default function HomePage(props: any) {
     updateMetaletWallet(metaletWallet);
   };
 
-  // useEffect(() => {
-  //   console.log("HomePage useEffect");
+  useEffect(() => {
+    console.log("HomePage useEffect");
 
-  //   initCurrentWallet();
+    initCurrentWallet();
 
-  //   eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
-  //     initCurrentWallet();
-  //     setIsShowLoading(true);
-  //     setTimeout(() => {
-  //       setIsShowLoading(false);
-  //     }, 1000);
-  //   });
-  // }, []);
+    eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
+      initCurrentWallet();
+      setIsShowLoading(true);
+      console.log("in eventBus");
+      setTimeout(() => {
+        setIsShowLoading(false);
+      }, 1000);
+    });
+  }, []);
 
   useEffect(() => {
     console.log("HomePage useEffect  btc 地址变化");
 
     getMVCBalance();
-    initCurrentWallet();
+
     setIsShowLoading(true);
-    console.log('showing')
-    const timeout = setTimeout(() => {
-      console.log('hiding')
+    setTimeout(() => {
       setIsShowLoading(false);
-    }, 1);
-
-    return () => clearTimeout(timeout)
-
+    }, 1000);
   }, [btcAddress]);
 
   // useFocusEffect(
@@ -221,6 +212,8 @@ export default function HomePage(props: any) {
     }, 800);
   }
 
+  let userAvater;
+  let accountName;
   //初始化所有钱包
   async function initCurrentWallet() {
     let wallets = await AsyncStorageUtil.getItem(wallets_key);
@@ -229,8 +222,24 @@ export default function HomePage(props: any) {
       for (let q = 0; q < wallet.accountsOptions.length; q++) {
         let account = wallet.accountsOptions[q];
         if (account.isSelect == true) {
-          updateMyWallet(wallet);
+          myWallet!.accountsOptions!.find((account) => {
+            if (account.isSelect) {
+              userAvater = account.defaultAvatarColor;
+            }
+          });
 
+          myWallet!.accountsOptions!.forEach((element) => {
+            if (element.isSelect) {
+              accountName = element.name;
+            }
+          });
+
+          updateMyWallet(wallet);
+          // const seedString = await AsyncStorageUtil.getItem("seed_key");
+          // const encoder = new TextEncoder();
+          // const seed = encoder.encode(seedString);
+
+          const t1 = performance.now();
           const btcTaprootWallet = new BtcWallet({
             network: "mainnet",
             mnemonic: myWallet.mnemonic,
@@ -238,9 +247,11 @@ export default function HomePage(props: any) {
             addressType: AddressType.Taproot,
             coinType: CoinType.BTC,
           });
+
+          const seed = btcTaprootWallet.getSeed();
+
           metaletWallet.btcTaprootWallet = btcTaprootWallet;
           setTaprootAddress(btcTaprootWallet.getAddress());
-
 
           const btcNativeSegwitWallet = new BtcWallet({
             network: "mainnet",
@@ -248,6 +259,7 @@ export default function HomePage(props: any) {
             addressIndex: account.addressIndex,
             addressType: AddressType.NativeSegwit,
             coinType: CoinType.BTC,
+            seed,
           });
           metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
           setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
@@ -258,6 +270,7 @@ export default function HomePage(props: any) {
             addressIndex: account.addressIndex,
             addressType: AddressType.NestedSegwit,
             coinType: CoinType.BTC,
+            seed,
           });
           metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
           setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
@@ -268,6 +281,7 @@ export default function HomePage(props: any) {
             addressIndex: account.addressIndex,
             addressType: AddressType.Legacy,
             coinType: CoinType.BTC,
+            seed,
           });
           metaletWallet.btcLegacyWallet = btcLegacyWallet;
           setLegacyAddress(btcLegacyWallet.getAddress());
@@ -278,6 +292,7 @@ export default function HomePage(props: any) {
             addressIndex: account.addressIndex,
             addressType: AddressType.LegacyMvc,
             coinType: wallet.mvcTypes,
+            seed,
           });
 
           metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
@@ -293,6 +308,7 @@ export default function HomePage(props: any) {
             addressIndex: account.addressIndex,
             addressType: AddressType.LegacyMvc,
             coinType: wallet.mvcTypes,
+            seed,
           });
 
           updateMvcAddress(mvcWallet.getAddress());
@@ -382,23 +398,8 @@ export default function HomePage(props: any) {
 
   const { userData, updateUserData } = useData();
 
-  let userAvater;
-  myWallet!.accountsOptions!.find((account) => {
-    if (account.isSelect) {
-      userAvater = account.defaultAvatarColor;
-    }
-  });
-
-  let accountName;
-  myWallet!.accountsOptions!.forEach((element) => {
-    if (element.isSelect) {
-      accountName = element.name;
-    }
-  });
-
   return (
     <SafeAreaView style={metaStyles.parentContainer}>
-     
       <LoadingModal
         isShow={isShowLoading}
         isCancel={true}

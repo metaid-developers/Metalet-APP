@@ -43,6 +43,7 @@ import AssetsMvcDetailPage from "../page/home/AssetsMvcDetailPage";
 import AssetsBtcDetailPage from "../page/home/AssetsBtcDetailPage";
 import SendSelectAssertPage from "../page/home/SendSelectAssertPage";
 import PasswordPage from "../page/home/PasswordPage";
+import SendSpacePage from "../page/home/SendSpacePage";
 
 ////////
 
@@ -98,6 +99,7 @@ const StackNavigator = () => (
     <Stack.Screen name="AssetsBtcDetailPage" component={AssetsBtcDetailPage} />
     <Stack.Screen name="SendSelectAssertPage" component={SendSelectAssertPage} />
     <Stack.Screen name="PasswordPage" component={PasswordPage} />
+    <Stack.Screen name="SendSpacePage" component={SendSpacePage} />
 
 
 

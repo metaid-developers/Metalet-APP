@@ -1757,6 +1757,21 @@
     decimal.js "^10.4.3"
     ecpair "^2.1.0"
 
+"@metalet/utxo-wallet-sdk@^0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.4.3.tgz#ceff9b1508dfda4c734ef3133c85e245f2c7ea65"
+  integrity sha512-jSz86CeXU4HAiK7CdlEuCniQRtg4XeHUZtKImQ0JNAvQbmdnTgN99O28fXVpqCoxGig67V03WysM5AGDcCcbtA==
+  dependencies:
+    "@bitcoinerlab/secp256k1" "^1.1.1"
+    "@magiceden-oss/runestone-lib" "^1.0.2"
+    "@okxweb3/crypto-lib" "^1.0.1"
+    "@scure/bip39" "^1.2.2"
+    bip32 "^4.0.0"
+    bitcoinjs-lib "^6.1.5"
+    bitcore-lib "^10.0.28"
+    decimal.js "^10.4.3"
+    ecpair "^2.1.0"
+
 "@metalet/utxo-wallet-service@^0.3.3":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.3.tgz#905961282740dc867f4ca6c3508d559ee1671c79"
@@ -5068,6 +5083,13 @@ expo-asset@~9.0.2:
     expo-file-system "~16.0.0"
     invariant "^2.2.4"
     md5-file "^3.2.3"
+
+expo-camera@~14.1.3:
+  version "14.1.3"
+  resolved "https://registry.yarnpkg.com/expo-camera/-/expo-camera-14.1.3.tgz#c3b36c7ed28613e7423b6c4df192549f4f9ee0dd"
+  integrity sha512-JodpVjOY8JDuSp/RkphS8Bxqaj/gwg0h0UbQB9MLr1LoxbL9brvJt7IZnmTf7+ON8jRKUx9E5o/F02pRNbmSbQ==
+  dependencies:
+    invariant "^2.2.4"
 
 expo-clipboard@~5.0.1:
   version "5.0.1"

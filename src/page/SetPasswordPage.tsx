@@ -26,13 +26,24 @@ import {AsyncStorageUtil, wallets_key, walllet_address_type_key} from "../utils/
 import { useData } from "../hooks/MyProvider";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
-import { AddressType } from "@metalet/utxo-wallet-service";
+import { AddressType, BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
 import { getRandomColorList } from "../utils/MetaFunUiils";
+import { btc_network } from "../wallet/wallet";
+import MetaletWallet from "../wallet/MetaletWallet";
 
 export default function SetPasswordPage(props) {
   const toastRef = useEasyToast("center");
   const [mnemonic, setMneMonic] = useState("");
   const { walletManager, updateWalletManager } = useData();
+
+
+
+  // 当前钱包
+  const { myWallet, updateMyWallet } = useData();
+  const { metaletWallet, updateMetaletWallet } = useData();
+
+  const { mvcAddress, updateMvcAddress } = useData();
+  const { btcAddress, updateBtcAddress } = useData();
 
   // const showToast = useCallback(() => {
   //   toastRef.current?.show('Hello World!', 2000, () => console.log('Toast dismissed'));
@@ -84,11 +95,38 @@ export default function SetPasswordPage(props) {
           ],
         };
 
+
+        const btcWallet = new BtcWallet({
+          network: btc_network,
+          mnemonic: walletBean.mnemonic,
+          addressIndex: walletBean.accountsOptions[0].addressIndex,
+          addressType: walletBean.addressTpye,
+          
+          //选中跟mvc 路径一致
+          coinType: walletBean.mvcTypes,
+        });
+
+        const mvcWallet = new MvcWallet({
+          network: "mainnet",
+          mnemonic: walletBean.mnemonic,
+          addressIndex: walletBean.accountsOptions[0].addressIndex,
+          addressType: AddressType.LegacyMvc,
+          coinType: walletBean.mvcTypes,
+        })
+
+        updateMvcAddress(mvcWallet.getAddress())
+        updateBtcAddress(btcWallet.getAddress())
+        let metaletWallet = new MetaletWallet();
+        metaletWallet.currentBtcWallet = btcWallet;
+        metaletWallet.currentMvcWallet = mvcWallet;
+        updateMetaletWallet(metaletWallet);
         // const updataWallets=[...value,walletBean]
         const updataWallets=addWallet(value,walletBean)
+        updateMyWallet(walletBean);
         await AsyncStorageUtil.updateItem(wallets_key, updataWallets);
         await AsyncStorageUtil.setItem(walllet_address_type_key,wallet_addressType)
-  
+
+
         // const myWalletManager = new MetaletWalletManager({
         //   network: "mainnet",
         //   walletsOptions: [
@@ -221,7 +259,7 @@ export default function SetPasswordPage(props) {
             numberOfLines={6}
             style={[
               metaStyles.textInputDefault,
-              { paddingVertical: 30, height: 135 },
+              { paddingVertical: 20, height: 135, textAlignVertical: "top", },
             ]}
             onChangeText={(text) => {
               setMneMonic(text);

@@ -4,6 +4,9 @@ import { AsyncStorageUtil, wallets_key, walllet_address_type_key } from "../util
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 
+// export const btc_network = "testnet";
+export const btc_network = "mainnet";
+
 export async function getStorageCurrentWallet() {
   const wallets = await AsyncStorageUtil.getItem(wallets_key);
   for (let i = 0; i < wallets.length; i++) {
@@ -24,7 +27,7 @@ export async function getCurrentMvcWallet():Promise<MvcWallet> {
   const wallet = await getStorageCurrentWallet();
 //   console.log("wallet 获取当前硬件钱包信息是： ",wallet);
   const mvcWallet = new MvcWallet({
-    network: "mainnet",
+    network: btc_network,
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
     addressType: AddressType.LegacyMvc,
@@ -44,7 +47,7 @@ export async function getCurrentBtcWallet():Promise<BtcWallet> {
     let coinType = addressType === AddressType.SameAsMvc ? wallet.mvcTypes : CoinType.BTC
 
     const btcWallet = new BtcWallet({
-      network: "mainnet",
+      network: btc_network,
       mnemonic: wallet.mnemonic,
       addressIndex: wallet.isCurrentPathIndex,
       addressType: addressType,

@@ -55,7 +55,7 @@ export default function SendSelectAssertPage() {
 
         <TouchableWithoutFeedback
           onPress={() => {
-            navigate("ReceivePage",{myCoinType:'SPACE'});
+            navigate("SendSpacePage");
           }}
         >
           <View
