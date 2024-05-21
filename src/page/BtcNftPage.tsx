@@ -8,6 +8,7 @@ import { useData } from '../hooks/MyProvider';
 import {MetaletWalletManager} from '../wallet/MetaletWalletManager';
 import { eventBus, refreshBtcFtEvent } from '../utils/EventBus';
 import { useFocusEffect } from '@react-navigation/native';
+import { btc_network } from '../wallet/wallet';
 
 
 
@@ -36,7 +37,7 @@ export default function BtcNftPage() {
 
    const getBtcNftData=async (address:string)=>{
     let params={
-      net:'mainnet',
+      net:btc_network,
       address:address,
       // address:metaletWallet.currentBtcWallet.getAddress(),
       cursor:0,

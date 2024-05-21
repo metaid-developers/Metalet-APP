@@ -39,6 +39,7 @@ import {
   network_key,
   network_mvc,
   wallets_key,
+  walllet_seed_key,
 } from "../utils/AsyncStorageUtil";
 import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
@@ -63,9 +64,11 @@ import NftMvcPage from "./nft/NftMvcPage";
 import {
   fetchAssetsPrice,
   fetchBtcActivityRecord,
+  fetchBtcBalance,
   fetchMvcActivityComfird,
 } from "../api/metaletservice";
-import { getCurrentBtcWallet, getCurrentMvcWallet } from "../wallet/wallet";
+import { btc_network, getCurrentBtcWallet, getCurrentMvcWallet, net_network } from "../wallet/wallet";
+import { Buffer } from "buffer";
 
 // import RNFS from "react-native-fs";
 
@@ -131,17 +134,12 @@ export default function HomePage(props: any) {
     metaletWallet.currentMvcBalance = dataMvcBalance.confirmed;
     // console.log("mvc余额 ", dataMvcBalance);
 
-    let btcParams = {
-      address: metaletWallet.currentBtcWallet.getAddress(),
-      net: "livenet",
-    };
 
-    let dataBtcBalance: RootBtcBalanceObject = await get(
-      BASE_METALET_URL + "/wallet-api/v3/address/btc-balance",
-      false,
-      btcParams
-    );
+    console.log("请求结果是： ", btcAddress);
+    
+    let dataBtcBalance: RootBtcBalanceObject=await  fetchBtcBalance(btcAddress)
     console.log("btc余额 ", dataBtcBalance);
+    
     metaletWallet.currentBtcBalance = dataBtcBalance.data.balance;
 
     metaletWallet.currentSumBalance =
@@ -218,7 +216,7 @@ export default function HomePage(props: any) {
   async function initCurrentWallet() {
     let wallets = await AsyncStorageUtil.getItem(wallets_key);
     for (let i = 0; i < wallets.length; i++) {
-      let wallet = wallets[i];
+      let wallet:WalletBean = wallets[i];
       for (let q = 0; q < wallet.accountsOptions.length; q++) {
         let account = wallet.accountsOptions[q];
         if (account.isSelect == true) {
@@ -235,26 +233,25 @@ export default function HomePage(props: any) {
           });
 
           updateMyWallet(wallet);
-          // const seedString = await AsyncStorageUtil.getItem("seed_key");
-          // const encoder = new TextEncoder();
-          // const seed = encoder.encode(seedString);
+          let localSeed = await AsyncStorageUtil.getItem(walllet_seed_key);
+          let seed = Buffer.from(localSeed, "hex");
 
-          const t1 = performance.now();
           const btcTaprootWallet = new BtcWallet({
-            network: "mainnet",
+            network: btc_network,
             mnemonic: myWallet.mnemonic,
             addressIndex: account.addressIndex,
             addressType: AddressType.Taproot,
             coinType: CoinType.BTC,
+            seed,
           });
 
-          const seed = btcTaprootWallet.getSeed();
+          // const seed = btcTaprootWallet.getSeed();
 
           metaletWallet.btcTaprootWallet = btcTaprootWallet;
           setTaprootAddress(btcTaprootWallet.getAddress());
 
           const btcNativeSegwitWallet = new BtcWallet({
-            network: "mainnet",
+            network: btc_network,
             mnemonic: myWallet.mnemonic,
             addressIndex: account.addressIndex,
             addressType: AddressType.NativeSegwit,
@@ -265,7 +262,7 @@ export default function HomePage(props: any) {
           setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
 
           const btcNestedSegwitWallet = new BtcWallet({
-            network: "mainnet",
+            network: btc_network,
             mnemonic: myWallet.mnemonic,
             addressIndex: account.addressIndex,
             addressType: AddressType.NestedSegwit,
@@ -276,7 +273,7 @@ export default function HomePage(props: any) {
           setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
 
           const btcLegacyWallet = new BtcWallet({
-            network: "mainnet",
+            network: btc_network,
             mnemonic: myWallet.mnemonic,
             addressIndex: account.addressIndex,
             addressType: AddressType.Legacy,
@@ -287,13 +284,15 @@ export default function HomePage(props: any) {
           setLegacyAddress(btcLegacyWallet.getAddress());
 
           const btcSameAsLegacyWallet = new BtcWallet({
-            network: "mainnet",
+            network: btc_network,
             mnemonic: myWallet.mnemonic,
             addressIndex: account.addressIndex,
             addressType: AddressType.LegacyMvc,
             coinType: wallet.mvcTypes,
             seed,
           });
+
+        
 
           metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
           setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
@@ -303,20 +302,39 @@ export default function HomePage(props: any) {
           // );
 
           const mvcWallet = new MvcWallet({
-            network: "mainnet",
+            network:"mainnet",
             mnemonic: wallet.mnemonic,
             addressIndex: account.addressIndex,
             addressType: AddressType.LegacyMvc,
             coinType: wallet.mvcTypes,
             seed,
           });
-
+        
+    
+         
+       
+          const nowBtcWallet = new BtcWallet({
+            network: btc_network,
+            mnemonic: myWallet.mnemonic,
+            addressIndex: account.addressIndex,
+            addressType: wallet.addressTpye,
+            coinType:wallet.addressTpye==AddressType.SameAsMvc? wallet.mvcTypes:CoinType.BTC,
+            seed,
+          });
           updateMvcAddress(mvcWallet.getAddress());
-          updateBtcAddress(btcLegacyWallet.getAddress());
-
-          metaletWallet.currentBtcWallet = btcSameAsLegacyWallet;
+          updateBtcAddress(nowBtcWallet.getAddress());
+          console.log(wallet.addressTpye);
+          
+        
+          console.log("updateBtcAddress"+nowBtcWallet.getAddress());
+          
+          metaletWallet.currentBtcWallet = nowBtcWallet;
           metaletWallet.currentMvcWallet = mvcWallet;
           updateMetaletWallet(metaletWallet);
+
+
+
+          getMVCBalance();
 
           // myTestMvc= mvcWallet.getAddress();
 
@@ -331,57 +349,8 @@ export default function HomePage(props: any) {
       }
     }
 
-    // // console.log("当前" + JSON.stringify(myWallet));
-    // const btcTaprootWallet = new BtcWallet({
-    //   network: "mainnet",
-    //   mnemonic: myWallet.mnemonic,
-    //   addressIndex: 0,
-    //   addressType: AddressType.Taproot,
-    //   coinType: CoinType.BTC,
-    // });
-    // metaletWallet.btcTaprootWallet = btcTaprootWallet;
-    // setTaprootAddress(btcTaprootWallet.getAddress());
-
-    // const btcNativeSegwitWallet = new BtcWallet({
-    //   network: "mainnet",
-    //   mnemonic: myWallet.mnemonic,
-    //   addressIndex: 0,
-    //   addressType: AddressType.NativeSegwit,
-    //   coinType: CoinType.BTC,
-    // });
-    // metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
-    // setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
-
-    // const btcNestedSegwitWallet = new BtcWallet({
-    //   network: "mainnet",
-    //   mnemonic: myWallet.mnemonic,
-    //   addressIndex: 0,
-    //   addressType: AddressType.NestedSegwit,
-    //   coinType: CoinType.BTC,
-    // });
-    // metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
-    // setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
-
-    // const btcLegacyWallet = new BtcWallet({
-    //   network: "mainnet",
-    //   mnemonic: myWallet.mnemonic,
-    //   addressIndex: 0,
-    //   addressType: AddressType.Legacy,
-    //   coinType: CoinType.BTC,
-    // });
-    // metaletWallet.btcLegacyWallet = btcLegacyWallet;
-    // setLegacyAddress(btcLegacyWallet.getAddress());
-
-    // await chooseMyWallet(myWallet);
-    // setLegacyAddress(metaletWallet.btcLegacyWallet.getAddress());
-    // setNestedSegwitAddress(metaletWallet.btcNestedSegwitWallet.getAddress());
-    // setTaprootAddress(metaletWallet.btcTaprootWallet.getAddress());
-    // setNativeSegwitAddress(metaletWallet.btcNativeSegwitWallet.getAddress());
-    // setMvcAddress(metaletWallet.currentMvcWallet.getAddress());
-
-    // updateMetaletWallet(metaletWallet);
-
-    getMVCBalance();
+  
+    
 
     await AsyncStorageUtil.getItem(network_key).then(async (saveNet) => {
       if (saveNet == null) {

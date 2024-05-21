@@ -44,6 +44,7 @@ import AssetsBtcDetailPage from "../page/home/AssetsBtcDetailPage";
 import SendSelectAssertPage from "../page/home/SendSelectAssertPage";
 import PasswordPage from "../page/home/PasswordPage";
 import SendSpacePage from "../page/home/SendSpacePage";
+import SendBtcPage from "../page/home/SendBtcPage";
 
 ////////
 
@@ -100,6 +101,7 @@ const StackNavigator = () => (
     <Stack.Screen name="SendSelectAssertPage" component={SendSelectAssertPage} />
     <Stack.Screen name="PasswordPage" component={PasswordPage} />
     <Stack.Screen name="SendSpacePage" component={SendSpacePage} />
+    <Stack.Screen name="SendBtcPage" component={SendBtcPage} />
 
 
 

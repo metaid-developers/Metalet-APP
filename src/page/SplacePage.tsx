@@ -13,6 +13,7 @@ import {
   AsyncStorageUtil,
   account_select_key,
   wallets_key,
+  walllet_seed_key,
 } from "../utils/AsyncStorageUtil";
 
 import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
@@ -21,6 +22,8 @@ import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { TypeTest } from "../wallet/TypeTest";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { WalletBean } from "../bean/WalletBean";
+import { Buffer } from "buffer";
+import { btc_network } from "../wallet/wallet";
 
 export default function SplacePage(props) {
   const { myWallet, updateMyWallet } = useData();
@@ -55,70 +58,36 @@ export default function SplacePage(props) {
             // console.log("account", account);
             if (account.isSelect == true) {
               updateMyWallet(wallet);
-              // console.log("初始化头像是："+wallet.);
 
-              // const myWalletManager = new MetaletWalletManager({
-              //   network: "mainnet",
-              //   walletsOptions: [
-              //     {
-              //       id: wallet.id,
-              //       mnemonic: wallet.mnemonic,
-              //       name: wallet.name,
-              //       mvcTypes: [wallet.mvcTypes],
-              //       accountsOptions: wallet.accountsOptions,
-              //     },
-              //   ],
-              // });
-              // updateWalletManager(myWalletManager);
+              let seed = await AsyncStorageUtil.getItem(walllet_seed_key);
+              if (!seed) {
+                seed = undefined;
+              }else{
+                seed = Buffer.from(seed, "hex");
+              }
 
               const btcWallet = new BtcWallet({
-                network: "mainnet",
+                network: btc_network,
                 mnemonic: wallet.mnemonic,
                 addressIndex: account.addressIndex,
                 addressType: wallet.addressTpye,
                 //选中跟mvc 路径一致
                 coinType: wallet.mvcTypes,
+                seed,
               });
-              const seed = btcWallet.getSeed();
+
+              if (!seed) {
+                seed = btcWallet.getSeed();
+                const saveSeed=seed.toString("hex")
+                console.log("saveSeed",saveSeed);
+                await AsyncStorageUtil.setItem(walllet_seed_key, saveSeed);
+              }
+
               // console.log(btcWallet.getAddress());
               console.log(
                 "对应的BTC 地址 ：" + btcWallet.getAddress(),
                 btcWallet.getPath()
               );
-            
-              // const btcWallet1 = new BtcWallet({
-              //   network: "mainnet",
-              //   mnemonic: wallet.mnemonic,
-              //   addressIndex: 0,
-              //   addressType: AddressType.NativeSegwit,
-              //   coinType: CoinType.BTC,
-              // });
-              // console.log(btcWallet1.getAddress());
-              // const btcWallet2 = new BtcWallet({
-              //   network: "mainnet",
-              //   mnemonic: wallet.mnemonic,
-              //   addressIndex: 0,
-              //   addressType: AddressType.NestedSegwit,
-              //   coinType: CoinType.BTC,
-              // });
-              // console.log(btcWallet2.getAddress());
-              // const btcWallet3 = new BtcWallet({
-              //   network: "mainnet",
-              //   mnemonic: wallet.mnemonic,
-              //   addressIndex: 0,
-              //   addressType: AddressType.Taproot,
-              //   coinType: CoinType.BTC,
-              // });
-              // console.log(btcWallet3.getAddress());
-
-              // const btcWallet4 = new BtcWallet({
-              //   network: "mainnet",
-              //   mnemonic: wallet.mnemonic,
-              //   addressIndex: 0,
-              //   addressType: AddressType.SameAsMvc,
-              //   coinType: CoinType.MVC,
-              // });
-              // console.log(btcWallet4.getAddress());
 
               const mvcWallet = new MvcWallet({
                 network: "mainnet",
@@ -129,25 +98,10 @@ export default function SplacePage(props) {
                 seed: seed,
               });
 
-              // mvcWallet.send({
-
-              //   toAddress: "MvC1LJK2K3yJJYQVzQKZ3vZgV1vKJZgKV",
-              //   amount: 0.0001,
-              //   feeRate: 1,
-              // });
-
               let metaletWallet = new MetaletWallet();
               metaletWallet.currentBtcWallet = btcWallet;
               metaletWallet.currentMvcWallet = mvcWallet;
-
               updateMetaletWallet(metaletWallet);
-
-              // const encoder = new TextEncoder();
-              const decoder = new TextDecoder();
-              const seedString = decoder.decode(seed);
-              console.log(seedString);
-              // const seedString = Buffer.from(seed, "hex").toString();
-              await AsyncStorageUtil.setItem("seed_key", seedString);
 
               props.navigation.navigate("Tabs");
             }

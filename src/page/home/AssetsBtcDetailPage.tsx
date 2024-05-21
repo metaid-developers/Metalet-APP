@@ -309,69 +309,75 @@ export default function AssetsBtcDetailPage({ route }) {
             alignItems: "center",
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "#F3F3FF",
-              borderRadius: 30,
-              paddingVertical: 20,
-              paddingHorizontal: 30,
-              alignItems: "center",
-              justifyContent: "center",
-              width: "40%",
-            }}
-          >
-            <Image
-              source={require("../../../image/assert_send_icon.png")}
-              style={{ width: 15, height: 15 }}
-            />
-
-            <Text
-              style={{
-                color: themeColor,
-                textAlign: "center",
-                marginLeft: 10,
-                lineHeight: 20,
-                fontSize: 18,
-              }}
-            >
-              Send
-            </Text>
-          </View>
-
           <TouchableWithoutFeedback onPress={() => {
-            navigate('ReceivePage',{myCoinType:'BTC'})
+            navigate("SendBtcPage")
           }}>
-          <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: themeColor,
-              borderRadius: 30,
-              paddingVertical: 20,
-              paddingHorizontal: 30,
-              alignItems: "center",
-              justifyContent: "center",
-              marginLeft: 20,
-              width: "40%",
-            }}
-          >
-            <Image
-              source={require("../../../image/assert_receive_icon.png")}
-              style={{ width: 15, height: 15 }}
-            />
-
-            <Text
+            <View
               style={{
-                color: "#fff",
-                textAlign: "center",
-                marginLeft: 10,
-                lineHeight: 20,
-                fontSize: 18,
+                flexDirection: "row",
+                backgroundColor: "#F3F3FF",
+                borderRadius: 30,
+                paddingVertical: 20,
+                paddingHorizontal: 30,
+                alignItems: "center",
+                justifyContent: "center",
+                width: "40%",
               }}
             >
-              Receive
-            </Text>
-          </View>
+              <Image
+                source={require("../../../image/assert_send_icon.png")}
+                style={{ width: 15, height: 15 }}
+              />
+
+              <Text
+                style={{
+                  color: themeColor,
+                  textAlign: "center",
+                  marginLeft: 10,
+                  lineHeight: 20,
+                  fontSize: 18,
+                }}
+              >
+                Send
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
+
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigate("ReceivePage", { myCoinType: "BTC" });
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                backgroundColor: themeColor,
+                borderRadius: 30,
+                paddingVertical: 20,
+                paddingHorizontal: 30,
+                alignItems: "center",
+                justifyContent: "center",
+                marginLeft: 20,
+                width: "40%",
+              }}
+            >
+              <Image
+                source={require("../../../image/assert_receive_icon.png")}
+                style={{ width: 15, height: 15 }}
+              />
+
+              <Text
+                style={{
+                  color: "#fff",
+                  textAlign: "center",
+                  marginLeft: 10,
+                  lineHeight: 20,
+                  fontSize: 18,
+                }}
+              >
+                Receive
+              </Text>
+            </View>
           </TouchableWithoutFeedback>
         </View>
       </View>
@@ -524,12 +530,12 @@ export default function AssetsBtcDetailPage({ route }) {
                   </Text>
                 </View>
 
-                {addressType == AddressType.NestedSegwit ?(
+                {addressType == AddressType.NestedSegwit ? (
                   <Image
                     source={require("../../../image/wallets_select_icon.png")}
                     style={{ width: 20, height: 20, marginRight: 10 }}
                   />
-                ):null}
+                ) : null}
               </View>
             </TouchableWithoutFeedback>
 
@@ -571,12 +577,12 @@ export default function AssetsBtcDetailPage({ route }) {
                   </Text>
                 </View>
 
-                {addressType == AddressType.NativeSegwit ?(
+                {addressType == AddressType.NativeSegwit ? (
                   <Image
                     source={require("../../../image/wallets_select_icon.png")}
                     style={{ width: 20, height: 20, marginRight: 10 }}
                   />
-                ):null}
+                ) : null}
               </View>
             </TouchableWithoutFeedback>
 
@@ -622,7 +628,7 @@ export default function AssetsBtcDetailPage({ route }) {
                     source={require("../../../image/wallets_select_icon.png")}
                     style={{ width: 20, height: 20, marginRight: 10 }}
                   />
-                ):null}
+                ) : null}
               </View>
             </TouchableWithoutFeedback>
             {/* Same as Mvc */}
@@ -667,7 +673,7 @@ export default function AssetsBtcDetailPage({ route }) {
                     source={require("../../../image/wallets_select_icon.png")}
                     style={{ width: 20, height: 20, marginRight: 10 }}
                   />
-                ):null}
+                ) : null}
               </View>
             </TouchableWithoutFeedback>
             {/* over */}

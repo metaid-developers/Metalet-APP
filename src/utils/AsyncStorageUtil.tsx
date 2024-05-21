@@ -74,3 +74,4 @@ export const network_all='network_all'
 
 
 export const walllet_address_type_key="walllet_address_type";
+export const walllet_seed_key="walllet_seed";

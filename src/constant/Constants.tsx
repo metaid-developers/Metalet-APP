@@ -183,3 +183,4 @@ export const metaStyles = StyleSheet.create({
 });
 
 export const themeColor = "#171AFF";
+export const inputNormalBgColor = 'rgba(191, 194, 204, 0.5)';

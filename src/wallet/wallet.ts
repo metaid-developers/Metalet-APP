@@ -3,9 +3,16 @@ import { WalletBean } from "../bean/WalletBean";
 import { AsyncStorageUtil, wallets_key, walllet_address_type_key } from "../utils/AsyncStorageUtil";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
+// READY
+// export const btc_network = "mainnet";
+// export const net_network = "livenet";
 
-// export const btc_network = "testnet";
-export const btc_network = "mainnet";
+
+
+export const btc_network = "testnet";
+export const net_network = "testnet";
+
+
 
 export async function getStorageCurrentWallet() {
   const wallets = await AsyncStorageUtil.getItem(wallets_key);

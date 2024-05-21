@@ -17,6 +17,7 @@ import { BTC_FT_URL, get } from "../utils/Api";
 import { useData } from "../hooks/MyProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
+import { btc_network } from "../wallet/wallet";
 
 export default function BtcFtPage() {
   let [btcFtList, setBtcFtList] = useState<BtcFtBean[]>([]);
@@ -53,7 +54,7 @@ export default function BtcFtPage() {
 
   const getBtcFtData = async (address: string) => {
     let params = {
-      net: "mainnet",
+      net: btc_network,
       // address: metaletWallet.currentBtcWallet.getAddress(),
       address: address,
       ticker: "btc",
