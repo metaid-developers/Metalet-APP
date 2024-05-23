@@ -94,6 +94,7 @@ export default function HomePage(props: any) {
   const [isShowNotice, setIsShowNotice] = useState(false);
   const [isShowLoading, setIsShowLoading] = useState(false);
   const [noticeContent, setNoticeContent] = useState("Successful");
+
   //复制地址
   const [isShowCopy, setIsShowCopy] = useState(false);
   const [legacyAddress, setLegacyAddress] = useState<string>();
@@ -311,8 +312,6 @@ export default function HomePage(props: any) {
           });
         
     
-         
-       
           const nowBtcWallet = new BtcWallet({
             network: btc_network,
             mnemonic: myWallet.mnemonic,
@@ -934,7 +933,6 @@ export default function HomePage(props: any) {
 
           <TouchableWithoutFeedback
             onPress={() => {
-              // navigate("SetPasswordPage");
               navigate("SelectReceivePage");
             }}
           >
@@ -1000,10 +998,11 @@ export default function HomePage(props: any) {
 
               // });
 
-              let data = await fetchBtcActivityRecord(
-                "bc1qxwul4ktslh9zumv8nvp2seyukz0jcmdxzq8kx6"
-              );
-              console.log(" 获取的封装btc 地址是： " + JSON.stringify(data));
+              // navigate("WebPageTest");
+              // navigate("WebPage");
+
+              AsyncStorageUtil.clear()
+
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -1032,8 +1031,6 @@ export default function HomePage(props: any) {
     </SafeAreaView>
   );
 }
-
-//底部
 
 function MyTabs() {
   return (

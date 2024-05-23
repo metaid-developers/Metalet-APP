@@ -31,7 +31,7 @@ import { getRandomColorList } from "../utils/MetaFunUiils";
 import { btc_network } from "../wallet/wallet";
 import MetaletWallet from "../wallet/MetaletWallet";
 
-export default function SetPasswordPage(props) {
+export default function ImportWalletPage(props) {
   const toastRef = useEasyToast("center");
   const [mnemonic, setMneMonic] = useState("");
   const { walletManager, updateWalletManager } = useData();
@@ -54,6 +54,7 @@ export default function SetPasswordPage(props) {
       setObj({ ...obj, isShow: true });
     }, 2000);
   };
+  
   const OpenModal = () => {
     setObj({ ...obj, isShow: true });
 
@@ -241,7 +242,7 @@ export default function SetPasswordPage(props) {
           event={closeModal}
         />
 
-        <Text style={metaStyles.largeDefaultText}>
+        <Text style={[metaStyles.largeDefaultText,{fontWeight:"bold"}]}>
           Enter your mnemonic phrase
         </Text>
         <Text style={[metaStyles.smallDefaultText, { marginTop: 20 }]}>

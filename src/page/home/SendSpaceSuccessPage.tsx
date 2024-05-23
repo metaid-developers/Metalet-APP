@@ -1,0 +1,116 @@
+import { View, Text, Image } from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { RoundSimButton, TitleBar } from "../../constant/Widget";
+import { navigate } from "../../base/NavigationService";
+
+export default function SendSpaceSuccessPage() {
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        <TitleBar
+          event={() => {
+            navigate("HomePage");
+          }}
+        />
+        <View
+          style={{
+            justifyContent: "center",
+            margin: 20,
+            alignItems: "center",
+            padding: 20,
+          }}
+        >
+          <Image
+            source={require("../../../image/pay_success_icon.png")}
+            style={{ width: "40%", height: 120 }}
+          />
+
+          <Text
+            style={{
+              color: "#333",
+              marginTop: 30,
+              fontSize: 25,
+              fontWeight: "bold",
+            }}
+          >
+            Sent Successfully
+          </Text>
+
+          <View
+            style={{
+              margin: 20,
+              padding: 20,
+              backgroundColor: "#fff",
+              borderRadius: 10,
+              width: "100%",
+            }}
+          >
+            <Text style={{ color: "#666", fontSize: 14 }}> Send Amount</Text>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../../../image/logo_space.png")}
+                style={{ width: 36, height: 36 }}
+              />
+              <Text style={{ color: "#000", fontSize: 16, marginLeft: 10 }}>
+                21836.32 BTC
+              </Text>
+            </View>
+
+            <View
+              style={{
+                marginVertical: 20,
+                backgroundColor: "#F5F7F9",
+                height: 1,
+              }}
+            />
+
+            <Text style={{ color: "#666", fontSize: 14 }}>
+              Receiving Address
+            </Text>
+            <View
+              style={{
+                marginTop: 20,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../../../image/send_receiver_wallet_icon.png")}
+                style={{ width: 36, height: 36 }}
+              />
+              <Text
+                style={{
+                  color: "#000",
+                  fontSize: 16,
+                  marginLeft: 10,
+                  marginRight: 20,
+                }}
+              >
+                0XCB515yr1G3PGJFMHVRZ4DG4k8fa88DL9UpTWKX
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={{ flex: 1 }} />
+        <View style={{ marginTop: 20, marginHorizontal: 40, marginBottom: 20 }}>
+          <RoundSimButton
+            title={"Done"}
+            textColor="#fff"
+            event={() => {
+              navigate("HomePage");
+            }}
+          />
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}

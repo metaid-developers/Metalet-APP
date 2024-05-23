@@ -12,6 +12,7 @@ import { useData } from "../hooks/MyProvider";
 import {
   AsyncStorageUtil,
   account_select_key,
+  wallet_password_key,
   wallets_key,
   walllet_seed_key,
 } from "../utils/AsyncStorageUtil";
@@ -39,6 +40,9 @@ export default function SplacePage(props) {
   }, []);
 
   async function initDataBase() {
+   
+
+
     await AsyncStorageUtil.getItem(account_select_key).then((value) => {
       if (value == null) {
         AsyncStorageUtil.setItem(account_select_key, 0);
@@ -115,7 +119,6 @@ export default function SplacePage(props) {
 
   function goToHome() {
     setTimeout(() => {
-      // props.navigation.navigate("SetPasswordPage");
       if (myWallet == null) {
         props.navigation.navigate("WelcomeWalletPage");
       } else {

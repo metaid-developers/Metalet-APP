@@ -19,7 +19,7 @@ import SettingsPage from "../page/SettingsPage";
 import WelcomeWalletPage from "../page/WelcomeWalletPage";
 import Index from "../page/Index";
 import SplacePage from "../page/SplacePage";
-import SetPasswordPage from "../page/SetPasswordPage";
+import ImportWalletPage from "../page/ImportWalletPage";
 import CongratulationsPage from "../page/CongratulationsPage";
 import MvcNftListPage from "../page/MvcNftListPage";
 import MvcNftDetailPage from "../page/MvcNftDetailPage";
@@ -45,6 +45,10 @@ import SendSelectAssertPage from "../page/home/SendSelectAssertPage";
 import PasswordPage from "../page/home/PasswordPage";
 import SendSpacePage from "../page/home/SendSpacePage";
 import SendBtcPage from "../page/home/SendBtcPage";
+import SendBtcConfirmPage from "../page/home/SendBtcConfirmPage";
+import SendBtcSuccessPage from "../page/home/SendBtcSuccessPage";
+import SendSpaceSuccessPage from "../page/home/SendSpaceSuccessPage";
+import SetPasswordPage from "../page/safe/SetPasswordPage";
 
 ////////
 
@@ -76,7 +80,7 @@ const StackNavigator = () => (
     initialRouteName="SplacePage"
     screenOptions={{ headerShown: false }}
   >
-    <Stack.Screen name="SetPasswordPage" component={SetPasswordPage} />
+    <Stack.Screen name="ImportWalletPage" component={ImportWalletPage} />
     <Stack.Screen name="SplacePage" component={SplacePage} />
     <Stack.Screen name="WelcomeWalletPage" component={WelcomeWalletPage} />
     <Stack.Screen name="CongratulationsPage" component={CongratulationsPage} />
@@ -102,7 +106,10 @@ const StackNavigator = () => (
     <Stack.Screen name="PasswordPage" component={PasswordPage} />
     <Stack.Screen name="SendSpacePage" component={SendSpacePage} />
     <Stack.Screen name="SendBtcPage" component={SendBtcPage} />
-
+    <Stack.Screen name="SendBtcConfirmPage" component={SendBtcConfirmPage} />
+    <Stack.Screen name="SendBtcSuccessPage" component={SendBtcSuccessPage} />
+    <Stack.Screen name="SendSpaceSuccessPage" component={SendSpaceSuccessPage} />
+    <Stack.Screen name="SetPasswordPage" component={SetPasswordPage} />
 
 
 

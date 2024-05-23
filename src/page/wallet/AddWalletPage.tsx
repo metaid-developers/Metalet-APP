@@ -58,7 +58,7 @@ export default function AddWalletPage() {
             </View>
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback  onPress={()=>{
-            navigate('SetPasswordPage')
+            navigate('ImportWalletPage')
           }}>
             <View
               style={[

@@ -1,6 +1,6 @@
 import { StyleSheet, Dimensions, StatusBar } from "react-native";
 
-const semiTransparentGray = "rgba(229, 229, 229, 0.7)"; // 这里的0.5表示50%的透明度
+export const semiTransparentGray = "rgba(229, 229, 229, 0.7)"; // 这里的0.5表示50%的透明度
 
 export const metaStyles = StyleSheet.create({
   //flex
@@ -103,7 +103,7 @@ export const metaStyles = StyleSheet.create({
   },
   largeDefaultText: {
     color: "#333333",
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: "bold",
     lineHeight: 30,
   },

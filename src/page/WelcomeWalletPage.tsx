@@ -11,16 +11,16 @@ import { metaStyles, themeColor } from "../constant/Constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "react-native-paper";
 import { RoundSimButton } from "../constant/Widget";
-import Index from '../page/Index';
-import  { NativeStackScreenProps } from '@react-navigation/native-stack';
-
-import {navigate} from '../base/NavigationService'
+import Index from "../page/Index";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { navigate } from "../base/NavigationService";
+import { isNoWalletPassword } from "../wallet/wallet";
 
 // type Props={
 //   navigation:StackNavigationProp<any,''/>;
 // };
 type Props = {
-  navigation: NativeStackScreenProps<any, 'Home'>; // 替换any为你的StackNavigator路由类型
+  navigation: NativeStackScreenProps<any, "Home">; // 替换any为你的StackNavigator路由类型
 };
 
 export default function WelcomeWalletPage(props) {
@@ -31,17 +31,21 @@ export default function WelcomeWalletPage(props) {
         style={styles.img}
       />
       <Text
-        style={[{ marginTop: 10 }, { fontWeight: "bold" }, { fontSize: 22 }]}
+        style={[{ marginTop: 20 }, { fontWeight: "bold" }, { fontSize: 22 }]}
       >
         Welcome To Metalet Wallet
       </Text>
+
       <View style={{ flex: 1 }} />
 
       <RoundSimButton
         title={"Import Wallet"}
         event={() => {
-          // props.navigation.navigate('SetPasswordPage')
-          navigate('SetPasswordPage',{destory:true})
+          if (isNoWalletPassword()) {
+            navigate("SetPasswordPage", { type: "import" });
+          } else {
+            navigate("ImportWalletPage", { destory: true });
+          }
         }}
         color="#F3F3FF"
       />
@@ -49,11 +53,18 @@ export default function WelcomeWalletPage(props) {
       <RoundSimButton
         title={"Create Wallet"}
         event={() => {
-          console.log("create wallet");
           // props.navigation.navigate("TabNavigator",{screen: "Home"});
-          // props.navigation.navigate('TabNavigator', { screen: 'Home' }); 
-          props.navigation.navigate('Tabs'); 
+          // props.navigation.navigate('TabNavigator', { screen: 'Home' });
+
           // navigate('Home')
+
+          if (isNoWalletPassword()) {
+            // navigate("ImportWalletPage", { destory: true });
+            navigate("SetPasswordPage", { type: "create" });
+          } else {
+            //TODO create wallet
+            props.navigation.navigate('Tabs');
+          }
         }}
         textColor="white"
       />
@@ -63,9 +74,9 @@ export default function WelcomeWalletPage(props) {
         By using Metalet,you agree and consent to our:
       </Text>
       <View style={[styles.row, { marginBottom: 40 }]}>
+        {/* <Text style={metaStyles.blueText}>User Agreement</Text> */}
+        <Text style={metaStyles.grayText99}> Metalet's </Text>
         <Text style={metaStyles.blueText}>Terms of Service</Text>
-        <Text style={metaStyles.grayText99}> and </Text>
-        <Text style={metaStyles.blueText}>Privacy Policy</Text>
       </View>
     </SafeAreaView>
   );

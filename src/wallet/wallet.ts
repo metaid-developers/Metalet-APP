@@ -1,6 +1,6 @@
 import { AddressType, BtcWallet, CoinType, MvcWallet } from "@metalet/utxo-wallet-service";
 import { WalletBean } from "../bean/WalletBean";
-import { AsyncStorageUtil, wallets_key, walllet_address_type_key } from "../utils/AsyncStorageUtil";
+import { AsyncStorageUtil, wallet_password_key, wallets_key, walllet_address_type_key } from "../utils/AsyncStorageUtil";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 // READY
@@ -69,4 +69,13 @@ export async function getCurrentBtcWallet():Promise<BtcWallet> {
   export async function getStorageAddressType() {
     const addressType=await AsyncStorageUtil.getItem(walllet_address_type_key);
     return addressType
+  }
+
+  export async function isNoWalletPassword():Promise<boolean>{
+    const  password = await AsyncStorageUtil.getItem(wallet_password_key);
+    if(password==null){
+      return true
+    }else{
+      return false
+    }
   }

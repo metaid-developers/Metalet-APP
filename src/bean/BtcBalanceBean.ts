@@ -5,10 +5,15 @@ export interface RootBtcBalanceObject {
   data: Data;
 }
 
-interface Data {
+export interface Data {
   balance: number;
   block: Block;
   mempool: Block;
+  pendingBalance: number;
+  safeBalance: number;
+  inscriptionsBalance: number;
+  runesBalance: number;
+  pinsBalance: number;
 }
 
 interface Block {

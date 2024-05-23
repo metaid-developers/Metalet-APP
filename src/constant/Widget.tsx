@@ -23,6 +23,12 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import QRCode from "react-native-qrcode-svg";
 import PasswordPay from "react-native-password-pay";
 import { Camera, CameraType } from "expo-camera";
+import { verifyPassword } from "../utils/WalletUtils";
+import {
+  AsyncStorageUtil,
+  wallet_password_key,
+} from "../utils/AsyncStorageUtil";
+// import { verifyPassword } from "../utils/WalletUtils";
 
 export const styles = StyleSheet.create({
   centeredView: {
@@ -37,6 +43,7 @@ export const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "center",
     marginBottom: 30,
+    marginHorizontal: 10,
 
     // backgroundColor: 'rgba(0, 0, 0, 0.1)',
   },
@@ -589,6 +596,7 @@ export const VerifyModal = ({
 
   return (
     <Modal transparent={true} visible={isShow}>
+      
       <View
         style={{
           flex: 1,
@@ -596,6 +604,7 @@ export const VerifyModal = ({
           backgroundColor: "rgba(0, 0, 0, 0.5)",
         }}
       >
+
         <View
           style={{
             backgroundColor: "#fff",
@@ -662,10 +671,17 @@ export const VerifyModal = ({
           >
             <PasswordPay
               maxLength={6}
-              onChange={(value) => {
-                console.log("输入的密码：", value);
-                if (value.length == 6) {
-                  event(inputText);
+              onChange={async (value) => {
+               
+                if (value.length==6) {
+                  const passwordLocal = await AsyncStorageUtil.getItem(wallet_password_key);
+                  // const isPassword = await verifyPassword(value);
+                  console.log("输入的密码：", value);
+                  if (passwordLocal==value) {
+                    event(inputText);
+                  } else {
+                    console.log("密码错误");
+                  }
                 }
               }}
             />
@@ -732,7 +748,7 @@ export const MyQrCode = ({ qrData, size }) => {
 };
 
 // 扫一扫
-export const QRScanner = ({handleScan}) => {
+export const QRScanner = ({ handleScan }) => {
   const [hasPermission, setHasPermission] = useState(null);
   //扫描状态
   const [scanned, setScanned] = useState(false);
@@ -741,7 +757,7 @@ export const QRScanner = ({handleScan}) => {
 
   const [cameraRef, setCameraRef] = useState(null);
 
-  let satrtScan:boolean=false
+  let satrtScan: boolean = false;
 
   useEffect(() => {
     // 组件加载时请求摄像头权限
@@ -752,10 +768,9 @@ export const QRScanner = ({handleScan}) => {
     };
   }, []);
 
-
-  async function getHasPermission(){
+  async function getHasPermission() {
     const { status } = await Camera.requestCameraPermissionsAsync();
-    if (status === 'granted') {
+    if (status === "granted") {
       return true;
     } else {
       return false;
@@ -766,7 +781,7 @@ export const QRScanner = ({handleScan}) => {
     // const { status } = await Camera.requestPermissionsAsync();
     // const { status } = await Camera.requestCameraPermissionsAsync();
     console.log("status");
-    
+
     // if(status === "granted"){
     //   setHasPermission(true);
     //   if(!showCamera&&satrtScan==false){
@@ -776,27 +791,24 @@ export const QRScanner = ({handleScan}) => {
     //   }
     // }
 
-
-    const hasPer=await getHasPermission()
-    if(hasPer&&satrtScan==false){
-      console.log('开始');
+    const hasPer = await getHasPermission();
+    if (hasPer && satrtScan == false) {
+      console.log("开始");
       setHasPermission(true);
-      satrtScan=true
-      startScanning()
+      satrtScan = true;
+      startScanning();
     }
     // setHasPermission(status === "granted");
-    
   };
 
   const handleBarCodeScanned = ({ type, data }) => {
     // setScanned(true);
     // Alert.alert(`扫描结果`, `类型: ${type}\n数据: ${data}`);
     console.log(type, data);
-    if(data!=null){
-      handleScan(data)
-      stopScanning()
+    if (data != null) {
+      handleScan(data);
+      stopScanning();
     }
-    
   };
 
   const startScanning = async () => {
@@ -805,9 +817,9 @@ export const QRScanner = ({handleScan}) => {
     //   await requestCameraPermission();
     // }else{
     //   console.log('开始');
-      
+
     //   setShowCamera(true);
-    // } 
+    // }
   };
 
   const stopScanning = () => {
@@ -817,30 +829,6 @@ export const QRScanner = ({handleScan}) => {
       cameraRef.pausePreview(); // 暂停相机预览
     }
   };
-
-  // const scanQRCode = async () => {
-  //   if (!hasPermission) {
-  //     // 请求摄像头权限
-  //     await requestCameraPermission();
-  //   }
-  //   // 如果有权限，显示摄像头
-  //   if (hasPermission) {
-  //     return (
-  //       <Camera
-  //         style={{ flex: 1 }}
-  //         type={CameraType.back}
-  //         // 扫描二维码时触发的回调函数
-  //         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-  //       />
-  //     );
-  //   } else {
-  //     return (
-  //       <View style={{ flex: 1 }}>
-  //         <Text>没有权限</Text>
-  //       </View>
-  //     );
-  //   }
-  // };
 
   const releaseCamera = () => {
     if (cameraRef) {

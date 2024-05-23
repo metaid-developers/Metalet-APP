@@ -23,8 +23,6 @@ export default function TransferMvcNftPage({ route }) {
     setTimeout(() => {
       setLoadingDailog({ ...loadingModal, isShow: false });
       navigate('HomePage')
-      // props.navigation.navigate('HomePage')
-      //   props.navigation.navigate('CongratulationsPage',{type:'Imported Successfully',type3:":sldkfj"})
     }, 2000);
   };
 

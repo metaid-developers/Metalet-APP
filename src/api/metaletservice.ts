@@ -1,6 +1,7 @@
 import { RootBtcBalanceObject } from "../bean/BtcBalanceBean";
 import { AssertPrice } from "../types/balance";
 import { FeedBtcObject } from "../types/btcfeed";
+import { UtxoBean } from "../types/utxoBean";
 import { get } from "../utils/Api";
 import { net_network } from "../wallet/wallet";
 
@@ -62,3 +63,14 @@ export async function fetchBtcBalance(
   return data;
 }
 
+//6.btc utxo 
+export async function fetchBtcUtxo(
+  address: string
+): Promise<UtxoBean> {
+  const data = await get(
+    BASE_METALET_URL + "/wallet-api/v3/address/btc-utxo",
+    false,
+    { address, net: net_network ,unconfirmed:"1",order:'desc'}
+  );
+  return data;
+}

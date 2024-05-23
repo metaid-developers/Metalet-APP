@@ -1,0 +1,269 @@
+import {
+  View,
+  Text,
+  TextInput,
+  Image,
+  Modal,
+  Button,
+  StyleSheet,
+  TouchableWithoutFeedback,
+} from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  RoundSimButton,
+  TitleBar,
+  useEasyToast,
+  LoadingModal,
+  LoadingNoticeModal,
+  // GradientAvatar,
+} from "../../constant/Widget";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { metaStyles, semiTransparentGray } from "../../constant/Constants";
+import { ActivityIndicator } from "react-native-paper";
+import { LinearGradient } from "expo-linear-gradient";
+import {
+  AsyncStorageUtil,
+  wallet_password_key,
+  wallets_key,
+  walllet_address_type_key,
+} from "../../utils/AsyncStorageUtil";
+import { navigate } from "../../base/NavigationService";
+
+export default function SetPasswordPage({ route }) {
+  const [IsPasswordLock, setIsPasswordLock] = useState(true);
+  const [IsSecondLock, setIsSecondLock] = useState(true);
+
+  const [inputPassword, setInputPassword] = useState("");
+  const [inputPasswordAgain, setInputPasswordAgain] = useState("");
+
+  const [isShowNotice, setIsShowNotice] = useState(false);
+  const [noticeContent, setNoticeContent] = useState("Successful");
+
+  const { type } = route.params;
+  const [value, setValue] = useState("");
+  const [valueAgain, setValueAgain] = useState("");
+
+  useEffect(() => {
+    console.log("mytype", type);
+  }, []);
+
+  const OpenModal = () => {
+    if (inputPassword == "" || inputPasswordAgain == "") {
+      return;
+    }
+    if (inputPassword == inputPasswordAgain) {
+      if (inputPassword.length == 6) {
+        AsyncStorageUtil.setItem(wallet_password_key, inputPassword);
+        if (type == "create") {
+        } else if (type == "import") {
+          navigate("ImportWalletPage", { destory: true });
+        }
+      } else {
+        setNoticeContent("Password must be 6 digits");
+        ShowNotice();
+      }
+    } else {
+      setNoticeContent("The passwords entered twice do not match");
+      ShowNotice();
+    }
+  };
+
+  const ShowNotice = () => {
+    setIsShowNotice(true);
+    setTimeout(() => {
+      setIsShowNotice(false);
+    }, 2000);
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
+
+      <TitleBar />
+
+      <View style={[metaStyles.verMarginContainer, { marginBottom: 50 }]}>
+        <Text style={[metaStyles.largeDefaultText, { fontWeight: "bold" }]}>
+          Set Password
+        </Text>
+        <Text style={[metaStyles.smallDefaultText, { marginTop: 20 }]}>
+          It's important to note that we do not retain your password, thus if it
+          is forgotten, you will need to reset your wallet and re-import it to
+          establish a new one.
+        </Text>
+        <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>
+          New Password{" "}
+          <Text style={{ color: "#666" }}>(6-digit numeric password)</Text>
+        </Text>
+
+        <View
+          style={{
+            alignItems: "center",
+            borderColor: "rgba(191, 194, 204, 0.5)",
+            flexDirection: "row",
+            borderWidth: 1,
+            height: 50,
+            borderRadius: 10,
+            marginTop: 10,
+            // backgroundColor:semiTransparentGray
+          }}
+        >
+          <TextInput
+            onChangeText={(text) => {
+              setInputPassword(text);
+              const numericValue = text.replace(/[^0-9]/g, "");
+              if (numericValue.length <= 6) {
+                setValue(numericValue);
+              }
+            }}
+            secureTextEntry={IsPasswordLock}
+            keyboardType="numeric"
+            maxLength={6}
+            value={value}
+            style={{
+              flex: 1,
+              backgroundColor: "transparent",
+              marginLeft: 10,
+              paddingRight: 10,
+            }}
+          />
+
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setIsPasswordLock(IsPasswordLock ? false : true);
+            }}
+          >
+            {IsPasswordLock ? (
+              <Image
+                source={require("../../../image/input_close_icon.png")}
+                style={{ width: 20, height: 20, marginRight: 10 }}
+              />
+            ) : (
+              <Image
+                source={require("../../../image/input_open_icon.png")}
+                style={{ width: 20, height: 20, marginRight: 10 }}
+              />
+            )}
+          </TouchableWithoutFeedback>
+        </View>
+
+        {/* <View
+          style={{
+            alignItems: "center",
+            borderColor: "rgba(191, 194, 204, 0.5)",
+            flexDirection: "row",
+            borderWidth: 1,
+            height: 50,
+            borderRadius: 10,
+            marginTop: 10,
+            // backgroundColor:semiTransparentGray
+          }}
+        >
+          <TextInput
+            onChangeText={(text) => {}}
+            secureTextEntry={true}
+            style={{
+              flex: 1,
+              backgroundColor: "transparent",
+              marginLeft: 10,
+              paddingRight: 10,
+            }}
+          />
+
+          <Image
+            source={require("../../../image/input_close_icon.png")}
+            style={{ width: 20, height: 20, marginRight: 10 }}
+          />
+        </View> */}
+
+        <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>Confirm</Text>
+
+        <View
+          style={{
+            alignItems: "center",
+            borderColor: "rgba(191, 194, 204, 0.5)",
+            flexDirection: "row",
+            borderWidth: 1,
+            height: 50,
+            borderRadius: 10,
+            marginTop: 10,
+            // backgroundColor:semiTransparentGray
+          }}
+        >
+          <TextInput
+            onChangeText={(text) => {
+              setInputPasswordAgain(text);
+              const numericValue = text.replace(/[^0-9]/g, "");
+              if (numericValue.length <= 6) {
+                setValueAgain(numericValue);
+              }
+
+            }}
+            secureTextEntry={IsSecondLock}
+            value={valueAgain}
+            keyboardType="numeric"
+            maxLength={6}
+            style={{
+              flex: 1,
+              backgroundColor: "transparent",
+              marginLeft: 10,
+              paddingRight: 10,
+            }}
+          />
+
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setIsSecondLock(IsSecondLock ? false : true);
+            }}
+          >
+            {IsSecondLock ? (
+              <Image
+                source={require("../../../image/input_close_icon.png")}
+                style={{ width: 20, height: 20, marginRight: 10 }}
+              />
+            ) : (
+              <Image
+                source={require("../../../image/input_open_icon.png")}
+                style={{ width: 20, height: 20, marginRight: 10 }}
+              />
+            )}
+          </TouchableWithoutFeedback>
+        </View>
+
+        <View>
+          <Text
+            numberOfLines={6}
+            style={[
+              { paddingVertical: 20, height: 135, textAlignVertical: "top" },
+            ]}
+          />
+        </View>
+
+        <View style={{ flex: 1 }}></View>
+
+        <RoundSimButton
+          title="Confirm"
+          textColor="white"
+          event={() => {
+            OpenModal();
+          }}
+        />
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    // backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  modalView: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+    // elevation: 5,
+  },
+});

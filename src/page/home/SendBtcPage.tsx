@@ -9,14 +9,25 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
+  LoadingModal,
+  LoadingNoticeModal,
   QRScanner,
   RoundSimButton,
+  RoundSimButtonFlee,
   TitleBar,
+  VerifyModal,
   styles,
 } from "../../constant/Widget";
 import { inputNormalBgColor, themeColor } from "../../constant/Constants";
 import { FeedBean, FeedBtcObject } from "../../types/btcfeed";
-import { fetchBtcFeed } from "../../api/metaletservice";
+import { fetchBtcBalance, fetchBtcFeed } from "../../api/metaletservice";
+import { Data, RootBtcBalanceObject } from "../../bean/BtcBalanceBean";
+import { useData } from "../../hooks/MyProvider";
+import { Utxo, UtxoBean } from "../../types/utxoBean";
+import { AddressType, ScriptType } from "@metalet/utxo-wallet-service";
+import { getBtcUtxos } from "../../queries/utxos";
+import { broadcastBTCTx } from "../../queries/transaction";
+import { navigate } from "../../base/NavigationService";
 
 export default function SendBtcPage() {
   const [nextBtnColor, setNextBtnColor] = useState("rgba(23, 26, 255, 0.5)");
@@ -27,6 +38,7 @@ export default function SendBtcPage() {
 
   // 扫描
   const [isScan, setIsScan] = useState(false);
+  const [rawTx, setRawTx] = useState<string>();
   //feed
   const [isShowFeed, setIsShowFeed] = useState(false);
   const feedModeSlow = "Slow";
@@ -35,8 +47,8 @@ export default function SendBtcPage() {
   const feedModeCustom = "Custom";
   const [feedModeType, setFeedModeType] = useState(feedModeAvg);
   const textInputRef = useRef(null);
-  const [feed, setFeed]=useState("10");
-  const [feedReady, setFeedReady]=useState("10");
+  const [feed, setFeed] = useState("10");
+  const [feedReady, setFeedReady] = useState("10");
 
   const [userSlowFeed, setSlowFeed] = useState<FeedBean>({
     title: "",
@@ -54,8 +66,39 @@ export default function SendBtcPage() {
     desc: "",
   });
 
+  //wallet
+  const { btcAddress, updateBtcAddress } = useData();
+  const [btcBalance, setBtcBalance] = useState<Data>({
+    balance: 0.00000546,
+    block: {
+      incomeFee: 0.00581438,
+      spendFee: 0.00580892,
+    },
+    mempool: {
+      incomeFee: 0,
+      spendFee: 0,
+    },
+    pendingBalance: 0,
+    safeBalance: 0.00000546,
+    inscriptionsBalance: 0,
+    runesBalance: 0,
+    pinsBalance: 0,
+  });
+  const [utxoList, setUtxos] = useState<Utxo[]>([]);
+  const { metaletWallet, updateMetaletWallet } = useData();
+
+  //提示
+  const [isShowNotice, setIsShowNotice] = useState(false);
+  const [isShowLoading, setIsShowLoading] = useState(false);
+  const [noticeContent, setNoticeContent] = useState("Successful");
+  const [confirmDailogState, setConfirmDailogState] = useState(false);
+
+  // verfiy
+  const [isShowVerify, setIsShowVerify] = useState(false);
+
   useEffect(() => {
     getFeed();
+    getBtcBalance();
   }, []);
 
   async function getFeed() {
@@ -71,8 +114,199 @@ export default function SendBtcPage() {
     }
   }
 
+  async function getBtcBalance() {
+    const balance: RootBtcBalanceObject = await fetchBtcBalance(btcAddress);
+    setBtcBalance(balance.data);
+  }
+
+  async function sendBtc() {
+    const needRawTx =
+      metaletWallet.currentBtcWallet.getAddressType() === AddressType.Legacy;
+    const utxos = await getBtcUtxos(btcAddress, needRawTx);
+    console.log("交易参数 inputAddress:" + inputAddress);
+    console.log("交易参数 inputAmount:" + inputAmount);
+    console.log("交易参数 feed:" + feed);
+    console.log("交易参数 utxos:" + JSON.stringify(utxos));
+    console.log("当前钱包地址：" + metaletWallet.currentBtcWallet.getAddress());
+
+    const { rawTx, cost } = metaletWallet.currentBtcWallet.send(
+      inputAddress,
+      inputAmount,
+      parseInt(feed),
+      utxos
+    );
+    setRawTx(rawTx);
+
+    // const txId = await broadcastBTCTx(rawTx).catch((err) => {
+    //   console.log(err);
+    // });
+  }
+
+  const OpenModal = () => {
+    setIsShowLoading(true);
+    setTimeout(() => {
+      setIsShowLoading(false);
+      // navigate("HomePage");
+      navigate("SendBtcSuccessPage");
+      
+
+    }, 2000);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <LoadingModal
+        isShow={isShowLoading}
+        isCancel={true}
+        event={() => {
+          setIsShowLoading(false);
+        }}
+      />
+
+      <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
+
+      {/* pay comfirm */}
+      <Modal visible={confirmDailogState} transparent={true}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: 10,
+              paddingHorizontal: 30,
+              paddingTop: 30,
+              marginHorizontal: 20,
+            }}
+          >
+            {/* <Text style={{ textAlign: "center", fontSize: 16 }}>
+              Confirm Transaction
+            </Text> */}
+
+            {/* 头部 */}
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../../../image/receive_btc_icon.png")}
+                style={{ width: 50, height: 50 }}
+              />
+
+              <Text
+                style={{
+                  color: "#333",
+                  textAlign: "center",
+                  lineHeight: 20,
+                  marginTop: 20,
+                  fontSize: 18,
+                  fontWeight: "bold",
+                }}
+              >
+                0.01 BTC
+              </Text>
+            </View>
+
+            <View>
+              <Text style={{ marginTop: 15, color: "#666", fontSize: 14 }}>
+                From
+              </Text>
+              <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
+                sdfwefef2132fslhfklewhfljskdjflkewjfljewoifjeiwfji1323
+              </Text>
+            </View>
+
+            <View>
+              <Text style={{ marginTop: 10, color: "#666", fontSize: 14 }}>
+                To
+              </Text>
+              <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
+                sdfwefef2132fslhfklewhfljskdjflkewjfljewoifjeiwfji1323
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 10,
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ color: "#666", fontSize: 14 }}>Amount</Text>
+              <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
+                0.01 BTC
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 10,
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ color: "#666", fontSize: 14 }}>
+                Fees(Estimated)
+              </Text>
+              <Text style={{ color: "#333", fontSize: 14 }}>0.01 BTC</Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 10,
+                justifyContent: "space-between",
+              }}
+            >
+              <Text style={{ color: "#666", fontSize: 14 }}>Total</Text>
+              <Text style={{ color: "#333", fontSize: 14 }}>0.01 BTC</Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 20,
+                justifyContent: "space-between",
+              }}
+            >
+              <RoundSimButtonFlee
+                title={"Cancel"}
+                style={{
+                  borderRadius: 10,
+                  height: 40,
+                  width: "45%",
+                  borderWidth: 1,
+                  borderColor: themeColor,
+                }}
+                color="#fff"
+                textColor="#171AFF"
+                event={() => {
+                  setConfirmDailogState(false);
+                }}
+              />
+
+              <RoundSimButtonFlee
+                title={"Confirm"}
+                style={{ borderRadius: 10, height: 40, width: "45%" }}
+                textColor="#fff"
+                event={() => {
+                  setConfirmDailogState(false);
+                  setIsShowVerify(true);
+                  // OpenModal();
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* feed */}
       <Modal transparent={true} visible={isShowFeed}>
         <View
           style={{
@@ -122,7 +356,7 @@ export default function SendBtcPage() {
                   if (textInputRef.current) {
                     textInputRef.current.blur();
                   }
-                  setFeedReady(userSlowFeed.feeRate.toString())
+                  setFeedReady(userSlowFeed.feeRate.toString());
                 }}
               >
                 <View
@@ -173,7 +407,7 @@ export default function SendBtcPage() {
                   if (textInputRef.current) {
                     textInputRef.current.blur();
                   }
-                  setFeedReady(userAvgFeed.feeRate.toString())
+                  setFeedReady(userAvgFeed.feeRate.toString());
                 }}
               >
                 <View
@@ -225,7 +459,7 @@ export default function SendBtcPage() {
                   if (textInputRef.current) {
                     textInputRef.current.blur();
                   }
-                  setFeedReady(userFastFeed.feeRate.toString())
+                  setFeedReady(userFastFeed.feeRate.toString());
                 }}
               >
                 <View
@@ -310,11 +544,10 @@ export default function SendBtcPage() {
 
                   <TextInput
                     placeholder="sat/vB"
-                   
                     ref={textInputRef}
                     keyboardType="numeric"
                     onChangeText={(text) => {
-                      if(feedModeType == feedModeCustom ){
+                      if (feedModeType == feedModeCustom) {
                         // const numericInput = text.replace(/[^0-9]/g, '');
                         setFeedReady(text);
                         // setFeed(parseInt(numericInput));
@@ -332,10 +565,12 @@ export default function SendBtcPage() {
               </View>
             </TouchableWithoutFeedback>
 
-            <TouchableWithoutFeedback onPress={async () => {
-              setFeed(feedReady)
-              setIsShowFeed(false)
-            }}>
+            <TouchableWithoutFeedback
+              onPress={async () => {
+                setFeed(feedReady);
+                setIsShowFeed(false);
+              }}
+            >
               <View
                 style={{
                   marginTop: 20,
@@ -374,6 +609,18 @@ export default function SendBtcPage() {
           </View>
         </View>
       </Modal>
+
+      {/* pay verify modal */}
+      <VerifyModal
+        isShow={isShowVerify}
+        eventCancel={() => {
+          setIsShowVerify(false);
+        }}
+        event={() => {
+          setIsShowVerify(false);
+          OpenModal();
+        }}
+      />
 
       {isScan ? (
         <QRScanner
@@ -536,7 +783,7 @@ export default function SendBtcPage() {
             >
               <Text style={{ color: "#666", fontSize: 14 }}>Balance</Text>
               <Text style={{ color: "#999", fontSize: 14 }}>
-                0.00000546 TBC
+                {btcBalance.balance} BTC
               </Text>
             </View>
 
@@ -552,9 +799,21 @@ export default function SendBtcPage() {
                 marginTop: 10,
               }}
             >
+              <Text style={{ color: "#666", fontSize: 14 }}>Pending</Text>
+              <Text style={{ color: "#999", fontSize: 14 }}>
+                {btcBalance.pinsBalance} BTC
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: 10,
+              }}
+            >
               <Text style={{ color: "#666", fontSize: 14 }}>Available</Text>
               <Text style={{ color: "#999", fontSize: 14 }}>
-                0.00000546 TBC
+                {btcBalance.safeBalance} BTC
               </Text>
             </View>
 
@@ -593,7 +852,11 @@ export default function SendBtcPage() {
           >
             <RoundSimButton
               title={"Next"}
-              event={() => {}}
+              event={() => {
+                // sendBtc()
+                // navigate('SendBtcConfirmPage')
+                setConfirmDailogState(true);
+              }}
               roundStytle={{}}
               textColor="#fff"
               color={nextBtnColor}
