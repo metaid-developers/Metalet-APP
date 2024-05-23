@@ -128,6 +128,7 @@ export default function SendBtcPage() {
     console.log("交易参数 feed:" + feed);
     console.log("交易参数 utxos:" + JSON.stringify(utxos));
     console.log("当前钱包地址：" + metaletWallet.currentBtcWallet.getAddress());
+    console.log("当前钱包地址：" + metaletWallet.currentBtcWallet.getAddress());
 
     const { rawTx, cost } = metaletWallet.currentBtcWallet.send(
       inputAddress,
@@ -135,6 +136,7 @@ export default function SendBtcPage() {
       parseInt(feed),
       utxos
     );
+
     setRawTx(rawTx);
 
     // const txId = await broadcastBTCTx(rawTx).catch((err) => {
@@ -853,9 +855,9 @@ export default function SendBtcPage() {
             <RoundSimButton
               title={"Next"}
               event={() => {
-                // sendBtc()
+                sendBtc()
                 // navigate('SendBtcConfirmPage')
-                setConfirmDailogState(true);
+                // setConfirmDailogState(true);
               }}
               roundStytle={{}}
               textColor="#fff"

@@ -1,4 +1,4 @@
-import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
+import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 
 class MetaletWallet{
   

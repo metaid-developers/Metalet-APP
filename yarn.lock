@@ -1757,10 +1757,10 @@
     decimal.js "^10.4.3"
     ecpair "^2.1.0"
 
-"@metalet/utxo-wallet-sdk@^0.4.3":
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.4.3.tgz#ceff9b1508dfda4c734ef3133c85e245f2c7ea65"
-  integrity sha512-jSz86CeXU4HAiK7CdlEuCniQRtg4XeHUZtKImQ0JNAvQbmdnTgN99O28fXVpqCoxGig67V03WysM5AGDcCcbtA==
+"@metalet/utxo-wallet-sdk@^0.4.6":
+  version "0.4.6"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.4.6.tgz#be27c3083b96eb4f935ab4e3ab3299c11a540d99"
+  integrity sha512-Bv0GA3aJte7Fxejy8eFRxY/CzqQeenu32kbGyPwi4yI4aPIeD0vRa4oxSFdJHsmTW4HBKE49ERrvXK7PrxRDKw==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.1.1"
     "@magiceden-oss/runestone-lib" "^1.0.2"
