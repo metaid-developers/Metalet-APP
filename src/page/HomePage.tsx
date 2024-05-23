@@ -18,7 +18,6 @@ import {
   LoadingNoticeModal,
 } from "../constant/Widget";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import SplacePage from "./SplacePage";
 import WelcomeWalletPage from "./WelcomeWalletPage";
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 import AssetsPage from "./AssetsPage";
@@ -39,7 +38,6 @@ import {
   network_key,
   network_mvc,
   wallets_key,
-  walllet_seed_key,
 } from "../utils/AsyncStorageUtil";
 import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
@@ -47,7 +45,6 @@ import { RootPriceObject } from "../bean/PriceBean";
 import { RootBtcBalanceObject } from "../bean/BtcBalanceBean";
 import * as Clipboard from "expo-clipboard";
 import { WalletBean } from "../bean/WalletBean";
-import { chooseMyWallet } from "../utils/WalletUtils";
 import {
   EventBus,
   eventBus,
@@ -69,6 +66,7 @@ import {
 } from "../api/metaletservice";
 import { btc_network, getCurrentBtcWallet, getCurrentMvcWallet, net_network } from "../wallet/wallet";
 import { Buffer } from "buffer";
+import { getCurrentWalletSeed } from "../utils/WalletUtils";
 
 // import RNFS from "react-native-fs";
 
@@ -234,8 +232,7 @@ export default function HomePage(props: any) {
           });
 
           updateMyWallet(wallet);
-          let localSeed = await AsyncStorageUtil.getItem(walllet_seed_key);
-          let seed = Buffer.from(localSeed, "hex");
+          let seed = await getCurrentWalletSeed()
 
           const btcTaprootWallet = new BtcWallet({
             network: btc_network,

@@ -14,7 +14,10 @@ import { RoundSimButton } from "../constant/Widget";
 import Index from "../page/Index";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { navigate } from "../base/NavigationService";
-import { isNoWalletPassword } from "../wallet/wallet";
+import { isNoWalletPassword } from "../utils/WalletUtils";
+import { wordlist } from '@scure/bip39/wordlists/english'
+import * as bip39 from '@scure/bip39'
+
 
 // type Props={
 //   navigation:StackNavigationProp<any,''/>;
@@ -40,8 +43,9 @@ export default function WelcomeWalletPage(props) {
 
       <RoundSimButton
         title={"Import Wallet"}
-        event={() => {
-          if (isNoWalletPassword()) {
+        event={async () => {
+          const noPassword= await isNoWalletPassword();
+          if (noPassword) {
             navigate("SetPasswordPage", { type: "import" });
           } else {
             navigate("ImportWalletPage", { destory: true });
@@ -63,7 +67,9 @@ export default function WelcomeWalletPage(props) {
             navigate("SetPasswordPage", { type: "create" });
           } else {
             //TODO create wallet
-            props.navigation.navigate('Tabs');
+            // props.navigation.navigate('Tabs');
+            const menmoic= bip39.generateMnemonic(wordlist).split(" ");
+            console.log("menmoic",menmoic);
           }
         }}
         textColor="white"

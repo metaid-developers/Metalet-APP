@@ -16,34 +16,44 @@ import {
   // GradientAvatar,
 } from "../constant/Widget";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { metaStyles } from "../constant/Constants";
+import { metaStyles, semiTransparentGray } from "../constant/Constants";
 import EasyToast from "react-native-easy-toast";
 import { ActivityIndicator } from "react-native-paper";
 
 import { LinearGradient } from "expo-linear-gradient";
-import {AsyncStorageUtil, wallets_key, walllet_address_type_key} from "../utils/AsyncStorageUtil";
+import {
+  AsyncStorageUtil,
+  CurrentAccountIDKey,
+  CurrentWalletIDKey,
+  wallets_key,
+  walllet_address_type_key,
+} from "../utils/AsyncStorageUtil";
 
 import { useData } from "../hooks/MyProvider";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
-import { AddressType, BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
+import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
 import { getRandomColorList } from "../utils/MetaFunUiils";
 import { btc_network } from "../wallet/wallet";
 import MetaletWallet from "../wallet/MetaletWallet";
+import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
+import { getStorageWallets, getWalletBeans, isNoStorageWallet } from "../utils/WalletUtils";
+
 
 export default function ImportWalletPage(props) {
   const toastRef = useEasyToast("center");
   const [mnemonic, setMneMonic] = useState("");
   const { walletManager, updateWalletManager } = useData();
 
-
-
   // 当前钱包
   const { myWallet, updateMyWallet } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
-
   const { mvcAddress, updateMvcAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
+
+
+  //import 
+  const [mvcPath, setmvcPath] = useState("")
 
   // const showToast = useCallback(() => {
   //   toastRef.current?.show('Hello World!', 2000, () => console.log('Toast dismissed'));
@@ -54,178 +64,249 @@ export default function ImportWalletPage(props) {
       setObj({ ...obj, isShow: true });
     }, 2000);
   };
-  
-  const OpenModal = () => {
+
+  const OpenModal = async () => {
     setObj({ ...obj, isShow: true });
 
-    AsyncStorageUtil.getItem(wallets_key).then(async (value) => {
-
-      console.log(value);
-      //wallet
-      let walletName;
-      let walletID = Math.random().toString(36).substr(2, 8);
-      let wallet_addressType=AddressType.Legacy;
-      let mvcTypes = 236;
-
-      //account
-      let accountName = "Account 1";
-      let accountID = Math.random().toString(36).substr(2, 8);
-      let accountAddressIndex = 0;
-
-      if (value != null && value.length > 0) {
-
-        //插入Wallet 写法
-        walletName = "Wallet " + (value.length + 1);
-        let walletBean: WalletBean = {
-          id: walletID,
-          name: walletName,
-          mnemonic,
-          mvcTypes,
-          isOpen: true,
-          addressTpye:wallet_addressType,
-          isBackUp:false,
-          isCurrentPathIndex:0,
-          accountsOptions: [
-            {
-              id: accountID,
-              name: accountName,
-              addressIndex: accountAddressIndex,
-              isSelect: true,
-              defaultAvatarColor:getRandomColorList()
-            },
-          ],
-        };
-
-
-        const btcWallet = new BtcWallet({
-          network: btc_network,
-          mnemonic: walletBean.mnemonic,
-          addressIndex: walletBean.accountsOptions[0].addressIndex,
-          addressType: walletBean.addressTpye,
-          
-          //选中跟mvc 路径一致
-          coinType: walletBean.mvcTypes,
-        });
-
-        const mvcWallet = new MvcWallet({
-          network: "mainnet",
-          mnemonic: walletBean.mnemonic,
-          addressIndex: walletBean.accountsOptions[0].addressIndex,
-          addressType: AddressType.LegacyMvc,
-          coinType: walletBean.mvcTypes,
-        })
-
-        updateMvcAddress(mvcWallet.getAddress())
-        updateBtcAddress(btcWallet.getAddress())
-        let metaletWallet = new MetaletWallet();
-        metaletWallet.currentBtcWallet = btcWallet;
-        metaletWallet.currentMvcWallet = mvcWallet;
-        updateMetaletWallet(metaletWallet);
-        // const updataWallets=[...value,walletBean]
-        const updataWallets=addWallet(value,walletBean)
-        updateMyWallet(walletBean);
-        await AsyncStorageUtil.updateItem(wallets_key, updataWallets);
-        await AsyncStorageUtil.setItem(walllet_address_type_key,wallet_addressType)
-
-
-        // const myWalletManager = new MetaletWalletManager({
-        //   network: "mainnet",
-        //   walletsOptions: [
-        //     {
-        //       id: walletID,
-        //       mnemonic: mnemonic,
-        //       name: walletName,
-        //       mvcTypes: [mvcTypes],
-        //       accountsOptions: [
-        //         {
-        //           id: accountID,
-        //           name: accountName,
-        //           addressIndex: accountAddressIndex,
-        //         },
-        //       ],
-        //     },
-        //   ],
-        // });
+    //wallet
+    let walletName;
+    let walletID = Math.random().toString(36).substr(2, 8);
+    let wallet_addressType = AddressType.Legacy;
   
-        // updateWalletManager(myWalletManager);
 
+    //account
+    let accountName = "Account 1";
+    let accountID = Math.random().toString(36).substr(2, 8);
+    let accountAddressIndex = 0;
 
-      } else {
-        walletName = "Wallet 1";
-        //新增的写法
-        let walletBean: WalletBean = {
-          id: walletID,
-          name: walletName,
-          mnemonic,
-          mvcTypes,
-          isOpen: true,
-          addressTpye:wallet_addressType,
-          isBackUp:false,
-          isCurrentPathIndex:0,
-          accountsOptions: [
-            {
-              id: accountID,
-              name: accountName,
-              addressIndex: accountAddressIndex,
-              isSelect: true,
-              defaultAvatarColor:getRandomColorList()
+    const hasNoWallets = await isNoStorageWallet();
+    const wallets= await getStorageWallets();
 
-            },
-          ],
-        };
-        let initWallets = [walletBean];
-        await AsyncStorageUtil.updateItem(wallets_key, initWallets);
-        await AsyncStorageUtil.setItem(walllet_address_type_key,wallet_addressType)
-        
-        // const myWalletManager = new MetaletWalletManager({
-        //   network: "mainnet",
-        //   walletsOptions: [
-        //     {
-        //       id: walletID,
-        //       mnemonic: mnemonic,
-        //       name: walletName,
-        //       mvcTypes: [mvcTypes],
-        //       accountsOptions: [
-        //         {
-        //           id: accountID,
-        //           name: accountName,
-        //           addressIndex: accountAddressIndex,
-        //         },
-        //       ],
-        //     },
-        //   ],
-        // });
-  
-        // updateWalletManager(myWalletManager);
+    if (hasNoWallets) {
+      //new
+      walletName = "Wallet 1";
+      console.log("new");
+      
+    } else {
+      //add
+      console.log("add");
+      
+      walletName = "Wallet " + (wallets.length + 1);
+    }
 
-      }
+    let walletBean: WalletBean = {
+      id: walletID,
+      name: walletName,
+      mnemonic,
+      mvcTypes:parseInt(mvcPath),
+      isOpen: true,
+      addressTpye: wallet_addressType,
+      isBackUp: false,
+      isCurrentPathIndex: 0,
+      seed:"",
+      accountsOptions: [
+        {
+          id: accountID,
+          name: accountName,
+          addressIndex: accountAddressIndex,
+          isSelect: true,
+          defaultAvatarColor: getRandomColorList(),
+        },
+      ],
+    };
 
-     
-
+    const btcWallet = new BtcWallet({
+      network: btc_network,
+      mnemonic: walletBean.mnemonic,
+      addressIndex: walletBean.accountsOptions[0].addressIndex,
+      addressType: walletBean.addressTpye,
+      coinType: CoinType.BTC,
     });
 
-    setTimeout(() => {
-      setObj({ ...obj, isShow: false });
+    const seed = btcWallet.getSeed();
+    const saveSeed=seed.toString("hex")
+    console.log("saveSeed",saveSeed);
+    walletBean.seed=saveSeed;
+
+    
+    const mvcWallet = new MvcWallet({
+      network: "mainnet",
+      mnemonic: walletBean.mnemonic,
+      addressIndex: walletBean.accountsOptions[0].addressIndex,
+      addressType: AddressType.LegacyMvc,
+      coinType: walletBean.mvcTypes,
+      seed
+    });
+
+    updateMvcAddress(mvcWallet.getAddress());
+    updateBtcAddress(btcWallet.getAddress());
+    let metaletWallet = new MetaletWallet();
+    metaletWallet.currentBtcWallet = btcWallet;
+    metaletWallet.currentMvcWallet = mvcWallet;
+    updateMetaletWallet(metaletWallet);
+    // const updataWallets=[...value,walletBean]
+    if(hasNoWallets){
+      await AsyncStorageUtil.updateItem(wallets_key, [walletBean]);
+    }else{
+      const newWallets=[...wallets, walletBean]
+      await AsyncStorageUtil.updateItem(wallets_key, newWallets);
+    }
+    // const updataWallets = addWallet(wallets, walletBean);
+    updateMyWallet(walletBean);
+    await AsyncStorageUtil.setItem(CurrentWalletIDKey, walletBean.id)
+    await AsyncStorageUtil.setItem(CurrentAccountIDKey, walletBean.accountsOptions[0].id)
+   
+    console.log('wallets '+getWalletBeans());
+    setObj({ ...obj, isShow: false });
       // props.navigation.navigate('HomePage')
 
       props.navigation.navigate("CongratulationsPage", {
         type: "Imported Successfully",
         type3: ":sldkfj",
       });
-    }, 4000);
+    
+
+    // AsyncStorageUtil.getItem(wallets_key).then(async (value) => {
+    //   console.log(value);
+
+    //   if (value != null && value.length > 0) {
+    //     //插入Wallet 写法
+    //     walletName = "Wallet " + (value.length + 1);
+    //     let walletBean: WalletBean = {
+    //       id: walletID,
+    //       name: walletName,
+    //       mnemonic,
+    //       mvcTypes,
+    //       isOpen: true,
+    //       addressTpye: wallet_addressType,
+    //       isBackUp: false,
+    //       isCurrentPathIndex: 0,
+    //       accountsOptions: [
+    //         {
+    //           id: accountID,
+    //           name: accountName,
+    //           addressIndex: accountAddressIndex,
+    //           isSelect: true,
+    //           defaultAvatarColor: getRandomColorList(),
+    //         },
+    //       ],
+    //     };
+
+    //     const btcWallet = new BtcWallet({
+    //       network: btc_network,
+    //       mnemonic: walletBean.mnemonic,
+    //       addressIndex: walletBean.accountsOptions[0].addressIndex,
+    //       addressType: walletBean.addressTpye,
+
+    //       //选中跟mvc 路径一致
+    //       coinType: walletBean.mvcTypes,
+    //     });
+
+    //     const mvcWallet = new MvcWallet({
+    //       network: "mainnet",
+    //       mnemonic: walletBean.mnemonic,
+    //       addressIndex: walletBean.accountsOptions[0].addressIndex,
+    //       addressType: AddressType.LegacyMvc,
+    //       coinType: walletBean.mvcTypes,
+    //     });
+
+    //     updateMvcAddress(mvcWallet.getAddress());
+    //     updateBtcAddress(btcWallet.getAddress());
+    //     let metaletWallet = new MetaletWallet();
+    //     metaletWallet.currentBtcWallet = btcWallet;
+    //     metaletWallet.currentMvcWallet = mvcWallet;
+    //     updateMetaletWallet(metaletWallet);
+    //     // const updataWallets=[...value,walletBean]
+    //     const updataWallets = addWallet(value, walletBean);
+    //     updateMyWallet(walletBean);
+    //     await AsyncStorageUtil.updateItem(wallets_key, updataWallets);
+    //     await AsyncStorageUtil.setItem(
+    //       walllet_address_type_key,
+    //       wallet_addressType
+    //     );
+
+    //     // const myWalletManager = new MetaletWalletManager({
+    //     //   network: "mainnet",
+    //     //   walletsOptions: [
+    //     //     {
+    //     //       id: walletID,
+    //     //       mnemonic: mnemonic,
+    //     //       name: walletName,
+    //     //       mvcTypes: [mvcTypes],
+    //     //       accountsOptions: [
+    //     //         {
+    //     //           id: accountID,
+    //     //           name: accountName,
+    //     //           addressIndex: accountAddressIndex,
+    //     //         },
+    //     //       ],
+    //     //     },
+    //     //   ],
+    //     // });
+
+    //     // updateWalletManager(myWalletManager);
+    //   } else {
+    //     walletName = "Wallet 1";
+    //     //新增的写法
+    //     let walletBean: WalletBean = {
+    //       id: walletID,
+    //       name: walletName,
+    //       mnemonic,
+    //       mvcTypes,
+    //       isOpen: true,
+    //       addressTpye: wallet_addressType,
+    //       isBackUp: false,
+    //       isCurrentPathIndex: 0,
+    //       accountsOptions: [
+    //         {
+    //           id: accountID,
+    //           name: accountName,
+    //           addressIndex: accountAddressIndex,
+    //           isSelect: true,
+    //           defaultAvatarColor: getRandomColorList(),
+    //         },
+    //       ],
+    //     };
+    //     let initWallets = [walletBean];
+    //     await AsyncStorageUtil.updateItem(wallets_key, initWallets);
+    //     await AsyncStorageUtil.setItem(
+    //       walllet_address_type_key,
+    //       wallet_addressType
+    //     );
+
+        // const myWalletManager = new MetaletWalletManager({
+        //   network: "mainnet",
+        //   walletsOptions: [
+        //     {
+        //       id: walletID,
+        //       mnemonic: mnemonic,
+        //       name: walletName,
+        //       mvcTypes: [mvcTypes],
+        //       accountsOptions: [
+        //         {
+        //           id: accountID,
+        //           name: accountName,
+        //           addressIndex: accountAddressIndex,
+        //         },
+        //       ],
+        //     },
+        //   ],
+        // });
+
+        // updateWalletManager(myWalletManager);
+    //   }
+    // });
+
   };
 
-
-  const addWallet=(wallets, newWallet)=>{
-    wallets.forEach(wallet => {
-      wallet.accountsOptions.forEach(account => {
+  const addWallet = (wallets, newWallet) => {
+    wallets.forEach((wallet) => {
+      wallet.accountsOptions.forEach((account) => {
         account.isSelect = false;
       });
     });
-
-    return [...wallets,newWallet];
-  }
-
+    return [...wallets, newWallet];
+  };
 
   const [obj, setObj] = useState({ title: "", isShow: false, isCancel: false });
 
@@ -242,7 +323,7 @@ export default function ImportWalletPage(props) {
           event={closeModal}
         />
 
-        <Text style={[metaStyles.largeDefaultText,{fontWeight:"bold"}]}>
+        <Text style={[metaStyles.largeDefaultText, { fontWeight: "bold" }]}>
           Enter your mnemonic phrase
         </Text>
         <Text style={[metaStyles.smallDefaultText, { marginTop: 20 }]}>
@@ -260,12 +341,38 @@ export default function ImportWalletPage(props) {
             numberOfLines={6}
             style={[
               metaStyles.textInputDefault,
-              { paddingVertical: 20, height: 135, textAlignVertical: "top", },
+              { paddingVertical: 20, height: 135, textAlignVertical: "top" },
             ]}
             onChangeText={(text) => {
               setMneMonic(text);
             }}
           />
+        </View>
+
+        <Text style={[metaStyles.defaultText, { marginTop: 20 }]}>
+         MVC Path
+        </Text>
+
+        <View style={{flexDirection:'row' ,alignItems:'center',marginTop:10}}>
+          <Text style={metaStyles.defaultText}>m/44'/</Text>
+          <TextInput
+            placeholder="10001"
+            keyboardType='numeric'
+            style={{
+              borderRadius: 5,
+              backgroundColor: semiTransparentGray,
+              fontSize: 14,
+              color: "#333333",
+              paddingHorizontal:5,
+              paddingVertical:3,
+              marginHorizontal:5
+              
+            }}
+            onChangeText={(text) => {
+              setmvcPath(text);
+            }}
+          />
+          <Text style={metaStyles.defaultText}>'/0'</Text>
         </View>
 
         <View style={metaStyles.noticeRed}>

@@ -2,7 +2,7 @@ import { RootBtcBalanceObject } from "../bean/BtcBalanceBean";
 import { AssertPrice } from "../types/balance";
 import { FeedBtcObject } from "../types/btcfeed";
 import { UtxoBean } from "../types/utxoBean";
-import { get } from "../utils/Api";
+import { get, post } from "../utils/Api";
 import { net_network } from "../wallet/wallet";
 
 export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
@@ -71,6 +71,15 @@ export async function fetchBtcUtxo(
     BASE_METALET_URL + "/wallet-api/v3/address/btc-utxo",
     false,
     { address, net: net_network ,unconfirmed:"1",order:'desc'}
+  );
+  return data;
+}
+
+// 7.space broadcast
+export async function broadcastSpace(hex:string) :Promise<{txid:string,message:string}> {
+  const data = await post(
+    BASE_MVC_API_URL + "/tx/broadcast",
+    {"hex":hex}
   );
   return data;
 }

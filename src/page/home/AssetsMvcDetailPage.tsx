@@ -77,9 +77,7 @@ export default function AssetsMvcDetailPage({ route }) {
       isIncome = false;
     }
 
-    console.log(item.address);
-    
-
+  
     return (
       <View>
         {item.address != "1" ? (

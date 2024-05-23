@@ -28,6 +28,8 @@ import {
   walllet_address_type_key,
 } from "../../utils/AsyncStorageUtil";
 import { navigate } from "../../base/NavigationService";
+import * as bip39 from "@scure/bip39";
+import { wordlist } from "@scure/bip39/wordlists/english";
 
 export default function SetPasswordPage({ route }) {
   const [IsPasswordLock, setIsPasswordLock] = useState(true);
@@ -43,6 +45,8 @@ export default function SetPasswordPage({ route }) {
   const [value, setValue] = useState("");
   const [valueAgain, setValueAgain] = useState("");
 
+  const [isShowLoading, setIsShowLoading] = useState(false);
+
   useEffect(() => {
     console.log("mytype", type);
   }, []);
@@ -55,6 +59,8 @@ export default function SetPasswordPage({ route }) {
       if (inputPassword.length == 6) {
         AsyncStorageUtil.setItem(wallet_password_key, inputPassword);
         if (type == "create") {
+          const menmoic = bip39.generateMnemonic(wordlist).split(" ");
+          console.log("menmoic", menmoic);
         } else if (type == "import") {
           navigate("ImportWalletPage", { destory: true });
         }
@@ -77,6 +83,13 @@ export default function SetPasswordPage({ route }) {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <LoadingModal
+        isShow={isShowLoading}
+        isCancel={true}
+        event={() => {
+          setIsShowLoading(false);
+        }}
+      />
       <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
 
       <TitleBar />
@@ -196,7 +209,6 @@ export default function SetPasswordPage({ route }) {
               if (numericValue.length <= 6) {
                 setValueAgain(numericValue);
               }
-
             }}
             secureTextEntry={IsSecondLock}
             value={valueAgain}

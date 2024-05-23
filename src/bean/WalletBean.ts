@@ -7,6 +7,7 @@ export type WalletBean ={
   mvcTypes: number;
   accountsOptions: AccountsOptions[];
 
+
   //dev
   isOpen:boolean;
   addressTpye:AddressType;
@@ -14,6 +15,7 @@ export type WalletBean ={
   isBackUp:boolean;
   //当前钱包选中的account 对应 addressIndex
   isCurrentPathIndex:number
+  seed:string;
 
 }
 

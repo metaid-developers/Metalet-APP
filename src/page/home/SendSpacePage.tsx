@@ -20,6 +20,11 @@ import {
 } from "../../constant/Widget";
 import { themeColor } from "../../constant/Constants";
 import { navigate } from "../../base/NavigationService";
+import { useData } from "../../hooks/MyProvider";
+import { Wallet, API_TARGET, API_NET } from "meta-contract";
+import { Transaction } from "bitcoinjs-lib";
+import { parseShowSpace } from "../../utils/WalletUtils";
+import { broadcastSpace } from "../../api/metaletservice";
 
 export default function SendSpacePage() {
   const [nextBtnColor, setNextBtnColor] = useState("rgba(23, 26, 255, 0.5)");
@@ -40,23 +45,63 @@ export default function SendSpacePage() {
   // verfiy
   const [isShowVerify, setIsShowVerify] = useState(false);
 
+  const { metaletWallet, updateMetaletWallet } = useData();
 
+  // commfirn
+  const [fee, setfee] = useState("");
+  const [total, settotal] = useState("");
+  const [rawTx, setrawTx] = useState("");
 
-  const OpenModal = () => {
-    setIsShowLoading(true);
-    setTimeout(() => {
-      setIsShowLoading(false);
-      // navigate("HomePage");
-      navigate("SendSpaceSuccessPage");
+  const sendSpace = async () => {
+    if (inputAddress == "" || inputAmount == "") {
+      return;
+    }
+    let amount = Math.floor(parseFloat(inputAmount) * 100000000);
 
-    }, 2000);
+    if (amount < 1000) {
+      return;
+    }
+
+    const priviteKey: string = metaletWallet.currentMvcWallet.getPrivateKey();
+    const wallet = new Wallet(priviteKey, API_NET.MAIN, 1, API_TARGET.MVC);
+
+    //
+    console.log(wallet.address.toString());
+    console.log(inputAddress);
+    console.log(inputAmount);
+    console.log(amount);
+
+    const sentRes = await wallet
+      .send(inputAddress, amount, { noBroadcast: true })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    if (sentRes) {
+      const fee = Transaction.fromHex(sentRes.txHex).virtualSize();
+      const total = amount + fee;
+      setrawTx(sentRes.txHex);
+
+      setfee((parseFloat(fee.toString()) / 100000000).toFixed(8));
+      settotal((parseFloat(total.toString()) / 100000000).toFixed(8));
+      console.log("fee" + fee);
+      console.log("total" + total);
+    }
+
+    // wallet
+    //   .send(inputAddress, amount, { noBroadcast: true })
+    //   .then((res) => {
+    //     console.log(res);
+    //     setIsShowLoading(false);
+    //     // navigate("SendSpaceSuccessPage");
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   };
-
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-
-
       <LoadingModal
         isShow={isShowLoading}
         isCancel={true}
@@ -68,7 +113,6 @@ export default function SendSpacePage() {
       <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
 
       <Modal visible={confirmDailogState} transparent={true}>
-       
         <View
           style={{
             flex: 1,
@@ -111,7 +155,7 @@ export default function SendSpacePage() {
                   fontWeight: "bold",
                 }}
               >
-                0.01 SPACE
+                {inputAmount} SPACE
               </Text>
             </View>
 
@@ -120,7 +164,7 @@ export default function SendSpacePage() {
                 From
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                sdfwefef2132fslhfklewhfljskdjflkewjfljewoifjeiwfji1323
+                {metaletWallet.currentMvcWallet.getAddress()}
               </Text>
             </View>
 
@@ -129,7 +173,7 @@ export default function SendSpacePage() {
                 To
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                sdfwefef2132fslhfklewhfljskdjflkewjfljewoifjeiwfji1323
+                {inputAddress}
               </Text>
             </View>
 
@@ -142,7 +186,7 @@ export default function SendSpacePage() {
             >
               <Text style={{ color: "#666", fontSize: 14 }}>Amount</Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                0.01 BTC
+                {inputAmount} SPACE
               </Text>
             </View>
 
@@ -156,7 +200,7 @@ export default function SendSpacePage() {
               <Text style={{ color: "#666", fontSize: 14 }}>
                 Fees(Estimated)
               </Text>
-              <Text style={{ color: "#333", fontSize: 14 }}>0.01 BTC</Text>
+              <Text style={{ color: "#333", fontSize: 14 }}>{fee} SPACE</Text>
             </View>
 
             <View
@@ -167,7 +211,7 @@ export default function SendSpacePage() {
               }}
             >
               <Text style={{ color: "#666", fontSize: 14 }}>Total</Text>
-              <Text style={{ color: "#333", fontSize: 14 }}>0.01 BTC</Text>
+              <Text style={{ color: "#333", fontSize: 14 }}>{total} SPACE</Text>
             </View>
 
             <View
@@ -208,16 +252,24 @@ export default function SendSpacePage() {
         </View>
       </Modal>
 
-
       {/* pay verify modal */}
       <VerifyModal
         isShow={isShowVerify}
         eventCancel={() => {
           setIsShowVerify(false);
         }}
-        event={() => {
+        event={async () => {
           setIsShowVerify(false);
-          OpenModal();
+          const { txid, message } = await broadcastSpace(rawTx);
+          if (txid != null) {
+            navigate("SendSpaceSuccessPage", {
+              result: {
+                txid: txid,
+                amount: inputAmount,
+                address: inputAddress,
+              },
+            });
+          }
         }}
       />
 
@@ -276,7 +328,7 @@ export default function SendSpacePage() {
             >
               <TextInput
                 placeholder="Recipient's address"
-                value={inputAddress}
+                // value={inputAddress}
                 onChangeText={(text) => {
                   setInputAddress(text);
                   if (text.length > 0 && inputAmount.length > 0) {
@@ -329,7 +381,7 @@ export default function SendSpacePage() {
                 width: "100%",
               }}
             >
-              Transfer Address
+              Transfer Amount
             </Text>
 
             <View
@@ -346,7 +398,9 @@ export default function SendSpacePage() {
               }}
             >
               <TextInput
-                placeholder="0.433 SPACE"
+                placeholder={
+                  metaletWallet.currentMvcBalance / 100000000 + " SPACE"
+                }
                 onChangeText={(text) => {
                   setInputAmount(text);
                   if (text.length > 0 && inputAddress.length > 0) {
@@ -375,7 +429,8 @@ export default function SendSpacePage() {
             <RoundSimButton
               title={"Next"}
               event={() => {
-                setConfirmDailogState(true)
+                setConfirmDailogState(true);
+                sendSpace();
               }}
               roundStytle={{ marginTop: 50 }}
               textColor="#fff"

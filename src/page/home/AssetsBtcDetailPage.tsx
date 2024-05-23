@@ -27,12 +27,12 @@ import {
 import { useData } from "../../hooks/MyProvider";
 import * as Clipboard from "expo-clipboard";
 import { formatTime } from "../../utils/MetaFunUiils";
-import { getStorageAddressType } from "../../wallet/wallet";
 import { AddressType } from "@metalet/utxo-wallet-service";
 import {
   AsyncStorageUtil,
   walllet_address_type_key,
 } from "../../utils/AsyncStorageUtil";
+import { changeCurrentWalletAddressType, getStorageCurrentWallet } from "../../utils/WalletUtils";
 
 export default function AssetsBtcDetailPage({ route }) {
   const { myCoinType } = route.params;
@@ -78,7 +78,9 @@ export default function AssetsBtcDetailPage({ route }) {
       console.log("datalist", datalist);
       setBtcActivityList([...datalist]);
     }
-    const addressType = await getStorageAddressType();
+    
+    const currentWallet = await getStorageCurrentWallet();
+    const addressType = currentWallet.addressTpye;
     setAddressType(addressType);
   }
 
@@ -97,46 +99,27 @@ export default function AssetsBtcDetailPage({ route }) {
       case AddressType.Legacy:
         metaletWallet.currentBtcWallet = metaletWallet.btcLegacyWallet;
         setAddressType(AddressType.Legacy);
-        await AsyncStorageUtil.setItem(
-          walllet_address_type_key,
-          AddressType.Legacy
-        );
-
+        changeCurrentWalletAddressType(AddressType.Legacy);
         break;
       case AddressType.NestedSegwit:
         metaletWallet.currentBtcWallet = metaletWallet.btcNestedSegwitWallet;
         setAddressType(AddressType.NestedSegwit);
-        await AsyncStorageUtil.setItem(
-          walllet_address_type_key,
-          AddressType.NestedSegwit
-        );
-
+        changeCurrentWalletAddressType(AddressType.NestedSegwit);
         break;
       case AddressType.NativeSegwit:
         metaletWallet.currentBtcWallet = metaletWallet.btcNativeSegwitWallet;
         setAddressType(AddressType.NativeSegwit);
-        await AsyncStorageUtil.setItem(
-          walllet_address_type_key,
-          AddressType.NativeSegwit
-        );
-
+        changeCurrentWalletAddressType(AddressType.NativeSegwit);
         break;
       case AddressType.Taproot:
         metaletWallet.currentBtcWallet = metaletWallet.btcTaprootWallet;
         setAddressType(AddressType.Taproot);
-        await AsyncStorageUtil.setItem(
-          walllet_address_type_key,
-          AddressType.Taproot
-        );
+        changeCurrentWalletAddressType(AddressType.Taproot);
         break;
       case AddressType.SameAsMvc:
         metaletWallet.currentBtcWallet = metaletWallet.btcSameAsWallet;
         setAddressType(AddressType.SameAsMvc);
-        await AsyncStorageUtil.setItem(
-          walllet_address_type_key,
-          AddressType.SameAsMvc
-        );
-
+        changeCurrentWalletAddressType(AddressType.SameAsMvc);
         break;
     }
 

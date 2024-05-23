@@ -4,7 +4,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { RoundSimButton, TitleBar } from "../../constant/Widget";
 import { navigate } from "../../base/NavigationService";
 
-export default function SendSpaceSuccessPage() {
+export default function SendSpaceSuccessPage({route}) {
+
+  const {result} = route.params;
+
+
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
@@ -60,7 +65,7 @@ export default function SendSpaceSuccessPage() {
                 style={{ width: 36, height: 36 }}
               />
               <Text style={{ color: "#000", fontSize: 16, marginLeft: 10 }}>
-                21836.32 BTC
+              {result.amount} SPACE
               </Text>
             </View>
 
@@ -94,7 +99,7 @@ export default function SendSpaceSuccessPage() {
                   marginRight: 20,
                 }}
               >
-                0XCB515yr1G3PGJFMHVRZ4DG4k8fa88DL9UpTWKX
+                {result.address}
               </Text>
             </View>
           </View>

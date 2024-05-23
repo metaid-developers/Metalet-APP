@@ -54,7 +54,7 @@ export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => 
 
 export const post = async (url, data = {}) => {
   try {
-    const response = await fetch(`${BASE_MVC_API_URL}${url}`, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

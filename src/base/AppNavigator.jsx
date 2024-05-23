@@ -18,7 +18,7 @@ import HomePage from "../page/HomePage";
 import SettingsPage from "../page/SettingsPage";
 import WelcomeWalletPage from "../page/WelcomeWalletPage";
 import Index from "../page/Index";
-import SplacePage from "../page/SplacePage";
+import SplashPage from "../page/SplashPage";
 import ImportWalletPage from "../page/ImportWalletPage";
 import CongratulationsPage from "../page/CongratulationsPage";
 import MvcNftListPage from "../page/MvcNftListPage";
@@ -77,11 +77,11 @@ export default AppNavigator;
 
 const StackNavigator = () => (
   <Stack.Navigator
-    initialRouteName="SplacePage"
+    initialRouteName="SplashPage"
     screenOptions={{ headerShown: false }}
   >
     <Stack.Screen name="ImportWalletPage" component={ImportWalletPage} />
-    <Stack.Screen name="SplacePage" component={SplacePage} />
+    <Stack.Screen name="SplashPage" component={SplashPage} />
     <Stack.Screen name="WelcomeWalletPage" component={WelcomeWalletPage} />
     <Stack.Screen name="CongratulationsPage" component={CongratulationsPage} />
     <Stack.Screen name="Tabs" component={TabNavigator} options={{ unmountOnBlur: false }} />

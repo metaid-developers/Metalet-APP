@@ -24,7 +24,6 @@ import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { goBack, navigate } from "../base/NavigationService";
 import { useData } from "../hooks/MyProvider";
 import { useFocusEffect } from "@react-navigation/native";
-import { chooseMyWallet } from "../utils/WalletUtils";
 import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 
 export default function WalletsPage() {

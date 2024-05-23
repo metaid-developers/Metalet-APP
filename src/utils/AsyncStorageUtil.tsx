@@ -73,6 +73,11 @@ export const network_mvc='network_mvc'
 export const network_all='network_all'
 
 export const walllet_address_type_key="walllet_address_type";
-export const walllet_seed_key="walllet_seed";
+
 
 export const wallet_password_key="wallet_password";
+
+// current
+export const CurrentWalletIDKey="CurrentWalletID_key";
+export const CurrentAccountIDKey="CurrentAccountID_key";
+

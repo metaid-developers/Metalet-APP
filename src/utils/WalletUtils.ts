@@ -4,45 +4,40 @@ import {
   CoinType,
   MvcWallet,
 } from "@metalet/utxo-wallet-service";
-import { WalletBean } from "../bean/WalletBean";
+import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { useData } from "../hooks/MyProvider";
 import {
   AsyncStorageUtil,
+  CurrentAccountIDKey,
+  CurrentWalletIDKey,
   wallet_password_key,
   wallets_key,
 } from "./AsyncStorageUtil";
 import MetaletWallet from "../wallet/MetaletWallet";
 
-//当前缓存钱包数据
-const { myWallet, updateMyWallet } = useData();
-//当前使用钱包实例
-const { metaletWallet, updateMetaletWallet } = useData();
+export async function isNoWalletPassword(): Promise<boolean> {
+  const password = await AsyncStorageUtil.getItem(wallet_password_key);
+  console.log("isNoWalletPassword", password);
 
-export const chooseMyWallet = async (wallet: WalletBean) => {
-  await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
-    wallets.forEach((wallet) => {
-      wallet.accountsOptions.forEach((account) => {
-        if (account.isSelected) {
-          updateMyWallet(wallet);
+  if (password == null) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
-          const btcWallet = new BtcWallet({
-            network: "mainnet",
-            mnemonic: wallet.mnemonic,
-            addressIndex: account.addressIndex,
-            addressType: wallet.addressTpye,
-            //选中跟mvc 路径一致
-            coinType: wallet.mvcTypes,
-          });
+export async function isNoStorageWallet(): Promise<boolean> {
+  const wallets = await AsyncStorageUtil.getItem(wallets_key);
+  if (wallets) {
+    return false;
+  }
+  return true;
+}
 
-     
-          //   setLegacyAddress(btcLegacyWallet.getAddress());
-          //   setMvcAddress(metaletWallet.currentMvcWallet.getAddress());
-          updateMetaletWallet(metaletWallet);
-        }
-      });
-    });
-  });
-};
+export async function getStorageWallets(): Promise<WalletBean[]> {
+  const wallets = await AsyncStorageUtil.getItem(wallets_key);
+  return wallets;
+}
 
 export async function verifyPassword(password: string): Promise<boolean> {
   const passwordLocal = await AsyncStorageUtil.getItem(wallet_password_key);
@@ -51,4 +46,74 @@ export async function verifyPassword(password: string): Promise<boolean> {
   } else {
     return false;
   }
+}
+
+export function parseShowSpace(space: string) {
+  return (parseFloat(space) / 100000000).toFixed(8);
+}
+
+export async function parseSatSpace(space: string) {
+  return Math.floor(parseFloat(space) * 100000000);
+}
+
+//storage
+export async function getCurrentWalletID(): Promise<string> {
+  const walletID = await AsyncStorageUtil.getItem(CurrentWalletIDKey);
+  return walletID;
+}
+
+export async function getCurrentAccountID(): Promise<string> {
+  const accountID = await AsyncStorageUtil.getItem(CurrentAccountIDKey);
+  return accountID;
+}
+
+export async function getCurrentWalletAccount(): Promise<AccountsOptions> {
+  const wallet = await getStorageCurrentWallet();
+  const accountID = await getCurrentAccountID();
+  if (!wallet || !accountID) {
+    return null;
+  }
+  return wallet.accountsOptions.find((account) => account.id == accountID);
+}
+export async function getStorageCurrentWallet(): Promise<WalletBean> {
+  const wallets = await AsyncStorageUtil.getItem(wallets_key);
+  if (wallets) {
+    const walletID = await getCurrentWalletID();
+    const wallet = wallets.find((wallet) => {
+      if (wallet) {
+        if (wallet.id == walletID) {
+          return wallet;
+        }
+      } else {
+        return null;
+      }
+    });
+    return wallet;
+  } else {
+    return null;
+  }
+}
+
+export async function getWalletBeans() {
+  return await AsyncStorageUtil.getItem(wallets_key);
+}
+
+export async function getCurrentWalletSeed() {
+  const wallet: WalletBean = await getStorageCurrentWallet();
+  if (wallet.seed == null) {
+    return null;
+  }
+  const seed = Buffer.from(wallet.seed, "hex");
+  return seed;
+}
+
+//change
+export async function changeCurrentWalletAddressType(
+  changeAddressType: AddressType
+) {
+  const wallets: WalletBean[] = await getWalletBeans();
+  const walletID = await getCurrentWalletID();
+  const wallet = wallets.find((wallet) => wallet.id == walletID);
+  wallet.addressTpye = changeAddressType;
+  await AsyncStorageUtil.updateItem(wallets_key, [...wallets, wallet]);
 }
