@@ -25,6 +25,12 @@ import { goBack, navigate } from "../base/NavigationService";
 import { useData } from "../hooks/MyProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
+import {
+  getCurrentAccountID,
+  getWalletBeans,
+  setCurrentAccountID,
+  setCurrentWalletID,
+} from "../utils/WalletUtils";
 
 export default function WalletsPage() {
   let [walletList, setWalletList] = useState<WalletBean[]>([]);
@@ -47,13 +53,17 @@ export default function WalletsPage() {
   //提示
   const [isShowNotice, setIsShowNotice] = useState(false);
 
+  //current
+  const [currentAccountID, setcurrentAccountID] = useState("");
+
   // let changeWallet:WalletBean;
 
   async function getWalletData() {
-    await AsyncStorageUtil.getItem(wallets_key).then((res) => {
-      console.log(JSON.stringify(res));
-      setWalletList(res);
-    });
+    const currentAccountID = await getCurrentAccountID();
+    setcurrentAccountID(currentAccountID);
+
+    const wallets = await getWalletBeans();
+    setWalletList(wallets);
   }
 
   useEffect(() => {
@@ -82,12 +92,6 @@ export default function WalletsPage() {
         });
       });
       const nowWallet: WalletBean = wallets[postion];
-      //   const newAccountsOptions = nowWallet.accountsOptions.map((account) => {
-      //     // 修改账户属性
-      //     return { ...account, isSelect: false };
-      //   });
-
-      //   nowWallet.accountsOptions = newAccountsOptions;
 
       const getRandomColor = () => {
         const letters = "0123456789ABCDEF";
@@ -109,13 +113,17 @@ export default function WalletsPage() {
         defaultAvatarColor: defaultAvatarColor,
       };
 
-     
       nowWallet.accountsOptions.push(newAccount);
-      nowWallet.isCurrentPathIndex=nowWallet.accountsOptions.length-1;
+      nowWallet.isCurrentPathIndex = nowWallet.accountsOptions.length - 1;
+
+      setcurrentAccountID(newAccount.id);
+      await setCurrentAccountID(newAccount.id);
+      await setCurrentWalletID(nowWallet.id);
+
       await AsyncStorageUtil.updateItem(wallets_key, wallets);
       getWalletData();
-      eventBus.publish(refreshHomeLoadingEvent,{data:''})
-
+      eventBus.publish(refreshHomeLoadingEvent, { data: "" });
+      navigate("Tabs");
     });
   }
 
@@ -127,23 +135,23 @@ export default function WalletsPage() {
     console.log("updataSelectAccount", walletIndex, accountIndex);
 
     await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
-      wallets.forEach((wallet) => {
-        wallet.accountsOptions.forEach((account) => {
-          account.isSelect = false;
-        });
-      });
+      // wallets.forEach((wallet) => {
+      //   wallet.accountsOptions.forEach((account) => {
+      //     account.isSelect = false;
+      //   });
+      // });
 
       const nowWallet = wallets[walletIndex];
-      nowWallet.isCurrentPathIndex=accountIndex;
+      nowWallet.isCurrentPathIndex = accountIndex;
       nowWallet.accountsOptions[accountIndex].isSelect = true;
+      setcurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
+      await setCurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
+      await setCurrentWalletID(nowWallet.id);
       updateMyWallet(nowWallet);
-
-      // console.log("wallets", "调整后的： "+JSON.stringify(wallets));
-      
       await AsyncStorageUtil.updateItem(wallets_key, wallets);
       getWalletData();
-      navigate('Tabs')
-      eventBus.publish(refreshHomeLoadingEvent,{data:''})
+      navigate("Tabs");
+      eventBus.publish(refreshHomeLoadingEvent, { data: "" });
 
       // chooseMyWallet(nowWallet);
     });
@@ -222,7 +230,8 @@ export default function WalletsPage() {
               </TouchableWithoutFeedback>
             )}
 
-            {item.isSelect && isEdit == false && (
+            {/* {item.isSelect && isEdit == false && ( */}
+            {item.id == currentAccountID && isEdit == false && (
               <Image
                 source={require("../../image/wallets_select_icon.png")}
                 style={{ padding: 8, width: 15, height: 15 }}
@@ -486,7 +495,7 @@ export default function WalletsPage() {
                 padding: 20,
                 borderTopRightRadius: 10,
                 borderTopLeftRadius: 10,
-                paddingBottom:40
+                paddingBottom: 40,
               }}
             >
               <View style={{ flexDirection: "row" }}>
@@ -611,7 +620,7 @@ export default function WalletsPage() {
                 padding: 20,
                 borderTopRightRadius: 10,
                 borderTopLeftRadius: 10,
-                paddingBottom:40
+                paddingBottom: 40,
               }}
             >
               <View style={{ flexDirection: "row" }}>
@@ -649,8 +658,8 @@ export default function WalletsPage() {
               >
                 <TextInput
                   multiline={true}
-                  placeholder={changeAccountName}
-                  autoCapitalize={"none"}
+                  // placeholder={changeAccountName}
+                  // autoCapitalize={"none"}
                   onChangeText={(text) => {
                     setChangeAccountName(text);
                     if (text.length > 0) {

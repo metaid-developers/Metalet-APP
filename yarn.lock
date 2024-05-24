@@ -1781,6 +1781,11 @@
     crypto-js "^4.2.0"
     decimal.js "^10.4.3"
 
+"@mvc-org/mvc-resources@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@mvc-org/mvc-resources/-/mvc-resources-1.0.6.tgz#b88c20d283e026437ec81a073a16495a2bdfd3ad"
+  integrity sha512-wG6yW9WxUGzFrO/x8eg1cd6qyuUdH8xc5SwvDG+HOqtZuwImmu5QE8LLk1L7kjpC8/+2KaAkdn927aaNVHI7Rg==
+
 "@noble/ed25519@^1.7.3":
   version "1.7.3"
   resolved "https://registry.yarnpkg.com/@noble/ed25519/-/ed25519-1.7.3.tgz#57e1677bf6885354b466c38e2b620c62f45a7123"

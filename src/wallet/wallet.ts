@@ -6,13 +6,13 @@ import { getCurrentWalletSeed, getStorageCurrentWallet } from "../utils/WalletUt
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 
 // READY
-// export const btc_network = "mainnet";
-// export const net_network = "livenet";
+export const btc_network = "mainnet";
+export const net_network = "livenet";
 
 
 
-export const btc_network = "testnet";
-export const net_network = "testnet";
+// export const btc_network = "testnet";
+// export const net_network = "testnet";
 
 
 
@@ -56,6 +56,25 @@ export async function getCurrentBtcWallet():Promise<BtcWallet> {
     return btcWallet;
   }
 
+
+
+  export async function getBtcWallet(uAddressType:AddressType):Promise<BtcWallet> {
+    const wallet = await getStorageCurrentWallet();
+    const seed=await getCurrentWalletSeed()
+
+    let coinType = uAddressType === AddressType.SameAsMvc ? wallet.mvcTypes : CoinType.BTC
+
+    const btcWallet = new BtcWallet({
+      network: btc_network,
+      mnemonic: wallet.mnemonic,
+      addressIndex: wallet.isCurrentPathIndex,
+      addressType: uAddressType,
+      coinType: coinType,
+      seed
+    //   coinType: wallet.mvcTypes,
+    });
+    return btcWallet;
+  }
 
 
 

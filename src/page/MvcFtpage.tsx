@@ -23,83 +23,93 @@ import { removeTrailingZeros } from "../utils/StringUtils";
 import { checkImage, getShowImageUrl } from "../utils/MetaFunUiils";
 import { useFocusEffect } from "@react-navigation/native";
 import { EventBus, eventBus, refreshMvcFtEvent } from "../utils/EventBus";
+import { fetchMvcFtBalance } from "../api/metaletservice";
+import { MvcFtData } from "../api/type/MvcFtData";
+import { getIconUri } from "@mvc-org/mvc-resources";
+import { getCurrentMvcWallet } from "../wallet/wallet";
 
 export default function MvcFtPage() {
   const { userData, updateUserData } = useData();
   const { walletManager, updateWalletManager } = useData();
   const { accountIndex, updateAccountIndex } = useData();
 
-  let [ftList, setftList] = useState<MvcFtBeans[]>();
+  let [ftList, setftList] = useState<MvcFtData[]>();
   const { metaletWallet, updateMetaletWallet } = useData();
   const { mvcAddress, updateMvcAddress } = useData();
 
   // let mvcAddress;
 
   useEffect(() => {
-    // mvcAddress = metaletWallet.currentMvcWallet.getAddress();
-    console.log("mvc ft page useEffect 页面初始");
-    getMvcFtData(mvcAddress);
-    // eventBus.subscribe(refreshMvcFtEvent, (message) => {
-    //   console.log("mvc ft page 收到刷新" + message.data);
-
-    //   updateMvcAddress(message.data);
-    //   getMvcFtData(message.data);
-    // });
-    // return () => {
-    //   eventBus.unsubscribe(refreshMvcFtEvent, (message) => {
-    //     console.log("mvc nft page 取消订阅" + message.data);
-    //   });
-    // };
-
+    refresh();
   }, []);
   
   useEffect(() => {
-    getMvcFtData(mvcAddress);
+    refresh();
   }, [mvcAddress]);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     console.log("useFocusEffect MVCFtPage"+mvcAddress);
-  //     getMvcFtData(mvcAddress);
-  //   }, [])
-  // );
+
+  async function refresh() {
+    if(mvcAddress){
+      getMvcFtData(mvcAddress);
+    }else{
+     const mvcWallet=await getCurrentMvcWallet();
+     getMvcFtData(mvcWallet.getAddress());
+    }
+  }
 
   async function getMvcFtData(address: string) {
-    let param = {
-      page: 1,
-      pageSize: 30,
-      chain: "mvc",
-    };
-    let data: RootObject = await get(
-      BASE_METALET_URL +
-        "/aggregation/v2/app/show/ft/" +
-        address +
-        "/summaries",
-      false,
-      param
-    );
-    //可以设置任何对象到全局变量
-    // updateUserData(data);
-    if (data.data.results.items != null) {
-      // console.log("data.data.results.items", data.data.results.items);
-      setftList([...data.data.results.items]);
-    } else {
+
+    const ftdata=await fetchMvcFtBalance(address);
+    // console.log(ftdata);
+    
+    if(ftdata){
+      setftList([...ftdata]);
+    }else{
       setftList([]);
     }
+    
+
+    // let param = {
+    //   page: 1,
+    //   pageSize: 30,
+    //   chain: "mvc",
+    // };
+    // let data: RootObject = await get(
+    //   BASE_METALET_URL +
+    //     "/aggregation/v2/app/show/ft/" +
+    //     address +
+    //     "/summaries",
+    //   false,
+    //   param
+    // );
+    // //可以设置任何对象到全局变量
+    // // updateUserData(data);
+    // if (data.data.results.items != null) {
+    //   // console.log("data.data.results.items", data.data.results.items);
+    //   setftList([...data.data.results.items]);
+    // } else {
+    //   setftList([]);
+    // }
   }
 
   const [data, setData] = useState([]);
 
   const refreshData = (id) => {
     setftList((prevList) =>
-      prevList.map((item) =>
+      prevList.map((item) => 
         item.name === id ? { ...item, imageError: true } : item
       )
     );
   };
 
   const ListItem = ({ index, item }) => {
-    let ImageUrl = getShowImageUrl(item.icon!);
+    // let ImageUrl = getShowImageUrl(item.icon!);
+    let ImageUrl = getIconUri({type:"metaContract",codehash:item.codeHash,genesis:item.genesis})
+    if(!ImageUrl){
+      ImageUrl="1"
+    }
+    
+
     //  const resut=await checkImage(ImageUrl)
     //  setICanLoadImage(resut)
     return (

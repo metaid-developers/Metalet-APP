@@ -64,9 +64,19 @@ import {
   fetchBtcBalance,
   fetchMvcActivityComfird,
 } from "../api/metaletservice";
-import { btc_network, getCurrentBtcWallet, getCurrentMvcWallet, net_network } from "../wallet/wallet";
+import {
+  btc_network,
+  getBtcWallet,
+  getCurrentBtcWallet,
+  getCurrentMvcWallet,
+  net_network,
+} from "../wallet/wallet";
 import { Buffer } from "buffer";
-import { getCurrentWalletSeed } from "../utils/WalletUtils";
+import {
+  getCurrentWalletAccount,
+  getCurrentWalletSeed,
+  getStorageCurrentWallet,
+} from "../utils/WalletUtils";
 
 // import RNFS from "react-native-fs";
 
@@ -134,11 +144,9 @@ export default function HomePage(props: any) {
     // console.log("mvc余额 ", dataMvcBalance);
 
 
-    console.log("请求结果是： ", btcAddress);
-    
-    let dataBtcBalance: RootBtcBalanceObject=await  fetchBtcBalance(btcAddress)
-    console.log("btc余额 ", dataBtcBalance);
-    
+    let dataBtcBalance: RootBtcBalanceObject =
+      await fetchBtcBalance(btcAddress);
+
     metaletWallet.currentBtcBalance = dataBtcBalance.data.balance;
 
     metaletWallet.currentSumBalance =
@@ -180,25 +188,6 @@ export default function HomePage(props: any) {
     }, 1000);
   }, [btcAddress]);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     // initCurrentWallet();
-  //     // console.log("HomePage useFocusEffect");
-  //     // eventBus.publish(refreshMvcFtEvent, {
-  //     //   data: metaletWallet.currentMvcWallet.getAddress(),
-  //     // });
-  //     // changeNetwork();
-
-  //     eventBus.publish(refreshMvcFtEvent, {
-  //       data: metaletWallet.currentMvcWallet.getAddress(),
-  //     });
-  //     eventBus.publish(refreshBtcFtEvent, {
-  //       data: metaletWallet.currentBtcWallet.getAddress(),
-  //     });
-
-  //   }, [])
-  // );
-
   function ShowNotice(notice) {
     setIsShowCopy(false);
     Clipboard.setString(notice);
@@ -209,145 +198,12 @@ export default function HomePage(props: any) {
     }, 800);
   }
 
-  let userAvater;
-  let accountName;
+  const [userAvater, setuserAvater] = useState<string[]>([]);
+  const [accountName, setaccountName] = useState("");
+  const [walletName, setWalletName] = useState("");
+
   //初始化所有钱包
   async function initCurrentWallet() {
-    let wallets = await AsyncStorageUtil.getItem(wallets_key);
-    for (let i = 0; i < wallets.length; i++) {
-      let wallet:WalletBean = wallets[i];
-      for (let q = 0; q < wallet.accountsOptions.length; q++) {
-        let account = wallet.accountsOptions[q];
-        if (account.isSelect == true) {
-          myWallet!.accountsOptions!.find((account) => {
-            if (account.isSelect) {
-              userAvater = account.defaultAvatarColor;
-            }
-          });
-
-          myWallet!.accountsOptions!.forEach((element) => {
-            if (element.isSelect) {
-              accountName = element.name;
-            }
-          });
-
-          updateMyWallet(wallet);
-          let seed = await getCurrentWalletSeed()
-
-          const btcTaprootWallet = new BtcWallet({
-            network: btc_network,
-            mnemonic: myWallet.mnemonic,
-            addressIndex: account.addressIndex,
-            addressType: AddressType.Taproot,
-            coinType: CoinType.BTC,
-            seed,
-          });
-
-          // const seed = btcTaprootWallet.getSeed();
-
-          metaletWallet.btcTaprootWallet = btcTaprootWallet;
-          setTaprootAddress(btcTaprootWallet.getAddress());
-
-          const btcNativeSegwitWallet = new BtcWallet({
-            network: btc_network,
-            mnemonic: myWallet.mnemonic,
-            addressIndex: account.addressIndex,
-            addressType: AddressType.NativeSegwit,
-            coinType: CoinType.BTC,
-            seed,
-          });
-          metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
-          setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
-
-          const btcNestedSegwitWallet = new BtcWallet({
-            network: btc_network,
-            mnemonic: myWallet.mnemonic,
-            addressIndex: account.addressIndex,
-            addressType: AddressType.NestedSegwit,
-            coinType: CoinType.BTC,
-            seed,
-          });
-          metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
-          setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
-
-          const btcLegacyWallet = new BtcWallet({
-            network: btc_network,
-            mnemonic: myWallet.mnemonic,
-            addressIndex: account.addressIndex,
-            addressType: AddressType.Legacy,
-            coinType: CoinType.BTC,
-            seed,
-          });
-          metaletWallet.btcLegacyWallet = btcLegacyWallet;
-          setLegacyAddress(btcLegacyWallet.getAddress());
-
-          const btcSameAsLegacyWallet = new BtcWallet({
-            network: btc_network,
-            mnemonic: myWallet.mnemonic,
-            addressIndex: account.addressIndex,
-            addressType: AddressType.LegacyMvc,
-            coinType: wallet.mvcTypes,
-            seed,
-          });
-
-        
-
-          metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
-          setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
-          // console.log(
-          //   "切换后的btc地址btSameAsLegacyWallet  ",
-          //   btcSameAsLegacyWallet.getAddress()
-          // );
-
-          const mvcWallet = new MvcWallet({
-            network:"mainnet",
-            mnemonic: wallet.mnemonic,
-            addressIndex: account.addressIndex,
-            addressType: AddressType.LegacyMvc,
-            coinType: wallet.mvcTypes,
-            seed,
-          });
-        
-    
-          const nowBtcWallet = new BtcWallet({
-            network: btc_network,
-            mnemonic: myWallet.mnemonic,
-            addressIndex: account.addressIndex,
-            addressType: wallet.addressTpye,
-            coinType:wallet.addressTpye==AddressType.SameAsMvc? wallet.mvcTypes:CoinType.BTC,
-            seed,
-          });
-          updateMvcAddress(mvcWallet.getAddress());
-          updateBtcAddress(nowBtcWallet.getAddress());
-          console.log(wallet.addressTpye);
-          
-        
-          console.log("updateBtcAddress"+nowBtcWallet.getAddress());
-          
-          metaletWallet.currentBtcWallet = nowBtcWallet;
-          metaletWallet.currentMvcWallet = mvcWallet;
-          updateMetaletWallet(metaletWallet);
-
-
-
-          getMVCBalance();
-
-          // myTestMvc= mvcWallet.getAddress();
-
-          // //通知更新
-          // eventBus.publish(refreshMvcFtEvent, {
-          //   data: metaletWallet.currentMvcWallet.getAddress(),
-          // });
-          // eventBus.publish(refreshBtcFtEvent, {
-          //   data: metaletWallet.currentBtcWallet.getAddress(),
-          // });
-        }
-      }
-    }
-
-  
-    
-
     await AsyncStorageUtil.getItem(network_key).then(async (saveNet) => {
       if (saveNet == null) {
         console.log("saveNet is null" + saveNet);
@@ -359,6 +215,170 @@ export default function HomePage(props: any) {
         updateNetWork(saveNet);
       }
     });
+
+    const nowWallet = await getStorageCurrentWallet();
+    const nowAccount = await getCurrentWalletAccount();
+    console.log("nowWallet" + nowWallet);
+    console.log("nowAccount" + nowAccount);
+
+    setWalletName(nowWallet.name);
+    setaccountName(nowAccount.name);
+    setuserAvater(nowAccount.defaultAvatarColor);
+
+    updateMyWallet(nowWallet);
+    const btcTaprootWallet = await getBtcWallet(AddressType.Taproot);
+    setTaprootAddress(btcTaprootWallet.getAddress());
+    const btcNativeSegwitWallet = await getBtcWallet(AddressType.NativeSegwit);
+    setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
+    const btcNestedSegwitWallet = await getBtcWallet(AddressType.NestedSegwit);
+    setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
+    const btcLegacyWallet = await getBtcWallet(AddressType.Legacy);
+    setLegacyAddress(btcLegacyWallet.getAddress());
+    const btcSameAsLegacyWallet = await getBtcWallet(AddressType.SameAsMvc);
+    setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
+    const mvcWallet = await getCurrentMvcWallet();
+    const currentBtcWallet = await getCurrentBtcWallet();
+
+    updateMvcAddress(mvcWallet.getAddress());
+    updateBtcAddress(currentBtcWallet.getAddress());
+
+    metaletWallet.currentBtcWallet = currentBtcWallet;
+    metaletWallet.currentMvcWallet = mvcWallet;
+    metaletWallet.btcLegacyWallet = btcLegacyWallet;
+    metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
+    metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
+    metaletWallet.btcTaprootWallet = btcTaprootWallet;
+    metaletWallet.btcSameAsWallet= btcSameAsLegacyWallet;
+
+    updateMetaletWallet(metaletWallet);
+    getMVCBalance();
+
+    // let wallets = await AsyncStorageUtil.getItem(wallets_key);
+    // for (let i = 0; i < wallets.length; i++) {
+    //   let wallet: WalletBean = wallets[i];
+    //   for (let q = 0; q < wallet.accountsOptions.length; q++) {
+    //     let account = wallet.accountsOptions[q];
+    //     if (account.isSelect == true) {
+    //       myWallet!.accountsOptions!.find((account) => {
+    //         if (account.isSelect) {
+    //           userAvater = account.defaultAvatarColor;
+    //         }
+    //       });
+
+    //       myWallet!.accountsOptions!.forEach((element) => {
+    //         if (element.isSelect) {
+    //           accountName = element.name;
+    //         }
+    //       });
+
+    //       updateMyWallet(wallet);
+    //       let seed = await getCurrentWalletSeed();
+
+    //       const btcTaprootWallet = new BtcWallet({
+    //         network: btc_network,
+    //         mnemonic: myWallet.mnemonic,
+    //         addressIndex: account.addressIndex,
+    //         addressType: AddressType.Taproot,
+    //         coinType: CoinType.BTC,
+    //         seed,
+    //       });
+
+    //       // const seed = btcTaprootWallet.getSeed();
+
+    //       metaletWallet.btcTaprootWallet = btcTaprootWallet;
+    //       setTaprootAddress(btcTaprootWallet.getAddress());
+
+    //       const btcNativeSegwitWallet = new BtcWallet({
+    //         network: btc_network,
+    //         mnemonic: myWallet.mnemonic,
+    //         addressIndex: account.addressIndex,
+    //         addressType: AddressType.NativeSegwit,
+    //         coinType: CoinType.BTC,
+    //         seed,
+    //       });
+    //       metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
+    //       setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
+
+    //       const btcNestedSegwitWallet = new BtcWallet({
+    //         network: btc_network,
+    //         mnemonic: myWallet.mnemonic,
+    //         addressIndex: account.addressIndex,
+    //         addressType: AddressType.NestedSegwit,
+    //         coinType: CoinType.BTC,
+    //         seed,
+    //       });
+    //       metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
+    //       setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
+
+    //       const btcLegacyWallet = new BtcWallet({
+    //         network: btc_network,
+    //         mnemonic: myWallet.mnemonic,
+    //         addressIndex: account.addressIndex,
+    //         addressType: AddressType.Legacy,
+    //         coinType: CoinType.BTC,
+    //         seed,
+    //       });
+    //       metaletWallet.btcLegacyWallet = btcLegacyWallet;
+    //       setLegacyAddress(btcLegacyWallet.getAddress());
+
+    //       const btcSameAsLegacyWallet = new BtcWallet({
+    //         network: btc_network,
+    //         mnemonic: myWallet.mnemonic,
+    //         addressIndex: account.addressIndex,
+    //         addressType: AddressType.LegacyMvc,
+    //         coinType: wallet.mvcTypes,
+    //         seed,
+    //       });
+
+    //       metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
+    //       setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
+    //       // console.log(
+    //       //   "切换后的btc地址btSameAsLegacyWallet  ",
+    //       //   btcSameAsLegacyWallet.getAddress()
+    //       // );
+
+    //       const mvcWallet = new MvcWallet({
+    //         network: "mainnet",
+    //         mnemonic: wallet.mnemonic,
+    //         addressIndex: account.addressIndex,
+    //         addressType: AddressType.LegacyMvc,
+    //         coinType: wallet.mvcTypes,
+    //         seed,
+    //       });
+
+    //       const nowBtcWallet = new BtcWallet({
+    //         network: btc_network,
+    //         mnemonic: myWallet.mnemonic,
+    //         addressIndex: account.addressIndex,
+    //         addressType: wallet.addressTpye,
+    //         coinType:
+    //           wallet.addressTpye == AddressType.SameAsMvc
+    //             ? wallet.mvcTypes
+    //             : CoinType.BTC,
+    //         seed,
+    //       });
+    //       updateMvcAddress(mvcWallet.getAddress());
+    //       updateBtcAddress(nowBtcWallet.getAddress());
+    //       console.log(wallet.addressTpye);
+
+    //       console.log("updateBtcAddress" + nowBtcWallet.getAddress());
+
+    //       metaletWallet.currentBtcWallet = nowBtcWallet;
+    //       metaletWallet.currentMvcWallet = mvcWallet;
+    //       updateMetaletWallet(metaletWallet);
+
+    //       // myTestMvc= mvcWallet.getAddress();
+
+    //       // //通知更新
+    //       // eventBus.publish(refreshMvcFtEvent, {
+    //       //   data: metaletWallet.currentMvcWallet.getAddress(),
+    //       // });
+    //       // eventBus.publish(refreshBtcFtEvent, {
+    //       //   data: metaletWallet.currentBtcWallet.getAddress(),
+    //       // });
+    //     }
+    //   }
+    // }
   }
 
   const { userData, updateUserData } = useData();
@@ -874,7 +894,7 @@ export default function HomePage(props: any) {
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Text style={metaStyles.grayTextdefault66}>
-                    {myWallet.name}-
+                    {walletName}-
                   </Text>
                   <Text style={metaStyles.defaultText}>{accountName}</Text>
                 </View>
@@ -998,8 +1018,7 @@ export default function HomePage(props: any) {
               // navigate("WebPageTest");
               // navigate("WebPage");
 
-              AsyncStorageUtil.clear()
-
+              AsyncStorageUtil.clear();
             }}
           >
             <View style={{ marginTop: 20 }}>

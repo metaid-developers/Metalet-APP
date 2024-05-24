@@ -62,10 +62,24 @@ export async function getCurrentWalletID(): Promise<string> {
   return walletID;
 }
 
+export async function setCurrentWalletID(walletID:string) {
+  await AsyncStorageUtil.setItem(CurrentWalletIDKey,walletID);
+  }
+
+
+
+
 export async function getCurrentAccountID(): Promise<string> {
   const accountID = await AsyncStorageUtil.getItem(CurrentAccountIDKey);
   return accountID;
 }
+
+export async function setCurrentAccountID(accountID:string) {
+  await AsyncStorageUtil.setItem(CurrentAccountIDKey, accountID)
+}
+
+
+
 
 export async function getCurrentWalletAccount(): Promise<AccountsOptions> {
   const wallet = await getStorageCurrentWallet();
@@ -93,6 +107,15 @@ export async function getStorageCurrentWallet(): Promise<WalletBean> {
     return null;
   }
 }
+
+// export async function setCurrentWallet(walletBean:WalletBean) {
+//   await AsyncStorageUtil.setItem(CurrentWalletIDKey,walletBean);
+//   }
+  
+//   export async function setCurrentAccount(account:AccountsOptions) {
+//      await AsyncStorageUtil.setItem(CurrentAccountIDKey,account);
+//   }
+  
 
 export async function getWalletBeans() {
   return await AsyncStorageUtil.getItem(wallets_key);

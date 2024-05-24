@@ -9,6 +9,8 @@ import { getShowImageUrl } from "../utils/MetaFunUiils";
 import { useFocusEffect } from "@react-navigation/native";
 import { useData } from "../hooks/MyProvider";
 import { eventBus, refreshMvcFtEvent } from "../utils/EventBus";
+import { fetchMvcNftBalance } from "../api/metaletservice";
+import { getCurrentMvcWallet } from "../wallet/wallet";
 export default function MvcNftPage(props) {
   let [nftList, setNftList] = useState<MvcGenesisItem[]>([]);
   const { walletManager, updateWalletManager } = useData();
@@ -16,12 +18,21 @@ export default function MvcNftPage(props) {
   const { mvcAddress, updateMvcAddress } = useData();
 
   useEffect(() => {
-    getMvcNft(mvcAddress);
+    refresh() 
   }, []);
 
   useEffect(() => {
-    getMvcNft(mvcAddress);
+    refresh() 
   }, [mvcAddress]);
+
+  async function refresh() {
+    if(mvcAddress){
+      getMvcNft(mvcAddress);
+    }else{
+     const mvcWallet=await getCurrentMvcWallet();
+     getMvcNft(mvcWallet.getAddress());
+    }
+  }
 
 
   // useFocusEffect(
@@ -36,6 +47,10 @@ export default function MvcNftPage(props) {
   // );
 
   async function getMvcNft(address:string) {
+
+  //  const nftList=await fetchMvcNftBalance(address);
+  //  console.log("nftList",nftList);
+
     let params = {
       page: 1,
       pageSize: 300,
