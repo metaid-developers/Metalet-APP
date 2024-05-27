@@ -1,6 +1,6 @@
 import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
 import { WalletBean } from "../bean/WalletBean";
-import { AsyncStorageUtil, wallet_password_key, wallets_key, walllet_address_type_key } from "../utils/AsyncStorageUtil";
+import {  wallet_password_key, wallets_key, walllet_address_type_key } from "../utils/AsyncStorageUtil";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 import { getCurrentWalletSeed, getStorageCurrentWallet } from "../utils/WalletUtils";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";

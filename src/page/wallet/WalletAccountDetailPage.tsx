@@ -14,9 +14,10 @@ import {
   TitleBar,
 } from "../../constant/Widget";
 import { AccountsOptions, WalletBean } from "../../bean/WalletBean";
-import { AsyncStorageUtil, wallets_key } from "../../utils/AsyncStorageUtil";
+import {  wallets_key } from "../../utils/AsyncStorageUtil";
 import { useFocusEffect } from "@react-navigation/native";
 import { navigate } from "../../base/NavigationService";
+import { getStorageWallets } from "../../utils/WalletUtils";
 
 export default function WalletAccountDetailPage({ route }) {
   const { PositionWallet } = route.params;
@@ -35,7 +36,8 @@ export default function WalletAccountDetailPage({ route }) {
   }, []);
 
   async function initWallet() {
-    await AsyncStorageUtil.getItem(wallets_key).then((wallets) => {
+    await getStorageWallets().then((wallets) => {
+      // await AsyncStorageUtil.getItem(wallets_key).then((wallets) => {
       const nowWallet = wallets[PositionWallet.walletIndex];
       setShowWalllet(nowWallet);
       setAccount(nowWallet.accountsOptions[PositionWallet.accountIndex]);
@@ -121,13 +123,14 @@ export default function WalletAccountDetailPage({ route }) {
                 showAccount.name = changeAccountName;
                 setAccount(showAccount);
 
-                await AsyncStorageUtil.getItem(wallets_key).then(
+                await getStorageWallets().then(
+                  // await AsyncStorageUtil.getItem(wallets_key).then(
                   async (wallets) => {
                     const nowWallet = wallets[PositionWallet.walletIndex];
                     nowWallet.accountsOptions[
                       PositionWallet.accountIndex
                     ].name = changeAccountName;
-                    await AsyncStorageUtil.updateItem(wallets_key, wallets);
+                    await storage.set(wallets_key, wallets);
                   }
                 );
                 setIsShowEditWallet(false);
@@ -221,32 +224,42 @@ export default function WalletAccountDetailPage({ route }) {
         </View>
 
         {/* address */}
-        <TouchableWithoutFeedback onPress={()=>{
-            navigate('AccountAddressPage',{SingleWallet:{menmonic:showWallet.mnemonic,addressIndex:showAccount.addressIndex,}})
-        }}>
-        <View
-          style={{
-            marginTop: 30,
-            flexDirection: "row",
-            // backgroundColor: "#fff",
-            padding: 20,
-            alignItems: "center",
+        <TouchableWithoutFeedback
+          onPress={() => {
+            navigate("AccountAddressPage", {
+              SingleWallet: {
+                menmonic: showWallet.mnemonic,
+                addressIndex: showAccount.addressIndex,
+              },
+            });
           }}
         >
-          <Image
-            source={require("../../../image/metalet_wallet_icon_address.png")}
-            style={{ width: 35, height: 35 }}
-          />
+          <View
+            style={{
+              marginTop: 30,
+              flexDirection: "row",
+              // backgroundColor: "#fff",
+              padding: 20,
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={require("../../../image/metalet_wallet_icon_address.png")}
+              style={{ width: 35, height: 35 }}
+            />
 
-          <Text style={{ marginLeft: 10, fontSize: 14 }}> Account Address</Text>
+            <Text style={{ marginLeft: 10, fontSize: 14 }}>
+              {" "}
+              Account Address
+            </Text>
 
-          <View style={{ flex: 1 }} />
+            <View style={{ flex: 1 }} />
 
-          <Image
-            source={require("../../../image/list_icon_ins.png")}
-            style={{ width: 20, height: 20 }}
-          />
-        </View>
+            <Image
+              source={require("../../../image/list_icon_ins.png")}
+              style={{ width: 20, height: 20 }}
+            />
+          </View>
         </TouchableWithoutFeedback>
 
         {/* private key */}

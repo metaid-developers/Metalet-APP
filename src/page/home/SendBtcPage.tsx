@@ -121,13 +121,12 @@ export default function SendBtcPage() {
 
   async function sendBtc() {
     const needRawTx =
-      metaletWallet.currentBtcWallet.getAddressType() === AddressType.Legacy;
+      metaletWallet.currentBtcWallet.getScriptType() === ScriptType.P2PKH;
     const utxos = await getBtcUtxos(btcAddress, needRawTx);
     console.log("交易参数 inputAddress:" + inputAddress);
     console.log("交易参数 inputAmount:" + inputAmount);
     console.log("交易参数 feed:" + feed);
     console.log("交易参数 utxos:" + JSON.stringify(utxos));
-    console.log("当前钱包地址：" + metaletWallet.currentBtcWallet.getAddress());
     console.log("当前钱包地址：" + metaletWallet.currentBtcWallet.getAddress());
 
     const { rawTx, cost } = metaletWallet.currentBtcWallet.send(
@@ -136,6 +135,8 @@ export default function SendBtcPage() {
       parseInt(feed),
       utxos
     );
+    console.log(rawTx);
+    
 
     setRawTx(rawTx);
 

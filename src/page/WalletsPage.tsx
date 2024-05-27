@@ -19,12 +19,17 @@ import {
   styles,
 } from "../constant/Widget";
 import { metaStyles } from "../constant/Constants";
-import { wallets_key, AsyncStorageUtil } from "../utils/AsyncStorageUtil";
+import {
+  wallets_key,
+  
+  createStorage,
+} from "../utils/AsyncStorageUtil";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { goBack, navigate } from "../base/NavigationService";
 import { useData } from "../hooks/MyProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
+import { getStorageWallets } from "../utils/WalletUtils";
 
 export default function WalletsPage() {
   let [walletList, setWalletList] = useState<WalletBean[]>([]);
@@ -49,8 +54,11 @@ export default function WalletsPage() {
 
   // let changeWallet:WalletBean;
 
+  const storage = createStorage();
+
   async function getWalletData() {
-    await AsyncStorageUtil.getItem(wallets_key).then((res) => {
+    await getStorageWallets().then((res) => {
+      // await AsyncStorageUtil.getItem(wallets_key).then((res) => {
       console.log(JSON.stringify(res));
       setWalletList(res);
     });
@@ -73,7 +81,8 @@ export default function WalletsPage() {
   async function addAccount(postion: number) {
     console.log("当前位置是 " + postion);
 
-    await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
+    await getStorageWallets().then(async (wallets) => {
+      // await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
       //插入Account 的写法
       // TODO 可能不是第一项进行插入
       wallets.forEach((wallet) => {
@@ -109,13 +118,11 @@ export default function WalletsPage() {
         defaultAvatarColor: defaultAvatarColor,
       };
 
-     
       nowWallet.accountsOptions.push(newAccount);
-      nowWallet.isCurrentPathIndex=nowWallet.accountsOptions.length-1;
-      await AsyncStorageUtil.updateItem(wallets_key, wallets);
+      nowWallet.isCurrentPathIndex = nowWallet.accountsOptions.length - 1;
+      await storage.set(wallets_key, wallets);
       getWalletData();
-      eventBus.publish(refreshHomeLoadingEvent,{data:''})
-
+      eventBus.publish(refreshHomeLoadingEvent, { data: "" });
     });
   }
 
@@ -126,7 +133,8 @@ export default function WalletsPage() {
   ) {
     console.log("updataSelectAccount", walletIndex, accountIndex);
 
-    await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
+    await getStorageWallets().then(async (wallets) => {
+      // await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
       wallets.forEach((wallet) => {
         wallet.accountsOptions.forEach((account) => {
           account.isSelect = false;
@@ -134,16 +142,16 @@ export default function WalletsPage() {
       });
 
       const nowWallet = wallets[walletIndex];
-      nowWallet.isCurrentPathIndex=accountIndex;
+      nowWallet.isCurrentPathIndex = accountIndex;
       nowWallet.accountsOptions[accountIndex].isSelect = true;
       updateMyWallet(nowWallet);
 
       // console.log("wallets", "调整后的： "+JSON.stringify(wallets));
-      
-      await AsyncStorageUtil.updateItem(wallets_key, wallets);
+
+      await storage.set(wallets_key, wallets);
       getWalletData();
-      navigate('Tabs')
-      eventBus.publish(refreshHomeLoadingEvent,{data:''})
+      navigate("Tabs");
+      eventBus.publish(refreshHomeLoadingEvent, { data: "" });
 
       // chooseMyWallet(nowWallet);
     });
@@ -151,9 +159,10 @@ export default function WalletsPage() {
 
   //是否展开钱包
   async function setIsOpenWallet(postion: number, isOpen: boolean) {
-    await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
+    await getStorageWallets().then(async (wallets) => {
+      // await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
       wallets[postion].isOpen = isOpen;
-      await AsyncStorageUtil.updateItem(wallets_key, wallets);
+      await storage.set(wallets_key, wallets);
     });
   }
 
@@ -486,7 +495,7 @@ export default function WalletsPage() {
                 padding: 20,
                 borderTopRightRadius: 10,
                 borderTopLeftRadius: 10,
-                paddingBottom:40
+                paddingBottom: 40,
               }}
             >
               <View style={{ flexDirection: "row" }}>
@@ -547,7 +556,7 @@ export default function WalletsPage() {
                 onPress={async () => {
                   changeWallet.name = changeWalletName;
                   setWalletList([...walletList]);
-                  await AsyncStorageUtil.updateItem(wallets_key, walletList);
+                  await storage.set(wallets_key, walletList);
                   setIsShowEditWallet(false);
                   setIsShowNotice(true);
                   setTimeout(() => {
@@ -611,7 +620,7 @@ export default function WalletsPage() {
                 padding: 20,
                 borderTopRightRadius: 10,
                 borderTopLeftRadius: 10,
-                paddingBottom:40
+                paddingBottom: 40,
               }}
             >
               <View style={{ flexDirection: "row" }}>
@@ -670,7 +679,8 @@ export default function WalletsPage() {
 
               <TouchableWithoutFeedback
                 onPress={async () => {
-                  await AsyncStorageUtil.getItem(wallets_key).then(
+                  await getStorageWallets().then(
+                    // await AsyncStorageUtil.getItem(wallets_key).then(
                     async (wallets) => {
                       const nowWallet = wallets[parentIndex];
                       nowWallet.accountsOptions[accountIndex].name =
@@ -678,7 +688,7 @@ export default function WalletsPage() {
                       setWalletList([...wallets]);
                       setIsShowEditAccount(false);
                       setIsEdit(false);
-                      await AsyncStorageUtil.updateItem(wallets_key, wallets);
+                      await storage.set(wallets_key, wallets);
                     }
                   );
 
@@ -688,7 +698,7 @@ export default function WalletsPage() {
                   }, 800);
                   // changeWallet.name = changeWalletName;
                   // setWalletList([...walletList]);
-                  // await AsyncStorageUtil.updateItem(wallets_key, walletList);
+                  // await storage.set(wallets_key, walletList);
                   // setIsShowEditWallet(false);
                 }}
               >

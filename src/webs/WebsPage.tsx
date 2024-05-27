@@ -1,13 +1,11 @@
-import { View, Text, SafeAreaView } from "react-native";
-import React, { useRef, useState } from "react";
 import WebView from "react-native-webview";
-import { injectedJavaScript } from "./actions";
+import { injectedJavaScript } from "./inject";
+import React, { useRef, useState } from "react";
+import { View, Text, SafeAreaView, Platform } from "react-native";
 
 export default function WebsPage() {
-//   const [webViewRef, setWebViewRef] = useState(null);
+  //   const [webViewRef, setWebViewRef] = useState(null);
   const webViewRef = useRef(null);
-
-
 
   const onError = ({ nativeEvent }) => {
     console.log("onError", nativeEvent);
@@ -20,36 +18,31 @@ export default function WebsPage() {
     webViewRef.current.postMessage(await getAddress());
   };
 
-
-async function getAddress(){
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const address = '123456';
-      resolve(address);
-    }, 500); // 模拟2秒的异步获取时间
-  });
-}
+  async function getAddress() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const address = "123456";
+        resolve(address);
+      }, 500); // 模拟2秒的异步获取时间
+    });
+  }
 
   const GetWebView = () => {
     return (
       <WebView
         style={{ marginTop: 20 }}
-        source={require("../../assets/metatest.html")}
+        source={{ uri: "https://metalet-tester.vercel.app/" }}
         ref={webViewRef}
         javaScriptEnabled={true}
         allowFileAccess={true}
         onError={onError}
         javaScriptCanOpenWindowsAutomatically={true}
         useWebKit={true}
-        // injectedJavaScript={"javascript:function deliverCode(data) { window.ReactNativeWebView.postMessage(data) };"}
-        injectedJavaScript={
-          // "(function() {window.postMessage = function(data) {window.ReactNativeWebView.postMessage(data)}})();"
-          injectedJavaScript
-        }
+        injectedJavaScript={injectedJavaScript}
         onMessage={(e) => {
           // 接受来自web的消息
           console.log(e.nativeEvent.data);
-          postRNMessage(e)
+          postRNMessage(e);
           // handleMessage2(e)
         }}
       />
@@ -58,16 +51,11 @@ async function getAddress(){
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
-      <Text
-          style={[{ marginTop: 100 }, { color: "red" }]}
-          onPress={postRNMessage}
-        >
-          给WebView 发送数据
-        </Text>
-
+      {Platform.OS === "web" ? (
+        <View>GetWebView does not support on web</View>
+      ) : (
         <GetWebView />
-      </View>
+      )}
     </SafeAreaView>
   );
 }

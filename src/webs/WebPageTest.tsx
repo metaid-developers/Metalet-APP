@@ -134,7 +134,8 @@ function getWebView() {
 
       <WebView
         style={[{ marginTop: 20 }]}
-        source={require("../../assets/metatest.html")}
+        source={{ uri: "https://metalet-tester.vercel.app/" }}
+        // source={require("../../assets/metatest.html")}
         ref={(ref) => (this.webViewRef = ref)}
         javaScriptEnabled
         allowFileAccess

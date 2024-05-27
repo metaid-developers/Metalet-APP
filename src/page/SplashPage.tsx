@@ -10,7 +10,6 @@ import React, { useEffect } from "react";
 import { metaStyles } from "../constant/Constants";
 import { useData } from "../hooks/MyProvider";
 import {
-  AsyncStorageUtil,
   account_select_key,
   wallet_password_key,
   wallets_key,
@@ -23,40 +22,49 @@ import { TypeTest } from "../wallet/TypeTest";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { WalletBean } from "../bean/WalletBean";
 import { Buffer } from "buffer";
-import { btc_network, getCurrentBtcWallet, getCurrentMvcWallet } from "../wallet/wallet";
-import { getCurrentWalletAccount, getStorageCurrentWallet, getWalletBeans } from "../utils/WalletUtils";
+import {
+  btc_network,
+  getCurrentBtcWallet,
+  getCurrentMvcWallet,
+} from "../wallet/wallet";
+import {
+  getCurrentWalletAccount,
+  getStorageCurrentWallet,
+  getWalletBeans,
+} from "../utils/WalletUtils";
+import { test } from "@/lib/test";
+import { getAccount } from "@/lib/account";
 
 export default function SplashPage(props) {
   const { myWallet, updateMyWallet } = useData();
   const { walletManager, updateWalletManager } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
 
+  test();
+  getAccount();
+
   useEffect(() => {
     initDataBase();
   }, []);
 
   async function initDataBase() {
-   const walletBean=await getStorageCurrentWallet();
-   const account=await getCurrentWalletAccount();
-   console.log("walletBean",walletBean);
-   console.log("account",account);
-   
-   
-   
-   if(walletBean&&account){
-    updateMyWallet(walletBean);
-    const btcWallet = await getCurrentBtcWallet();
-    const mvcWallet = await getCurrentMvcWallet();
-    let metaletWallet = new MetaletWallet();
-    metaletWallet.currentBtcWallet = btcWallet;
-    metaletWallet.currentMvcWallet = mvcWallet;
-    updateMetaletWallet(metaletWallet);
-    props.navigation.navigate("Tabs");
-      
-    }else{
+    const walletBean = await getStorageCurrentWallet();
+    const account = await getCurrentWalletAccount();
+    console.log("walletBean", walletBean);
+    console.log("account", account);
+
+    if (walletBean && account) {
+      updateMyWallet(walletBean);
+      const btcWallet = await getCurrentBtcWallet();
+      const mvcWallet = await getCurrentMvcWallet();
+      let metaletWallet = new MetaletWallet();
+      metaletWallet.currentBtcWallet = btcWallet;
+      metaletWallet.currentMvcWallet = mvcWallet;
+      updateMetaletWallet(metaletWallet);
+      props.navigation.navigate("Tabs");
+    } else {
       props.navigation.navigate("WelcomeWalletPage");
     }
-
 
     // AsyncStorageUtil.getItem(wallets_key).then(async (value) => {
     //   if (value != null && value.length > 0) {

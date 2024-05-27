@@ -10,32 +10,37 @@ import { GradientAvatar, TitleBar } from "../constant/Widget";
 import { metaStyles } from "../constant/Constants";
 import { useData } from "../hooks/MyProvider";
 import {
-  AsyncStorageUtil,
+  
   network_all,
   network_btc,
   network_key,
   network_mvc,
+  createStorage,
 } from "../utils/AsyncStorageUtil";
 import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 import { navigate } from "../base/NavigationService";
+
+const storage = createStorage();
 
 export default function NetWorkPage() {
   const { netWork, updateNetWork } = useData();
 
   async function changeNetwork(changeNetwork: string) {
     if (changeNetwork == network_mvc) {
-      await AsyncStorageUtil.setItem(network_key, network_mvc);
+      await storage.set(network_key, network_mvc);
+      // await AsyncStorageUtil.setItem(network_key, network_mvc);
     } else if (changeNetwork == network_btc) {
-      await AsyncStorageUtil.setItem(network_key, network_btc);
+      await storage.set(network_key, network_btc);
+      // await AsyncStorageUtil.setItem(network_key, network_btc);
     } else if (changeNetwork == network_all) {
-      await AsyncStorageUtil.setItem(network_key, network_all);
+      await storage.set(network_key, network_all);
+      // await AsyncStorageUtil.setItem(network_key, network_all);
     }
     // eventBus.publish(refreshHomeLoadingEvent,{data:''})
-    navigate('Tabs')
+    navigate("Tabs");
     updateNetWork(changeNetwork);
-   
-    //
 
+    //
   }
 
   return (
@@ -43,9 +48,11 @@ export default function NetWorkPage() {
       <View style={{ flex: 1 }}>
         <TitleBar title="Select Network" />
 
-        <TouchableWithoutFeedback onPress={() => {
-            changeNetwork(network_all)
-        }}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            changeNetwork(network_all);
+          }}
+        >
           <View
             style={{
               flexDirection: "row",
@@ -73,9 +80,11 @@ export default function NetWorkPage() {
             )}
           </View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => {
-              changeNetwork(network_btc)
-        }}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            changeNetwork(network_btc);
+          }}
+        >
           <View
             style={{
               flexDirection: "row",
@@ -104,9 +113,11 @@ export default function NetWorkPage() {
           </View>
         </TouchableWithoutFeedback>
 
-        <TouchableWithoutFeedback onPress={() => {
-              changeNetwork(network_mvc)
-        }}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            changeNetwork(network_mvc);
+          }}
+        >
           <View
             style={{
               flexDirection: "row",

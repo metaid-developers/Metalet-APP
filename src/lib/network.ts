@@ -1,0 +1,1 @@
+import { Net } from "@metalet/utxo-wallet-service";

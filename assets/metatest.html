@@ -4,19 +4,26 @@
     <title>测试页面</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="shortcut icon"
+      href="https://www.okx.com/cdn/assets/imgs/226/EB771F0EE8994DD5.png"
+      type="image/png"
+    />
 
     <script>
       window.onload = function () {
         //connect
         document.getElementById("viewPicture").onclick = async function () {
-          const result = await window.metaidwallet.getAddress();
+          const result = await window.metaidwallet.getAddress({
+            data: "11111",
+            message: "22222",
+            test: "33333",
+          });
           alert("result:" + result);
         };
 
         //
-        document.getElementById("viewPicture1").onclick = function () {
-         
-        };
+        document.getElementById("viewPicture1").onclick = function () {};
       };
     </script>
 

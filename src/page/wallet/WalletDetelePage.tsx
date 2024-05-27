@@ -6,10 +6,15 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState } from "react";
-import { LoadingNoticeModal, TitleBar, VerifyModal } from "../../constant/Widget";
-import { AsyncStorageUtil, wallets_key } from "../../utils/AsyncStorageUtil";
+import {
+  LoadingNoticeModal,
+  TitleBar,
+  VerifyModal,
+} from "../../constant/Widget";
+import {  wallets_key } from "../../utils/AsyncStorageUtil";
 import { navigate } from "../../base/NavigationService";
 import { eventBus, refreshHomeLoadingEvent } from "../../utils/EventBus";
+import { getStorageWallets } from "../../utils/WalletUtils";
 
 export default function WalletDetelePage({ route }) {
   const [isAgree, setIsAgree] = useState(false);
@@ -19,7 +24,8 @@ export default function WalletDetelePage({ route }) {
   const { postion } = route.params;
 
   async function deleteWallet() {
-    await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
+    await getStorageWallets().then(async (wallets) => {
+      // await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
       // const nowWallet = wallets[postion];
       // //    let wallet=res.find(item=>item.id==id)
       // setnowWallet(nowWallet);
@@ -28,21 +34,19 @@ export default function WalletDetelePage({ route }) {
       if (wallets.length > 0) {
         wallets[0].accountsOptions[0].isSelect = true;
       }
-      setIsDelete(true)
-      await AsyncStorageUtil.updateItem(wallets_key, wallets).then(() => {
-       setTimeout(() => {
-        setIsDelete(false)
-        navigate('WalletsPage')
-      }, 1000);
-
-
+      setIsDelete(true);
+      await storage.set(wallets_key, wallets).then(() => {
+        setTimeout(() => {
+          setIsDelete(false);
+          navigate("WalletsPage");
+        }, 1000);
       });
     });
   }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-     <LoadingNoticeModal title="Delete Sucessful" isShow={isDelete}/>
+      <LoadingNoticeModal title="Delete Sucessful" isShow={isDelete} />
 
       <VerifyModal
         isShow={isShow}

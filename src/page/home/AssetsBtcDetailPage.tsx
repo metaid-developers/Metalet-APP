@@ -29,7 +29,7 @@ import * as Clipboard from "expo-clipboard";
 import { formatTime } from "../../utils/MetaFunUiils";
 import { AddressType } from "@metalet/utxo-wallet-service";
 import {
-  AsyncStorageUtil,
+  
   walllet_address_type_key,
 } from "../../utils/AsyncStorageUtil";
 import { changeCurrentWalletAddressType, getStorageCurrentWallet } from "../../utils/WalletUtils";

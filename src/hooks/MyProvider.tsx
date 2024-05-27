@@ -3,6 +3,8 @@ import MetaletWallet from "../wallet/MetaletWallet";
 import { WalletBean } from "../bean/WalletBean";
 import { network_all } from "../utils/AsyncStorageUtil";
 
+import { WalletManager } from "@metalet/utxo-wallet-service";
+
 // 创建上下文
 type GlobalContext = {
   userData: any;
@@ -22,9 +24,9 @@ type GlobalContext = {
   currentSumBalance: string;
   updateCurrentSumBalance;
   netWork: string;
-  updateNetWork,
-  btcAddress:string,
-  updateBtcAddress,
+  updateNetWork;
+  btcAddress: string;
+  updateBtcAddress;
 };
 
 const UserContext = createContext<GlobalContext>(undefined);
@@ -78,8 +80,6 @@ export const UserProvider = ({ children }) => {
     setBtcAddress(newData);
   };
 
-
-
   //4.当前的钱包管理类
   const [metaletWallet, setMetaletWallet] = useState<MetaletWallet>(null);
   const updateMetaletWallet = (newData) => {
@@ -119,7 +119,7 @@ export const UserProvider = ({ children }) => {
     netWork,
     updateNetWork,
     btcAddress,
-    updateBtcAddress
+    updateBtcAddress,
   };
 
   return (

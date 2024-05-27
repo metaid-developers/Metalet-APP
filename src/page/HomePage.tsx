@@ -6,6 +6,7 @@ import {
   TouchableWithoutFeedback,
   NativeModules,
   Modal,
+  Platform,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { navigate } from "../base/NavigationService";
@@ -32,12 +33,13 @@ import {
 import { useData } from "../hooks/MyProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  AsyncStorageUtil,
+  
   network_all,
   network_btc,
   network_key,
   network_mvc,
   wallets_key,
+  createStorage,
 } from "../utils/AsyncStorageUtil";
 import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
@@ -64,9 +66,16 @@ import {
   fetchBtcBalance,
   fetchMvcActivityComfird,
 } from "../api/metaletservice";
-import { btc_network, getCurrentBtcWallet, getCurrentMvcWallet, net_network } from "../wallet/wallet";
+import {
+  btc_network,
+  getCurrentBtcWallet,
+  getCurrentMvcWallet,
+  net_network,
+} from "../wallet/wallet";
 import { Buffer } from "buffer";
-import { getCurrentWalletSeed } from "../utils/WalletUtils";
+import { getCurrentWalletSeed, getStorageWallets } from "../utils/WalletUtils";
+
+const storage = createStorage();
 
 // import RNFS from "react-native-fs";
 
@@ -133,12 +142,12 @@ export default function HomePage(props: any) {
     metaletWallet.currentMvcBalance = dataMvcBalance.confirmed;
     // console.log("mvc余额 ", dataMvcBalance);
 
-
     console.log("请求结果是： ", btcAddress);
-    
-    let dataBtcBalance: RootBtcBalanceObject=await  fetchBtcBalance(btcAddress)
+
+    let dataBtcBalance: RootBtcBalanceObject =
+      await fetchBtcBalance(btcAddress);
     console.log("btc余额 ", dataBtcBalance);
-    
+
     metaletWallet.currentBtcBalance = dataBtcBalance.data.balance;
 
     metaletWallet.currentSumBalance =
@@ -213,9 +222,10 @@ export default function HomePage(props: any) {
   let accountName;
   //初始化所有钱包
   async function initCurrentWallet() {
-    let wallets = await AsyncStorageUtil.getItem(wallets_key);
+    let wallets = await getStorageWallets();
+    // let wallets = await AsyncStorageUtil.getItem(wallets_key);
     for (let i = 0; i < wallets.length; i++) {
-      let wallet:WalletBean = wallets[i];
+      let wallet: WalletBean = wallets[i];
       for (let q = 0; q < wallet.accountsOptions.length; q++) {
         let account = wallet.accountsOptions[q];
         if (account.isSelect == true) {
@@ -232,7 +242,7 @@ export default function HomePage(props: any) {
           });
 
           updateMyWallet(wallet);
-          let seed = await getCurrentWalletSeed()
+          let seed = await getCurrentWalletSeed();
 
           const btcTaprootWallet = new BtcWallet({
             network: btc_network,
@@ -290,8 +300,6 @@ export default function HomePage(props: any) {
             seed,
           });
 
-        
-
           metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
           setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
           // console.log(
@@ -300,35 +308,34 @@ export default function HomePage(props: any) {
           // );
 
           const mvcWallet = new MvcWallet({
-            network:"mainnet",
+            network: "mainnet",
             mnemonic: wallet.mnemonic,
             addressIndex: account.addressIndex,
             addressType: AddressType.LegacyMvc,
             coinType: wallet.mvcTypes,
             seed,
           });
-        
-    
+
           const nowBtcWallet = new BtcWallet({
             network: btc_network,
             mnemonic: myWallet.mnemonic,
             addressIndex: account.addressIndex,
             addressType: wallet.addressTpye,
-            coinType:wallet.addressTpye==AddressType.SameAsMvc? wallet.mvcTypes:CoinType.BTC,
+            coinType:
+              wallet.addressTpye == AddressType.SameAsMvc
+                ? wallet.mvcTypes
+                : CoinType.BTC,
             seed,
           });
           updateMvcAddress(mvcWallet.getAddress());
           updateBtcAddress(nowBtcWallet.getAddress());
           console.log(wallet.addressTpye);
-          
-        
-          console.log("updateBtcAddress"+nowBtcWallet.getAddress());
-          
+
+          console.log("updateBtcAddress" + nowBtcWallet.getAddress());
+
           metaletWallet.currentBtcWallet = nowBtcWallet;
           metaletWallet.currentMvcWallet = mvcWallet;
           updateMetaletWallet(metaletWallet);
-
-
 
           getMVCBalance();
 
@@ -345,13 +352,12 @@ export default function HomePage(props: any) {
       }
     }
 
-  
-    
-
-    await AsyncStorageUtil.getItem(network_key).then(async (saveNet) => {
+    await storage.get(network_key).then(async (saveNet) => {
+      // await AsyncStorageUtil.getItem(network_key).then(async (saveNet) => {
       if (saveNet == null) {
         console.log("saveNet is null" + saveNet);
-        await AsyncStorageUtil.setItem(network_key, network_all);
+        await storage.set(network_key, network_all);
+        // await AsyncStorageUtil.setItem(network_key, network_all);
         updateNetWork(network_all);
       } else {
         console.log(saveNet);
@@ -998,8 +1004,7 @@ export default function HomePage(props: any) {
               // navigate("WebPageTest");
               // navigate("WebPage");
 
-              AsyncStorageUtil.clear()
-
+              AsyncStorageUtil.clear();
             }}
           >
             <View style={{ marginTop: 20 }}>

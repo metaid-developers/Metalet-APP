@@ -25,10 +25,13 @@ import PasswordPay from "react-native-password-pay";
 import { Camera, CameraType } from "expo-camera";
 import { verifyPassword } from "../utils/WalletUtils";
 import {
-  AsyncStorageUtil,
+  
   wallet_password_key,
+  createStorage,
 } from "../utils/AsyncStorageUtil";
 // import { verifyPassword } from "../utils/WalletUtils";
+
+const storage = createStorage();
 
 export const styles = StyleSheet.create({
   centeredView: {
@@ -596,7 +599,6 @@ export const VerifyModal = ({
 
   return (
     <Modal transparent={true} visible={isShow}>
-      
       <View
         style={{
           flex: 1,
@@ -604,7 +606,6 @@ export const VerifyModal = ({
           backgroundColor: "rgba(0, 0, 0, 0.5)",
         }}
       >
-
         <View
           style={{
             backgroundColor: "#fff",
@@ -672,12 +673,13 @@ export const VerifyModal = ({
             <PasswordPay
               maxLength={6}
               onChange={async (value) => {
-               
-                if (value.length==6) {
-                  const passwordLocal = await AsyncStorageUtil.getItem(wallet_password_key);
+                if (value.length == 6) {
+                  const passwordLocal =
+                    await storage.get(wallet_password_key);
+                    // await AsyncStorageUtil.getItem(wallet_password_key);
                   // const isPassword = await verifyPassword(value);
                   console.log("输入的密码：", value);
-                  if (passwordLocal==value) {
+                  if (passwordLocal == value) {
                     event(inputText);
                   } else {
                     console.log("密码错误");

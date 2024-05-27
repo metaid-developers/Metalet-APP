@@ -22,11 +22,12 @@ import { ActivityIndicator } from "react-native-paper";
 
 import { LinearGradient } from "expo-linear-gradient";
 import {
-  AsyncStorageUtil,
+  
   CurrentAccountIDKey,
   CurrentWalletIDKey,
   wallets_key,
   walllet_address_type_key,
+  createStorage,
 } from "../utils/AsyncStorageUtil";
 
 import { useData } from "../hooks/MyProvider";
@@ -37,8 +38,13 @@ import { getRandomColorList } from "../utils/MetaFunUiils";
 import { btc_network } from "../wallet/wallet";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
-import { getStorageWallets, getWalletBeans, isNoStorageWallet } from "../utils/WalletUtils";
+import {
+  getStorageWallets,
+  getWalletBeans,
+  isNoStorageWallet,
+} from "../utils/WalletUtils";
 
+const storage = createStorage();
 
 export default function ImportWalletPage(props) {
   const toastRef = useEasyToast("center");
@@ -51,9 +57,8 @@ export default function ImportWalletPage(props) {
   const { mvcAddress, updateMvcAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
 
-
-  //import 
-  const [mvcPath, setmvcPath] = useState("")
+  //import
+  const [mvcPath, setmvcPath] = useState("");
 
   // const showToast = useCallback(() => {
   //   toastRef.current?.show('Hello World!', 2000, () => console.log('Toast dismissed'));
@@ -72,7 +77,6 @@ export default function ImportWalletPage(props) {
     let walletName;
     let walletID = Math.random().toString(36).substr(2, 8);
     let wallet_addressType = AddressType.Legacy;
-  
 
     //account
     let accountName = "Account 1";
@@ -80,17 +84,16 @@ export default function ImportWalletPage(props) {
     let accountAddressIndex = 0;
 
     const hasNoWallets = await isNoStorageWallet();
-    const wallets= await getStorageWallets();
+    const wallets = await getStorageWallets();
 
     if (hasNoWallets) {
       //new
       walletName = "Wallet 1";
       console.log("new");
-      
     } else {
       //add
       console.log("add");
-      
+
       walletName = "Wallet " + (wallets.length + 1);
     }
 
@@ -98,12 +101,12 @@ export default function ImportWalletPage(props) {
       id: walletID,
       name: walletName,
       mnemonic,
-      mvcTypes:parseInt(mvcPath),
+      mvcTypes: parseInt(mvcPath),
       isOpen: true,
       addressTpye: wallet_addressType,
       isBackUp: false,
       isCurrentPathIndex: 0,
-      seed:"",
+      seed: "",
       accountsOptions: [
         {
           id: accountID,
@@ -124,18 +127,17 @@ export default function ImportWalletPage(props) {
     });
 
     const seed = btcWallet.getSeed();
-    const saveSeed=seed.toString("hex")
-    console.log("saveSeed",saveSeed);
-    walletBean.seed=saveSeed;
+    const saveSeed = seed.toString("hex");
+    console.log("saveSeed", saveSeed);
+    walletBean.seed = saveSeed;
 
-    
     const mvcWallet = new MvcWallet({
       network: "mainnet",
       mnemonic: walletBean.mnemonic,
       addressIndex: walletBean.accountsOptions[0].addressIndex,
       addressType: AddressType.LegacyMvc,
       coinType: walletBean.mvcTypes,
-      seed
+      seed,
     });
 
     updateMvcAddress(mvcWallet.getAddress());
@@ -145,26 +147,33 @@ export default function ImportWalletPage(props) {
     metaletWallet.currentMvcWallet = mvcWallet;
     updateMetaletWallet(metaletWallet);
     // const updataWallets=[...value,walletBean]
-    if(hasNoWallets){
-      await AsyncStorageUtil.updateItem(wallets_key, [walletBean]);
-    }else{
-      const newWallets=[...wallets, walletBean]
-      await AsyncStorageUtil.updateItem(wallets_key, newWallets);
+    if (hasNoWallets) {
+      await storage.set(wallets_key, [walletBean]);
+    } else {
+      const newWallets = [...wallets, walletBean];
+      await storage.set(wallets_key, newWallets);
     }
     // const updataWallets = addWallet(wallets, walletBean);
     updateMyWallet(walletBean);
-    await AsyncStorageUtil.setItem(CurrentWalletIDKey, walletBean.id)
-    await AsyncStorageUtil.setItem(CurrentAccountIDKey, walletBean.accountsOptions[0].id)
-   
-    console.log('wallets '+getWalletBeans());
-    setObj({ ...obj, isShow: false });
-      // props.navigation.navigate('HomePage')
+    await storage.set(CurrentWalletIDKey, walletBean.id);
+    await storage.set(
+      CurrentAccountIDKey,
+      walletBean.accountsOptions[0].id
+    );
+    // await AsyncStorageUtil.setItem(CurrentWalletIDKey, walletBean.id);
+    // await AsyncStorageUtil.setItem(
+    //   CurrentAccountIDKey,
+    //   walletBean.accountsOptions[0].id
+    // );
 
-      props.navigation.navigate("CongratulationsPage", {
-        type: "Imported Successfully",
-        type3: ":sldkfj",
-      });
-    
+    console.log("wallets " + getWalletBeans());
+    setObj({ ...obj, isShow: false });
+    // props.navigation.navigate('HomePage')
+
+    props.navigation.navigate("CongratulationsPage", {
+      type: "Imported Successfully",
+      type3: ":sldkfj",
+    });
 
     // AsyncStorageUtil.getItem(wallets_key).then(async (value) => {
     //   console.log(value);
@@ -219,7 +228,7 @@ export default function ImportWalletPage(props) {
     //     // const updataWallets=[...value,walletBean]
     //     const updataWallets = addWallet(value, walletBean);
     //     updateMyWallet(walletBean);
-    //     await AsyncStorageUtil.updateItem(wallets_key, updataWallets);
+    //     await storage.set(wallets_key, updataWallets);
     //     await AsyncStorageUtil.setItem(
     //       walllet_address_type_key,
     //       wallet_addressType
@@ -268,35 +277,34 @@ export default function ImportWalletPage(props) {
     //       ],
     //     };
     //     let initWallets = [walletBean];
-    //     await AsyncStorageUtil.updateItem(wallets_key, initWallets);
+    //     await storage.set(wallets_key, initWallets);
     //     await AsyncStorageUtil.setItem(
     //       walllet_address_type_key,
     //       wallet_addressType
     //     );
 
-        // const myWalletManager = new MetaletWalletManager({
-        //   network: "mainnet",
-        //   walletsOptions: [
-        //     {
-        //       id: walletID,
-        //       mnemonic: mnemonic,
-        //       name: walletName,
-        //       mvcTypes: [mvcTypes],
-        //       accountsOptions: [
-        //         {
-        //           id: accountID,
-        //           name: accountName,
-        //           addressIndex: accountAddressIndex,
-        //         },
-        //       ],
-        //     },
-        //   ],
-        // });
-
-        // updateWalletManager(myWalletManager);
-    //   }
+    // const myWalletManager = new MetaletWalletManager({
+    //   network: "mainnet",
+    //   walletsOptions: [
+    //     {
+    //       id: walletID,
+    //       mnemonic: mnemonic,
+    //       name: walletName,
+    //       mvcTypes: [mvcTypes],
+    //       accountsOptions: [
+    //         {
+    //           id: accountID,
+    //           name: accountName,
+    //           addressIndex: accountAddressIndex,
+    //         },
+    //       ],
+    //     },
+    //   ],
     // });
 
+    // updateWalletManager(myWalletManager);
+    //   }
+    // });
   };
 
   const addWallet = (wallets, newWallet) => {
@@ -350,23 +358,24 @@ export default function ImportWalletPage(props) {
         </View>
 
         <Text style={[metaStyles.defaultText, { marginTop: 20 }]}>
-         MVC Path
+          MVC Path
         </Text>
 
-        <View style={{flexDirection:'row' ,alignItems:'center',marginTop:10}}>
+        <View
+          style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}
+        >
           <Text style={metaStyles.defaultText}>m/44'/</Text>
           <TextInput
             placeholder="10001"
-            keyboardType='numeric'
+            keyboardType="numeric"
             style={{
               borderRadius: 5,
               backgroundColor: semiTransparentGray,
               fontSize: 14,
               color: "#333333",
-              paddingHorizontal:5,
-              paddingVertical:3,
-              marginHorizontal:5
-              
+              paddingHorizontal: 5,
+              paddingVertical: 3,
+              marginHorizontal: 5,
             }}
             onChangeText={(text) => {
               setmvcPath(text);

@@ -22,14 +22,17 @@ import { metaStyles, semiTransparentGray } from "../../constant/Constants";
 import { ActivityIndicator } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-  AsyncStorageUtil,
+  
   wallet_password_key,
   wallets_key,
   walllet_address_type_key,
+  createStorage,
 } from "../../utils/AsyncStorageUtil";
 import { navigate } from "../../base/NavigationService";
 import * as bip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
+
+const storage = createStorage();
 
 export default function SetPasswordPage({ route }) {
   const [IsPasswordLock, setIsPasswordLock] = useState(true);
@@ -57,7 +60,8 @@ export default function SetPasswordPage({ route }) {
     }
     if (inputPassword == inputPasswordAgain) {
       if (inputPassword.length == 6) {
-        AsyncStorageUtil.setItem(wallet_password_key, inputPassword);
+        storage.set(wallet_password_key, inputPassword);
+        // AsyncStorageUtil.setItem(wallet_password_key, inputPassword);
         if (type == "create") {
           const menmoic = bip39.generateMnemonic(wordlist).split(" ");
           console.log("menmoic", menmoic);

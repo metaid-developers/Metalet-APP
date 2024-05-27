@@ -12,7 +12,7 @@ import { NoMoreDataView, useEasyToast } from "../constant/Widget";
 import * as FileSystem from "expo-file-system";
 import EasyToast from "react-native-easy-toast";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AsyncStorageUtil, network_all, network_btc, network_mvc } from "../utils/AsyncStorageUtil";
+import {  network_all, network_btc, network_mvc } from "../utils/AsyncStorageUtil";
 import { useData } from "../hooks/MyProvider";
 import { navigate } from "../base/NavigationService";
 

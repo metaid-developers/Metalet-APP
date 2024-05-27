@@ -9,10 +9,11 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { metaStyles } from "../../constant/Constants";
 import { goBack, navigate } from "../../base/NavigationService";
-import { AsyncStorageUtil, wallets_key } from "../../utils/AsyncStorageUtil";
+import {  wallets_key } from "../../utils/AsyncStorageUtil";
 import { AccountsOptions, WalletBean } from "../../bean/WalletBean";
 import { GradientAvatar } from "../../constant/Widget";
 import { useFocusEffect } from "@react-navigation/native";
+import { getStorageWallets } from "../../utils/WalletUtils";
 
 export default function WalletDetailPage({ route }) {
   const [nowWallet, setnowWallet] = useState<WalletBean>();
@@ -23,7 +24,8 @@ export default function WalletDetailPage({ route }) {
   const { postion } = route.params;
 
   async function initWalletData() {
-    await AsyncStorageUtil.getItem(wallets_key).then((wallets) => {
+    await getStorageWallets().then((wallets) => {
+      // await AsyncStorageUtil.getItem(wallets_key).then((wallets) => {
       const nowWallet = wallets[postion];
       //    let wallet=res.find(item=>item.id==id)
       setnowWallet(nowWallet);
@@ -34,11 +36,11 @@ export default function WalletDetailPage({ route }) {
   useEffect(() => {
     initWalletData();
   }, []);
-  
+
   useFocusEffect(
     React.useCallback(() => {
-        console.log("useFocusEffect");
-        initWalletData();
+      console.log("useFocusEffect");
+      initWalletData();
     }, [])
   );
 
@@ -47,7 +49,9 @@ export default function WalletDetailPage({ route }) {
       <TouchableWithoutFeedback
         onPress={() => {
           console.log(item);
-          navigate('WalletAccountDetailPage', {PositionWallet:{walletIndex:postion,accountIndex:index}})
+          navigate("WalletAccountDetailPage", {
+            PositionWallet: { walletIndex: postion, accountIndex: index },
+          });
           //   updataSelectAccount(parentIndex, index);
         }}
       >
@@ -109,8 +113,8 @@ export default function WalletDetailPage({ route }) {
 
           <TouchableWithoutFeedback
             onPress={() => {
-                // navigate("WalletDetailPage",{postion:parentIndex})
-              navigate("WalletDetelePage",{postion:postion});
+              // navigate("WalletDetailPage",{postion:parentIndex})
+              navigate("WalletDetelePage", { postion: postion });
             }}
           >
             <Image
