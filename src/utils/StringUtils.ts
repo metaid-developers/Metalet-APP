@@ -6,3 +6,5 @@ export function removeTrailingZeros(numberString){
   const trimmedString = number.toString();
   return trimmedString;
 }
+
+

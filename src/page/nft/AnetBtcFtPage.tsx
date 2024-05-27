@@ -59,11 +59,6 @@ export default function AnetBtcFtPage() {
     let data: RootBtcFtObject = await get(BTC_FT_URL, false, params);
     if (data.data != null) {
       if (data.data.list != null) {
-        console.log(
-          "getBtcFtData  重新获取接口数据： ",
-          data.data.list,
-          data.data.list.length
-        );
         setBtcFtList([...data.data.list]);
       } else {
         setBtcFtList([]);

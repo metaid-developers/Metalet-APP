@@ -22,7 +22,8 @@ import { metaStyles, semiTransparentGray } from "../../constant/Constants";
 import { ActivityIndicator } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-  
+  CurrentAccountIDKey,
+  CurrentWalletIDKey,
   wallet_password_key,
   wallets_key,
   walllet_address_type_key,
@@ -31,6 +32,10 @@ import {
 import { navigate } from "../../base/NavigationService";
 import * as bip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
+import {  getStorageWallets, isNoStorageWallet } from "../../utils/WalletUtils";
+import { useData } from "../../hooks/MyProvider";
+import MetaletWallet from "../../wallet/MetaletWallet";
+import { createMetaletWallet } from "../../wallet/wallet";
 
 const storage = createStorage();
 
@@ -50,11 +55,17 @@ export default function SetPasswordPage({ route }) {
 
   const [isShowLoading, setIsShowLoading] = useState(false);
 
+  //create
+  const { myWallet, updateMyWallet } = useData();
+  const { metaletWallet, updateMetaletWallet } = useData();
+  const { mvcAddress, updateMvcAddress } = useData();
+  const { btcAddress, updateBtcAddress } = useData();
+
   useEffect(() => {
     console.log("mytype", type);
   }, []);
 
-  const OpenModal = () => {
+  const OpenModal = async () => {
     if (inputPassword == "" || inputPasswordAgain == "") {
       return;
     }
@@ -63,8 +74,33 @@ export default function SetPasswordPage({ route }) {
         storage.set(wallet_password_key, inputPassword);
         // AsyncStorageUtil.setItem(wallet_password_key, inputPassword);
         if (type == "create") {
-          const menmoic = bip39.generateMnemonic(wordlist).split(" ");
-          console.log("menmoic", menmoic);
+          setIsShowLoading(true);
+          const { btcWallet, mvcWallet, walletBean } =
+            await createMetaletWallet(10001);
+          const wallets = await getStorageWallets();
+          const hasNoWallets = await isNoStorageWallet();
+
+          let metaletWallet = new MetaletWallet();
+          updateMvcAddress(mvcWallet.getAddress());
+          updateBtcAddress(btcWallet.getAddress());
+          metaletWallet.currentBtcWallet = btcWallet;
+          metaletWallet.currentMvcWallet = mvcWallet;
+          updateMetaletWallet(metaletWallet);
+
+          if(hasNoWallets){
+            await storage.set(wallets_key, [walletBean]);
+          }else{
+            const newWallets=[...wallets, walletBean]
+            await storage.set(wallets_key, newWallets);
+          }
+          updateMyWallet(walletBean);
+          await storage.set(CurrentWalletIDKey, walletBean.id)
+          await storage.set(CurrentAccountIDKey, walletBean.accountsOptions[0].id)
+          setIsShowLoading(false);
+          navigate("CongratulationsPage", {
+            type: "create Successfully",
+          });
+      
         } else if (type == "import") {
           navigate("ImportWalletPage", { destory: true });
         }

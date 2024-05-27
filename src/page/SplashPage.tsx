@@ -32,16 +32,12 @@ import {
   getStorageCurrentWallet,
   getWalletBeans,
 } from "../utils/WalletUtils";
-import { test } from "@/lib/test";
-import { getAccount } from "@/lib/account";
+import { goBack, navigate, reSets } from "../base/NavigationService";
 
 export default function SplashPage(props) {
   const { myWallet, updateMyWallet } = useData();
   const { walletManager, updateWalletManager } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
-
-  test();
-  getAccount();
 
   useEffect(() => {
     initDataBase();
@@ -61,7 +57,10 @@ export default function SplashPage(props) {
       metaletWallet.currentBtcWallet = btcWallet;
       metaletWallet.currentMvcWallet = mvcWallet;
       updateMetaletWallet(metaletWallet);
-      props.navigation.navigate("Tabs");
+      // props.navigation.navigate("Tabs");
+      // reSets()
+      // navigate("Tabs",{destory:true});
+      reSets("Tabs");
     } else {
       props.navigation.navigate("WelcomeWalletPage");
     }

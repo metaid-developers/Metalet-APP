@@ -57,8 +57,9 @@ export default function ImportWalletPage(props) {
   const { mvcAddress, updateMvcAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
 
-  //import
-  const [mvcPath, setmvcPath] = useState("");
+
+  //import 
+  const [mvcPath, setmvcPath] = useState("10001")
 
   // const showToast = useCallback(() => {
   //   toastRef.current?.show('Hello World!', 2000, () => console.log('Toast dismissed'));
@@ -97,6 +98,8 @@ export default function ImportWalletPage(props) {
       walletName = "Wallet " + (wallets.length + 1);
     }
 
+    console.log(mvcPath);
+    
     let walletBean: WalletBean = {
       id: walletID,
       name: walletName,

@@ -29,7 +29,13 @@ import { goBack, navigate } from "../base/NavigationService";
 import { useData } from "../hooks/MyProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
-import { getStorageWallets } from "../utils/WalletUtils";
+import {
+  getCurrentAccountID,
+  getRandomID,
+  getWalletBeans,
+  setCurrentAccountID,
+  setCurrentWalletID,
+} from "../utils/WalletUtils";
 
 export default function WalletsPage() {
   let [walletList, setWalletList] = useState<WalletBean[]>([]);
@@ -52,16 +58,22 @@ export default function WalletsPage() {
   //提示
   const [isShowNotice, setIsShowNotice] = useState(false);
 
+  //current
+  const [currentAccountID, setcurrentAccountID] = useState("");
+  const { needInitWallet, updateNeedInitWallet } = useData();
+  const { metaletWallet, updateMetaletWallet } = useData();
+
+
   // let changeWallet:WalletBean;
 
   const storage = createStorage();
 
   async function getWalletData() {
-    await getStorageWallets().then((res) => {
-      // await AsyncStorageUtil.getItem(wallets_key).then((res) => {
-      console.log(JSON.stringify(res));
-      setWalletList(res);
-    });
+    const currentAccountID = await getCurrentAccountID();
+    setcurrentAccountID(currentAccountID);
+
+    const wallets = await getWalletBeans();
+    setWalletList(wallets);
   }
 
   useEffect(() => {
@@ -91,12 +103,6 @@ export default function WalletsPage() {
         });
       });
       const nowWallet: WalletBean = wallets[postion];
-      //   const newAccountsOptions = nowWallet.accountsOptions.map((account) => {
-      //     // 修改账户属性
-      //     return { ...account, isSelect: false };
-      //   });
-
-      //   nowWallet.accountsOptions = newAccountsOptions;
 
       const getRandomColor = () => {
         const letters = "0123456789ABCDEF";
@@ -120,9 +126,16 @@ export default function WalletsPage() {
 
       nowWallet.accountsOptions.push(newAccount);
       nowWallet.isCurrentPathIndex = nowWallet.accountsOptions.length - 1;
-      await storage.set(wallets_key, wallets);
+
+      setcurrentAccountID(newAccount.id);
+      await setCurrentAccountID(newAccount.id);
+      await setCurrentWalletID(nowWallet.id);
+
+      await AsyncStorageUtil.updateItem(wallets_key, wallets);
       getWalletData();
+      updateNeedInitWallet(getRandomID())
       eventBus.publish(refreshHomeLoadingEvent, { data: "" });
+      navigate("Tabs");
     });
   }
 
@@ -133,24 +146,25 @@ export default function WalletsPage() {
   ) {
     console.log("updataSelectAccount", walletIndex, accountIndex);
 
-    await getStorageWallets().then(async (wallets) => {
-      // await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
-      wallets.forEach((wallet) => {
-        wallet.accountsOptions.forEach((account) => {
-          account.isSelect = false;
-        });
-      });
+    await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
+      // wallets.forEach((wallet) => {
+      //   wallet.accountsOptions.forEach((account) => {
+      //     account.isSelect = false;
+      //   });
+      // });
 
       const nowWallet = wallets[walletIndex];
       nowWallet.isCurrentPathIndex = accountIndex;
       nowWallet.accountsOptions[accountIndex].isSelect = true;
+      setcurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
+      await setCurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
+      await setCurrentWalletID(nowWallet.id);
       updateMyWallet(nowWallet);
-
-      // console.log("wallets", "调整后的： "+JSON.stringify(wallets));
-
-      await storage.set(wallets_key, wallets);
+      await AsyncStorageUtil.updateItem(wallets_key, wallets);
       getWalletData();
       navigate("Tabs");
+      updateNeedInitWallet(getRandomID())
+
       eventBus.publish(refreshHomeLoadingEvent, { data: "" });
 
       // chooseMyWallet(nowWallet);
@@ -231,7 +245,8 @@ export default function WalletsPage() {
               </TouchableWithoutFeedback>
             )}
 
-            {item.isSelect && isEdit == false && (
+            {/* {item.isSelect && isEdit == false && ( */}
+            {item.id == currentAccountID && isEdit == false && (
               <Image
                 source={require("../../image/wallets_select_icon.png")}
                 style={{ padding: 8, width: 15, height: 15 }}
@@ -426,7 +441,7 @@ export default function WalletsPage() {
             { marginTop: 10, textAlign: "center" },
           ]}
         >
-          $82,352.31
+          ${metaletWallet.currentSumAssert}
         </Text>
 
         <FlatList
@@ -658,8 +673,8 @@ export default function WalletsPage() {
               >
                 <TextInput
                   multiline={true}
-                  placeholder={changeAccountName}
-                  autoCapitalize={"none"}
+                  // placeholder={changeAccountName}
+                  // autoCapitalize={"none"}
                   onChangeText={(text) => {
                     setChangeAccountName(text);
                     if (text.length > 0) {

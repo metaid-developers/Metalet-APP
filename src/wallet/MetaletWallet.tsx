@@ -18,9 +18,12 @@ class MetaletWallet{
 
   
   //当前钱包余额
-  currentSumBalance:number
-  currentMvcBalance:number
-  currentBtcBalance:number
+  currentSumAssert:string
+  currentMvcBalance:string
+  currentBtcBalance:string
+  currentSpaceAssert:string
+  currentBtcAssert:string
+
   currentMVCPrice:number
   currentBtcPrice:number
 

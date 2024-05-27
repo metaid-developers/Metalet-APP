@@ -42,13 +42,15 @@ export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => 
     });
     if (!response.ok) {
       console.log("fullUrl请求出错的接口 ： ", fullUrl);
-      throw new Error(response.statusText);
+      // throw new Error(response.statusText);
     }
 
     return await response.json();
   } catch (error) {
+    console.log("Get Rqeuest Error:", fullUrl);
+    
     console.error("Get Rqeuest Error:", error);
-    throw error;
+    // throw error;
   }
 };
 

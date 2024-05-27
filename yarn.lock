@@ -1759,8 +1759,10 @@
     decimal.js "^10.4.3"
     ecpair "^2.1.0"
 
-"@metalet/utxo-wallet-sdk@file:../utxo-wallet-sdk":
-  version "0.4.7"
+"@metalet/utxo-wallet-sdk@^0.4.8":
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.4.8.tgz#0dd2076e83e2e2e8a4507798852df3bc101e3e05"
+  integrity sha512-Iv4bICLVfM4g4Vw7ilMha+R0ulZCG2r4hAlYaidzMV6viUXOGwYsLZfiQI0HuR4vVLnwsSmPsq9rv9olinXSdA==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.1.1"
     "@magiceden-oss/runestone-lib" "^1.0.2"
@@ -1772,12 +1774,19 @@
     decimal.js "^10.4.3"
     ecpair "^2.1.0"
 
-"@metalet/utxo-wallet-service@file:../utxo-wallet-service":
+"@metalet/utxo-wallet-service@^0.3.4":
   version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.4.tgz#675140b4865ab1b0c79d54def052ef8db1b94526"
+  integrity sha512-5yB+1KaS5BisAnUJ6CT+VeD4jFukx8Q79isEYoYukjz3Jj8KcIGCZAAeonicof0Gi4s/cpHZscGzCkgEdUusww==
   dependencies:
-    "@metalet/utxo-wallet-sdk" "file:../utxo-wallet-sdk"
+    "@metalet/utxo-wallet-sdk" "^0.4.8"
     crypto-js "^4.2.0"
     decimal.js "^10.4.3"
+
+"@mvc-org/mvc-resources@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@mvc-org/mvc-resources/-/mvc-resources-1.0.6.tgz#b88c20d283e026437ec81a073a16495a2bdfd3ad"
+  integrity sha512-wG6yW9WxUGzFrO/x8eg1cd6qyuUdH8xc5SwvDG+HOqtZuwImmu5QE8LLk1L7kjpC8/+2KaAkdn927aaNVHI7Rg==
 
 "@noble/ed25519@^1.7.3":
   version "1.7.3"
@@ -2073,6 +2082,11 @@
     graceful-fs "^4.1.3"
     prompts "^2.4.2"
     semver "^7.5.2"
+
+"@react-native-community/hooks@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/hooks/-/hooks-3.0.0.tgz#af5f2ca32eea59b792ce9e3d9a4cf0354f9b195f"
+  integrity sha512-g2OyxXHfwIytXUJitBR6Z/ISoOfp0WKx5FOv+NqJ/CrWjRDcTw6zXE5I1C9axfuh30kJqzWchVfCDrkzZYTxqg==
 
 "@react-native/assets-registry@0.73.1", "@react-native/assets-registry@~0.73.1":
   version "0.73.1"

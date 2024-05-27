@@ -4,6 +4,10 @@ import { FeedBtcObject } from "../types/btcfeed";
 import { UtxoBean } from "../types/utxoBean";
 import { get, post } from "../utils/Api";
 import { net_network } from "../wallet/wallet";
+import { SpaceBalance } from "./type/Balance";
+import { MvcFtData, MvcFtRecordData } from "./type/MvcFtData";
+import { MvcNftData } from "./type/MvcNftData";
+import { MvcFtPriceData } from "./type/Price";
 
 export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
@@ -63,23 +67,86 @@ export async function fetchBtcBalance(
   return data;
 }
 
-//6.btc utxo 
-export async function fetchBtcUtxo(
-  address: string
-): Promise<UtxoBean> {
+//6.btc utxo
+export async function fetchBtcUtxo(address: string): Promise<UtxoBean> {
   const data = await get(
     BASE_METALET_URL + "/wallet-api/v3/address/btc-utxo",
     false,
-    { address, net: net_network ,unconfirmed:"1",order:'desc'}
+    { address, net: net_network, unconfirmed: "1", order: "desc" }
   );
   return data;
 }
 
 // 7.space broadcast
-export async function broadcastSpace(hex:string) :Promise<{txid:string,message:string}> {
-  const data = await post(
-    BASE_MVC_API_URL + "/tx/broadcast",
-    {"hex":hex}
+export async function broadcastSpace(
+  hex: string
+): Promise<{ txid: string; message: string }> {
+  const data = await post(BASE_MVC_API_URL + "/tx/broadcast", { hex: hex });
+  return data;
+}
+
+// 8.MVC ft data
+export async function fetchMvcFtBalance(address: string): Promise<MvcFtData[]> {
+  const data = await get(
+    BASE_MVC_API_URL + "/contract/ft/address/" + address + "/balance",
+    true
   );
   return data;
+}
+
+// 9. MVC nft data
+export async function fetchMvcNftBalance(address: string): Promise<MvcNftData> {
+  const data = await get(
+    BASE_METALET_URL + "/wallet-api/v3/address/contract/nft/utxo",
+    false,
+    { net: "livenet", address: address }
+  );
+  return data;
+}
+
+// 10.btc broadcast
+export async function broadcastBtc(hex: string): Promise<{
+  code: number;
+  message: string;
+  processingTime: number;
+  data: string;
+}> {
+  const data = await post(BASE_METALET_URL + "/wallet-api/v3/tx/broadcast", {
+    chain: "btc",
+    net: net_network,
+    rawTx: hex,
+  });
+  return data;
+}
+
+// 11.mvc ft price
+export async function fetchMvcFtPrice(): Promise<MvcFtPriceData> {
+  const data = await get(
+    BASE_METALET_URL + "/wallet-api/v3/coin/contract/ft/price",
+    true
+  );
+  return data;
+}
+
+// balance
+//12.space balance
+export async function fetchSpaceBalance(
+  address: string
+): Promise<SpaceBalance> {
+  const dataMvcBalance: SpaceBalance = await get(
+    BASE_MVC_API_URL + "/address/" + address + "/balance"
+  );
+  return dataMvcBalance;
+}
+
+// 13.mvc ft record
+export async function fetchMvcFtRecord(
+  address: string,
+  genesis:string,
+  codeHash:string,
+): Promise<MvcFtRecordData[]> {
+  const dataMvcBalance: MvcFtRecordData[] = await get(
+    BASE_MVC_API_URL + "/contract/ft/address/" + address + "/"+ codeHash +  "/"+ genesis +"/tx"
+  );
+  return dataMvcBalance;
 }

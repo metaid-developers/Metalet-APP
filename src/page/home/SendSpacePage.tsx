@@ -23,8 +23,8 @@ import { navigate } from "../../base/NavigationService";
 import { useData } from "../../hooks/MyProvider";
 import { Wallet, API_TARGET, API_NET } from "meta-contract";
 import { Transaction } from "bitcoinjs-lib";
-import { parseShowSpace } from "../../utils/WalletUtils";
 import { broadcastSpace } from "../../api/metaletservice";
+import { getRandomID } from "../../utils/WalletUtils";
 
 export default function SendSpacePage() {
   const [nextBtnColor, setNextBtnColor] = useState("rgba(23, 26, 255, 0.5)");
@@ -51,6 +51,7 @@ export default function SendSpacePage() {
   const [fee, setfee] = useState("");
   const [total, settotal] = useState("");
   const [rawTx, setrawTx] = useState("");
+  const { needRefreshHome, updateNeedRefreshHome } = useData();
 
   const sendSpace = async () => {
     if (inputAddress == "" || inputAmount == "") {
@@ -262,6 +263,8 @@ export default function SendSpacePage() {
           setIsShowVerify(false);
           const { txid, message } = await broadcastSpace(rawTx);
           if (txid != null) {
+            updateNeedRefreshHome(getRandomID());
+
             navigate("SendSpaceSuccessPage", {
               result: {
                 txid: txid,
@@ -399,7 +402,7 @@ export default function SendSpacePage() {
             >
               <TextInput
                 placeholder={
-                  metaletWallet.currentMvcBalance / 100000000 + " SPACE"
+                  metaletWallet.currentMvcBalance  + " SPACE"
                 }
                 onChangeText={(text) => {
                   setInputAmount(text);
