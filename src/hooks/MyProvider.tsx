@@ -25,6 +25,11 @@ type GlobalContext = {
   updateNetWork,
   btcAddress:string,
   updateBtcAddress,
+  needRefreshHome:string,
+  updateNeedRefreshHome,
+  needInitWallet:string,
+  updateNeedInitWallet
+  
 };
 
 const UserContext = createContext<GlobalContext>(undefined);
@@ -78,6 +83,15 @@ export const UserProvider = ({ children }) => {
     setBtcAddress(newData);
   };
 
+  const [needRefreshHome, setNeedRefreshHome]=useState("")
+  const updateNeedRefreshHome = (newData) => {
+    setNeedRefreshHome(newData);
+  };
+
+  const [needInitWallet, setNeedInitWallet]=useState("")
+  const updateNeedInitWallet = (newData) => {
+    setNeedInitWallet(newData);
+  };
 
 
   //4.当前的钱包管理类
@@ -97,6 +111,8 @@ export const UserProvider = ({ children }) => {
   const updateAccountIndex = (newData) => {
     setAccountIndex(newData);
   };
+
+
 
   // 将需要共享的数据和更新方法放在上下文的 value 中
   const contextValue = {
@@ -119,7 +135,11 @@ export const UserProvider = ({ children }) => {
     netWork,
     updateNetWork,
     btcAddress,
-    updateBtcAddress
+    updateBtcAddress,
+    needRefreshHome,
+    updateNeedRefreshHome,
+    needInitWallet,
+    updateNeedInitWallet
   };
 
   return (

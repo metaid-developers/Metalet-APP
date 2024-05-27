@@ -12,7 +12,12 @@ import { NoMoreDataView, useEasyToast } from "../constant/Widget";
 import * as FileSystem from "expo-file-system";
 import EasyToast from "react-native-easy-toast";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AsyncStorageUtil, network_all, network_btc, network_mvc } from "../utils/AsyncStorageUtil";
+import {
+  AsyncStorageUtil,
+  network_all,
+  network_btc,
+  network_mvc,
+} from "../utils/AsyncStorageUtil";
 import { useData } from "../hooks/MyProvider";
 import { navigate } from "../base/NavigationService";
 
@@ -21,7 +26,6 @@ export default function AssetsPage() {
   const { accountIndex, updateAccountIndex } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
   const { netWork, updateNetWork } = useData();
-
 
   const [hasData, setHasData] = useState(false);
   const [myfile, setFolders] = useState<string[]>([]);
@@ -68,61 +72,12 @@ export default function AssetsPage() {
   // });
 
   return (
-    <View style={{flex:1,backgroundColor:"#fff"}}>
-
-   {netWork==network_btc&& <TouchableWithoutFeedback
-        onPress={() => {
-          // navigate("ReceivePage", { myCoinType: "BTC" });
-          navigate("AssetsBtcDetailPage", { myCoinType: "BTC" });
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            marginTop: 30,
-            alignItems: "center",
-          }}
-        >
-          <Image
-            source={require("../../image/logo_btc.png")}
-            style={{ width: 45, height: 45 }}
-          />
-          <View style={{ marginLeft: 12 }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>BTC</Text>
-            {/* <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
-                sdfewfwsf
-              </Text> */}
-          </View>
-
-          <View style={{ flex: 1 }} />
-
-          <View>
-            <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
-              {metaletWallet.currentBtcBalance} BTC{" "}
-            </Text>
-            <Text
-              style={{
-                color: "#666",
-                fontSize: 14,
-                marginTop: 10,
-                textAlign: "right",
-              }}
-            >
-              $
-              {(
-                metaletWallet.currentBtcBalance * metaletWallet.currentBtcPrice
-              ).toFixed(2)}
-            </Text>
-          </View>
-        </View>
-      </TouchableWithoutFeedback>}
-     
-
-      {netWork==network_mvc&& <TouchableWithoutFeedback
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      {netWork == network_btc && (
+        <TouchableWithoutFeedback
           onPress={() => {
-            // navigate("ReceivePage",{myCoinType:'SPACE'});
-            navigate("AssetsMvcDetailPage", { myCoinType: "SPACE" });
-
+            // navigate("ReceivePage", { myCoinType: "BTC" });
+            navigate("AssetsBtcDetailPage", { myCoinType: "BTC" });
           }}
         >
           <View
@@ -133,13 +88,11 @@ export default function AssetsPage() {
             }}
           >
             <Image
-              source={require("../../image/logo_space.png")}
-              style={{ width: 45, height: 45,  }}
+              source={require("../../image/logo_btc.png")}
+              style={{ width: 45, height: 45 }}
             />
             <View style={{ marginLeft: 12 }}>
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                SPACE
-              </Text>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>BTC</Text>
               {/* <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
                 sdfewfwsf
               </Text> */}
@@ -148,68 +101,26 @@ export default function AssetsPage() {
             <View style={{ flex: 1 }} />
 
             <View>
-              <Text style={{ color: "#333", fontSize: 16,textAlign:'right' }}>{metaletWallet.currentMvcBalance/100000000} SPACE </Text>
-              <Text style={{ color: "#666", fontSize: 14 ,marginTop:10,textAlign:'right'}}>${(metaletWallet.currentMvcBalance/100000000 * metaletWallet.currentMVCPrice).toFixed(2)}</Text>
+              <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
+                {metaletWallet.currentBtcBalance} BTC{" "}
+              </Text>
+              <Text
+                style={{
+                  color: "#666",
+                  fontSize: 14,
+                  marginTop: 10,
+                  textAlign: "right",
+                }}
+              >
+                ${metaletWallet.currentBtcBalance}
+              </Text>
             </View>
           </View>
-        </TouchableWithoutFeedback>}
+        </TouchableWithoutFeedback>
+      )}
 
-
-
-
-
-
-        {netWork==network_all&& <TouchableWithoutFeedback
-        onPress={() => {
-          // navigate("ReceivePage",{myCoinType:{type:'BTC'}});
-          // navigate("ReceivePage", { myCoinType: "BTC" });
-          navigate("AssetsBtcDetailPage", { myCoinType: "BTC" });
-
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            marginTop: 30,
-            alignItems: "center",
-          }}
-        >
-          <Image
-            source={require("../../image/logo_btc.png")}
-            style={{ width: 45, height: 45 }}
-          />
-          <View style={{ marginLeft: 12 }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>BTC</Text>
-            {/* <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
-                sdfewfwsf
-              </Text> */}
-          </View>
-
-          <View style={{ flex: 1 }} />
-
-          <View>
-            <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
-              {metaletWallet.currentBtcBalance} BTC{" "}
-            </Text>
-            <Text
-              style={{
-                color: "#666",
-                fontSize: 14,
-                marginTop: 10,
-                textAlign: "right",
-              }}
-            >
-              $
-              {(
-                metaletWallet.currentBtcBalance * metaletWallet.currentBtcPrice
-              ).toFixed(2)}
-            </Text>
-          </View>
-        </View>
-      </TouchableWithoutFeedback>}
-     
-
-      {netWork==network_all&& <TouchableWithoutFeedback
+      {netWork == network_mvc && (
+        <TouchableWithoutFeedback
           onPress={() => {
             // navigate("ReceivePage",{myCoinType:'SPACE'});
             navigate("AssetsMvcDetailPage", { myCoinType: "SPACE" });
@@ -224,12 +135,10 @@ export default function AssetsPage() {
           >
             <Image
               source={require("../../image/logo_space.png")}
-              style={{ width: 45, height: 45,  }}
+              style={{ width: 45, height: 45 }}
             />
             <View style={{ marginLeft: 12 }}>
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                SPACE
-              </Text>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>SPACE</Text>
               {/* <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
                 sdfewfwsf
               </Text> */}
@@ -238,15 +147,117 @@ export default function AssetsPage() {
             <View style={{ flex: 1 }} />
 
             <View>
-              <Text style={{ color: "#333", fontSize: 16,textAlign:'right' }}>{metaletWallet.currentMvcBalance/100000000} SPACE </Text>
-              <Text style={{ color: "#666", fontSize: 14 ,marginTop:10,textAlign:'right'}}>${(metaletWallet.currentMvcBalance/100000000 * metaletWallet.currentMVCPrice).toFixed(2)}</Text>
+              <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
+                {metaletWallet.currentMvcBalance} SPACE{" "}
+              </Text>
+              <Text
+                style={{
+                  color: "#666",
+                  fontSize: 14,
+                  marginTop: 10,
+                  textAlign: "right",
+                }}
+              >
+                ${metaletWallet.currentSpaceAssert}
+              </Text>
             </View>
           </View>
-        </TouchableWithoutFeedback>}
+        </TouchableWithoutFeedback>
+      )}
 
+      {netWork == network_all && (
+        <TouchableWithoutFeedback
+          onPress={() => {
+            // navigate("ReceivePage",{myCoinType:{type:'BTC'}});
+            // navigate("ReceivePage", { myCoinType: "BTC" });
+            navigate("AssetsBtcDetailPage", { myCoinType: "BTC" });
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: 30,
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={require("../../image/logo_btc.png")}
+              style={{ width: 45, height: 45 }}
+            />
+            <View style={{ marginLeft: 12 }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>BTC</Text>
+              {/* <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
+                sdfewfwsf
+              </Text> */}
+            </View>
 
-       
+            <View style={{ flex: 1 }} />
 
+            <View>
+              <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
+                {metaletWallet.currentBtcBalance} BTC{" "}
+              </Text>
+              <Text
+                style={{
+                  color: "#666",
+                  fontSize: 14,
+                  marginTop: 10,
+                  textAlign: "right",
+                }}
+              >
+                ${metaletWallet.currentBtcAssert}
+              </Text>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      )}
+
+      {netWork == network_all && (
+        <TouchableWithoutFeedback
+          onPress={() => {
+            // navigate("ReceivePage",{myCoinType:'SPACE'});
+            navigate("AssetsMvcDetailPage", { myCoinType: "SPACE" });
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: 30,
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={require("../../image/logo_space.png")}
+              style={{ width: 45, height: 45 }}
+            />
+            <View style={{ marginLeft: 12 }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>SPACE</Text>
+              {/* <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
+                sdfewfwsf
+              </Text> */}
+            </View>
+
+            <View style={{ flex: 1 }} />
+
+            <View>
+              <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
+                {metaletWallet.currentMvcBalance } SPACE{" "}
+              </Text>
+              <Text
+                style={{
+                  color: "#666",
+                  fontSize: 14,
+                  marginTop: 10,
+                  textAlign: "right",
+                }}
+              >
+                ${metaletWallet.currentSpaceAssert}
+               
+              </Text>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      )}
     </View>
   );
 }

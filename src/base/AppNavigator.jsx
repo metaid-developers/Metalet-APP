@@ -49,6 +49,7 @@ import SendBtcConfirmPage from "../page/home/SendBtcConfirmPage";
 import SendBtcSuccessPage from "../page/home/SendBtcSuccessPage";
 import SendSpaceSuccessPage from "../page/home/SendSpaceSuccessPage";
 import SetPasswordPage from "../page/safe/SetPasswordPage";
+import AssetsMvcFtDetailPage from "../page/home/AssetsMvcFtDetailPage";
 
 ////////
 
@@ -110,6 +111,7 @@ const StackNavigator = () => (
     <Stack.Screen name="SendBtcSuccessPage" component={SendBtcSuccessPage} />
     <Stack.Screen name="SendSpaceSuccessPage" component={SendSpaceSuccessPage} />
     <Stack.Screen name="SetPasswordPage" component={SetPasswordPage} />
+    <Stack.Screen name="AssetsMvcFtDetailPage" component={AssetsMvcFtDetailPage} />
 
 
 

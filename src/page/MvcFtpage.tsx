@@ -23,10 +23,13 @@ import { removeTrailingZeros } from "../utils/StringUtils";
 import { checkImage, getShowImageUrl } from "../utils/MetaFunUiils";
 import { useFocusEffect } from "@react-navigation/native";
 import { EventBus, eventBus, refreshMvcFtEvent } from "../utils/EventBus";
-import { fetchMvcFtBalance } from "../api/metaletservice";
+import { fetchMvcFtBalance, fetchMvcFtPrice } from "../api/metaletservice";
 import { MvcFtData } from "../api/type/MvcFtData";
 import { getIconUri } from "@mvc-org/mvc-resources";
 import { getCurrentMvcWallet } from "../wallet/wallet";
+import { formatToDecimal } from "../utils/WalletUtils";
+import { caculateOneFtValue } from "../utils/AssertUtils";
+import { navigate } from "../base/NavigationService";
 
 export default function MvcFtPage() {
   const { userData, updateUserData } = useData();
@@ -42,32 +45,40 @@ export default function MvcFtPage() {
   useEffect(() => {
     refresh();
   }, []);
-  
+
   useEffect(() => {
     refresh();
   }, [mvcAddress]);
 
-
   async function refresh() {
-    if(mvcAddress){
+    if (mvcAddress) {
       getMvcFtData(mvcAddress);
-    }else{
-     const mvcWallet=await getCurrentMvcWallet();
-     getMvcFtData(mvcWallet.getAddress());
+    } else {
+      const mvcWallet = await getCurrentMvcWallet();
+      getMvcFtData(mvcWallet.getAddress());
     }
   }
 
   async function getMvcFtData(address: string) {
+    const ftdata = await fetchMvcFtBalance(address);
+    const ftPriceData = await fetchMvcFtPrice();
 
-    const ftdata=await fetchMvcFtBalance(address);
+    let list = [];
+    for (let i = 0; i < ftdata.length; i++) {
+      const ftItem: MvcFtData = ftdata[i];
+      const assertFt = caculateOneFtValue([ftItem], ftPriceData);
+      ftItem.assetPrice = assertFt;
+      // console.log("ftItem.assetPrice",ftItem.assetPrice);
+      list.push(ftItem);
+    }
+
     // console.log(ftdata);
-    
-    if(ftdata){
-      setftList([...ftdata]);
-    }else{
+
+    if (list) {
+      setftList([...list]);
+    } else {
       setftList([]);
     }
-    
 
     // let param = {
     //   page: 1,
@@ -96,7 +107,7 @@ export default function MvcFtPage() {
 
   const refreshData = (id) => {
     setftList((prevList) =>
-      prevList.map((item) => 
+      prevList.map((item) =>
         item.name === id ? { ...item, imageError: true } : item
       )
     );
@@ -104,18 +115,24 @@ export default function MvcFtPage() {
 
   const ListItem = ({ index, item }) => {
     // let ImageUrl = getShowImageUrl(item.icon!);
-    let ImageUrl = getIconUri({type:"metaContract",codehash:item.codeHash,genesis:item.genesis})
-    if(!ImageUrl){
-      ImageUrl="1"
+    let ImageUrl = getIconUri({
+      type: "metaContract",
+      codehash: item.codeHash,
+      genesis: item.genesis,
+    });
+    if (!ImageUrl) {
+      ImageUrl = "1";
     }
-    
 
     //  const resut=await checkImage(ImageUrl)
     //  setICanLoadImage(resut)
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          console.log("item.name", item.name);
+          
+          navigate("AssetsMvcFtDetailPage", {
+            mvcFtData: item,
+          });
         }}
       >
         <View style={styles.flatListStyle}>
@@ -148,10 +165,11 @@ export default function MvcFtPage() {
                 textAlign: "right",
               }}
             >
-              {removeTrailingZeros(item.balance)}
+              {formatToDecimal(item.confirmed, item.decimal)}
+              {/* {removeTrailingZeros(item.balance)} */}
             </Text>
             <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>
-              $32983.99
+              ${item.assetPrice}
             </Text>
           </View>
         </View>

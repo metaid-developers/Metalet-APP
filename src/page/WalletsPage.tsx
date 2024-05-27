@@ -27,6 +27,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 import {
   getCurrentAccountID,
+  getRandomID,
   getWalletBeans,
   setCurrentAccountID,
   setCurrentWalletID,
@@ -55,6 +56,9 @@ export default function WalletsPage() {
 
   //current
   const [currentAccountID, setcurrentAccountID] = useState("");
+  const { needInitWallet, updateNeedInitWallet } = useData();
+  const { metaletWallet, updateMetaletWallet } = useData();
+
 
   // let changeWallet:WalletBean;
 
@@ -122,6 +126,7 @@ export default function WalletsPage() {
 
       await AsyncStorageUtil.updateItem(wallets_key, wallets);
       getWalletData();
+      updateNeedInitWallet(getRandomID())
       eventBus.publish(refreshHomeLoadingEvent, { data: "" });
       navigate("Tabs");
     });
@@ -151,6 +156,8 @@ export default function WalletsPage() {
       await AsyncStorageUtil.updateItem(wallets_key, wallets);
       getWalletData();
       navigate("Tabs");
+      updateNeedInitWallet(getRandomID())
+
       eventBus.publish(refreshHomeLoadingEvent, { data: "" });
 
       // chooseMyWallet(nowWallet);
@@ -426,7 +433,7 @@ export default function WalletsPage() {
             { marginTop: 10, textAlign: "center" },
           ]}
         >
-          $82,352.31
+          ${metaletWallet.currentSumAssert}
         </Text>
 
         <FlatList

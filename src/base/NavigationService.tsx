@@ -10,20 +10,30 @@ export function setTopLevelNavigator(navigatorRef) {
 }
 
 // 全局跳转的方法
-export function navigate(routeName,myObject?) {
+export function navigate(routeName, myObject?) {
   if (_navigator) {
     // 对于react-navigation v5+
-    _navigator.navigate(routeName,myObject);
+    _navigator.navigate(routeName, myObject);
   } else {
     console.warn("Can't navigate without a navigator!");
   }
 }
 
-
 export function goBack() {
   if (_navigator) {
     // 对于react-navigation v5+
     _navigator.goBack();
+  } else {
+    console.warn("Can't navigate without a navigator!");
+  }
+}
+
+export function reSets(name: string) {
+  if (_navigator) {
+    _navigator.reset({
+      index: 0,
+      routes: [{ name: name }],
+    });
   } else {
     console.warn("Can't navigate without a navigator!");
   }

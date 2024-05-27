@@ -23,8 +23,17 @@ import { TypeTest } from "../wallet/TypeTest";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { WalletBean } from "../bean/WalletBean";
 import { Buffer } from "buffer";
-import { btc_network, getCurrentBtcWallet, getCurrentMvcWallet } from "../wallet/wallet";
-import { getCurrentWalletAccount, getStorageCurrentWallet, getWalletBeans } from "../utils/WalletUtils";
+import {
+  btc_network,
+  getCurrentBtcWallet,
+  getCurrentMvcWallet,
+} from "../wallet/wallet";
+import {
+  getCurrentWalletAccount,
+  getStorageCurrentWallet,
+  getWalletBeans,
+} from "../utils/WalletUtils";
+import { goBack, navigate, reSets } from "../base/NavigationService";
 
 export default function SplashPage(props) {
   const { myWallet, updateMyWallet } = useData();
@@ -36,27 +45,26 @@ export default function SplashPage(props) {
   }, []);
 
   async function initDataBase() {
-   const walletBean=await getStorageCurrentWallet();
-   const account=await getCurrentWalletAccount();
-   console.log("walletBean",walletBean);
-   console.log("account",account);
-   
-   
-   
-   if(walletBean&&account){
-    updateMyWallet(walletBean);
-    const btcWallet = await getCurrentBtcWallet();
-    const mvcWallet = await getCurrentMvcWallet();
-    let metaletWallet = new MetaletWallet();
-    metaletWallet.currentBtcWallet = btcWallet;
-    metaletWallet.currentMvcWallet = mvcWallet;
-    updateMetaletWallet(metaletWallet);
-    props.navigation.navigate("Tabs");
-      
-    }else{
+    const walletBean = await getStorageCurrentWallet();
+    const account = await getCurrentWalletAccount();
+    console.log("walletBean", walletBean);
+    console.log("account", account);
+
+    if (walletBean && account) {
+      updateMyWallet(walletBean);
+      const btcWallet = await getCurrentBtcWallet();
+      const mvcWallet = await getCurrentMvcWallet();
+      let metaletWallet = new MetaletWallet();
+      metaletWallet.currentBtcWallet = btcWallet;
+      metaletWallet.currentMvcWallet = mvcWallet;
+      updateMetaletWallet(metaletWallet);
+      // props.navigation.navigate("Tabs");
+      // reSets()
+      // navigate("Tabs",{destory:true});
+      reSets("Tabs");
+    } else {
       props.navigation.navigate("WelcomeWalletPage");
     }
-
 
     // AsyncStorageUtil.getItem(wallets_key).then(async (value) => {
     //   if (value != null && value.length > 0) {

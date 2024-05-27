@@ -202,7 +202,7 @@ export default function AssetsMvcDetailPage({ route }) {
             fontWeight: "bold",
           }}
         >
-          {(metaletWallet.currentMvcBalance / 100000000).toFixed(8)} SPACE
+          {metaletWallet.currentMvcBalance } SPACE
         </Text>
 
         <Text
@@ -214,11 +214,8 @@ export default function AssetsMvcDetailPage({ route }) {
             fontSize: 18,
           }}
         >
-          $
-          {(
-            (metaletWallet.currentMvcBalance / 100000000) *
-            metaletWallet.currentMVCPrice
-          ).toFixed(2)}
+          ${metaletWallet.currentSpaceAssert}
+          
         </Text>
 
         <View

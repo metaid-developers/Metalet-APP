@@ -6,18 +6,21 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { metaStyles, themeColor } from "../constant/Constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "react-native-paper";
-import { RoundSimButton } from "../constant/Widget";
+import { LoadingModal, RoundSimButton } from "../constant/Widget";
 import Index from "../page/Index";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { navigate } from "../base/NavigationService";
-import { isNoWalletPassword } from "../utils/WalletUtils";
-import { wordlist } from '@scure/bip39/wordlists/english'
-import * as bip39 from '@scure/bip39'
-
+import { getStorageWallets, isNoStorageWallet, isNoWalletPassword } from "../utils/WalletUtils";
+import { wordlist } from "@scure/bip39/wordlists/english";
+import * as bip39 from "@scure/bip39";
+import { useData } from "../hooks/MyProvider";
+import { createMetaletWallet } from "../wallet/wallet";
+import MetaletWallet from "../wallet/MetaletWallet";
+import { AsyncStorageUtil, CurrentAccountIDKey, CurrentWalletIDKey, wallets_key } from "../utils/AsyncStorageUtil";
 
 // type Props={
 //   navigation:StackNavigationProp<any,''/>;
@@ -27,8 +30,56 @@ type Props = {
 };
 
 export default function WelcomeWalletPage(props) {
+  //create
+  const { myWallet, updateMyWallet } = useData();
+  const { metaletWallet, updateMetaletWallet } = useData();
+  const { mvcAddress, updateMvcAddress } = useData();
+  const { btcAddress, updateBtcAddress } = useData();
+  const [isShowLoading, setIsShowLoading] = useState(false);
+
+  async function createWallet() {
+    
+    setIsShowLoading(true);
+    const { btcWallet, mvcWallet, walletBean } =
+      await createMetaletWallet(10001);
+    const wallets = await getStorageWallets();
+    const hasNoWallets = await isNoStorageWallet();
+
+    let metaletWallet = new MetaletWallet();
+    updateMvcAddress(mvcWallet.getAddress());
+    updateBtcAddress(btcWallet.getAddress());
+    metaletWallet.currentBtcWallet = btcWallet;
+    metaletWallet.currentMvcWallet = mvcWallet;
+    updateMetaletWallet(metaletWallet);
+
+    if (hasNoWallets) {
+      await AsyncStorageUtil.updateItem(wallets_key, [walletBean]);
+    } else {
+      const newWallets = [...wallets, walletBean];
+      await AsyncStorageUtil.updateItem(wallets_key, newWallets);
+    }
+    updateMyWallet(walletBean);
+    await AsyncStorageUtil.setItem(CurrentWalletIDKey, walletBean.id);
+    await AsyncStorageUtil.setItem(
+      CurrentAccountIDKey,
+      walletBean.accountsOptions[0].id
+    );
+    setIsShowLoading(false);
+    navigate("CongratulationsPage", {
+      type: "Successfully created",
+    });
+  }
+
   return (
     <SafeAreaView style={styles.container}>
+      <LoadingModal
+        isShow={isShowLoading}
+        isCancel={true}
+        event={() => {
+          setIsShowLoading(false);
+        }}
+      />
+
       <Image
         source={require("../../image/me_first_choose_wallet.png")}
         style={styles.img}
@@ -44,7 +95,7 @@ export default function WelcomeWalletPage(props) {
       <RoundSimButton
         title={"Import Wallet"}
         event={async () => {
-          const noPassword= await isNoWalletPassword();
+          const noPassword = await isNoWalletPassword();
           if (noPassword) {
             navigate("SetPasswordPage", { type: "import" });
           } else {
@@ -61,15 +112,13 @@ export default function WelcomeWalletPage(props) {
           // props.navigation.navigate('TabNavigator', { screen: 'Home' });
 
           // navigate('Home')
+          
 
           if (isNoWalletPassword()) {
             // navigate("ImportWalletPage", { destory: true });
             navigate("SetPasswordPage", { type: "create" });
           } else {
-            //TODO create wallet
-            // props.navigation.navigate('Tabs');
-            const menmoic= bip39.generateMnemonic(wordlist).split(" ");
-            console.log("menmoic",menmoic);
+            createWallet();
           }
         }}
         textColor="white"

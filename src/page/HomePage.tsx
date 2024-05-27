@@ -6,6 +6,7 @@ import {
   TouchableWithoutFeedback,
   NativeModules,
   Modal,
+  BackHandler,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { navigate } from "../base/NavigationService";
@@ -63,6 +64,7 @@ import {
   fetchBtcActivityRecord,
   fetchBtcBalance,
   fetchMvcActivityComfird,
+  fetchSpaceBalance,
 } from "../api/metaletservice";
 import {
   btc_network,
@@ -77,6 +79,8 @@ import {
   getCurrentWalletSeed,
   getStorageCurrentWallet,
 } from "../utils/WalletUtils";
+import { caculateMvcAndBtcAssert } from "../utils/AssertUtils";
+import { ShowBalance } from "../api/type/Balance";
 
 // import RNFS from "react-native-fs";
 
@@ -90,7 +94,7 @@ type Balance = {
   unconfirmed: number;
 };
 
-export default function HomePage(props: any) {
+export default function HomePage({ navigation }) {
   const { accountIndex, updateAccountIndex } = useData();
 
   const { metaletWallet, updateMetaletWallet } = useData();
@@ -119,54 +123,15 @@ export default function HomePage(props: any) {
   const { mvcAddress, updateMvcAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
 
-  const getMVCBalance = async () => {
-    // console.log("请求结果是11： ", data.address);
-    // const dataflutter = await FlutterDatabase.getDatabaseData();
-    // console.log(dataflutter);
-    // let data: RootPriceObject = await get(BALANCE_PRICE_URL);
-    // metaletWallet.currentBtcPrice = data.data.priceInfo.btc;
-    // metaletWallet.currentMVCPrice = data.data.priceInfo.space;
-
-    const assertPrice = await fetchAssetsPrice();
-    metaletWallet.currentBtcPrice = assertPrice.data.priceInfo.btc;
-    metaletWallet.currentMVCPrice = assertPrice.data.priceInfo.space;
-
-    // console.log("请求结果是11： ", data);
-
-    let dataMvcBalance: Balance = await get(
-      BASE_MVC_API_URL +
-        "/address/" +
-        metaletWallet.currentMvcWallet.getAddress() +
-        "/balance"
-    );
-
-    metaletWallet.currentMvcBalance = dataMvcBalance.confirmed;
-    // console.log("mvc余额 ", dataMvcBalance);
-
-
-    let dataBtcBalance: RootBtcBalanceObject =
-      await fetchBtcBalance(btcAddress);
-
-    metaletWallet.currentBtcBalance = dataBtcBalance.data.balance;
-
-    metaletWallet.currentSumBalance =
-      (metaletWallet.currentMvcBalance * metaletWallet.currentMVCPrice) /
-        100000000 +
-      metaletWallet.currentBtcBalance * metaletWallet.currentBtcPrice;
-    // console.log("当前btc", metaletWallet.currentBtcBalance);
-    // console.log("当前btc价格", metaletWallet.currentBtcPrice);
-    // console.log("当前mvc", metaletWallet.currentMvcBalance);
-    // console.log("当前mvc价格", metaletWallet.currentMVCPrice);
-    // console.log("当前mvc+btc", metaletWallet.currentSumBalance.toFixed(2));
-    updateCurrentSumBalance(metaletWallet.currentSumBalance.toFixed(2));
-    updateMetaletWallet(metaletWallet);
-  };
+  const { needRefreshHome, updateNeedRefreshHome } = useData();
+  const { needInitWallet, updateNeedInitWallet } = useData();
+  const [userAvater, setuserAvater] = useState<string[]>([]);
+  const [accountName, setaccountName] = useState("");
+  const [walletName, setWalletName] = useState("");
 
   useEffect(() => {
     console.log("HomePage useEffect");
-
     initCurrentWallet();
-
     eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
       initCurrentWallet();
       setIsShowLoading(true);
@@ -178,15 +143,51 @@ export default function HomePage(props: any) {
   }, []);
 
   useEffect(() => {
-    console.log("HomePage useEffect  btc 地址变化");
-
-    getMVCBalance();
-
+    console.log("HomePage useEffect   btc change");
+    
     setIsShowLoading(true);
     setTimeout(() => {
       setIsShowLoading(false);
+      getShowBalance();
     }, 1000);
   }, [btcAddress]);
+
+  useEffect(() => {
+    console.log("HomePage needRefreshHome ");
+    getShowBalance();
+  }, [needRefreshHome]);
+
+  useEffect(() => {
+    console.log("HomePage needInitWallet ");
+    // initCurrentWallet();
+  }, [needInitWallet]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("tabPress", (e) => {
+      // Prevent default behavior
+      // e.preventDefault();
+      console.log("Home tab was pressed");
+      getShowBalance();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Add event listener for back button press
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          BackHandler.exitApp();
+          return true;
+        }
+      );
+      // Clean up the event listener when the screen is unfocused or component unmounts
+      return () => backHandler.remove();
+    }, [])
+  );
 
   function ShowNotice(notice) {
     setIsShowCopy(false);
@@ -198,10 +199,22 @@ export default function HomePage(props: any) {
     }, 800);
   }
 
-  const [userAvater, setuserAvater] = useState<string[]>([]);
-  const [accountName, setaccountName] = useState("");
-  const [walletName, setWalletName] = useState("");
+  const getShowBalance = async () => {
+    const nowMvcWallet=await getCurrentMvcWallet();
+    const nowBtcWallet=await getCurrentBtcWallet();
+    const showbalance: ShowBalance = await caculateMvcAndBtcAssert(
+      nowMvcWallet.getAddress(),
+      nowBtcWallet.getAddress()
+    );
+    metaletWallet.currentMvcBalance = showbalance.spaceBalance;
+    metaletWallet.currentBtcBalance = showbalance.btcBalance;
+    metaletWallet.currentSumAssert = showbalance.sumAssert;
+    metaletWallet.currentBtcAssert = showbalance.btcAssert;
+    metaletWallet.currentSpaceAssert = showbalance.spaceAssert;
 
+    updateCurrentSumBalance(showbalance.sumAssert);
+    updateMetaletWallet(metaletWallet);
+  };
   //初始化所有钱包
   async function initCurrentWallet() {
     await AsyncStorageUtil.getItem(network_key).then(async (saveNet) => {
@@ -218,8 +231,6 @@ export default function HomePage(props: any) {
 
     const nowWallet = await getStorageCurrentWallet();
     const nowAccount = await getCurrentWalletAccount();
-    console.log("nowWallet" + nowWallet);
-    console.log("nowAccount" + nowAccount);
 
     setWalletName(nowWallet.name);
     setaccountName(nowAccount.name);
@@ -248,10 +259,10 @@ export default function HomePage(props: any) {
     metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
     metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
     metaletWallet.btcTaprootWallet = btcTaprootWallet;
-    metaletWallet.btcSameAsWallet= btcSameAsLegacyWallet;
+    metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
 
     updateMetaletWallet(metaletWallet);
-    getMVCBalance();
+    getShowBalance();
 
     // let wallets = await AsyncStorageUtil.getItem(wallets_key);
     // for (let i = 0; i < wallets.length; i++) {

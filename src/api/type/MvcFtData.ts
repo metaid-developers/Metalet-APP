@@ -12,4 +12,18 @@ export interface MvcFtData {
   unconfirmedString: string;
   //dev
   imageError:boolean
+  assetPrice:string
+}
+
+
+export interface MvcFtRecordData {
+  flag: string;
+  address: string;
+  codeHash: string;
+  genesis: string;
+  time: number;
+  height: number;
+  income: number;
+  outcome: number;
+  txid: string;
 }

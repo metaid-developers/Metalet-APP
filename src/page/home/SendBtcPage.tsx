@@ -20,7 +20,11 @@ import {
 } from "../../constant/Widget";
 import { inputNormalBgColor, themeColor } from "../../constant/Constants";
 import { FeedBean, FeedBtcObject } from "../../types/btcfeed";
-import { fetchBtcBalance, fetchBtcFeed } from "../../api/metaletservice";
+import {
+  broadcastBtc,
+  fetchBtcBalance,
+  fetchBtcFeed,
+} from "../../api/metaletservice";
 import { Data, RootBtcBalanceObject } from "../../bean/BtcBalanceBean";
 import { useData } from "../../hooks/MyProvider";
 import { Utxo, UtxoBean } from "../../types/utxoBean";
@@ -28,6 +32,8 @@ import { AddressType, ScriptType } from "@metalet/utxo-wallet-service";
 import { getBtcUtxos } from "../../queries/utxos";
 import { broadcastBTCTx } from "../../queries/transaction";
 import { navigate } from "../../base/NavigationService";
+import { getCurrentBtcWallet } from "../../wallet/wallet";
+import { getRandomID, parseToSat, parseToSpace } from "../../utils/WalletUtils";
 
 export default function SendBtcPage() {
   const [nextBtnColor, setNextBtnColor] = useState("rgba(23, 26, 255, 0.5)");
@@ -38,7 +44,6 @@ export default function SendBtcPage() {
 
   // 扫描
   const [isScan, setIsScan] = useState(false);
-  const [rawTx, setRawTx] = useState<string>();
   //feed
   const [isShowFeed, setIsShowFeed] = useState(false);
   const feedModeSlow = "Slow";
@@ -67,6 +72,7 @@ export default function SendBtcPage() {
   });
 
   //wallet
+  const { metaletWallet, updateMetaletWallet } = useData();
   const { btcAddress, updateBtcAddress } = useData();
   const [btcBalance, setBtcBalance] = useState<Data>({
     balance: 0.00000546,
@@ -85,16 +91,22 @@ export default function SendBtcPage() {
     pinsBalance: 0,
   });
   const [utxoList, setUtxos] = useState<Utxo[]>([]);
-  const { metaletWallet, updateMetaletWallet } = useData();
+  // const { metaletWallet, updateMetaletWallet } = useData();
 
   //提示
   const [isShowNotice, setIsShowNotice] = useState(false);
   const [isShowLoading, setIsShowLoading] = useState(false);
   const [noticeContent, setNoticeContent] = useState("Successful");
   const [confirmDailogState, setConfirmDailogState] = useState(false);
+  const {needRefreshHome,updateNeedRefreshHome}=useData();
 
   // verfiy
   const [isShowVerify, setIsShowVerify] = useState(false);
+
+  // commfirn
+  const [fee, setfee] = useState("");
+  const [total, settotal] = useState("");
+  const [rawTx, setRawTx] = useState<string>();
 
   useEffect(() => {
     getFeed();
@@ -120,39 +132,62 @@ export default function SendBtcPage() {
   }
 
   async function sendBtc() {
-    const needRawTx =
-      metaletWallet.currentBtcWallet.getAddressType() === AddressType.Legacy;
+    const btcWallet = await getCurrentBtcWallet();
+    const needRawTx = btcWallet.getScriptType() === ScriptType.P2PKH;
     const utxos = await getBtcUtxos(btcAddress, needRawTx);
+    console.log("needRawTx", needRawTx);
+
     console.log("交易参数 inputAddress:" + inputAddress);
     console.log("交易参数 inputAmount:" + inputAmount);
     console.log("交易参数 feed:" + feed);
     console.log("交易参数 utxos:" + JSON.stringify(utxos));
-    console.log("当前钱包地址：" + metaletWallet.currentBtcWallet.getAddress());
-    console.log("当前钱包地址：" + metaletWallet.currentBtcWallet.getAddress());
+    console.log("当前钱包地址：" + btcWallet.getAddress());
 
-    const { rawTx, cost } = metaletWallet.currentBtcWallet.send(
+    const { rawTx, cost } = btcWallet.send(
       inputAddress,
       inputAmount,
       parseInt(feed),
       utxos
     );
 
+    const amount = parseToSat(inputAmount);
+    const gas = parseInt(cost) - amount;
+    const fee = parseToSpace(gas.toString()).toString();
+    const total = parseToSpace(cost.toString()).toString();
+    settotal(total);
+    setfee(fee);
+
+    console.log(rawTx);
+    console.log(cost);
+
     setRawTx(rawTx);
 
+    setConfirmDailogState(true);
     // const txId = await broadcastBTCTx(rawTx).catch((err) => {
     //   console.log(err);
     // });
   }
 
-  const OpenModal = () => {
+  const OpenModal = async () => {
     setIsShowLoading(true);
-    setTimeout(() => {
+    // broadcast
+    const { code, message, processingTime, data } = await broadcastBtc(rawTx);
+    if (data) {
       setIsShowLoading(false);
-      // navigate("HomePage");
-      navigate("SendBtcSuccessPage");
-      
-
-    }, 2000);
+      updateNeedRefreshHome(getRandomID())
+      navigate("SendBtcSuccessPage", {
+        result: {
+          txid: data,
+          amount: inputAmount,
+          address: inputAddress,
+        },
+      });
+    }
+    // setTimeout(() => {
+    //   setIsShowLoading(false);
+    //   // navigate("HomePage");
+    //   navigate("SendBtcSuccessPage");
+    // }, 2000);
   };
 
   return (
@@ -211,7 +246,7 @@ export default function SendBtcPage() {
                   fontWeight: "bold",
                 }}
               >
-                0.01 BTC
+                {inputAmount} BTC
               </Text>
             </View>
 
@@ -220,7 +255,7 @@ export default function SendBtcPage() {
                 From
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                sdfwefef2132fslhfklewhfljskdjflkewjfljewoifjeiwfji1323
+                {metaletWallet.currentBtcWallet.getAddress()}
               </Text>
             </View>
 
@@ -229,7 +264,7 @@ export default function SendBtcPage() {
                 To
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                sdfwefef2132fslhfklewhfljskdjflkewjfljewoifjeiwfji1323
+                {inputAddress}
               </Text>
             </View>
 
@@ -242,7 +277,7 @@ export default function SendBtcPage() {
             >
               <Text style={{ color: "#666", fontSize: 14 }}>Amount</Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                0.01 BTC
+                {inputAmount} BTC
               </Text>
             </View>
 
@@ -256,7 +291,7 @@ export default function SendBtcPage() {
               <Text style={{ color: "#666", fontSize: 14 }}>
                 Fees(Estimated)
               </Text>
-              <Text style={{ color: "#333", fontSize: 14 }}>0.01 BTC</Text>
+              <Text style={{ color: "#333", fontSize: 14 }}>{fee} BTC</Text>
             </View>
 
             <View
@@ -267,7 +302,7 @@ export default function SendBtcPage() {
               }}
             >
               <Text style={{ color: "#666", fontSize: 14 }}>Total</Text>
-              <Text style={{ color: "#333", fontSize: 14 }}>0.01 BTC</Text>
+              <Text style={{ color: "#333", fontSize: 14 }}>{total} BTC</Text>
             </View>
 
             <View
@@ -855,7 +890,7 @@ export default function SendBtcPage() {
             <RoundSimButton
               title={"Next"}
               event={() => {
-                sendBtc()
+                sendBtc();
                 // navigate('SendBtcConfirmPage')
                 // setConfirmDailogState(true);
               }}

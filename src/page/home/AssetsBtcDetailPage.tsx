@@ -266,7 +266,7 @@ export default function AssetsBtcDetailPage({ route }) {
           }}
         >
           {/* {(metaletWallet.currentBtcBalance / 100000000).toFixed(8)} SPACE */}
-          {metaletWallet.currentBtcBalance.toFixed(8)} BTC
+          {metaletWallet.currentBtcBalance} BTC
         </Text>
 
         <Text
@@ -279,10 +279,8 @@ export default function AssetsBtcDetailPage({ route }) {
           }}
         >
           $
-          {(
-            (metaletWallet.currentBtcBalance / 100000000) *
-            metaletWallet.currentBtcPrice
-          ).toFixed(2)}
+          {metaletWallet.currentBtcAssert}
+        
         </Text>
 
         <View
