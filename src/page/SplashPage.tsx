@@ -15,7 +15,7 @@ import {
   wallets_key,
 } from "../utils/AsyncStorageUtil";
 
-import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
+import { AddressType, Chain, CoinType } from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { TypeTest } from "../wallet/TypeTest";
@@ -32,6 +32,7 @@ import {
   getStorageCurrentWallet,
   getWalletBeans,
 } from "../utils/WalletUtils";
+import useWalletManager from "@/hooks/useWalletManager";
 import { goBack, navigate, reSets } from "../base/NavigationService";
 
 export default function SplashPage(props) {
@@ -46,8 +47,8 @@ export default function SplashPage(props) {
   async function initDataBase() {
     const walletBean = await getStorageCurrentWallet();
     const account = await getCurrentWalletAccount();
-    console.log("walletBean", walletBean);
-    console.log("account", account);
+    // console.log("walletBean", walletBean);
+    // console.log("account", account);
 
     if (walletBean && account) {
       updateMyWallet(walletBean);
@@ -64,70 +65,6 @@ export default function SplashPage(props) {
     } else {
       props.navigation.navigate("WelcomeWalletPage");
     }
-
-    // AsyncStorageUtil.getItem(wallets_key).then(async (value) => {
-    //   if (value != null && value.length > 0) {
-    //     // console.log("value", value);
-    //     for (let i = 0; i < value.length; i++) {
-    //       let wallet: WalletBean = value[i];
-    //       for (let q = 0; q < wallet.accountsOptions.length; q++) {
-    //         let account = wallet.accountsOptions[q];
-    //         // console.log("account", account);
-    //         if (account.isSelect == true) {
-    //           updateMyWallet(wallet);
-
-    //           let seed = await AsyncStorageUtil.getItem(walllet_seed_key);
-    //           if (!seed) {
-    //             seed = undefined;
-    //           }else{
-    //             seed = Buffer.from(seed, "hex");
-    //           }
-
-    //           const btcWallet = new BtcWallet({
-    //             network: btc_network,
-    //             mnemonic: wallet.mnemonic,
-    //             addressIndex: account.addressIndex,
-    //             addressType: wallet.addressTpye,
-    //             //选中跟mvc 路径一致
-    //             coinType: wallet.mvcTypes,
-    //             seed,
-    //           });
-
-    //           if (!seed) {
-    //             seed = btcWallet.getSeed();
-    //             const saveSeed=seed.toString("hex")
-    //             console.log("saveSeed",saveSeed);
-    //             await AsyncStorageUtil.setItem(walllet_seed_key, saveSeed);
-    //           }
-
-    //           // console.log(btcWallet.getAddress());
-    //           console.log(
-    //             "对应的BTC 地址 ：" + btcWallet.getAddress(),
-    //             btcWallet.getPath()
-    //           );
-
-    //           const mvcWallet = new MvcWallet({
-    //             network: "mainnet",
-    //             mnemonic: wallet.mnemonic,
-    //             addressIndex: account.addressIndex,
-    //             addressType: AddressType.LegacyMvc,
-    //             coinType: wallet.mvcTypes,
-    //             seed: seed,
-    //           });
-
-    //           let metaletWallet = new MetaletWallet();
-    //           metaletWallet.currentBtcWallet = btcWallet;
-    //           metaletWallet.currentMvcWallet = mvcWallet;
-    //           updateMetaletWallet(metaletWallet);
-
-    //           props.navigation.navigate("Tabs");
-    //         }
-    //       }
-    //     }
-    //   } else {
-    //     props.navigation.navigate("WelcomeWalletPage");
-    //   }
-    // });
   }
 
   function goToHome() {

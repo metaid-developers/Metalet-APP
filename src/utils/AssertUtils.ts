@@ -67,7 +67,7 @@ export async function caculateMvcAndBtcAssert(
   }
 
   balance.sumAssert = assertSum.toFixed(2);
-  console.log("assert" + JSON.stringify(balance));
+  // console.log("assert" + JSON.stringify(balance));
   return balance;
 }
 

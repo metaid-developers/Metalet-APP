@@ -35,6 +35,7 @@ import {
   getWalletBeans,
   setCurrentAccountID,
   setCurrentWalletID,
+  getStorageWallets
 } from "../utils/WalletUtils";
 
 export default function WalletsPage() {
@@ -131,7 +132,7 @@ export default function WalletsPage() {
       await setCurrentAccountID(newAccount.id);
       await setCurrentWalletID(nowWallet.id);
 
-      await AsyncStorageUtil.updateItem(wallets_key, wallets);
+      await storage.set(wallets_key, wallets);
       getWalletData();
       updateNeedInitWallet(getRandomID())
       eventBus.publish(refreshHomeLoadingEvent, { data: "" });
@@ -146,7 +147,7 @@ export default function WalletsPage() {
   ) {
     console.log("updataSelectAccount", walletIndex, accountIndex);
 
-    await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
+    await getStorageWallets().then(async (wallets) => {
       // wallets.forEach((wallet) => {
       //   wallet.accountsOptions.forEach((account) => {
       //     account.isSelect = false;
@@ -160,7 +161,7 @@ export default function WalletsPage() {
       await setCurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
       await setCurrentWalletID(nowWallet.id);
       updateMyWallet(nowWallet);
-      await AsyncStorageUtil.updateItem(wallets_key, wallets);
+      await storage.set(wallets_key, wallets);
       getWalletData();
       navigate("Tabs");
       updateNeedInitWallet(getRandomID())
