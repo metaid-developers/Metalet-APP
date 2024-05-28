@@ -21,7 +21,7 @@ const postMessage = async function (actionName, actionType, params) {
       host: window.location.host,
       nonce: generateRandomString(16),
       action: actionName + "-" + actionType,
-      icon: document.querySelector("link[rel='shortcut icon']")?.href || "",
+      icon: document.querySelector("link[rel='icon']")?.href || document.querySelector("link[rel='shortcut icon']")?.href || "",
     })
   );
 
@@ -44,6 +44,18 @@ const postMessage = async function (actionName, actionType, params) {
 };
 
 window.metaidwallet = {
+  connect: async function () {
+    return await postMessage("Connect", "authorize");
+  },
+  disconnect: async function () {
+    return await postMessage("Disconnect", "authorize");
+  },
+  isConnected: async function () {
+    return await postMessage("IsConnected", "query");
+  },
+  getNetwork: async function () {
+    return await postMessage("GetNetwork", "query");
+  },
   getAddress: async function (data) {
     return await postMessage("GetAddress", "query", data);
   },

@@ -8,6 +8,7 @@ import {
   Modal,
   Platform,
   BackHandler,
+  Button,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { navigate } from "../base/NavigationService";
@@ -34,7 +35,6 @@ import {
 import { useData } from "../hooks/MyProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  
   network_all,
   network_btc,
   network_key,
@@ -42,7 +42,7 @@ import {
   wallets_key,
   createStorage,
 } from "../utils/AsyncStorageUtil";
-import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
+import { AddressType, Chain, CoinType } from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 import { RootPriceObject } from "../bean/PriceBean";
 import { RootBtcBalanceObject } from "../bean/BtcBalanceBean";
@@ -84,6 +84,8 @@ import {
 } from "../utils/WalletUtils";
 import { caculateMvcAndBtcAssert } from "../utils/AssertUtils";
 import { ShowBalance } from "../api/type/Balance";
+import useWalletManager from "@/hooks/useWalletManager";
+import useNetworkStore from "@/store/useNetworkStore";
 
 // import RNFS from "react-native-fs";
 
@@ -134,9 +136,24 @@ export default function HomePage({ navigation }) {
   const [accountName, setaccountName] = useState("");
   const [walletName, setWalletName] = useState("");
 
+  const { network, switchNetwork } = useNetworkStore();
+  const {
+    getWallets,
+    walletManager,
+    initWalletManager,
+    getCurrentChainWallet,
+  } = useWalletManager();
+  useWalletManager();
+
   useEffect(() => {
-    console.log("HomePage useEffect");
+    // console.log("HomePage useEffect");
     initCurrentWallet();
+    initWalletManager().then(async () => {
+      // const btcWallet = await getCurrentChainWallet(Chain.BTC);
+      // console.log("currentBtcWallet", btcWallet.getAddress());
+      // const mvcWallet = await getCurrentChainWallet(Chain.MVC);
+      // console.log("currentMvcWallet", mvcWallet.getAddress());
+    });
     eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
       initCurrentWallet();
       setIsShowLoading(true);
@@ -148,8 +165,8 @@ export default function HomePage({ navigation }) {
   }, []);
 
   useEffect(() => {
-    console.log("HomePage useEffect   btc change");
-    
+    // console.log("HomePage useEffect   btc change");
+
     setIsShowLoading(true);
     setTimeout(() => {
       setIsShowLoading(false);
@@ -158,12 +175,12 @@ export default function HomePage({ navigation }) {
   }, [btcAddress]);
 
   useEffect(() => {
-    console.log("HomePage needRefreshHome ");
+    // console.log("HomePage needRefreshHome ");
     getShowBalance();
   }, [needRefreshHome]);
 
   useEffect(() => {
-    console.log("HomePage needInitWallet ");
+    // console.log("HomePage needInitWallet ");
     // initCurrentWallet();
   }, [needInitWallet]);
 
@@ -177,7 +194,6 @@ export default function HomePage({ navigation }) {
 
     return unsubscribe;
   }, [navigation]);
-
 
   useFocusEffect(
     React.useCallback(() => {
@@ -225,12 +241,12 @@ export default function HomePage({ navigation }) {
   async function initCurrentWallet() {
     await storage.get(network_key).then(async (saveNet) => {
       if (saveNet == null) {
-        console.log("saveNet is null" + saveNet);
+        // console.log("saveNet is null" + saveNet);
         await storage.set(network_key, network_all);
         // await AsyncStorageUtil.setItem(network_key, network_all);
         updateNetWork(network_all);
       } else {
-        console.log(saveNet);
+        // console.log(saveNet);
 
         updateNetWork(saveNet);
       }
@@ -270,136 +286,28 @@ export default function HomePage({ navigation }) {
 
     updateMetaletWallet(metaletWallet);
     getShowBalance();
-
-    // let wallets = await AsyncStorageUtil.getItem(wallets_key);
-    // for (let i = 0; i < wallets.length; i++) {
-    //   let wallet: WalletBean = wallets[i];
-    //   for (let q = 0; q < wallet.accountsOptions.length; q++) {
-    //     let account = wallet.accountsOptions[q];
-    //     if (account.isSelect == true) {
-    //       myWallet!.accountsOptions!.find((account) => {
-    //         if (account.isSelect) {
-    //           userAvater = account.defaultAvatarColor;
-    //         }
-    //       });
-
-    //       myWallet!.accountsOptions!.forEach((element) => {
-    //         if (element.isSelect) {
-    //           accountName = element.name;
-    //         }
-    //       });
-
-    //       updateMyWallet(wallet);
-    //       let seed = await getCurrentWalletSeed();
-
-    //       const btcTaprootWallet = new BtcWallet({
-    //         network: btc_network,
-    //         mnemonic: myWallet.mnemonic,
-    //         addressIndex: account.addressIndex,
-    //         addressType: AddressType.Taproot,
-    //         coinType: CoinType.BTC,
-    //         seed,
-    //       });
-
-    //       // const seed = btcTaprootWallet.getSeed();
-
-    //       metaletWallet.btcTaprootWallet = btcTaprootWallet;
-    //       setTaprootAddress(btcTaprootWallet.getAddress());
-
-    //       const btcNativeSegwitWallet = new BtcWallet({
-    //         network: btc_network,
-    //         mnemonic: myWallet.mnemonic,
-    //         addressIndex: account.addressIndex,
-    //         addressType: AddressType.NativeSegwit,
-    //         coinType: CoinType.BTC,
-    //         seed,
-    //       });
-    //       metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
-    //       setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
-
-    //       const btcNestedSegwitWallet = new BtcWallet({
-    //         network: btc_network,
-    //         mnemonic: myWallet.mnemonic,
-    //         addressIndex: account.addressIndex,
-    //         addressType: AddressType.NestedSegwit,
-    //         coinType: CoinType.BTC,
-    //         seed,
-    //       });
-    //       metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
-    //       setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
-
-    //       const btcLegacyWallet = new BtcWallet({
-    //         network: btc_network,
-    //         mnemonic: myWallet.mnemonic,
-    //         addressIndex: account.addressIndex,
-    //         addressType: AddressType.Legacy,
-    //         coinType: CoinType.BTC,
-    //         seed,
-    //       });
-    //       metaletWallet.btcLegacyWallet = btcLegacyWallet;
-    //       setLegacyAddress(btcLegacyWallet.getAddress());
-
-    //       const btcSameAsLegacyWallet = new BtcWallet({
-    //         network: btc_network,
-    //         mnemonic: myWallet.mnemonic,
-    //         addressIndex: account.addressIndex,
-    //         addressType: AddressType.LegacyMvc,
-    //         coinType: wallet.mvcTypes,
-    //         seed,
-    //       });
-
-    //       metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
-    //       setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
-    //       // console.log(
-    //       //   "切换后的btc地址btSameAsLegacyWallet  ",
-    //       //   btcSameAsLegacyWallet.getAddress()
-    //       // );
-
-    //       const mvcWallet = new MvcWallet({
-    //         network: "mainnet",
-    //         mnemonic: wallet.mnemonic,
-    //         addressIndex: account.addressIndex,
-    //         addressType: AddressType.LegacyMvc,
-    //         coinType: wallet.mvcTypes,
-    //         seed,
-    //       });
-
-    //       const nowBtcWallet = new BtcWallet({
-    //         network: btc_network,
-    //         mnemonic: myWallet.mnemonic,
-    //         addressIndex: account.addressIndex,
-    //         addressType: wallet.addressType,
-    //         coinType:
-    //           wallet.addressType == AddressType.SameAsMvc
-    //             ? wallet.mvcTypes
-    //             : CoinType.BTC,
-    //         seed,
-    //       });
-    //       updateMvcAddress(mvcWallet.getAddress());
-    //       updateBtcAddress(nowBtcWallet.getAddress());
-    //       console.log(wallet.addressType);
-
-    //       console.log("updateBtcAddress" + nowBtcWallet.getAddress());
-
-    //       metaletWallet.currentBtcWallet = nowBtcWallet;
-    //       metaletWallet.currentMvcWallet = mvcWallet;
-    //       updateMetaletWallet(metaletWallet);
-
-    //       // myTestMvc= mvcWallet.getAddress();
-
-    //       // //通知更新
-    //       // eventBus.publish(refreshMvcFtEvent, {
-    //       //   data: metaletWallet.currentMvcWallet.getAddress(),
-    //       // });
-    //       // eventBus.publish(refreshBtcFtEvent, {
-    //       //   data: metaletWallet.currentBtcWallet.getAddress(),
-    //       // });
-    //     }
-    //   }
-    // }
   }
 
-  const { userData, updateUserData } = useData();
+  useEffect(() => {
+    if (walletManager) {
+      getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
+        console.log("btc address", network, btcWallet.getAddress());
+      });
+      getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
+        console.log("mvc address", network, mvcWallet.getAddress());
+      });
+    }
+    setIsShowLoading(false)
+  }, [walletManager]);
+
+  async function changeNetWork() {
+    setIsShowLoading(true)
+    if (network === "mainnet") {
+      switchNetwork("testnet");
+    } else if (network === "testnet") {
+      switchNetwork("mainnet");
+    }
+  }
 
   return (
     <SafeAreaView style={metaStyles.parentContainer}>
@@ -898,6 +806,9 @@ export default function HomePage({ navigation }) {
           source={require("../../image/meta_last_icon.png")}
           style={{ width: 8, height: 6, marginLeft: 5 }}
         />
+
+        <Button onPress={changeNetWork} title={network} />
+        <Button onPress={getWallets} title="getWallets" />
       </View>
 
       <View style={[metaStyles.varContainer, { marginHorizontal: 30 }]}>

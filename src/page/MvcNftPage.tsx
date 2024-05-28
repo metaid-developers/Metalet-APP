@@ -64,11 +64,11 @@ export default function MvcNftPage(props) {
     );
     if (data.data.results.items != null) {
        // setNftList(data.data.results.items);
-      console.log('有数据刷新');
+      // console.log('有数据刷新');
       setNftList([...data.data.results.items]);
       // setBtcFtList([...data.data.list]);
     }else{
-      console.log('无有数据刷新');
+      // console.log('无有数据刷新');
       setNftList([]);
     }
   }

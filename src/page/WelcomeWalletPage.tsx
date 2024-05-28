@@ -14,13 +14,24 @@ import { LoadingModal, RoundSimButton } from "../constant/Widget";
 import Index from "../page/Index";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { navigate } from "../base/NavigationService";
-import { getStorageWallets, isNoStorageWallet, isNoWalletPassword } from "../utils/WalletUtils";
+import {
+  getStorageWallets,
+  isNoStorageWallet,
+  isNoWalletPassword,
+} from "../utils/WalletUtils";
 import { wordlist } from "@scure/bip39/wordlists/english";
 import * as bip39 from "@scure/bip39";
 import { useData } from "../hooks/MyProvider";
 import { createMetaletWallet } from "../wallet/wallet";
 import MetaletWallet from "../wallet/MetaletWallet";
-import { AsyncStorageUtil, CurrentAccountIDKey, CurrentWalletIDKey, wallets_key } from "../utils/AsyncStorageUtil";
+import {
+  createStorage,
+  CurrentAccountIDKey,
+  CurrentWalletIDKey,
+  wallets_key,
+} from "../utils/AsyncStorageUtil";
+
+const storage = createStorage();
 
 // type Props={
 //   navigation:StackNavigationProp<any,''/>;
@@ -38,7 +49,6 @@ export default function WelcomeWalletPage(props) {
   const [isShowLoading, setIsShowLoading] = useState(false);
 
   async function createWallet() {
-    
     setIsShowLoading(true);
     const { btcWallet, mvcWallet, walletBean } =
       await createMetaletWallet(10001);
@@ -53,17 +63,14 @@ export default function WelcomeWalletPage(props) {
     updateMetaletWallet(metaletWallet);
 
     if (hasNoWallets) {
-      await AsyncStorageUtil.updateItem(wallets_key, [walletBean]);
+      await storage.set(wallets_key, [walletBean]);
     } else {
       const newWallets = [...wallets, walletBean];
-      await AsyncStorageUtil.updateItem(wallets_key, newWallets);
+      await storage.set(wallets_key, newWallets);
     }
     updateMyWallet(walletBean);
-    await AsyncStorageUtil.setItem(CurrentWalletIDKey, walletBean.id);
-    await AsyncStorageUtil.setItem(
-      CurrentAccountIDKey,
-      walletBean.accountsOptions[0].id
-    );
+    await storage.set(CurrentWalletIDKey, walletBean.id);
+    await storage.set(CurrentAccountIDKey, walletBean.accountsOptions[0].id);
     setIsShowLoading(false);
     navigate("CongratulationsPage", {
       type: "Successfully created",
@@ -112,7 +119,6 @@ export default function WelcomeWalletPage(props) {
           // props.navigation.navigate('TabNavigator', { screen: 'Home' });
 
           // navigate('Home')
-          
 
           if (isNoWalletPassword()) {
             // navigate("ImportWalletPage", { destory: true });

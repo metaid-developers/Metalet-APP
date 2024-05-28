@@ -24,15 +24,17 @@ import {
   fetchBtcActivityRecord,
   fetchMvcActivityComfird,
 } from "../../api/metaletservice";
+// import useNetworkManager from "@/hooks/useNetworkManager";
+import useNetworkStore from "@/store/useNetworkStore";
 import { useData } from "../../hooks/MyProvider";
 import * as Clipboard from "expo-clipboard";
 import { formatTime } from "../../utils/MetaFunUiils";
 import { AddressType } from "@metalet/utxo-wallet-service";
+import { walllet_address_type_key } from "../../utils/AsyncStorageUtil";
 import {
-  
-  walllet_address_type_key,
-} from "../../utils/AsyncStorageUtil";
-import { changeCurrentWalletAddressType, getStorageCurrentWallet } from "../../utils/WalletUtils";
+  changeCurrentWalletAddressType,
+  getStorageCurrentWallet,
+} from "../../utils/WalletUtils";
 
 export default function AssetsBtcDetailPage({ route }) {
   const { myCoinType } = route.params;
@@ -43,6 +45,8 @@ export default function AssetsBtcDetailPage({ route }) {
   const { metaletWallet, updateMetaletWallet } = useData();
   const [isShowCopy, setIsShowCopy] = useState(false);
   const [addressType, setAddressType] = useState(AddressType.Legacy);
+
+  const { network } = useNetworkStore();
 
   //当前btc 地址
   const { btcAddress, updateBtcAddress } = useData();
@@ -78,7 +82,7 @@ export default function AssetsBtcDetailPage({ route }) {
       console.log("datalist", datalist);
       setBtcActivityList([...datalist]);
     }
-    
+
     const currentWallet = await getStorageCurrentWallet();
     const addressType = currentWallet.addressTpye;
     setAddressType(addressType);
@@ -278,9 +282,7 @@ export default function AssetsBtcDetailPage({ route }) {
             fontSize: 18,
           }}
         >
-          $
-          {metaletWallet.currentBtcAssert}
-        
+          ${metaletWallet.currentBtcAssert}
         </Text>
 
         <View
@@ -290,9 +292,11 @@ export default function AssetsBtcDetailPage({ route }) {
             alignItems: "center",
           }}
         >
-          <TouchableWithoutFeedback onPress={() => {
-            navigate("SendBtcPage")
-          }}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigate("SendBtcPage");
+            }}
+          >
             <View
               style={{
                 flexDirection: "row",
@@ -321,6 +325,7 @@ export default function AssetsBtcDetailPage({ route }) {
               >
                 Send
               </Text>
+              <Text>{network}</Text>
             </View>
           </TouchableWithoutFeedback>
 
