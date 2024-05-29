@@ -1,10 +1,10 @@
+import { actionType } from "./types";
 import queryActions from "./query-actions";
 import authorizeActions from "./authorize-actions";
 
-type actionType = "authorize" | "query" | "event" | "inscribe";
+const actionDispatcher = (action: `${string}-${actionType}`) => {
+  const [actionName, actionType] = action.split("-");
 
-const actionDispatcher = (action: `${actionType}-${string}`) => {
-  const [actionType, actionName] = action.split("-");
   switch (actionType) {
     case "authorize":
       return authorizeActions[actionName];
@@ -14,3 +14,5 @@ const actionDispatcher = (action: `${actionType}-${string}`) => {
       return null;
   }
 };
+
+export default actionDispatcher;

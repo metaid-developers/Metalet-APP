@@ -1,6 +1,8 @@
 import WebView from "react-native-webview";
+import { actionType } from "./actions/types";
 import { injectedJavaScript } from "./inject";
 import React, { useRef, useState } from "react";
+import actionDispatcher from "./actions/action-dispatcher";
 import {
   View,
   Text,
@@ -11,10 +13,6 @@ import {
   Pressable,
   SafeAreaView,
 } from "react-native";
-
-import { process } from "./actions/lib/query/get-address";
-
-type actionType = "authorize" | "query";
 
 interface Message {
   params: Record<string, unknown>;
@@ -45,9 +43,15 @@ export default function WebsPage() {
       setIcon(message.icon);
       setHost(message.host);
       setActionName(actionName);
-    } else if (actionName === "GetAddress") {
-      const address = await process();
-      postMessage(address);
+    } else {
+      const { process } = actionDispatcher(message.action);
+      const data = await process();
+      postMessage(
+        JSON.stringify({
+          data,
+          nonce: message.nonce,
+        })
+      );
     }
   };
 
@@ -61,7 +65,7 @@ export default function WebsPage() {
   };
 
   const confirmAction = async () => {
-    postMessage("1111");
+    postMessage("Confirm Action");
     setModalVisible(false);
   };
 

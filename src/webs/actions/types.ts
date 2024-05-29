@@ -1,0 +1,1 @@
+export type actionType = "authorize" | "query" | "event" | "inscribe";

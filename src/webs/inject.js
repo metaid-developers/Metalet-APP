@@ -14,12 +14,14 @@ const generateRandomString = (len) => {
 };
 
 const postMessage = async function (actionName, actionType, params) {
+  const nonce = generateRandomString(16);
+
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
+      nonce,
       params: params || {},
       channel: "to-metaidwallet",
       host: window.location.host,
-      nonce: generateRandomString(16),
       action: actionName + "-" + actionType,
       icon:
         document.querySelector("link[rel='icon']")?.href ||
@@ -31,14 +33,12 @@ const postMessage = async function (actionName, actionType, params) {
   const subscribe = (callback) => {
     const eventListener = (nativeEvent) => {
       try {
-        const data = JSON.parse(nativeEvent.data);
-        if (typeof data === "object") {
-          callback(JSON.parse(nativeEvent.data));
-        } else {
-          callback(nativeEvent.data);
+        const res = JSON.parse(nativeEvent.data);
+        if (typeof res === "object" && res.nonce === nonce) {
+          callback(res.data);
         }
       } catch (e) {
-        callback(nativeEvent.data);
+        console.error("listen error:", e);
       }
     };
 
@@ -50,6 +50,9 @@ const postMessage = async function (actionName, actionType, params) {
 
   return await new Promise((resolve, reject) => {
     subscribe((data) => {
+      if (data.error) {
+        reject(data.error)
+      }
       resolve(data);
     });
   });
@@ -68,8 +71,11 @@ window.metaidwallet = {
   getNetwork: async function () {
     return await postMessage("GetNetwork", "query");
   },
-  getAddress: async function (data) {
-    return await postMessage("GetAddress", "query", data);
+  getAddress: async function () {
+    return await postMessage("GetAddress", "query");
+  },
+  getUtxos: async function () {
+    return await postMessage("GetUtxos", "query");
   },
   getPublick: function () {
     postMessage("getPublick");

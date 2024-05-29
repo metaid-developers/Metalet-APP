@@ -1,7 +1,7 @@
-// import * as IsConnected from '../lib/actions/is-connected'
+import * as GetUtxos from "./lib/query/get-utxos";
+import * as GetAddress from "./lib/query/get-address";
+import * as IsConnected from "./lib/query/is-connected";
 // import * as Listen from '../lib/actions/listen'
-import * as GetAddress from './lib/query/get-address'
-// import * as GetUtxos from '../lib/actions/get-utxos'
 // import * as GetPublicKey from '../lib/actions/get-public-key'
 // import * as GetXPublicKey from '../lib/actions/get-extended-public-key'
 // import * as GetBalance from '../lib/actions/get-balance'
@@ -20,17 +20,17 @@ import * as GetAddress from './lib/query/get-address'
 // import * as BTCVerifyMessage from '../lib/actions/btc/verify-message'
 
 type QueryAction = {
-  process: Function
-}
+  process: Function;
+};
 
 export default {
-  // IsConnected,
+  GetUtxos,
+  GetAddress,
+  IsConnected,
   // Listen,
   // GetNetwork,
-  GetAddress,
   // GetPublicKey,
   // GetBalance,
-  // GetUtxos,
   // GetTokenBalance,
   // VerifySignature,
   // GetXPublicKey,
@@ -44,4 +44,4 @@ export default {
   // GetBTCUtxos,
   // PushPsbt,
   // BTCVerifyMessage,
-} as { [key: string]: QueryAction }
+} as { [key: string]: QueryAction };
