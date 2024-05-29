@@ -12,6 +12,8 @@ import {
   SafeAreaView,
 } from "react-native";
 
+import { process } from "./actions/lib/query/get-address";
+
 type actionType = "authorize" | "query";
 
 interface Message {
@@ -35,7 +37,7 @@ export default function WebsPage() {
     console.log("onError", nativeEvent);
   };
 
-  const postRNMessage = async (message: Message) => {
+  const handlerMessage = async (message: Message) => {
     console.log(message);
     const [actionName, actionType] = message.action.split("-");
     if (actionType === "authorize") {
@@ -43,32 +45,28 @@ export default function WebsPage() {
       setIcon(message.icon);
       setHost(message.host);
       setActionName(actionName);
+    } else if (actionName === "GetAddress") {
+      const address = await process();
+      postMessage(address);
     }
-    //给web发送消息
-    webViewRef.current.postMessage(await getAddress());
   };
 
-  async function getAddress() {
-    return "123456";
-  }
-
-  const GetWebView = () => {
-    return (
-      <WebView
-        style={{ marginTop: 20 }}
-        source={{ uri: "https://metalet-tester.vercel.app/" }}
-        ref={webViewRef}
-        javaScriptEnabled={true}
-        allowFileAccess={true}
-        onError={onError}
-        javaScriptCanOpenWindowsAutomatically={true}
-        useWebKit={true}
-        injectedJavaScript={injectedJavaScript}
-        onMessage={(e) => {
-          postRNMessage(JSON.parse(e.nativeEvent.data));
-        }}
-      />
+  const cancelAction = async () => {
+    postMessage(
+      JSON.stringify({
+        status: "canceled",
+      })
     );
+    setModalVisible(false);
+  };
+
+  const confirmAction = async () => {
+    postMessage("1111");
+    setModalVisible(false);
+  };
+
+  const postMessage = async (message: unknown) => {
+    webViewRef.current.postMessage(message);
   };
 
   return (
@@ -100,7 +98,7 @@ export default function WebsPage() {
 
           <View className="flex flex-row items-center justify-center pt-6 pb-12 w-full gap-2">
             <Pressable
-              onPress={() => setModalVisible(false)}
+              onPress={cancelAction}
               className="w-[120px] rounded-3xl bg-blue-light py-4"
             >
               <Text className="text-center text-sm text-blue-primary">
@@ -108,7 +106,7 @@ export default function WebsPage() {
               </Text>
             </Pressable>
             <Pressable
-              onPress={() => setModalVisible(false)}
+              onPress={confirmAction}
               className="w-[120px] rounded-3xl bg-blue-primary py-4"
             >
               <Text className="text-center text-sm text-white">Confirm</Text>
@@ -116,14 +114,25 @@ export default function WebsPage() {
           </View>
         </View>
       </Modal>
-
       {Platform.OS === "web" ? (
         <View className="w-full h-full flex flex-col items-center justify-center">
           <Text className="mb-4">GetWebView does not support on web</Text>
           <Button onPress={() => setModalVisible(true)} title="Show Modal" />
         </View>
       ) : (
-        <GetWebView />
+        <WebView
+          ref={webViewRef}
+          useWebKit={true}
+          onError={onError}
+          allowFileAccess={true}
+          javaScriptEnabled={true}
+          injectedJavaScript={injectedJavaScript}
+          javaScriptCanOpenWindowsAutomatically={true}
+          source={{ uri: "https://metalet-tester.vercel.app/" }}
+          onMessage={(e) => {
+            handlerMessage(JSON.parse(e.nativeEvent.data));
+          }}
+        />
       )}
     </SafeAreaView>
   );

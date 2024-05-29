@@ -4,7 +4,7 @@ import { persist, StateStorage, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface NetworkState {
-  network: Net;
+  network: Net | null;
   switchNetwork: (network: Net) => void;
 }
 
@@ -27,12 +27,12 @@ interface NetworkState {
 const useNetworkStore = create(
   persist<NetworkState>(
     (set) => ({
-      network: "mainnet",
+      network: null,
       switchNetwork: (network: Net) => set({ network }),
     }),
     {
       name: "net",
-      storage: createJSONStorage(() => AsyncStorage)
+      storage: createJSONStorage(() => AsyncStorage),
     }
     // {
     //   name: "net",

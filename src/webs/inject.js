@@ -21,13 +21,25 @@ const postMessage = async function (actionName, actionType, params) {
       host: window.location.host,
       nonce: generateRandomString(16),
       action: actionName + "-" + actionType,
-      icon: document.querySelector("link[rel='icon']")?.href || document.querySelector("link[rel='shortcut icon']")?.href || "",
+      icon:
+        document.querySelector("link[rel='icon']")?.href ||
+        document.querySelector("link[rel='shortcut icon']")?.href ||
+        "",
     })
   );
 
   const subscribe = (callback) => {
     const eventListener = (nativeEvent) => {
-      callback(nativeEvent.data);
+      try {
+        const data = JSON.parse(nativeEvent.data);
+        if (typeof data === "object") {
+          callback(JSON.parse(nativeEvent.data));
+        } else {
+          callback(nativeEvent.data);
+        }
+      } catch (e) {
+        callback(nativeEvent.data);
+      }
     };
 
     // Android

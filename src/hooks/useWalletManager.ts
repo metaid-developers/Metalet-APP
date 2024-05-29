@@ -1,5 +1,6 @@
 import { getCurrentAccountId } from "@/lib/account";
-import useNetworkStore from "@/store/useNetworkStore";
+import useWalletStore from "@/stores/useWalletStore";
+import useNetworkStore from "@/stores/useNetworkStore";
 import { useState, useCallback, useEffect } from "react";
 import {
   Chain,
@@ -24,10 +25,14 @@ interface WalletMap {
 
 const useWalletManager = () => {
   const { network } = useNetworkStore();
+  const { setCurrentWallet } = useWalletStore();
   const [walletManager, setWalletManager] = useState<WalletManager>(null);
 
   const initWalletManager: () => Promise<WalletManager> =
     useCallback(async () => {
+      if (network === null) {
+        return;
+      }
       try {
         // console.log("network", network);
 
@@ -52,6 +57,32 @@ const useWalletManager = () => {
           },
         ];
         const walletManager = new WalletManager({ network, walletsOptions });
+
+        const chainWallets = walletManager.getAccountChainWallets(
+          activeWallet.id,
+          activeWallet.accountsOptions[0].id
+        );
+
+        const currentWalletId = await getCurrentWalletId();
+        const btcAddressType = await getBtcAddressType(currentWalletId);
+
+        const btcWallet = chainWallets.btc.find(
+          (wallet) => wallet.getAddressType() === btcAddressType
+        );
+
+        if (!btcWallet) {
+          throw new Error(`No ${btcAddressType} btc wallet found.`);
+        }
+
+        const mvcWallet = chainWallets.mvc.find(
+          (wallet) => wallet.getAddressType() === AddressType.LegacyMvc
+        );
+
+        if (!mvcWallet) {
+          throw new Error(`No ${AddressType.LegacyMvc} mvc wallet found.`);
+        }
+
+        setCurrentWallet({ btcWallet, mvcWallet });
 
         // const t4 = performance.now();
         // console.log("walletManager", t4 - t3);
