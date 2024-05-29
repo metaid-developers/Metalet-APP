@@ -30,7 +30,7 @@ import { getIconUri } from "@mvc-org/mvc-resources";
 import { formatToDecimal } from "../../utils/WalletUtils";
 import { caculateOneFtValue, getBtcBrc20Icon } from "../../utils/AssertUtils";
 
-export default function Brc20DetailPage({ route }) {
+export default function BRC20DetailPage({ route }) {
   const [mvcActivityList, setMvcActivityList] = useState<MvcFtRecordData[]>([]);
   const { mvcAddress, updateMvcAddress } = useData();
   const [noticeContent, setNoticeContent] = useState("Successful");

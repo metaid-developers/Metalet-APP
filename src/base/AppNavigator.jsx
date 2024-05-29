@@ -53,7 +53,7 @@ import AssetsMvcFtDetailPage from "../page/home/AssetsMvcFtDetailPage";
 import SendMvcFtPage from "../page/home/SendMvcFtPage";
 import SendSuccessPage from "@/page/home/SendSuccessPage";
 import PlazaPage from "@/page/PlazaPage";
-import Brc20DetailPage from "@/page/home/Brc20DetailPage";
+import Brc20DetailPage from "@/page/home/BRC20DetailPage";
 
 ////////
 
