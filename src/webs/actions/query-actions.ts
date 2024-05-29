@@ -1,6 +1,6 @@
 // import * as IsConnected from '../lib/actions/is-connected'
 // import * as Listen from '../lib/actions/listen'
-import * as GetAddress from '../lib/actions/get-address'
+import * as GetAddress from './lib/query/get-address'
 // import * as GetUtxos from '../lib/actions/get-utxos'
 // import * as GetPublicKey from '../lib/actions/get-public-key'
 // import * as GetXPublicKey from '../lib/actions/get-extended-public-key'

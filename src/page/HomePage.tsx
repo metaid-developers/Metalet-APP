@@ -85,7 +85,7 @@ import {
 import { caculateMvcAndBtcAssert } from "../utils/AssertUtils";
 import { ShowBalance } from "../api/type/Balance";
 import useWalletManager from "@/hooks/useWalletManager";
-import useNetworkStore from "@/store/useNetworkStore";
+import useNetworkStore from "@/stores/useNetworkStore";
 
 // import RNFS from "react-native-fs";
 
@@ -143,7 +143,6 @@ export default function HomePage({ navigation }) {
     initWalletManager,
     getCurrentChainWallet,
   } = useWalletManager();
-  useWalletManager();
 
   useEffect(() => {
     // console.log("HomePage useEffect");

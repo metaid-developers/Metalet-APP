@@ -25,7 +25,7 @@ import {
   fetchMvcActivityComfird,
 } from "../../api/metaletservice";
 // import useNetworkManager from "@/hooks/useNetworkManager";
-import useNetworkStore from "@/store/useNetworkStore";
+import useNetworkStore from "@/stores/useNetworkStore";
 import { useData } from "../../hooks/MyProvider";
 import * as Clipboard from "expo-clipboard";
 import { formatTime } from "../../utils/MetaFunUiils";
