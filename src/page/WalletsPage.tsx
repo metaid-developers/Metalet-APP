@@ -32,10 +32,10 @@ import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 import {
   getCurrentAccountID,
   getRandomID,
+  getStorageWallets,
   getWalletBeans,
   setCurrentAccountID,
   setCurrentWalletID,
-  getStorageWallets
 } from "../utils/WalletUtils";
 
 export default function WalletsPage() {
