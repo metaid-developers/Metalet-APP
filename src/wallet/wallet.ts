@@ -9,13 +9,13 @@ import { wordlist } from "@scure/bip39/wordlists/english";
 import { getRandomColorList } from "../utils/MetaFunUiils";
 
 // READY
-// export const btc_network = "mainnet";
-// export const net_network = "livenet";
+export const btc_network = "mainnet";
+export const net_network = "livenet";
 
 
 
-export const btc_network = "testnet";
-export const net_network = "testnet";
+// export const btc_network = "testnet";
+// export const net_network = "testnet";
 
 
 

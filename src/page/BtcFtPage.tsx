@@ -4,6 +4,7 @@ import {
   FlatList,
   TouchableWithoutFeedback,
   StyleSheet,
+  ListRenderItem,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -17,7 +18,8 @@ import { BTC_FT_URL, get } from "../utils/Api";
 import { useData } from "../hooks/MyProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
-import { btc_network } from "../wallet/wallet";
+import { btc_network, getCurrentBtcWallet } from "../wallet/wallet";
+import { navigate } from "@/base/NavigationService";
 
 export default function BtcFtPage() {
   let [btcFtList, setBtcFtList] = useState<BtcFtBean[]>([]);
@@ -29,28 +31,29 @@ export default function BtcFtPage() {
   const { netWork, updateNetWork } = useData();
 
   // const isFocused = useIsFocused(); // 使用useIsFocused钩子
-
   useEffect(() => {
-    getBtcFtData(btcAddress);
+    refresh();
   }, []);
 
   useEffect(() => {
-    getBtcFtData(btcAddress);
+    refresh();
   }, [btcAddress]);
 
+  useFocusEffect(
+    useCallback(() => {
+      console.log("useFocusEffect  BtcFtPage", { btcAddress });
+      refresh();
+    }, [btcAddress])
+  );
 
-  // useEffect(() => {
-  
-
-  //   // getBtcFtData(btcAddress);
-  // }, [btcAddress]);
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     console.log('地址变化加载中 ',{ btcAddress });
-  //     getBtcFtData(btcAddress);
-  //   }, [btcAddress])
-  // );
+  async function refresh() {
+    if (btcAddress) {
+      getBtcFtData(btcAddress);
+    } else {
+      const mvcWallet = await getCurrentBtcWallet();
+      getBtcFtData(mvcWallet.getAddress());
+    }
+  }
 
   const getBtcFtData = async (address: string) => {
     let params = {
@@ -63,10 +66,9 @@ export default function BtcFtPage() {
     };
 
     let data: RootBtcFtObject = await get(BTC_FT_URL, false, params);
-    
+
     if (data.data != null) {
       if (data.data.list != null) {
-   
         setBtcFtList([...data.data.list]);
       } else {
         setBtcFtList([]);
@@ -76,11 +78,13 @@ export default function BtcFtPage() {
     }
   };
 
-  const ListItem = ({ index, item }) => {
+  const ListItem:React.FC<{index:number;item:BtcFtBean}> = ({ index, item }) => {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          console.log("点击了" + index);
+          // navigate("Brc20DetailPage", {
+          //   brc20: item,
+          // });
         }}
       >
         <View style={styles.flatListStyle}>
@@ -133,9 +137,13 @@ export default function BtcFtPage() {
     );
   };
 
+    // 定义 renderItem 函数
+    const renderItem: ListRenderItem<BtcFtBean> = ({ item, index }) => {
+      return <ListItem item={item} index={index} />;
+    };
+
   return (
     <View style={[metaStyles.varContainer, { backgroundColor: "#fff" }]}>
-
       {btcFtList.length == 0 ? (
         <NoMoreDataView />
       ) : (
@@ -143,7 +151,7 @@ export default function BtcFtPage() {
           data={btcFtList}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
-          renderItem={ListItem}
+          renderItem={renderItem}
         />
       )}
     </View>

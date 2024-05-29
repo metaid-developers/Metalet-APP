@@ -806,8 +806,8 @@ export default function HomePage({ navigation }) {
           style={{ width: 8, height: 6, marginLeft: 5 }}
         />
 
-        <Button onPress={changeNetWork} title={network} />
-        <Button onPress={getWallets} title="getWallets" />
+        {/* <Button onPress={changeNetWork} title={network} />
+        <Button onPress={getWallets} title="getWallets" /> */}
       </View>
 
       <View style={[metaStyles.varContainer, { marginHorizontal: 30 }]}>

@@ -77,3 +77,65 @@ export function toFloorNum(value: number, num: number) {
   const reuslt = Math.floor(value * factor) / factor;
   return reuslt;
 }
+
+
+//btc icon
+export const btcBaseIconUrl="https://www.metalet.space/wallet-api";
+
+
+export function getBtcBrc20Icon(ftName: string) {
+  let iconPic="";
+  console.log("ftName:"+ftName);
+  
+  switch (ftName.toLocaleLowerCase()) {
+    case "bili":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/bili.jpg";
+      break;
+    case "btcs":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/btcs.jpg";
+      break;
+    case "cats":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/cats.jpg";
+      break;
+    case "fish":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/fish.jpg";
+      break;
+    case "grum":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/grum.png";
+      break;
+    case "ibtc":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/ibtc.jpg";
+      break;
+    case "lger":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/lger.jpg";
+      break;
+    case "ordi":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/ordi.svg";
+      break;
+    case "orxc":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/orxc.png";
+      break;
+    case "oxbt":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/oxbt.png";
+      break;
+    case "rats":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/rats.jpg";
+      break;
+    case "rdex":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/rdex.png";
+      break;
+    case "sats":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/sats.jpg";
+      break;
+    case "sayc":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/sayc.jpg";
+      break;
+    case "trac":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/trac.png";
+      break;
+    case "vmpx":
+      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/vmpx.jpg";
+      break;
+  }
+  return iconPic;
+}

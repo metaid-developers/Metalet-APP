@@ -53,6 +53,7 @@ import AssetsMvcFtDetailPage from "../page/home/AssetsMvcFtDetailPage";
 import SendMvcFtPage from "../page/home/SendMvcFtPage";
 import SendSuccessPage from "@/page/home/SendSuccessPage";
 import PlazaPage from "@/page/PlazaPage";
+import Brc20DetailPage from "@/page/home/Brc20DetailPage";
 
 ////////
 
@@ -81,7 +82,7 @@ export default AppNavigator;
 
 const StackNavigator = () => (
   <Stack.Navigator
-    initialRouteName="WebsPage"
+    initialRouteName="SplashPage"
     screenOptions={{ headerShown: false }}
   >
     <Stack.Screen name="ImportWalletPage" component={ImportWalletPage} />
@@ -133,6 +134,7 @@ const StackNavigator = () => (
     />
     <Stack.Screen name="SendMvcFtPage" component={SendMvcFtPage} />
     <Stack.Screen name="SendSuccessPage" component={SendSuccessPage} />
+    <Stack.Screen name="Brc20DetailPage" component={Brc20DetailPage} />
   </Stack.Navigator>
 );
 
@@ -155,7 +157,9 @@ const TabNavigator = () => (
               style={metaStyles.tabImage}
             />
           );
-        } else if (route.name === "PlazaPage") {
+        } 
+
+        else if (route.name === "WebsPage") {
           icon = focused ? (
             <Image
               source={require("../../image/me_plaza_select_tab.png")}
@@ -167,6 +171,19 @@ const TabNavigator = () => (
               style={metaStyles.tabImage}
             />
           );
+        
+        // else if (route.name === "PlazaPage") {
+        //   icon = focused ? (
+        //     <Image
+        //       source={require("../../image/me_plaza_select_tab.png")}
+        //       style={metaStyles.tabImage}
+        //     />
+        //   ) : (
+        //     <Image
+        //       source={require("../../image/me_plaza_normal_tab.png")}
+        //       style={metaStyles.tabImage}
+        //     />
+        //   );
         } else {
           icon = focused ? (
             <Image
@@ -185,7 +202,8 @@ const TabNavigator = () => (
     })}
   >
     <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
-    <Tab.Screen name="PlazaPage" component={PlazaPage} />
+    {/* <Tab.Screen name="PlazaPage" component={PlazaPage} /> */}
+    <Tab.Screen name="WebsPage" component={WebsPage} />
     <Tab.Screen name="SettingsPage" component={SettingsPage} />
   </Tab.Navigator>
 );

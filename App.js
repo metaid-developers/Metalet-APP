@@ -1,6 +1,6 @@
 import "./globals.js";
 import { useEffect } from "react";
-import AppNavigator from "./src/base/AppNavigator";
+import AppNavigator from "./src/base/AppNavigator.jsx";
 import { UserProvider } from "./src/hooks/MyProvider";
 import useWalletManager from "@/hooks/useWalletManager";
 
@@ -14,6 +14,6 @@ export default function App() {
   return (
     <UserProvider>
       <AppNavigator />
-    </UserProvider>
+    </UserProvider> 
   );
 }

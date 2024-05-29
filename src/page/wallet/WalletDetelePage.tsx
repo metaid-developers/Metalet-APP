@@ -11,7 +11,7 @@ import {
   TitleBar,
   VerifyModal,
 } from "../../constant/Widget";
-import {  wallets_key } from "../../utils/AsyncStorageUtil";
+import {  wallets_key ,createStorage} from "../../utils/AsyncStorageUtil";
 import { navigate } from "../../base/NavigationService";
 import { eventBus, refreshHomeLoadingEvent } from "../../utils/EventBus";
 import { getStorageWallets } from "../../utils/WalletUtils";
@@ -22,6 +22,7 @@ export default function WalletDetelePage({ route }) {
   const [isDelete, setIsDelete] = useState(false);
 
   const { postion } = route.params;
+  const storage = createStorage();
 
   async function deleteWallet() {
     await getStorageWallets().then(async (wallets) => {
