@@ -84,7 +84,7 @@ const useWalletManager = () => {
 
         setCurrentWallet({ btcWallet, mvcWallet });
 
-        console.log("load mvc wallet", mvcWallet.getAddress());
+        console.log("load mvc wallet", network, mvcWallet.getAddress());
 
         // const t4 = performance.now();
         // console.log("walletManager", t4 - t3);

@@ -1,4 +1,5 @@
 import { createStorage, CurrentAccountIDKey } from "@/utils/AsyncStorageUtil";
+import { Chain } from "@metalet/utxo-wallet-service";
 
 const storage = createStorage();
 

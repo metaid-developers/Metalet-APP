@@ -15,18 +15,18 @@ import {
 } from "react-native";
 
 interface Message {
-  params: Record<string, unknown>;
-  channel: "to-metaidwallet";
   host: string;
-  nonce: string;
-  action: `${string}-${actionType}`;
   icon: string;
+  nonce: string;
+  channel: "to-metaidwallet";
+  params: Record<string, unknown>;
+  action: `${string}-${actionType}`;
 }
 
 export default function WebsPage() {
   const [icon, setIcon] = useState("");
   const [host, setHost] = useState("");
-  const [actionName, setActionName] = useState("");
+  const [actionMsg, setActionMsg] = useState<Message>();
   const [modalVisible, setModalVisible] = useState(false);
 
   const webViewRef = useRef(null);
@@ -38,14 +38,18 @@ export default function WebsPage() {
   const handlerMessage = async (message: Message) => {
     console.log(message);
     const [actionName, actionType] = message.action.split("-");
+    if (actionName === "Connect") {
+      message.params.icon = message.icon;
+    }
+    setActionMsg(message);
+
     if (actionType === "authorize") {
       setModalVisible(true);
       setIcon(message.icon);
       setHost(message.host);
-      setActionName(actionName);
     } else {
       const { process } = actionDispatcher(message.action);
-      const data = await process();
+      const data = await process(message.params, message.host);
       postMessage(
         JSON.stringify({
           data,
@@ -58,14 +62,24 @@ export default function WebsPage() {
   const cancelAction = async () => {
     postMessage(
       JSON.stringify({
-        status: "canceled",
+        nonce: actionMsg.nonce,
+        data: {
+          status: "canceled",
+        },
       })
     );
     setModalVisible(false);
   };
 
   const confirmAction = async () => {
-    postMessage("Confirm Action");
+    const { process } = actionDispatcher(actionMsg.action);
+    const data = await process(actionMsg.params, actionMsg.host);
+    postMessage(
+      JSON.stringify({
+        data,
+        nonce: actionMsg.nonce,
+      })
+    );
     setModalVisible(false);
   };
 
@@ -97,7 +111,7 @@ export default function WebsPage() {
           </Text>
 
           <View className="grow overflow-y-auto rounded-lg bg-gray-50 px-4 py-6 text-sm w-full">
-            <Text>{actionName}</Text>
+            <Text>{JSON.stringify(actionMsg)}</Text>
           </View>
 
           <View className="flex flex-row items-center justify-center pt-6 pb-12 w-full gap-2">

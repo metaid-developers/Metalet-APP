@@ -1,10 +1,10 @@
-import useWalletStore from "@/stores/useWalletStore";
+import { getCurrentWallet } from "@/lib/wallet";
+import { Chain } from "@metalet/utxo-wallet-service";
 
 export async function process() {
-  if (!useWalletStore.getState().mvcWallet) {
-    return {
-      error: "MVC Wallet is not initialized.",
-    };
+  try {
+    return getCurrentWallet(Chain.MVC).getAddress();
+  } catch (error) {
+    return { error: error.message };
   }
-  return useWalletStore.getState().mvcWallet.getAddress();
 }
