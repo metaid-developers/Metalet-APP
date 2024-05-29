@@ -14,7 +14,7 @@ export default function MvcNftDetailPage({ route }) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <TitleBar />
-      <View style={[metaStyles.verMarginContainer,{marginBottom:20}]}>
+      <View style={[metaStyles.verMarginContainer, { marginBottom: 20 }]}>
         <View style={{ alignItems: "center", alignContent: "center" }}>
           <Image
             source={{ uri: imgNftUrl }}
@@ -24,7 +24,7 @@ export default function MvcNftDetailPage({ route }) {
 
         <View>
           <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
-            Web 先锋徽章
+            {myObject.nftName}
           </Text>
 
           <View style={{ flexDirection: "row", marginTop: 5 }}>
@@ -55,7 +55,7 @@ export default function MvcNftDetailPage({ route }) {
               style={{
                 flexDirection: "row",
                 marginTop: 10,
-                backgroundColor: "rgba(23, 26, 255, 0.5)",
+                backgroundColor: "rgba(23, 26, 255, 0.3)",
                 padding: 3,
                 width: 85,
                 alignItems: "center",
@@ -88,8 +88,10 @@ export default function MvcNftDetailPage({ route }) {
             justifyContent: "space-between",
           }}
         >
-          <Text style={{color:'#666666',fontSize:15}}>Cteator: </Text>
-          <Text style={{color:'#333333',fontSize:15}}>{myObject.nftIssuer!} </Text>
+          <Text style={{ color: "#666666", fontSize: 15 }}>Cteator: </Text>
+          <Text style={{ color: "#333333", fontSize: 15 }}>
+            {myObject.nftIssuer!}{" "}
+          </Text>
         </View>
         <View
           style={{
@@ -98,8 +100,10 @@ export default function MvcNftDetailPage({ route }) {
             justifyContent: "space-between",
           }}
         >
-          <Text style={{color:'#666666',fontSize:15}}>Token Index: </Text>
-          <Text style={{color:'#333333',fontSize:15}}>{myObject.nftTokenIndex!} </Text>
+          <Text style={{ color: "#666666", fontSize: 15 }}>Token Index: </Text>
+          <Text style={{ color: "#333333", fontSize: 15 }}>
+            {myObject.nftTokenIndex!}{" "}
+          </Text>
         </View>
         <View
           style={{
@@ -108,8 +112,21 @@ export default function MvcNftDetailPage({ route }) {
             justifyContent: "space-between",
           }}
         >
-          <Text style={{color:'#666666',fontSize:15}}>Seriers Genesis: </Text>
-          <Text numberOfLines={1} ellipsizeMode='middle' style={{color:'#333333',fontSize:15,marginHorizontal:30,paddingRight:60}  }>{myObject.nftGenesis!} </Text>
+          <Text style={{ color: "#666666", fontSize: 15 }}>
+            Seriers Genesis:{" "}
+          </Text>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="middle"
+            style={{
+              color: "#333333",
+              fontSize: 15,
+              marginHorizontal: 30,
+              paddingRight: 60,
+            }}
+          >
+            {myObject.nftGenesis!}{" "}
+          </Text>
         </View>
         <View
           style={{
@@ -118,16 +135,22 @@ export default function MvcNftDetailPage({ route }) {
             justifyContent: "space-between",
           }}
         >
-          <Text style={{color:'#666666',fontSize:15}}>Last Activity At: </Text>
-          <Text style={{color:'#333333',fontSize:15}}>{formatTime(myObject.nftTimestamp!)} </Text>
+          <Text style={{ color: "#666666", fontSize: 15 }}>
+            Last Activity At:{" "}
+          </Text>
+          <Text style={{ color: "#333333", fontSize: 15 }}>
+            {formatTime(myObject.nftTimestamp!)}{" "}
+          </Text>
         </View>
 
-       <View style={{flex:1}}/>
-       <RoundSimButton title="Transfers" event={()=>{
-        navigate('TransferMvcNftPage',{myObject:myObject})
-
-        }}  textColor="#fff"  />
-
+        <View style={{ flex: 1 }} />
+        <RoundSimButton
+          title="Transfers"
+          event={() => {
+            navigate("TransferMvcNftPage", { myObject: myObject });
+          }}
+          textColor="#fff"
+        />
       </View>
     </SafeAreaView>
   );

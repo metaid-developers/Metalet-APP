@@ -9,7 +9,7 @@ export type WalletBean = {
 
   //dev
   isOpen: boolean;
-  addressTpye: AddressType;
+  addressType: AddressType;
   //钱包助记词是否备份
   isBackUp: boolean;
   //当前钱包选中的account 对应 addressIndex

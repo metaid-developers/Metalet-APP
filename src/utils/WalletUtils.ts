@@ -7,15 +7,15 @@ import {
   wallet_password_key,
   wallets_key,
   createStorage,
-  Storage,
+  network_btc,
 } from "./AsyncStorageUtil";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { removeTrailingZeros } from "./StringUtils";
 import { fetchMvcFtPrice } from "../api/metaletservice";
 import { MvcFtData } from "../api/type/MvcFtData";
+import { Linking } from "react-native";
 
 const storage = createStorage();
-
 
 //storage
 export async function getCurrentWalletID(): Promise<string> {
@@ -119,21 +119,18 @@ export async function verifyPassword(password: string): Promise<boolean> {
   }
 }
 
-// fuction
-
-
-//change
+/////////////change
 export async function changeCurrentWalletAddressType(
   changeAddressType: AddressType
 ) {
   const wallets: WalletBean[] = await getWalletBeans();
   const walletID = await getCurrentWalletID();
   const wallet = wallets.find((wallet) => wallet.id == walletID);
-  wallet.addressTpye = changeAddressType;
+  wallet.addressType = changeAddressType;
   await storage.set(wallets_key, [...wallets, wallet]);
 }
 
-//utils
+///////////utils
 export function parseToSpace(space: string) {
   return (parseFloat(space) / 100000000).toFixed(8);
 }
@@ -146,9 +143,44 @@ export function getRandomID() {
   return Math.random().toString(36).substr(2, 8);
 }
 
-export function formatToDecimal(amount, precision) {
+//sat to space
+export function formatToDecimal(amount: number, precision: number) {
   // 将整数转换为浮点数并除以10的精度次方
   const divisor = Math.pow(10, precision);
   const formattedAmount = (amount / divisor).toFixed(precision);
   return removeTrailingZeros(formattedAmount);
+}
+
+//space to sat
+export function caculateToSatDecimal(amount: number, precision: number) {
+  const divisor = Math.pow(10, precision);
+  const formattedAmount = (amount * divisor).toFixed(precision);
+  return removeTrailingZeros(formattedAmount);
+}
+
+/////////// fuction
+export async function goToWebScan(chain: string, linkTx: string,network:string) {
+  let url;
+  if (chain == "mvc") {
+    url = "https://www.mvcscan.com/tx/" + linkTx;
+  } else if (chain == "btc") {
+    if (network == "testnet") {
+      url = "https://mempool.space/zh/tx/" + linkTx;
+    } else {
+      url = "https://mempool.space/tx/" + linkTx;
+    }
+  }
+
+
+  console.log("url",url);
+  
+  if(url){
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      console.log(`Don't know how to open this URL: ${url}`);
+    }
+  }
+
 }

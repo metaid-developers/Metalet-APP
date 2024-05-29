@@ -87,7 +87,7 @@ export default function SplashPage(props) {
     //             network: btc_network,
     //             mnemonic: wallet.mnemonic,
     //             addressIndex: account.addressIndex,
-    //             addressType: wallet.addressTpye,
+    //             addressType: wallet.addressType,
     //             //选中跟mvc 路径一致
     //             coinType: wallet.mvcTypes,
     //             seed,

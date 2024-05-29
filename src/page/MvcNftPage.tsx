@@ -35,16 +35,14 @@ export default function MvcNftPage(props) {
   }
 
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //    console.log("MvcNftPage  useFocusEffect :"+mvcAddress);
-  //   setTimeout(() => {
-  //     getMvcNft(mvcAddress);
-  //   }, 1000)
-  //   // nftList.splice(2,1)
-  //   // setNftList([...nftList])
-  //   }, [])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+    //  console.log("MvcNftPage  useFocusEffect :"+mvcAddress);
+     refresh()
+    // nftList.splice(2,1)
+    // setNftList([...nftList])
+    }, [])
+  );
 
   async function getMvcNft(address:string) {
 

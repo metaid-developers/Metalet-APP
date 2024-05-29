@@ -50,6 +50,9 @@ import SendBtcSuccessPage from "../page/home/SendBtcSuccessPage";
 import SendSpaceSuccessPage from "../page/home/SendSpaceSuccessPage";
 import SetPasswordPage from "../page/safe/SetPasswordPage";
 import AssetsMvcFtDetailPage from "../page/home/AssetsMvcFtDetailPage";
+import SendMvcFtPage from "../page/home/SendMvcFtPage";
+import SendSuccessPage from "@/page/home/SendSuccessPage";
+import PlazaPage from "@/page/PlazaPage";
 
 ////////
 
@@ -85,7 +88,11 @@ const StackNavigator = () => (
     <Stack.Screen name="SplashPage" component={SplashPage} />
     <Stack.Screen name="WelcomeWalletPage" component={WelcomeWalletPage} />
     <Stack.Screen name="CongratulationsPage" component={CongratulationsPage} />
-    <Stack.Screen name="Tabs" component={TabNavigator} options={{ unmountOnBlur: false }} />
+    <Stack.Screen
+      name="Tabs"
+      component={TabNavigator}
+      options={{ unmountOnBlur: false }}
+    />
     <Stack.Screen name="MvcNftListPage" component={MvcNftListPage} />
     <Stack.Screen name="MvcNftDetailPage" component={MvcNftDetailPage} />
     <Stack.Screen name="TransferMvcNftPage" component={TransferMvcNftPage} />
@@ -93,7 +100,10 @@ const StackNavigator = () => (
     <Stack.Screen name="AddWalletPage" component={AddWalletPage} />
     <Stack.Screen name="WalletDetailPage" component={WalletDetailPage} />
     <Stack.Screen name="WalletDetelePage" component={WalletDetelePage} />
-    <Stack.Screen name="WalletAccountDetailPage" component={WalletAccountDetailPage} />
+    <Stack.Screen
+      name="WalletAccountDetailPage"
+      component={WalletAccountDetailPage}
+    />
     <Stack.Screen name="AccountAddressPage" component={AccountAddressPage} />
     <Stack.Screen name="NetWorkPage" component={NetWorkPage} />
     <Stack.Screen name="SelectReceivePage" component={SelectReceivePage} />
@@ -103,18 +113,26 @@ const StackNavigator = () => (
     <Stack.Screen name="WebsPage" component={WebsPage} />
     <Stack.Screen name="AssetsMvcDetailPage" component={AssetsMvcDetailPage} />
     <Stack.Screen name="AssetsBtcDetailPage" component={AssetsBtcDetailPage} />
-    <Stack.Screen name="SendSelectAssertPage" component={SendSelectAssertPage} />
+    <Stack.Screen
+      name="SendSelectAssertPage"
+      component={SendSelectAssertPage}
+    />
     <Stack.Screen name="PasswordPage" component={PasswordPage} />
     <Stack.Screen name="SendSpacePage" component={SendSpacePage} />
     <Stack.Screen name="SendBtcPage" component={SendBtcPage} />
     <Stack.Screen name="SendBtcConfirmPage" component={SendBtcConfirmPage} />
     <Stack.Screen name="SendBtcSuccessPage" component={SendBtcSuccessPage} />
-    <Stack.Screen name="SendSpaceSuccessPage" component={SendSpaceSuccessPage} />
+    <Stack.Screen
+      name="SendSpaceSuccessPage"
+      component={SendSpaceSuccessPage}
+    />
     <Stack.Screen name="SetPasswordPage" component={SetPasswordPage} />
-    <Stack.Screen name="AssetsMvcFtDetailPage" component={AssetsMvcFtDetailPage} />
-
-
-
+    <Stack.Screen
+      name="AssetsMvcFtDetailPage"
+      component={AssetsMvcFtDetailPage}
+    />
+    <Stack.Screen name="SendMvcFtPage" component={SendMvcFtPage} />
+    <Stack.Screen name="SendSuccessPage" component={SendSuccessPage} />
   </Stack.Navigator>
 );
 
@@ -137,6 +155,18 @@ const TabNavigator = () => (
               style={metaStyles.tabImage}
             />
           );
+        } else if (route.name === "PlazaPage") {
+          icon = focused ? (
+            <Image
+              source={require("../../image/me_plaza_select_tab.png")}
+              style={metaStyles.tabImage}
+            />
+          ) : (
+            <Image
+              source={require("../../image/me_plaza_normal_tab.png")}
+              style={metaStyles.tabImage}
+            />
+          );
         } else {
           icon = focused ? (
             <Image
@@ -155,6 +185,7 @@ const TabNavigator = () => (
     })}
   >
     <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
+    <Tab.Screen name="PlazaPage" component={PlazaPage} />
     <Tab.Screen name="SettingsPage" component={SettingsPage} />
   </Tab.Navigator>
 );

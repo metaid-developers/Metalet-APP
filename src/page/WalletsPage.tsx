@@ -32,6 +32,7 @@ import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 import {
   getCurrentAccountID,
   getRandomID,
+  getStorageWallets,
   getWalletBeans,
   setCurrentAccountID,
   setCurrentWalletID,
@@ -131,7 +132,7 @@ export default function WalletsPage() {
       await setCurrentAccountID(newAccount.id);
       await setCurrentWalletID(nowWallet.id);
 
-      await AsyncStorageUtil.updateItem(wallets_key, wallets);
+      await storage.set(wallets_key, wallets);
       getWalletData();
       updateNeedInitWallet(getRandomID())
       eventBus.publish(refreshHomeLoadingEvent, { data: "" });
@@ -144,9 +145,9 @@ export default function WalletsPage() {
     walletIndex: number,
     accountIndex: number
   ) {
-    console.log("updataSelectAccount", walletIndex, accountIndex);
-
-    await AsyncStorageUtil.getItem(wallets_key).then(async (wallets) => {
+   
+    const wallets= await getStorageWallets();
+    // await getStorageWallets().then(async (wallets) => {
       // wallets.forEach((wallet) => {
       //   wallet.accountsOptions.forEach((account) => {
       //     account.isSelect = false;
@@ -160,7 +161,9 @@ export default function WalletsPage() {
       await setCurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
       await setCurrentWalletID(nowWallet.id);
       updateMyWallet(nowWallet);
-      await AsyncStorageUtil.updateItem(wallets_key, wallets);
+      console.log("nowWallet", JSON.stringify(wallets));
+      
+      await storage.set(wallets_key, wallets);
       getWalletData();
       navigate("Tabs");
       updateNeedInitWallet(getRandomID())
@@ -168,7 +171,7 @@ export default function WalletsPage() {
       eventBus.publish(refreshHomeLoadingEvent, { data: "" });
 
       // chooseMyWallet(nowWallet);
-    });
+    // });
   }
 
   //是否展开钱包

@@ -207,6 +207,7 @@ export default function HomePage({ navigation }) {
   const getShowBalance = async () => {
     const nowMvcWallet=await getCurrentMvcWallet();
     const nowBtcWallet=await getCurrentBtcWallet();
+    
     const showbalance: ShowBalance = await caculateMvcAndBtcAssert(
       nowMvcWallet.getAddress(),
       nowBtcWallet.getAddress()
@@ -367,16 +368,16 @@ export default function HomePage({ navigation }) {
     //         network: btc_network,
     //         mnemonic: myWallet.mnemonic,
     //         addressIndex: account.addressIndex,
-    //         addressType: wallet.addressTpye,
+    //         addressType: wallet.addressType,
     //         coinType:
-    //           wallet.addressTpye == AddressType.SameAsMvc
+    //           wallet.addressType == AddressType.SameAsMvc
     //             ? wallet.mvcTypes
     //             : CoinType.BTC,
     //         seed,
     //       });
     //       updateMvcAddress(mvcWallet.getAddress());
     //       updateBtcAddress(nowBtcWallet.getAddress());
-    //       console.log(wallet.addressTpye);
+    //       console.log(wallet.addressType);
 
     //       console.log("updateBtcAddress" + nowBtcWallet.getAddress());
 
@@ -1035,7 +1036,9 @@ export default function HomePage({ navigation }) {
               // navigate("WebPageTest");
               // navigate("WebPage");
 
-              AsyncStorageUtil.clear();
+              // AsyncStorageUtil.clear();
+              await AsyncStorage.clear();
+ 
             }}
           >
             <View style={{ marginTop: 20 }}>

@@ -16,7 +16,11 @@ import {
 import { goBack, navigate } from "../../base/NavigationService";
 import { metaStyles, themeColor } from "../../constant/Constants";
 import { MvcActivityRecord } from "../../types/mvcrecord";
-import { fetchMvcActivityComfird, fetchMvcFtPrice, fetchMvcFtRecord } from "../../api/metaletservice";
+import {
+  fetchMvcActivityComfird,
+  fetchMvcFtPrice,
+  fetchMvcFtRecord,
+} from "../../api/metaletservice";
 import { useData } from "../../hooks/MyProvider";
 import * as Clipboard from "expo-clipboard";
 import { formatTime } from "../../utils/MetaFunUiils";
@@ -28,9 +32,7 @@ import { caculateOneFtValue } from "../../utils/AssertUtils";
 
 export default function AssetsMvcFtDetailPage({ route }) {
   const { mvcFtData } = route.params;
-  const [mvcActivityList, setMvcActivityList] = useState<MvcFtRecordData[]>(
-    []
-  );
+  const [mvcActivityList, setMvcActivityList] = useState<MvcFtRecordData[]>([]);
   const { mvcAddress, updateMvcAddress } = useData();
   const [noticeContent, setNoticeContent] = useState("Successful");
   const [isShowNotice, setIsShowNotice] = useState(false);
@@ -38,10 +40,9 @@ export default function AssetsMvcFtDetailPage({ route }) {
 
   const [assertOneFt, setOneFtAssert] = useState("0.0");
 
-  
   useEffect(() => {
     console.log(mvcFtData);
-    
+
     getActivityList();
   }, []);
 
@@ -49,14 +50,15 @@ export default function AssetsMvcFtDetailPage({ route }) {
     const ftPriceData = await fetchMvcFtPrice();
     const assertFt = caculateOneFtValue([mvcFtData], ftPriceData);
     setOneFtAssert(assertFt);
-    
-    let mvcActivityListData = await fetchMvcFtRecord(mvcAddress, mvcFtData.genesis,mvcFtData.codeHash);
+
+    let mvcActivityListData = await fetchMvcFtRecord(
+      mvcAddress,
+      mvcFtData.genesis,
+      mvcFtData.codeHash
+    );
     // console.log(mvcActivityListData);
-    
 
     if (mvcActivityListData.length == 0) {
-      console.log("mvcActivityListData.length == 0");
-      
       let record: MvcFtRecordData = {
         flag: "1",
         address: "1",
@@ -66,7 +68,7 @@ export default function AssetsMvcFtDetailPage({ route }) {
         outcome: 1,
         txid: "",
         codeHash: "",
-        genesis: ""
+        genesis: "",
       };
       setMvcActivityList([...mvcActivityListData, record]);
     } else {
@@ -88,7 +90,9 @@ export default function AssetsMvcFtDetailPage({ route }) {
     let recordMoney;
     let showAmount;
     recordMoney = item.income - item.outcome;
-    showAmount = (recordMoney / 100000000).toFixed(8);
+    // showAmount = (recordMoney / 100000000).toFixed(8);
+
+    showAmount = formatToDecimal(recordMoney, parseFloat(mvcFtData.decimal));
 
     if (recordMoney > 0) {
       isIncome = true;
@@ -96,7 +100,12 @@ export default function AssetsMvcFtDetailPage({ route }) {
       isIncome = false;
     }
 
-  
+    let ImageUrl = getIconUri({
+      type: "metaContract",
+      codehash: mvcFtData.codeHash,
+      genesis: mvcFtData.genesis,
+    });
+
     return (
       <View>
         {item.address != "1" ? (
@@ -114,66 +123,144 @@ export default function AssetsMvcFtDetailPage({ route }) {
             {isIncome ? (
               <View>
                 <Image
-                source={require("../../../image/assert_mvcrecord_receive_icon.png")}
-                style={{ width: 35, height: 35 }}
-              />
+                  source={require("../../../image/record_type_in.png")}
+                  style={{ width: 35, height: 35 }}
+                />
+                {/* {mvcFtData.imageError ? (
+                  <View>
+                    <CircleAvatarLetter
+                      letterStr={mvcFtData.name.substring(0, 1)}
+                    />
+                    <Image
+                      source={require("../../../image/record_type_in.png")}
+                      style={{ width: 5, height: 5 }}
+                    />
+                  </View>
+                ) : (
+
+                  <Image
+                  source={require("../../../image/record_type_in.png")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                  }}
+                />
+                  // <View
+                  //   style={{
+                  //     width: 50,
+                  //     height: 50,
+                  //     borderRadius: 50,
+                  //     overflow: "hidden",
+                  //   }}
+                  // >
+                  //   <Image
+                  //     style={{ width: "100%", height: "100%" }}
+                  //     source={{ uri: ImageUrl }}
+                  //     onError={() => {}}
+                  //   />
+                  //   <Image
+                  //     source={require("../../../image/record_type_in.png")}
+                  //     style={{
+                  //       position: "absolute",
+                  //       width: 5,
+                  //       height: 5,
+                  //       bottom: 10,
+                  //       right: 0,
+                  //     }}
+                  //   />
+                  // </View>
+
+                  // <View>
+                  //   <Image
+                  //     style={{ width: 50, height: 50 }}
+                  //     source={{ uri: ImageUrl }}
+                  //     onError={() => {}}
+                  //   />
+
+                  //   <Image
+                  //     source={require("../../../image/record_type_in.png")}
+                  //     style={{
+                  //       position: "absolute",
+                  //       width: 5,
+                  //       height: 5,
+                  //       bottom: 0,
+                  //       right: 0,
+                  //     }}
+                  //   />
+                  // </View>
+                )} */}
               </View>
             ) : (
+              // <Image
+              //   source={require("../../../image/assert_mvcrecord_send_icon.png")}
+              //   style={{ width: 35, height: 35 }}
+              // />
               <Image
-                source={require("../../../image/assert_mvcrecord_send_icon.png")}
-                style={{ width: 35, height: 35 }}
+                source={require("../../../image/record_type_out.png")}
+                style={{
+                  width: 35,
+                  height: 35,
+                }}
               />
             )}
 
-            <View style={{ marginLeft: 10 }}>
-              <Text
-                style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
-              >
-                {isIncome ? "Receive" : "Send"}
-              </Text>
-              <Text style={metaStyles.grayTextSmall66}>
-                {formatTime(item.time)}
-              </Text>
-            </View>
+            <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, marginLeft: 10, flexDirection: "row" }}>
+                <Text
+                  style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
+                >
+                  {isIncome ? "Receive" : "Send"}
+                </Text>
+                <View style={{ flex: 1 }} />
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: isIncome ? "green" : "red",
+                    marginBottom: 10,
+                    // textAlign: "right",
+                  }}
+                >
+                  {isIncome ? "+" + showAmount : showAmount}{" "}
+                  {mvcFtData.symbol.toString().toUpperCase()}
+                </Text>
+              </View>
 
-            <View style={{ flex: 1 }} />
-            <View style={{ marginLeft: 10, marginRight: 10 }}>
-              <Text
-                numberOfLines={2}
-                ellipsizeMode="tail"
+              <View
                 style={{
-                  fontSize: 16,
-                  color: isIncome ? "green" : "red",
-                  marginBottom: 10,
-                  textAlign: "right",
+                  flex: 1,
+                  marginLeft: 10,
+
+                  alignItems: "flex-end",
                 }}
               >
-                {isIncome ? "+" + showAmount : showAmount}
-              </Text>
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    ShowNotice(item.txid);
+                  }}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={metaStyles.grayTextSmall66}>
+                      {formatTime(item.time)}
+                    </Text>
+                    <View style={{ flex: 1 }} />
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="middle"
+                      style={[
+                        metaStyles.grayTextSmall66,
+                        { textAlign: "right", width: 100 },
+                      ]}
+                    >
+                      {item.txid}
+                    </Text>
 
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  ShowNotice(item.txid);
-                }}
-              >
-                <View style={{ flexDirection: "row" }}>
-                  <Text
-                    numberOfLines={1}
-                    ellipsizeMode="middle"
-                    style={[
-                      metaStyles.grayTextSmall66,
-                      { textAlign: "right", width: 100 },
-                    ]}
-                  >
-                    {item.txid}
-                  </Text>
-
-                  <Image
-                    source={require("../../../image/meta_copy_icon.png")}
-                    style={{ width: 15, height: 15, marginLeft: 5 }}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
+                    <Image
+                      source={require("../../../image/meta_copy_icon.png")}
+                      style={{ width: 15, height: 15, marginLeft: 5 }}
+                    />
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
             </View>
           </View>
         ) : (
@@ -188,7 +275,7 @@ export default function AssetsMvcFtDetailPage({ route }) {
           >
             <Image
               source={require("../../../image/assert_record_nodata_icon.png")}
-              style={{ width: 38, height: 53,marginTop: 100  }}
+              style={{ width: 38, height: 53, marginTop: 100 }}
             />
 
             <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
@@ -200,10 +287,7 @@ export default function AssetsMvcFtDetailPage({ route }) {
     );
   };
 
-
   const ListHeader = () => {
-   
-
     let ImageUrl = getIconUri({
       type: "metaContract",
       codehash: mvcFtData.codeHash,
@@ -222,15 +306,15 @@ export default function AssetsMvcFtDetailPage({ route }) {
         }}
       >
         {mvcFtData.imageError ? (
-            <CircleAvatarLetter letterStr={mvcFtData.name.substring(0, 1)} />
-          ) : (
-            <CircleAvatar
-              imageUrl={ImageUrl}
-              event={() => {
-                // refreshData(mvcFtData.txid);
-              }}
-            />
-          )}
+          <CircleAvatarLetter letterStr={mvcFtData.name.substring(0, 1)} />
+        ) : (
+          <CircleAvatar
+            imageUrl={ImageUrl}
+            event={() => {
+              // refreshData(mvcFtData.txid);
+            }}
+          />
+        )}
 
         <Text
           style={{
@@ -241,7 +325,8 @@ export default function AssetsMvcFtDetailPage({ route }) {
             fontWeight: "bold",
           }}
         >
-           {formatToDecimal(mvcFtData.confirmed, mvcFtData.decimal)} {mvcFtData.symbol.toUpperCase()}
+          {formatToDecimal(mvcFtData.confirmed, mvcFtData.decimal)}{" "}
+          {mvcFtData.symbol.toUpperCase()}
         </Text>
 
         <Text
@@ -254,7 +339,6 @@ export default function AssetsMvcFtDetailPage({ route }) {
           }}
         >
           ${assertOneFt}
-          
         </Text>
 
         <View
@@ -264,46 +348,49 @@ export default function AssetsMvcFtDetailPage({ route }) {
             alignItems: "center",
           }}
         >
-        
-        <TouchableWithoutFeedback
-        onPress={()=>{
-          navigate("SendSpacePage");
-        }}
-        >
-        <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "#F3F3FF",
-              borderRadius: 30,
-              paddingVertical: 20,
-              paddingHorizontal: 30,
-              alignItems: "center",
-              justifyContent: "center",
-              width: "40%",
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigate("SendMvcFtPage", {
+                mvcFtData: mvcFtData,
+              });
             }}
           >
-            <Image
-              source={require("../../../image/assert_send_icon.png")}
-              style={{ width: 15, height: 15 }}
-            />
-
-            <Text
+            <View
               style={{
-                color: themeColor,
-                textAlign: "center",
-                marginLeft: 10,
-                lineHeight: 20,
-                fontSize: 18,
+                flexDirection: "row",
+                backgroundColor: "#F3F3FF",
+                borderRadius: 30,
+                paddingVertical: 20,
+                paddingHorizontal: 30,
+                alignItems: "center",
+                justifyContent: "center",
+                width: "40%",
               }}
             >
-              Send
-            </Text>
-          </View>
-        </TouchableWithoutFeedback>
+              <Image
+                source={require("../../../image/assert_send_icon.png")}
+                style={{ width: 15, height: 15 }}
+              />
 
-          <TouchableWithoutFeedback onPress={() => {
-            navigate('ReceivePage',{myCoinType:'SPACE'})
-          }}>
+              <Text
+                style={{
+                  color: themeColor,
+                  textAlign: "center",
+                  marginLeft: 10,
+                  lineHeight: 20,
+                  fontSize: 18,
+                }}
+              >
+                Send
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
+
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigate("ReceivePage", { myCoinType: "SPACE" });
+            }}
+          >
             <View
               style={{
                 flexDirection: "row",

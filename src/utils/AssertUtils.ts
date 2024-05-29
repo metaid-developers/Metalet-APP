@@ -72,7 +72,7 @@ export async function caculateMvcAndBtcAssert(
 }
 
 //utils
-function toFloorNum(value: number, num: number) {
+export function toFloorNum(value: number, num: number) {
   const factor = Math.pow(10, num);
   const reuslt = Math.floor(value * factor) / factor;
   return reuslt;

@@ -50,6 +50,13 @@ export default function MvcFtPage() {
     refresh();
   }, [mvcAddress]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log("MvcFtPage  useFocusEffect :" + mvcAddress);
+      refresh();
+    }, [])
+  );
+
   async function refresh() {
     if (mvcAddress) {
       getMvcFtData(mvcAddress);
@@ -129,7 +136,6 @@ export default function MvcFtPage() {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          
           navigate("AssetsMvcFtDetailPage", {
             mvcFtData: item,
           });

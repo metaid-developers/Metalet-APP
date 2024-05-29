@@ -6,7 +6,7 @@ import {
   Dimensions,
   StyleSheet,
   TouchableWithoutFeedback,
-  Platform
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { BASE_METALET_URL, get } from "../utils/Api";
@@ -17,12 +17,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TitleBar } from "../constant/Widget";
 import { getShowImageUrl } from "../utils/MetaFunUiils";
-import {navigate} from '../base/NavigationService'
-
+import { navigate } from "../base/NavigationService";
+import { useData } from "@/hooks/MyProvider";
 
 export default function MvcNftListPage({ props, route }) {
   const { myObject } = route.params;
   let [genesisNftList, setGenesisNftList] = useState<MvcGenesisItemBean[]>([]);
+  const { mvcAddress, updateMvcAddress } = useData();
 
   let page = 1;
   let pageSize = 30;
@@ -43,7 +44,7 @@ export default function MvcNftListPage({ props, route }) {
     let url =
       BASE_METALET_URL +
       "/aggregation/v2/app/show/nft/" +
-      "1C2XjqoXHRegJNnmJqGDMt3rbAcrYLX4L9" +
+      mvcAddress +
       "/details";
 
     let data: RootMvcGenesisBeanObject = await get(url, false, params);
@@ -52,22 +53,15 @@ export default function MvcNftListPage({ props, route }) {
     }
 
     try {
-      
-        // const value=await AsyncStorage.getItem('@FlutterSharedPreferences:data');
+      // const value=await AsyncStorage.getItem('@FlutterSharedPreferences:data');
       // console.log('读取的flutter数据信息',value);
       // const filePath = RNFS.DocumentDirectoryPath + "/data.json";
-      // const defaultPath = (Platform.OS === 'ios' ? RNFS.MainBundlePath : RNFS.DocumentDirectoryPath) + '/data'; 
-
-
+      // const defaultPath = (Platform.OS === 'ios' ? RNFS.MainBundlePath : RNFS.DocumentDirectoryPath) + '/data';
       // // 读取文件内容
       // const fileContent = await RNFS.readFile(filePath);
-
       // // 解析 JSON 数据
       // const jsonData = JSON.parse(fileContent);
       // console.log("读取的数据信息", jsonData);
-     
-
-     
     } catch (e) {
       console.log("读取数据信息错误", e);
     }
@@ -77,9 +71,11 @@ export default function MvcNftListPage({ props, route }) {
     let imageUrl = getShowImageUrl(item.nftIcon!);
     // console.log("imageUrl",imageUrl)
     return (
-      <TouchableWithoutFeedback onPress={() => {
-       navigate('MvcNftDetailPage',{myObject:item})
-      }}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          navigate("MvcNftDetailPage", { myObject: item });
+        }}
+      >
         <View style={styles.itemStyle}>
           <Image source={{ uri: imageUrl }} style={styles.detailItemStyle} />
           <Text

@@ -42,7 +42,7 @@ export async function getCurrentMvcWallet():Promise<MvcWallet> {
 
 export async function getCurrentBtcWallet():Promise<BtcWallet> {
     const wallet = await getStorageCurrentWallet();
-    const addressType=wallet.addressTpye;
+    const addressType=wallet.addressType;
     const seed=await getCurrentWalletSeed()
 
     let coinType = addressType === AddressType.SameAsMvc ? wallet.mvcTypes : CoinType.BTC
@@ -87,7 +87,7 @@ export async function getCurrentBtcWallet():Promise<BtcWallet> {
       network: btc_network,
       mnemonic: walletBean.mnemonic,
       addressIndex: walletBean.isCurrentPathIndex,
-      addressType: walletBean.addressTpye,
+      addressType: walletBean.addressType,
       coinType: coinType,
       // seed
     //   coinType: wallet.mvcTypes,
@@ -142,7 +142,7 @@ export async function getCurrentBtcWallet():Promise<BtcWallet> {
       mnemonic,
       mvcTypes: parseInt(mvcPath),
       isOpen: true,
-      addressTpye: wallet_addressType,
+      addressType: wallet_addressType,
       isBackUp: false,
       isCurrentPathIndex: 0,
       seed: "",

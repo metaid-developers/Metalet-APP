@@ -106,7 +106,7 @@ export default function ImportWalletPage(props) {
       mnemonic,
       mvcTypes: parseInt(mvcPath),
       isOpen: true,
-      addressTpye: wallet_addressType,
+      addressType: wallet_addressType,
       isBackUp: false,
       isCurrentPathIndex: 0,
       seed: "",
@@ -125,7 +125,7 @@ export default function ImportWalletPage(props) {
       network: btc_network,
       mnemonic: walletBean.mnemonic,
       addressIndex: walletBean.accountsOptions[0].addressIndex,
-      addressType: walletBean.addressTpye,
+      addressType: walletBean.addressType,
       coinType: CoinType.BTC,
     });
 
@@ -190,7 +190,7 @@ export default function ImportWalletPage(props) {
     //       mnemonic,
     //       mvcTypes,
     //       isOpen: true,
-    //       addressTpye: wallet_addressType,
+    //       addressType: wallet_addressType,
     //       isBackUp: false,
     //       isCurrentPathIndex: 0,
     //       accountsOptions: [
@@ -208,7 +208,7 @@ export default function ImportWalletPage(props) {
     //       network: btc_network,
     //       mnemonic: walletBean.mnemonic,
     //       addressIndex: walletBean.accountsOptions[0].addressIndex,
-    //       addressType: walletBean.addressTpye,
+    //       addressType: walletBean.addressType,
 
     //       //选中跟mvc 路径一致
     //       coinType: walletBean.mvcTypes,
@@ -266,7 +266,7 @@ export default function ImportWalletPage(props) {
     //       mnemonic,
     //       mvcTypes,
     //       isOpen: true,
-    //       addressTpye: wallet_addressType,
+    //       addressType: wallet_addressType,
     //       isBackUp: false,
     //       isCurrentPathIndex: 0,
     //       accountsOptions: [
