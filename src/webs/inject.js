@@ -14,12 +14,14 @@ const generateRandomString = (len) => {
 };
 
 const postMessage = async function (actionName, actionType, params) {
+  const nonce = generateRandomString(16);
+
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
+      nonce,
       params: params || {},
       channel: "to-metaidwallet",
       host: window.location.host,
-      nonce: generateRandomString(16),
       action: actionName + "-" + actionType,
       icon:
         document.querySelector("link[rel='icon']")?.href ||
@@ -31,14 +33,12 @@ const postMessage = async function (actionName, actionType, params) {
   const subscribe = (callback) => {
     const eventListener = (nativeEvent) => {
       try {
-        const data = JSON.parse(nativeEvent.data);
-        if (typeof data === "object") {
-          callback(JSON.parse(nativeEvent.data));
-        } else {
-          callback(nativeEvent.data);
+        const res = JSON.parse(nativeEvent.data);
+        if (typeof res === "object" && res.nonce === nonce) {
+          callback(res.data);
         }
       } catch (e) {
-        callback(nativeEvent.data);
+        console.error("listen error:", e);
       }
     };
 
@@ -50,29 +50,66 @@ const postMessage = async function (actionName, actionType, params) {
 
   return await new Promise((resolve, reject) => {
     subscribe((data) => {
+      if (data.error) {
+        reject(data.error)
+      }
       resolve(data);
     });
   });
 };
 
-window.metaidwallet = {
-  connect: async function () {
-    return await postMessage("Connect", "authorize");
-  },
-  disconnect: async function () {
-    return await postMessage("Disconnect", "authorize");
-  },
-  isConnected: async function () {
-    return await postMessage("IsConnected", "query");
-  },
-  getNetwork: async function () {
-    return await postMessage("GetNetwork", "query");
-  },
-  getAddress: async function (data) {
-    return await postMessage("GetAddress", "query", data);
-  },
-  getPublick: function () {
-    postMessage("getPublick");
-  },
+const actions = {
+  connect: { action: "Connect", type: "authorize" },
+  disconnect: { action: "Disconnect", type: "authorize" },
+  isConnected: { action: "IsConnected", type: "query" },
+  getNetwork: { action: "GetNetwork", type: "query" },
+  switchNetwork: { action: "SwitchNetwork", type: "authorize" },
+  getAddress: { action: "GetAddress", type: "query" },
+  getUtxos: { action: "GetUtxos", type: "query" },
+  getPublicKey: { action: "GetPublicKey", type: "query" },
+  getXPublicKey: { action: "GetXPublicKey", type: "query" },
+  getBalance: { action: "GetBalance", type: "query" },
+  getTokenBalance: { action: "GetTokenBalance", type: "query" },
+  verifySignature: { action: "VerifySignature", type: "query" },
+  previewTransaction: { action: "PreviewTransaction", type: "query" },
 };
-;`;
+
+const metalet = { btc: {} };
+
+Object.keys(actions).forEach((key) => {
+  metalet[key] = async function (params) {
+    const { action, type } = actions[key];
+    return await postMessage(action, type, params);
+  };
+});
+
+const btcKeys = {
+  query: [
+    { name: "getBalance", action: "GetBTCBalance" },
+    { name: "getAddress", action: "GetBTCAddress" },
+    { name: "getAddresType", action: "GetBTCAddressType" },
+    { name: "getPublicKey", action: "GetBTCPublicKey" },
+    { name: "getUtxos", action: "GetBTCUtxos" },
+    { name: "pushPsbt", action: "PushPsbt" },
+    { name: "verifyMessage", action: "BTCVerifyMessage" },
+  ],
+  authorize: [
+    { name: "connect", action: "ConnectBTC" },
+    { name: "signPsbt", action: "SignBTCPsbt" },
+    { name: "signMessage", action: "SignBTCMessage" },
+    { name: "inscribe", action: "Inscribe" },
+    { name: "transfer", action: "BTCTransfer" },
+  ],
+  inscribe: [{ name: "inscribeTransfer", action: "InscribeTransfer" }],
+};
+
+Object.keys(btcKeys).forEach((type) => {
+  btcKeys[type].forEach((item) => {
+    metalet.btc[item.name] = async function (params) {
+      return await postMessage(item.action, type, params);
+    };
+  });
+});
+
+window.metaidwallet = metalet;
+`;

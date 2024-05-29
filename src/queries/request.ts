@@ -1,4 +1,5 @@
 // import { getCredential } from '@/lib/account'
+import { getNetwork } from "@/lib/network";
 import {
   METASV_TESTNET_HOST,
   METASV_HOST,
@@ -10,7 +11,6 @@ import {
   ORDINALS_HOST,
   UNISAT_TESTNET_HOST,
 } from "./hosts";
-import { Net } from "@metalet/utxo-wallet-service";
 
 type OptionParams = Record<string, string | number | undefined>;
 
@@ -93,7 +93,8 @@ export const createApi = (host: string) => {
   };
 };
 
-export const mvcApi = <T>(path: string, network: Net) => {
+export const mvcApi = <T>(path: string) => {
+  const network = getNetwork();
   const metasvHost = network === "mainnet" ? METASV_HOST : METASV_TESTNET_HOST;
   return {
     get: (params?: OptionParams) =>
@@ -117,40 +118,6 @@ export const metaletApi = <T>(path: string) => {
         method: "POST",
         data,
         withCredential: true,
-      }),
-  };
-};
-
-export const metaletApiV2 = <T>(path: string, network: Net) => {
-  if (network === "mainnet") {
-    const metaletHost = `${METALET_HOST}/wallet-api/v2`;
-    return {
-      get: (params?: OptionParams) =>
-        metaletV3Request<T>(`${metaletHost}${path}`, {
-          method: "GET",
-          params,
-          mode: "cors",
-        }),
-      post: (data?: OptionData) =>
-        metaletV3Request<T>(`${metaletHost}${path}`, {
-          method: "POST",
-          data,
-          mode: "cors",
-        }),
-    };
-  }
-  return {
-    get: (params?: OptionParams) =>
-      unisatRequest<T>(`${UNISAT_TESTNET_HOST}${path}`, {
-        method: "GET",
-        params,
-        mode: "cors",
-      }),
-    post: (data?: OptionData) =>
-      unisatRequest<T>(`${UNISAT_TESTNET_HOST}${path}`, {
-        method: "POST",
-        data,
-        mode: "cors",
       }),
   };
 };
@@ -250,7 +217,8 @@ const unisatRequest = <T>(url: string, options: RequestOption): Promise<T> =>
     return data.data;
   });
 
-export const unisatApi = <T>(path: string, network: Net) => {
+export const unisatApi = <T>(path: string) => {
+  const network = getNetwork();
   const unisatHost = network === "mainnet" ? UNISAT_HOST : UNISAT_TESTNET_HOST;
 
   const headers = new Headers();

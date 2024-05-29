@@ -82,7 +82,7 @@ export default AppNavigator;
 
 const StackNavigator = () => (
   <Stack.Navigator
-    initialRouteName="SplashPage"
+    initialRouteName="WebsPage"
     screenOptions={{ headerShown: false }}
   >
     <Stack.Screen name="ImportWalletPage" component={ImportWalletPage} />
