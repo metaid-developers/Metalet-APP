@@ -2,13 +2,8 @@
 // import useStorage from '@/lib/storage'
 // import { type V3Wallet } from './types'
 import { getCurrentAccountId } from "./account";
-import {
-  Chain,
-  MvcWallet,
-  BtcWallet,
-  AddressType,
-  CoinType,
-} from "@metalet/utxo-wallet-service";
+import useWalletStore from "@/stores/useWalletStore";
+import { Chain, AddressType } from "@metalet/utxo-wallet-service";
 
 import { Wallet } from "./types/wallet";
 import {
@@ -265,23 +260,6 @@ export async function getActiveWalletOtherAccounts() {
 //   return !!wallets.length
 // }
 
-// export async function getCurrentWallet(chain: Chain, _addressIndex?: number) {
-//   const network = getNet()
-//   const activeWallet = await getActiveWalletOnlyAccount()
-//   const mnemonic = activeWallet.mnemonic
-//   const addressIndex = _addressIndex ?? activeWallet.accounts[0].addressIndex
-//   const addressType = await getV3AddressTypeStorage(chain)
-//   if (chain === Chain.BTC) {
-//     const coinType = addressType === AddressType.SameAsMvc ? activeWallet.mvcTypes[0] : CoinType.BTC
-//     return new BtcWallet({ coinType, addressType, addressIndex, network, mnemonic })
-//   } else if (chain === Chain.MVC) {
-//     const coinType = activeWallet.mvcTypes[0]
-//     return new MvcWallet({ coinType, addressType, addressIndex, network, mnemonic })
-//   } else {
-//     throw new Error(`Chain ${chain} is not supported`)
-//   }
-// }
-
 // export async function deleteV3Wallet(walletId: string) {
 //   const walletsMap = await getV3WalletsStorage()
 //   if (!walletsMap) {
@@ -290,3 +268,18 @@ export async function getActiveWalletOtherAccounts() {
 //   delete walletsMap[walletId]
 //   await setV3WalletsStorage(walletsMap)
 // }
+
+export function getCurrentWallet(chain: Chain) {
+  if (chain === Chain.MVC) {
+    if (!useWalletStore.getState().mvcWallet) {
+      throw new Error("MVC Wallet is not initialized.");
+    }
+    return useWalletStore.getState().mvcWallet;
+  } else if (chain === Chain.BTC) {
+    if (!useWalletStore.getState().btcWallet) {
+      throw new Error("BTC Wallet is not initialized.");
+    }
+    return useWalletStore.getState().btcWallet;
+  }
+  throw new Error(`Chain ${chain} is not supported`);
+}
