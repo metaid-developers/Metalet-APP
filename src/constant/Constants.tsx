@@ -107,6 +107,12 @@ export const metaStyles = StyleSheet.create({
     fontWeight: "bold",
     lineHeight: 30,
   },
+  largeDefaultLittleText: {
+    color: "#333333",
+    fontSize: 18,
+    fontWeight: "bold",
+    lineHeight: 30,
+  },
   defaultText: {
     color: "#333333",
     fontSize: 16,
@@ -178,6 +184,14 @@ export const metaStyles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     marginHorizontal:20, marginVertical:20,
+  },
+
+  //bg
+  lineBgRadius: {
+    borderColor:'rgba(191, 194, 204, 0.5)',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginTop: 20,
   },
  
 });

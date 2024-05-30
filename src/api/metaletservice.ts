@@ -4,7 +4,8 @@ import { FeedBtcObject } from "../types/btcfeed";
 import { UtxoBean } from "../types/utxoBean";
 import { get, post } from "../utils/Api";
 import { net_network } from "../wallet/wallet";
-import { SpaceBalance } from "./type/Balance";
+import { AddressTokenSummary, Brc20DetailData, SpaceBalance } from "./type/Balance";
+import { BtcFtOneRecordData } from "./type/BtcFtOneRecordData";
 import { MvcFtData, MvcFtRecordData } from "./type/MvcFtData";
 import { MvcNftData } from "./type/MvcNftData";
 import { MvcFtPriceData } from "./type/Price";
@@ -142,11 +143,55 @@ export async function fetchSpaceBalance(
 // 13.mvc ft record
 export async function fetchMvcFtRecord(
   address: string,
-  genesis:string,
-  codeHash:string,
+  genesis: string,
+  codeHash: string
 ): Promise<MvcFtRecordData[]> {
   const dataMvcBalance: MvcFtRecordData[] = await get(
-    BASE_MVC_API_URL + "/contract/ft/address/" + address + "/"+ codeHash +  "/"+ genesis +"/tx"
+    BASE_MVC_API_URL +
+      "/contract/ft/address/" +
+      address +
+      "/" +
+      codeHash +
+      "/" +
+      genesis +
+      "/tx"
   );
   return dataMvcBalance;
+}
+
+// 14. ft btc price
+export async function fetchBtcFtPrice(): Promise<MvcFtPriceData> {
+  const data = await get(
+    BASE_METALET_URL + "/wallet-api/v3/coin/brc20/price",
+    true
+  );
+  return data;
+}
+
+//15. brc20 one balance
+export async function fetchOneBrc20(
+  address: string,
+  net: string,
+  ticker: string
+): Promise<Brc20DetailData> {
+  const data: Brc20DetailData = await get(
+    BASE_METALET_URL + "/wallet-api/v3/brc20/token-summary",
+    false,
+    { net: net, ticker: ticker, address: address }
+  );
+  return data;
+}
+
+//16. brc20 one record
+export async function fetchBrc20Record(
+  address: string,
+  chain: string,
+  ticker: string
+): Promise<BtcFtOneRecordData> {
+  const data: BtcFtOneRecordData = await get(
+    BASE_METALET_URL + "/wallet-api/v3/address/brc20/activities",
+    false,
+    { chain: chain, tick: ticker, address: address }
+  );
+  return data;
 }

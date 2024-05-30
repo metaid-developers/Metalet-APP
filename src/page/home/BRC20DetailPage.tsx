@@ -4,6 +4,8 @@ import {
   TouchableWithoutFeedback,
   Image,
   FlatList,
+  Dimensions,
+  StyleSheet,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
@@ -14,12 +16,19 @@ import {
   TitleBar,
 } from "../../constant/Widget";
 import { goBack, navigate } from "../../base/NavigationService";
-import { metaStyles, themeColor } from "../../constant/Constants";
+import {
+  inputNormalBgColor,
+  metaStyles,
+  themeColor,
+} from "../../constant/Constants";
 import { MvcActivityRecord } from "../../types/mvcrecord";
 import {
+  fetchBrc20Record,
+  fetchBtcFtPrice,
   fetchMvcActivityComfird,
   fetchMvcFtPrice,
   fetchMvcFtRecord,
+  fetchOneBrc20,
 } from "../../api/metaletservice";
 import { useData } from "../../hooks/MyProvider";
 import * as Clipboard from "expo-clipboard";
@@ -28,55 +37,120 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MvcFtRecordData } from "../../api/type/MvcFtData";
 import { getIconUri } from "@mvc-org/mvc-resources";
 import { formatToDecimal } from "../../utils/WalletUtils";
-import { caculateOneFtValue, getBtcBrc20Icon } from "../../utils/AssertUtils";
+import {
+  caculateOneBtcFtValue,
+  caculateOneFtValue,
+  getBtcBrc20Icon,
+} from "../../utils/AssertUtils";
+import { net_network } from "@/wallet/wallet";
+import {
+  AddressTokenSummary,
+  Brc20DetailData,
+  TokenBalance,
+  TokenTransfer,
+} from "@/api/type/Balance";
+import { InscriptionsList } from "@/api/type/BtcFtOneRecordData";
 
 export default function BRC20DetailPage({ route }) {
-  const [mvcActivityList, setMvcActivityList] = useState<MvcFtRecordData[]>([]);
-  const { mvcAddress, updateMvcAddress } = useData();
+  const [mvcActivityList, setMvcActivityList] = useState<InscriptionsList[]>(
+    []
+  );
+  const { btcAddress, updateBtcAddress } = useData();
   const [noticeContent, setNoticeContent] = useState("Successful");
   const [isShowNotice, setIsShowNotice] = useState(false);
   const { metaletWallet, updateMetaletWallet } = useData();
   const [assertOneFt, setOneFtAssert] = useState("0.0");
 
-
-
   const [isErrorIcon, setisErrorIcon] = useState(false);
-
 
   const { brc20 } = route.params;
 
+  //header brc20
+  const [tokenTransferNum, setTokenTransferNum] = useState("");
+  const [tokenAvaialeNum, setTokenAvaialeNum] = useState("");
+  const [tokenAvaialePingNum, setTokenAvaialePingNum] = useState("");
+  const [tokenTransferList, setTokenTransferList] = useState([]);
+  const [tokenPingList, setTokenPingList] = useState([]);
+  const [isSelectTransfer, setIsSelectTransfer] = useState(true);
+
   useEffect(() => {
-    console.log(brc20);
-    // getActivityList();
+    // console.log("brc20: " + JSON.stringify(brc20));
+    getActivityList(btcAddress);
   }, []);
 
-  async function getActivityList() {
-    const ftPriceData = await fetchMvcFtPrice();
-    const assertFt = caculateOneFtValue([brc20], ftPriceData);
+  async function getActivityList(address: string) {
+    const ftPriceData = await fetchBtcFtPrice();
+    // console.log("ftPriceData: " + JSON.stringify(ftPriceData));
+
+    const assertFt = caculateOneBtcFtValue([brc20], ftPriceData);
+    // console.log("assertFt: " + assertFt);
+
     setOneFtAssert(assertFt);
 
-    let mvcActivityListData = await fetchMvcFtRecord(
-      mvcAddress,
-      brc20.genesis,
-      brc20.codeHash
+    const brc20Balance: Brc20DetailData = await fetchOneBrc20(
+      address,
+      net_network,
+      brc20.ticker
     );
-    // console.log(mvcActivityListData);
 
-    if (mvcActivityListData.length == 0) {
-      let record: MvcFtRecordData = {
-        flag: "1",
-        address: "1",
-        time: 1712334223000,
-        height: 1,
-        income: 1,
-        outcome: 1,
-        txid: "",
-        codeHash: "",
-        genesis: "",
+    console.log("brc20Balance: " + JSON.stringify(brc20Balance));
+    // let tokeList = [];
+    // const toke1: TokenTransfer = {
+    //   ticker: "brc20",
+    //   amount: "20",
+    //   inscriptionId: "#2974",
+    //   inscriptionNumber: 23,
+    //   timestamp: 32,
+    // };
+    // const toke2: TokenTransfer = {
+    //   ticker: "rdex",
+    //   amount: "2321",
+    //   inscriptionId: "#3248",
+    //   inscriptionNumber: 23,
+    //   timestamp: 32,
+    // };
+    // tokeList.push(toke1);
+    // tokeList.push(toke2);
+    const tokeList: TokenTransfer[] = brc20Balance.data.transferableList;
+    setTokenTransferList(tokeList);
+
+    const tokenBalance: TokenBalance = brc20Balance.data.tokenBalance;
+
+    setTokenTransferNum(tokenBalance.transferableBalance);
+    setTokenAvaialeNum(tokenBalance.availableBalanceSafe);
+    setTokenAvaialePingNum(tokenBalance.availableBalanceUnSafe);
+
+    let mvcActivityListData = await fetchBrc20Record(
+      address,
+      "btc",
+      brc20.ticker
+    );
+    // console.log("resutl  ", mvcActivityListData);
+    let brc20RecordList: InscriptionsList[] =
+      mvcActivityListData.data.inscriptionsList;
+    // brc20RecordList.push(mvcActivityListData.data.inscriptionsList[0])
+
+    if (brc20RecordList.length == 0) {
+      let record: InscriptionsList = {
+        txId: "1",
+        blockHeight: "",
+        state: "",
+        tokenType: "",
+        actionType: "",
+        fromAddress: "",
+        toAddress: "",
+        amount: "",
+        token: "",
+        inscriptionId: "",
+        inscriptionNumber: "",
+        index: "",
+        location: "",
+        msg: "",
+        time: "",
       };
-      setMvcActivityList([...mvcActivityListData, record]);
+      setMvcActivityList([...brc20RecordList, record]);
     } else {
-      setMvcActivityList([...mvcActivityListData]);
+      setMvcActivityList([...brc20RecordList]);
     }
   }
 
@@ -91,14 +165,17 @@ export default function BRC20DetailPage({ route }) {
 
   const ListItem = ({ index, item }) => {
     let isIncome;
-    let recordMoney;
     let showAmount;
-    recordMoney = item.income - item.outcome;
+    // recordMoney = item.income - item.outcome;
     // showAmount = (recordMoney / 100000000).toFixed(8);
+    // showAmount = formatToDecimal(recordMoney, parseFloat(brc20.decimal));
+    showAmount = item.amount;
+    // console.log('btc',btcAddress);
+    // console.log("item: " + JSON.stringify(item));
 
-    showAmount = formatToDecimal(recordMoney, parseFloat(brc20.decimal));
+    // console.log(formatTime(parseFloat(item.time)));
 
-    if (recordMoney > 0) {
+    if (item.toAddress == btcAddress) {
       isIncome = true;
     } else {
       isIncome = false;
@@ -110,200 +187,203 @@ export default function BRC20DetailPage({ route }) {
     //   genesis: brc20.genesis,
     // });
 
-    return (
-      <View> <Text> niaho </Text></View>
-    );
     // return (
     //   <View>
-    //     {item.address != "1" ? (
-    //       <View
-    //         style={{
-    //           width: "100%",
-    //           marginTop: 20,
-    //           borderRadius: 10,
-    //           flex: 1,
-    //           flexDirection: "row",
-    //           alignItems: "center",
-    //           paddingHorizontal: 20,
-    //         }}
-    //       >
-    //         {isIncome ? (
-    //           <View>
-    //             <Image
-    //               source={require("../../../image/record_type_in.png")}
-    //               style={{ width: 35, height: 35 }}
-    //             />
-    //             {/* {brc20.imageError ? (
-    //               <View>
-    //                 <CircleAvatarLetter
-    //                   letterStr={brc20.name.substring(0, 1)}
-    //                 />
-    //                 <Image
-    //                   source={require("../../../image/record_type_in.png")}
-    //                   style={{ width: 5, height: 5 }}
-    //                 />
-    //               </View>
-    //             ) : (
-
-    //               <Image
-    //               source={require("../../../image/record_type_in.png")}
-    //               style={{
-    //                 width: 35,
-    //                 height: 35,
-    //               }}
-    //             />
-    //               // <View
-    //               //   style={{
-    //               //     width: 50,
-    //               //     height: 50,
-    //               //     borderRadius: 50,
-    //               //     overflow: "hidden",
-    //               //   }}
-    //               // >
-    //               //   <Image
-    //               //     style={{ width: "100%", height: "100%" }}
-    //               //     source={{ uri: ImageUrl }}
-    //               //     onError={() => {}}
-    //               //   />
-    //               //   <Image
-    //               //     source={require("../../../image/record_type_in.png")}
-    //               //     style={{
-    //               //       position: "absolute",
-    //               //       width: 5,
-    //               //       height: 5,
-    //               //       bottom: 10,
-    //               //       right: 0,
-    //               //     }}
-    //               //   />
-    //               // </View>
-
-    //               // <View>
-    //               //   <Image
-    //               //     style={{ width: 50, height: 50 }}
-    //               //     source={{ uri: ImageUrl }}
-    //               //     onError={() => {}}
-    //               //   />
-
-    //               //   <Image
-    //               //     source={require("../../../image/record_type_in.png")}
-    //               //     style={{
-    //               //       position: "absolute",
-    //               //       width: 5,
-    //               //       height: 5,
-    //               //       bottom: 0,
-    //               //       right: 0,
-    //               //     }}
-    //               //   />
-    //               // </View>
-    //             )} */}
-    //           </View>
-    //         ) : (
-    //           // <Image
-    //           //   source={require("../../../image/assert_mvcrecord_send_icon.png")}
-    //           //   style={{ width: 35, height: 35 }}
-    //           // />
-    //           <Image
-    //             source={require("../../../image/record_type_out.png")}
-    //             style={{
-    //               width: 35,
-    //               height: 35,
-    //             }}
-    //           />
-    //         )}
-
-    //         <View style={{ flex: 1 }}>
-    //           <View style={{ flex: 1, marginLeft: 10, flexDirection: "row" }}>
-    //             <Text
-    //               style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
-    //             >
-    //               {isIncome ? "Receive" : "Send"}
-    //             </Text>
-    //             <View style={{ flex: 1 }} />
-    //             <Text
-    //               style={{
-    //                 fontSize: 16,
-    //                 color: isIncome ? "green" : "red",
-    //                 marginBottom: 10,
-    //                 // textAlign: "right",
-    //               }}
-    //             >
-    //               {isIncome ? "+" + showAmount : showAmount}{" "}
-    //               {brc20.symbol.toString().toUpperCase()}
-    //             </Text>
-    //           </View>
-
-    //           <View
-    //             style={{
-    //               flex: 1,
-    //               marginLeft: 10,
-
-    //               alignItems: "flex-end",
-    //             }}
-    //           >
-    //             <TouchableWithoutFeedback
-    //               onPress={() => {
-    //                 ShowNotice(item.txid);
-    //               }}
-    //             >
-    //               <View style={{ flexDirection: "row" }}>
-    //                 <Text style={metaStyles.grayTextSmall66}>
-    //                   {formatTime(item.time)}
-    //                 </Text>
-    //                 <View style={{ flex: 1 }} />
-    //                 <Text
-    //                   numberOfLines={1}
-    //                   ellipsizeMode="middle"
-    //                   style={[
-    //                     metaStyles.grayTextSmall66,
-    //                     { textAlign: "right", width: 100 },
-    //                   ]}
-    //                 >
-    //                   {item.txid}
-    //                 </Text>
-
-    //                 <Image
-    //                   source={require("../../../image/meta_copy_icon.png")}
-    //                   style={{ width: 15, height: 15, marginLeft: 5 }}
-    //                 />
-    //               </View>
-    //             </TouchableWithoutFeedback>
-    //           </View>
-    //         </View>
-    //       </View>
-    //     ) : (
-    //       <View
-    //         style={{
-    //           justifyContent: "center",
-    //           alignItems: "center",
-    //           // width: "100%",
-    //           // height: "100%",
-    //           // opacity: isShow?1:0,
-    //         }}
-    //       >
-    //         <Image
-    //           source={require("../../../image/assert_record_nodata_icon.png")}
-    //           style={{ width: 38, height: 53, marginTop: 100 }}
-    //         />
-
-    //         <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
-    //           No activities
-    //         </Text>
-    //       </View>
-    //     )}
+    //     <Text> niaho </Text>
     //   </View>
     // );
+    return (
+      <View>
+        <View
+          style={{
+            width: "100%",
+            marginTop: 20,
+            borderRadius: 10,
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 20,
+          }}
+        >
+          {isIncome ? (
+            <View>
+              <Image
+                source={require("../../../image/record_type_in.png")}
+                style={{ width: 35, height: 35 }}
+              />
+              {/* {brc20.imageError ? (
+                  <View>
+                    <CircleAvatarLetter
+                      letterStr={brc20.name.substring(0, 1)}
+                    />
+                    <Image
+                      source={require("../../../image/record_type_in.png")}
+                      style={{ width: 5, height: 5 }}
+                    />
+                  </View>
+                ) : (
+
+                  <Image
+                  source={require("../../../image/record_type_in.png")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                  }}
+                />
+                  // <View
+                  //   style={{
+                  //     width: 50,
+                  //     height: 50,
+                  //     borderRadius: 50,
+                  //     overflow: "hidden",
+                  //   }}
+                  // >
+                  //   <Image
+                  //     style={{ width: "100%", height: "100%" }}
+                  //     source={{ uri: ImageUrl }}
+                  //     onError={() => {}}
+                  //   />
+                  //   <Image
+                  //     source={require("../../../image/record_type_in.png")}
+                  //     style={{
+                  //       position: "absolute",
+                  //       width: 5,
+                  //       height: 5,
+                  //       bottom: 10,
+                  //       right: 0,
+                  //     }}
+                  //   />
+                  // </View>
+
+                  // <View>
+                  //   <Image
+                  //     style={{ width: 50, height: 50 }}
+                  //     source={{ uri: ImageUrl }}
+                  //     onError={() => {}}
+                  //   />
+
+                  //   <Image
+                  //     source={require("../../../image/record_type_in.png")}
+                  //     style={{
+                  //       position: "absolute",
+                  //       width: 5,
+                  //       height: 5,
+                  //       bottom: 0,
+                  //       right: 0,
+                  //     }}
+                  //   />
+                  // </View>
+                )} */}
+            </View>
+          ) : (
+            // <Image
+            //   source={require("../../../image/assert_mvcrecord_send_icon.png")}
+            //   style={{ width: 35, height: 35 }}
+            // />
+            <Image
+              source={require("../../../image/record_type_out.png")}
+              style={{
+                width: 35,
+                height: 35,
+              }}
+            />
+          )}
+
+          <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, marginLeft: 10, flexDirection: "row" }}>
+              <Text
+                style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
+              >
+                {isIncome ? "Receive" : "Send"}
+              </Text>
+              <View style={{ flex: 1 }} />
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: isIncome ? "green" : "red",
+                  marginBottom: 10,
+                  // textAlign: "right",
+                }}
+              >
+                {isIncome ? "+" + showAmount : showAmount}{" "}
+                {item.token.toString().toUpperCase()}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                marginLeft: 10,
+
+                alignItems: "flex-end",
+              }}
+            >
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  ShowNotice(item.txId);
+                }}
+              >
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={metaStyles.grayTextSmall66}>
+                    {formatTime(parseFloat(item.time))}
+                  </Text>
+                  <View style={{ flex: 1 }} />
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="middle"
+                    style={[
+                      metaStyles.grayTextSmall66,
+                      { textAlign: "right", width: 100 },
+                    ]}
+                  >
+                    {item.txId}
+                  </Text>
+
+                  <Image
+                    source={require("../../../image/meta_copy_icon.png")}
+                    style={{ width: 15, height: 15, marginLeft: 5 }}
+                  />
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const EmptyView = () => {
+    return (
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          source={require("../../../image/btc_brc20_empty_icon.png")}
+          style={{ width: 54, height: 50, marginTop: 45 }}
+          resizeMode="cover"
+        />
+
+        <Text
+          style={[metaStyles.grayText99, { marginTop: 20, marginBottom: 20 }]}
+        >
+          Empty
+        </Text>
+      </View>
+    );
   };
 
   const ListHeader = () => {
     let ImageUrl = getBtcBrc20Icon(brc20.ticker);
     // let ImageUrl = 'https://www.metalet.space/wallet-api/v3/coin/brc20/icon/rdex.png'
-    console.log("ImageUrl", ImageUrl);
-    
+    // console.log("ImageUrl", ImageUrl);
     if (!ImageUrl) {
       ImageUrl = "1";
     }
-    console.log("ImageUrl", ImageUrl);
 
+    // console.log("ImageUrl", ImageUrl);
     return (
       <View
         style={{
@@ -313,7 +393,7 @@ export default function BRC20DetailPage({ route }) {
         }}
       >
         {isErrorIcon ? (
-          <CircleAvatarLetter letterStr={brc20.ticker.substring(0, 1)} />
+          <CircleAvatarLetter widthC={60} heightC={60} letterStr={brc20.ticker.substring(0, 1)} />
         ) : (
           <CircleAvatar
             imageUrl={ImageUrl}
@@ -335,7 +415,7 @@ export default function BRC20DetailPage({ route }) {
         >
           {/* {formatToDecimal(brc20.confirmed, brc20.decimal)}{" "}
           {brc20.symbol.toUpperCase()} */}
-          sff
+          {brc20.overallBalance} {brc20.ticker.toUpperCase()}
         </Text>
 
         <Text
@@ -359,7 +439,7 @@ export default function BRC20DetailPage({ route }) {
         >
           <TouchableWithoutFeedback
             onPress={() => {
-              navigate("SendMvcFtPage", {
+              navigate("TransferBrc20FirstPage", {
                 brc20: brc20,
               });
             }}
@@ -397,7 +477,7 @@ export default function BRC20DetailPage({ route }) {
 
           <TouchableWithoutFeedback
             onPress={() => {
-              navigate("ReceivePage", { myCoinType: "SPACE" });
+              navigate("ReceivePage", { myCoinType: "BTC" });
             }}
           >
             <View
@@ -431,6 +511,189 @@ export default function BRC20DetailPage({ route }) {
               </Text>
             </View>
           </TouchableWithoutFeedback>
+        </View>
+
+        {/* weib */}
+        <View
+          style={[
+            {
+              borderColor: "rgba(191, 194, 204, 0.5)",
+              borderWidth: 1,
+              borderRadius: 5,
+              marginTop: 30,
+              marginHorizontal: 20,
+            },
+          ]}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setIsSelectTransfer(true);
+              }}
+            >
+              <View style={{ flex: 1, alignItems: "center", paddingTop: 20 }}>
+                <Text style={metaStyles.largeDefaultLittleText}>
+                  {tokenTransferNum}
+                </Text>
+                <Text style={[metaStyles.grayTextSmall66, { marginTop: 5 }]}>
+                  Transferable
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+
+            <View
+              style={{
+                backgroundColor: inputNormalBgColor,
+                width: 0.5,
+                height: 20,
+              }}
+            />
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setIsSelectTransfer(false);
+              }}
+            >
+              <View style={{ flex: 1, alignItems: "center", paddingTop: 20 }}>
+                <Text style={metaStyles.largeDefaultLittleText}>
+                  {tokenAvaialeNum}{" "}
+                  {parseFloat(tokenAvaialePingNum) > 0 && (
+                    <Text style={{ color: "#666" }}>
+                      + {tokenAvaialePingNum}
+                    </Text>
+                  )}
+                </Text>
+                <Text style={[metaStyles.grayTextSmall66, { marginTop: 5 }]}>
+                  Available
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+
+          <View style={{ flexDirection: "row", marginTop: 10 }}>
+            <View
+              style={{
+                width: "50%",
+                height: isSelectTransfer ? 2 : 0.5,
+                backgroundColor: isSelectTransfer
+                  ? themeColor
+                  : inputNormalBgColor,
+              }}
+            />
+            <View
+              style={{
+                width: "50%",
+                height: isSelectTransfer ? 0.5 : 2,
+                backgroundColor: isSelectTransfer
+                  ? inputNormalBgColor
+                  : themeColor,
+              }}
+            />
+          </View>
+
+          {isSelectTransfer &&
+            (tokenTransferList.length > 0 ? (
+              <View>
+                <FlatList
+                  keyExtractor={(item, index) => index.toString()}
+                  showsHorizontalScrollIndicator={false}
+                  numColumns={2}
+                  style={{ marginHorizontal: 20 }}
+                  data={tokenTransferList}
+                  columnWrapperStyle={{ justifyContent: "space-between" }}
+                  renderItem={({ item, index }) => {
+                    return (
+                      <View
+                        style={{
+                          marginTop: 20,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flex: 1,
+                          marginLeft: index == 0 ? 0 : 20,
+                        }}
+                      >
+                        <View
+                          style={{
+                            paddingTop: 10,
+                            width: "100%",
+                            flex: 1,
+                            marginBottom: 20,
+                            alignItems: "center",
+                            backgroundColor: "#EDEDED",
+                            borderRadius: 10,
+                          }}
+                        >
+                          <Text
+                            style={[
+                              metaStyles.grayTextSmall66,
+                              { marginTop: 20 },
+                            ]}
+                          >
+                            {item.ticker.toUpperCase()}
+                          </Text>
+
+                          <Text
+                            style={[
+                              metaStyles.largeDefaultLittleText,
+                              { marginTop: 15 },
+                            ]}
+                          >
+                            {item.amount}
+                          </Text>
+
+                          <View
+                            style={{
+                              backgroundColor: themeColor,
+                              width: "100%",
+                              borderBottomEndRadius: 10,
+                              borderBottomStartRadius: 10,
+                              alignItems: "center",
+                              paddingVertical: 8,
+                              marginTop: 25,
+                            }}
+                          >
+                            <Text style={{ color: "#fff" }}>
+                              {item.inscriptionId}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  }}
+                />
+
+                {tokenTransferList.length >= 3 && (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginBottom: 10,
+                    }}
+                  >
+                    <Text style={{ color: "#666", fontSize: 16 }}>All</Text>
+                    <Image
+                      source={require("../../../image/wallets_close_icon.png")}
+                      style={{ width: 10, height: 10, marginLeft: 5 }}
+                    />
+                  </View>
+                )}
+              </View>
+            ) : (
+              <EmptyView />
+            ))}
+
+          {isSelectTransfer == false && EmptyView()}
+
+          {/* 将接口数据填充 */}
+          {/* 两个list 进行切换选择 */}
+          {/* 显示历史收到数据 */}
+          {/* 两个Receive 和Send  */}
         </View>
       </View>
     );

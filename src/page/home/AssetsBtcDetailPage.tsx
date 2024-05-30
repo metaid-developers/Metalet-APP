@@ -84,7 +84,7 @@ export default function AssetsBtcDetailPage({ route }) {
     }
 
     const currentWallet = await getStorageCurrentWallet();
-    const addressType = currentWallet.addressTpye;
+    const addressType = currentWallet.addressType;
     setAddressType(addressType);
   }
 

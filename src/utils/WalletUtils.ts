@@ -8,6 +8,7 @@ import {
   wallets_key,
   createStorage,
   network_btc,
+  AsyncStorageUtil,
 } from "./AsyncStorageUtil";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { removeTrailingZeros } from "./StringUtils";
@@ -127,7 +128,10 @@ export async function changeCurrentWalletAddressType(
   const walletID = await getCurrentWalletID();
   const wallet = wallets.find((wallet) => wallet.id == walletID);
   wallet.addressType = changeAddressType;
-  await storage.set(wallets_key, [...wallets, wallet]);
+  await storage.set(wallets_key, wallets);
+  // await AsyncStorageUtil.updateItem(wallets_key, [...wallets, wallet]);
+  // await AsyncStorageUtil.updateItem(wallets_key, wallets);
+
 }
 
 ///////////utils

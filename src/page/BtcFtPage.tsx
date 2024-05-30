@@ -21,6 +21,7 @@ import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
 import { btc_network, getCurrentBtcWallet } from "../wallet/wallet";
 import { navigate } from "@/base/NavigationService";
 
+// now
 export default function BtcFtPage() {
   let [btcFtList, setBtcFtList] = useState<BtcFtBean[]>([]);
   const { walletManager, updateWalletManager } = useData();
@@ -82,9 +83,9 @@ export default function BtcFtPage() {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          // navigate("Brc20DetailPage", {
-          //   brc20: item,
-          // });
+          navigate("BRC20DetailPage", {
+            brc20: item,
+          });
         }}
       >
         <View style={styles.flatListStyle}>

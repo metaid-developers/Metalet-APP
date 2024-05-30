@@ -14,3 +14,43 @@ export type SpaceBalance = {
     btcAssert:string="";
     sumAssert:string="";
   }
+
+
+  //btc ft balance
+
+  export interface TokenBalance {
+    availableBalance: string
+    overallBalance: string
+    ticker: string
+    transferableBalance: string
+    availableBalanceSafe: string
+    availableBalanceUnSafe: string
+  }
+  
+  export interface TokenTransfer {
+    ticker: string
+    amount: string
+    inscriptionId: string
+    inscriptionNumber: number
+    timestamp: number
+  }
+  export interface TokenInfo {
+    totalSupply: string
+    totalMinted: string
+  }
+  
+  export interface AddressTokenSummary {
+    tokenInfo: TokenInfo
+    tokenBalance: TokenBalance
+    historyList: TokenTransfer[]
+    transferableList: TokenTransfer[]
+  }
+
+ export interface Brc20DetailData {
+  code: number;
+  message: string;
+  processingTime: number;
+  data: AddressTokenSummary;
+}
+
+

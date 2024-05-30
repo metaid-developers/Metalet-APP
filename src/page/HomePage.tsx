@@ -861,8 +861,8 @@ export default function HomePage({ navigation }) {
               // updateUserData({ ...userData, name: "校长" });
               //  AsyncStorage.removeItem(network_key);
               // console.log(metaletWallet.btcLegacyWallet.getAddress());
-              // navigate("SendSelectAssertPage");
-              navigate("PasswordPage");
+              navigate("SendSelectAssertPage");
+              // navigate("PasswordPage");
             }}
           >
             <View style={{ marginTop: 20 }}>

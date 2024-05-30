@@ -1,3 +1,4 @@
+import { BtcFtBean } from "@/bean/BtcFtBean";
 import {
   fetchAssetsPrice,
   fetchBtcBalance,
@@ -32,6 +33,27 @@ export function caculateOneFtValue(
   }
 
   return toFloorNum(total, 2).toFixed(2);
+}
+
+export function caculateOneBtcFtValue(
+  tokens: BtcFtBean[],
+  ftPriceData: MvcFtPriceData
+) {
+  let total = 0;
+  // const ftPriceData = await fetchMvcFtPrice();
+  const mvcPrices = ftPriceData.data.priceInfo;
+
+  for (let i = 0; i < tokens.length; i++) {
+    const tokenSymbol = tokens[i].ticker.toLocaleLowerCase();
+    const quantity = parseFloat(tokens[i].overallBalance);
+    if (tokenSymbol in mvcPrices) {
+      const price = mvcPrices[tokenSymbol];
+      const assert = price * quantity;
+      total += price * quantity;
+    }
+  }
+
+  return total.toFixed(2);
 }
 
 //balance
@@ -71,70 +93,67 @@ export async function caculateMvcAndBtcAssert(
   return balance;
 }
 
-//utils
+//utils b 45 bao 2
 export function toFloorNum(value: number, num: number) {
   const factor = Math.pow(10, num);
   const reuslt = Math.floor(value * factor) / factor;
   return reuslt;
 }
 
-
 //btc icon
-export const btcBaseIconUrl="https://www.metalet.space/wallet-api";
-
+export const btcBaseIconUrl = "https://www.metalet.space/wallet-api";
 
 export function getBtcBrc20Icon(ftName: string) {
-  let iconPic="";
-  console.log("ftName:"+ftName);
-  
+  let iconPic = "";
+
   switch (ftName.toLocaleLowerCase()) {
     case "bili":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/bili.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/bili.jpg";
       break;
     case "btcs":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/btcs.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/btcs.jpg";
       break;
     case "cats":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/cats.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/cats.jpg";
       break;
     case "fish":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/fish.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/fish.jpg";
       break;
     case "grum":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/grum.png";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/grum.png";
       break;
     case "ibtc":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/ibtc.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/ibtc.jpg";
       break;
     case "lger":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/lger.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/lger.jpg";
       break;
     case "ordi":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/ordi.svg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/ordi.svg";
       break;
     case "orxc":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/orxc.png";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/orxc.png";
       break;
     case "oxbt":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/oxbt.png";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/oxbt.png";
       break;
     case "rats":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/rats.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/rats.jpg";
       break;
     case "rdex":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/rdex.png";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/rdex.png";
       break;
     case "sats":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/sats.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/sats.jpg";
       break;
     case "sayc":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/sayc.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/sayc.jpg";
       break;
     case "trac":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/trac.png";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/trac.png";
       break;
     case "vmpx":
-      iconPic=btcBaseIconUrl+"/v3/coin/brc20/icon/vmpx.jpg";
+      iconPic = btcBaseIconUrl + "/v3/coin/brc20/icon/vmpx.jpg";
       break;
   }
   return iconPic;

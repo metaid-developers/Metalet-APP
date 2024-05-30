@@ -53,7 +53,9 @@ import AssetsMvcFtDetailPage from "../page/home/AssetsMvcFtDetailPage";
 import SendMvcFtPage from "../page/home/SendMvcFtPage";
 import SendSuccessPage from "@/page/home/SendSuccessPage";
 import PlazaPage from "@/page/PlazaPage";
-import Brc20DetailPage from "@/page/home/BRC20DetailPage";
+import BRC20DetailPage from "@/page/home/BRC20DetailPage";
+import TransferBrc20FirstPage from "@/page/home/transfer/TransferBrc20FirstPage";
+import InscribeFirstPage from "@/page/home/transfer/InscribeFirstPage";
 
 ////////
 
@@ -134,7 +136,9 @@ const StackNavigator = () => (
     />
     <Stack.Screen name="SendMvcFtPage" component={SendMvcFtPage} />
     <Stack.Screen name="SendSuccessPage" component={SendSuccessPage} />
-    <Stack.Screen name="Brc20DetailPage" component={Brc20DetailPage} />
+    <Stack.Screen name="BRC20DetailPage" component={BRC20DetailPage} />
+    <Stack.Screen name="TransferBrc20FirstPage" component={TransferBrc20FirstPage} />
+    <Stack.Screen name="InscribeFirstPage" component={InscribeFirstPage} />
   </Stack.Navigator>
 );
 

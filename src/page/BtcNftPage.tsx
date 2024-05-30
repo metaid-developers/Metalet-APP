@@ -8,8 +8,10 @@ import { useData } from "../hooks/MyProvider";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
 import { useFocusEffect } from "@react-navigation/native";
-import { btc_network, net_network } from "../wallet/wallet";
+import { btc_network, getCurrentBtcWallet, net_network } from "../wallet/wallet";
 
+
+// nft
 export default function BtcNftPage() {
   let [nftList, setNftList] = useState<BtcNftBean[]>([]);
   const { accountIndex, updateAccountIndex } = useData();
@@ -19,18 +21,27 @@ export default function BtcNftPage() {
   const [ismany, setIsmany] = useState(0);
 
   useEffect(() => {
-    getBtcNftData(btcAddress);
+    refresh();
   }, []);
 
   useEffect(() => {
-    getBtcNftData(btcAddress);
+    refresh();
   }, [btcAddress]);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     getBtcNftData(btcAddress);
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [])
+  );
+
+  async function refresh() {
+    if (btcAddress) {
+      getBtcNftData(btcAddress);
+    } else {
+      const btcWallet = await getCurrentBtcWallet();
+      getBtcNftData(btcWallet.getAddress());
+    }
+  }
 
   const getBtcNftData = async (address: string) => {
     let params = {

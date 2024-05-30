@@ -749,7 +749,7 @@ export const MyQrCode = ({ qrData, size }) => {
   );
 };
 
-// 扫一扫
+// 13 扫一扫
 export const QRScanner = ({ handleScan }) => {
   const [hasPermission, setHasPermission] = useState(null);
   //扫描状态
@@ -850,5 +850,20 @@ export const QRScanner = ({ handleScan }) => {
         />
       )}
     </View>
+  );
+};
+
+
+// 14.
+export const Line = ({top=10}) => {
+  return (
+    <View
+      style={{
+        width: "100%",
+        height: 0.8,
+        backgroundColor: "rgba(191, 194, 204, 0.5)",
+        marginTop: top,
+      }}
+    />
   );
 };
