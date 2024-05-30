@@ -234,7 +234,7 @@ export default function WalletsPage() {
             <View style={{ flex: 1 }} />
 
             {/* 暂不显示更多 */}
-            {isEdit && (
+            {/* {isEdit && (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setIsEdit(false);
@@ -246,7 +246,7 @@ export default function WalletsPage() {
                   style={{ width: 15, height: 15 }}
                 />
               </TouchableWithoutFeedback>
-            )}
+            )} */}
 
             {/* {item.isSelect && isEdit == false && ( */}
             {item.id == currentAccountID && isEdit == false && (
