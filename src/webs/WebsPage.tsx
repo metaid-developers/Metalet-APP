@@ -1,8 +1,10 @@
 import WebView from "react-native-webview";
 import { actionType } from "./actions/types";
 import { injectedJavaScript } from "./inject";
-import React, { useRef, useState } from "react";
+import CloseIcon from "@/components/icons/CloseIcon";
+import React, { useEffect, useRef, useState } from "react";
 import actionDispatcher from "./actions/action-dispatcher";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
@@ -11,7 +13,6 @@ import {
   Button,
   Platform,
   Pressable,
-  SafeAreaView,
 } from "react-native";
 
 interface Message {
@@ -24,12 +25,11 @@ interface Message {
 }
 
 export default function WebsPage() {
+  const webViewRef = useRef(null);
   const [icon, setIcon] = useState("");
   const [host, setHost] = useState("");
   const [actionMsg, setActionMsg] = useState<Message>();
   const [modalVisible, setModalVisible] = useState(false);
-
-  const webViewRef = useRef(null);
 
   const onError = ({ nativeEvent }) => {
     console.log("onError", nativeEvent);
@@ -88,7 +88,15 @@ export default function WebsPage() {
   };
 
   return (
-    <SafeAreaView className="w-screen h-screen">
+    <SafeAreaView className="w-screen h-screen pb-12 relative">
+      <View className="flex flex-row items-center px-2.5 gap-x-2 h-14 py-2">
+        <Text className="bg-[#E5EAEE] px-[18px] h-full leading-10 grow rounded-[60px]">
+          app.orders.exchange
+        </Text>
+        <View className="border border-[#E7E7E7] rounded-full w-10 h-10 flex items-center justify-center">
+          <CloseIcon className="text-black-primary" onClick="" />
+        </View>
+      </View>
       <Modal animationType="slide" visible={modalVisible}>
         <View className="w-screen h-screen flex flex-col items-center px-4">
           <Text className="text-blue-primary text-2xl tracking-wide py-6">
@@ -146,7 +154,9 @@ export default function WebsPage() {
           javaScriptEnabled={true}
           injectedJavaScript={injectedJavaScript}
           javaScriptCanOpenWindowsAutomatically={true}
-          source={{ uri: "https://metalet-tester.vercel.app/" }}
+          // source={{ uri: "https://metalet-tester.vercel.app/" }}
+          // source={{ uri: "https://mvcswap.com/#/" }}
+          source={{ uri: "https://testnet.orders.exchange/swap" }}
           onMessage={(e) => {
             handlerMessage(JSON.parse(e.nativeEvent.data));
           }}

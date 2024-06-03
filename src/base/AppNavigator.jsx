@@ -39,6 +39,7 @@ import ReceivePage from "../page/receive/ReceivePage";
 import WebPage from "../webs/WebPage";
 import WebPageTest from "../webs/WebPageTest";
 import WebsPage from "../webs/WebsPage";
+import DiscoverPage from "@/webs/DiscoverPage";
 import AssetsMvcDetailPage from "../page/home/AssetsMvcDetailPage";
 import AssetsBtcDetailPage from "../page/home/AssetsBtcDetailPage";
 import SendSelectAssertPage from "../page/home/SendSelectAssertPage";
@@ -90,7 +91,7 @@ export default AppNavigator;
 
 const StackNavigator = () => (
   <Stack.Navigator
-    initialRouteName="SplashPage"
+    initialRouteName="DiscoverPage"
     screenOptions={{ headerShown: false }}
   >
     <Stack.Screen name="ImportWalletPage" component={ImportWalletPage} />
@@ -120,6 +121,7 @@ const StackNavigator = () => (
     <Stack.Screen name="WebPage" component={WebPage} />
     <Stack.Screen name="WebPageTest" component={WebPageTest} />
     <Stack.Screen name="WebsPage" component={WebsPage} />
+    <Stack.Screen name="DiscoverPage" component={DiscoverPage} />
     <Stack.Screen name="AssetsMvcDetailPage" component={AssetsMvcDetailPage} />
     <Stack.Screen name="AssetsBtcDetailPage" component={AssetsBtcDetailPage} />
     <Stack.Screen

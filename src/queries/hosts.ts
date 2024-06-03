@@ -24,6 +24,8 @@ export const API2_ORDERS_EXCHANGE = "https://api2.orders.exchange/api";
 export const UNISAT_HOST = "https://wallet-api.unisat.io/v5";
 export const UNISAT_TESTNET_HOST = "https://wallet-api-testnet.unisat.io/v5";
 
+export const METALET_WALLET_PREFIX = METALET_HOST + "/wallet-api";
+
 export async function getApiHost() {
   const network = getNetwork();
 
