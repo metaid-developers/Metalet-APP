@@ -91,7 +91,7 @@ export default AppNavigator;
 
 const StackNavigator = () => (
   <Stack.Navigator
-    initialRouteName="DiscoverPage"
+    initialRouteName="SplashPage"
     screenOptions={{ headerShown: false }}
   >
     <Stack.Screen name="ImportWalletPage" component={ImportWalletPage} />
@@ -225,7 +225,7 @@ const TabNavigator = () => (
   >
     <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
     {/* <Tab.Screen name="PlazaPage" component={PlazaPage} /> */}
-    <Tab.Screen name="WebsPage" component={WebsPage} />
+    <Tab.Screen name="DiscoverPage" component={DiscoverPage} />
     <Tab.Screen name="SettingsPage" component={SettingsPage} />
   </Tab.Navigator>
 );
