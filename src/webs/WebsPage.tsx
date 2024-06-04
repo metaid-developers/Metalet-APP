@@ -1,6 +1,7 @@
 import WebView from "react-native-webview";
 import { actionType } from "./actions/types";
 import { injectedJavaScript } from "./inject";
+import { navigate } from "@/base/NavigationService";
 import CloseIcon from "@/components/icons/CloseIcon";
 import React, { useEffect, useRef, useState } from "react";
 import actionDispatcher from "./actions/action-dispatcher";
@@ -13,6 +14,7 @@ import {
   Button,
   Platform,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
 
 interface Message {
@@ -24,12 +26,21 @@ interface Message {
   action: `${string}-${actionType}`;
 }
 
-export default function WebsPage() {
+export default function WebsPage(props) {
   const webViewRef = useRef(null);
+  const [uri, setURI] = useState("");
   const [icon, setIcon] = useState("");
   const [host, setHost] = useState("");
   const [actionMsg, setActionMsg] = useState<Message>();
   const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (!props.route.params?.url) {
+      navigate("DiscoverPage");
+    } else {
+      setURI(props.route.params.url);
+    }
+  }, []);
 
   const onError = ({ nativeEvent }) => {
     console.log("onError", nativeEvent);
@@ -91,11 +102,14 @@ export default function WebsPage() {
     <SafeAreaView className="w-screen h-screen pb-12 relative">
       <View className="flex flex-row items-center px-2.5 gap-x-2 h-14 py-2">
         <Text className="bg-[#E5EAEE] px-[18px] h-full leading-10 grow rounded-[60px]">
-          app.orders.exchange
+          {uri}
         </Text>
-        <View className="border border-[#E7E7E7] rounded-full w-10 h-10 flex items-center justify-center">
-          <CloseIcon className="text-black-primary" onClick="" />
-        </View>
+        <TouchableOpacity
+          onPress={() => navigate("DiscoverPage")}
+          className="border border-[#E7E7E7] rounded-full w-10 h-10 flex items-center justify-center"
+        >
+          <CloseIcon className="text-black-primary" />
+        </TouchableOpacity>
       </View>
       <Modal animationType="slide" visible={modalVisible}>
         <View className="w-screen h-screen flex flex-col items-center px-4">
@@ -148,15 +162,13 @@ export default function WebsPage() {
       ) : (
         <WebView
           ref={webViewRef}
+          source={{ uri }}
           useWebKit={true}
           onError={onError}
           allowFileAccess={true}
           javaScriptEnabled={true}
           injectedJavaScript={injectedJavaScript}
           javaScriptCanOpenWindowsAutomatically={true}
-          // source={{ uri: "https://metalet-tester.vercel.app/" }}
-          // source={{ uri: "https://mvcswap.com/#/" }}
-          source={{ uri: "https://testnet.orders.exchange/swap" }}
           onMessage={(e) => {
             handlerMessage(JSON.parse(e.nativeEvent.data));
           }}

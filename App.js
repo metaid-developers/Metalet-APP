@@ -1,8 +1,19 @@
 import "./globals.js";
 import { useEffect } from "react";
-import AppNavigator from "./src/base/AppNavigator.jsx";
 import { UserProvider } from "./src/hooks/MyProvider";
+import AppNavigator from "./src/base/AppNavigator.jsx";
 import useWalletManager from "@/hooks/useWalletManager";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 30, // 30 seconds
+      cacheTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false, // Disable refetch on window focus for React Native
+    },
+  },
+});
 
 export default function App() {
   const { initWalletManager } = useWalletManager();
@@ -10,10 +21,12 @@ export default function App() {
   useEffect(() => {
     initWalletManager();
   }, []);
-  
+
   return (
     <UserProvider>
-      <AppNavigator />
-    </UserProvider> 
+      <QueryClientProvider client={queryClient}>
+        <AppNavigator />
+      </QueryClientProvider>
+    </UserProvider>
   );
 }
