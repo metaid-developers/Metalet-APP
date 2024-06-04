@@ -1,19 +1,24 @@
+import { Chain } from "@metalet/utxo-wallet-service";
 import { RootBtcBalanceObject } from "../bean/BtcBalanceBean";
 import { AssertPrice } from "../types/balance";
 import { FeedBtcObject } from "../types/btcfeed";
 import { UtxoBean } from "../types/utxoBean";
 import { get, post } from "../utils/Api";
-import { net_network } from "../wallet/wallet";
 import {
   AddressTokenSummary,
   Brc20DetailData,
   SpaceBalance,
 } from "./type/Balance";
 import { BtcFtOneRecordData } from "./type/BtcFtOneRecordData";
-import { InscribeResultData, PreInscribe, PreInscribeData } from "./type/Inscribe";
+import {
+  InscribeResultData,
+  PreInscribe,
+  PreInscribeData,
+} from "./type/Inscribe";
 import { MvcFtData, MvcFtRecordData } from "./type/MvcFtData";
 import { MvcNftData } from "./type/MvcNftData";
 import { MvcFtPriceData } from "./type/Price";
+import { getWalletNetwork } from "@/utils/WalletUtils";
 
 export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
@@ -53,10 +58,11 @@ export async function fetchBtcActivityRecord(address: string) {
 
 //4.feed
 export async function fetchBtcFeed(): Promise<FeedBtcObject> {
+  const network = await getWalletNetwork(Chain.BTC);
   const data = await get(
     BASE_METALET_URL + "/wallet-api/v3/btc/fee/summary",
     false,
-    { net: net_network }
+    { net: network }
   );
   return data;
 }
@@ -65,20 +71,23 @@ export async function fetchBtcFeed(): Promise<FeedBtcObject> {
 export async function fetchBtcBalance(
   address: string
 ): Promise<RootBtcBalanceObject> {
+  const network = await getWalletNetwork(Chain.BTC);
   const data = await get(
     BASE_METALET_URL + "/wallet-api/v3/address/btc-balance",
     false,
-    { address, net: net_network }
+    { address, net: network }
   );
   return data;
 }
 
 //6.btc utxo
 export async function fetchBtcUtxo(address: string): Promise<UtxoBean> {
+  const network = await getWalletNetwork(Chain.BTC);
+
   const data = await get(
     BASE_METALET_URL + "/wallet-api/v3/address/btc-utxo",
     false,
-    { address, net: net_network, unconfirmed: "1", order: "desc" }
+    { address, net: network, unconfirmed: "1", order: "desc" }
   );
   return data;
 }
@@ -117,9 +126,10 @@ export async function broadcastBtc(hex: string): Promise<{
   processingTime: number;
   data: string;
 }> {
+  const network = await getWalletNetwork(Chain.BTC);
   const data = await post(BASE_METALET_URL + "/wallet-api/v3/tx/broadcast", {
     chain: "btc",
-    net: net_network,
+    net: network,
     rawTx: hex,
   });
   return data;
@@ -232,8 +242,8 @@ export async function fetchBrc20InscribeCommit(
   feeAddress: string,
   net: string,
   rawTx: string
-) :Promise <InscribeResultData>{
-  const data:InscribeResultData = await post(
+): Promise<InscribeResultData> {
+  const data: InscribeResultData = await post(
     BASE_METALET_URL + "/wallet-api/v3/inscribe/commit",
     {
       version,

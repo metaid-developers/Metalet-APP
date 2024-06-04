@@ -867,3 +867,22 @@ export const Line = ({top=10}) => {
     />
   );
 };
+
+
+// 15.close
+export const CloseView = ({event}) => {
+  return (
+    <TouchableWithoutFeedback
+    onPress={() => {
+      event()
+    }}
+  >
+   <View style={{width:40,height:40,alignItems:'flex-end',justifyContent:'center'}}>
+   <Image
+      source={require("../../image/metalet_close_big_icon.png")}
+      style={{ width: 15, height: 15 }}
+    />
+   </View>
+  </TouchableWithoutFeedback>
+  );
+};

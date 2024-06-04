@@ -17,9 +17,10 @@ import {
 import { FeedBean, FeedBtcObject } from "@/types/btcfeed";
 import { fetchBrc20InscribePre, fetchBtcFeed } from "@/api/metaletservice";
 import { useData } from "@/hooks/MyProvider";
-import { btc_network, net_network } from "@/wallet/wallet";
 import { PreInscribe, PreInscribeData } from "@/api/type/Inscribe";
 import { navigate } from "@/base/NavigationService";
+import { getWalletNetwork } from "@/utils/WalletUtils";
+import { Chain } from "@metalet/utxo-wallet-service";
 
 export default function InscribeFirstPage({ route }) {
   const { brc20 } = route.params;
@@ -514,10 +515,12 @@ export default function InscribeFirstPage({ route }) {
     }
     // const base64Data= Buffer.from(fileName).toString("base64");
     // console.log(base64Data);
+    const network=await getWalletNetwork(Chain.BTC);
+
    const preInscribe:PreInscribeData = await fetchBrc20InscribePre(
       btcAddress,
       parseInt(feed),
-      net_network,
+      network,
       fileName
     );
 

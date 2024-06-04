@@ -20,7 +20,8 @@ import { navigate } from "@/base/NavigationService";
 import { useData } from "@/hooks/MyProvider";
 import { Brc20DetailData, TokenTransfer } from "@/api/type/Balance";
 import { fetchOneBrc20 } from "@/api/metaletservice";
-import { net_network } from "@/wallet/wallet";
+import { getWalletNetwork } from "@/utils/WalletUtils";
+import { Chain } from "@metalet/utxo-wallet-service";
 
 export default function TransferBrc20FirstPage({ route }) {
   const { brc20 } = route.params;
@@ -36,9 +37,10 @@ export default function TransferBrc20FirstPage({ route }) {
   }, []);
 
   async function initData() {
+    const network=await getWalletNetwork(Chain.BTC);
     const brc20Balance: Brc20DetailData = await fetchOneBrc20(
       btcAddress,
-      net_network,
+      network,
       brc20.ticker
     );
     const tokeList: TokenTransfer[] = brc20Balance.data.transferableList;

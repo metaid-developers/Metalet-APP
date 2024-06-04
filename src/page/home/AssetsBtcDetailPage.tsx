@@ -46,7 +46,6 @@ export default function AssetsBtcDetailPage({ route }) {
   const [isShowCopy, setIsShowCopy] = useState(false);
   const [addressType, setAddressType] = useState(AddressType.Legacy);
 
-  const { network } = useNetworkStore();
 
   //当前btc 地址
   const { btcAddress, updateBtcAddress } = useData();
@@ -325,7 +324,6 @@ export default function AssetsBtcDetailPage({ route }) {
               >
                 Send
               </Text>
-              <Text>{network}</Text>
             </View>
           </TouchableWithoutFeedback>
 

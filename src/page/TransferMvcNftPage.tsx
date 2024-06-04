@@ -1,4 +1,11 @@
-import { View, Text, Image, TextInput, Modal, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  Modal,
+  TouchableWithoutFeedback,
+} from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -16,7 +23,6 @@ import { useData } from "../hooks/MyProvider";
 import { API_NET, API_TARGET, NftManager } from "meta-contract";
 import { MvcGenesisItemBean } from "@/bean/MvcGenesisBean";
 import { goToWebScan } from "@/utils/WalletUtils";
-import { net_network } from "@/wallet/wallet";
 
 export default function TransferMvcNftPage({ route }) {
   const { myObject } = route.params;
@@ -46,17 +52,19 @@ export default function TransferMvcNftPage({ route }) {
       apiTarget: API_TARGET.MVC,
       purse: privateKey,
     });
-    const transferRes = await nftManager.transfer({
-      codehash: myObject.nftCodehash,
-      genesis:myObject.nftGenesis,
-      tokenIndex: myObject.nftTokenIndex,
-      senderWif: privateKey,
-      receiverAddress: inputAddress,
-    }).catch(e => {
-      console.log(e);
-      setIsShowLoading(false);
-      showNotice(e.message);
-    });
+    const transferRes = await nftManager
+      .transfer({
+        codehash: myObject.nftCodehash,
+        genesis: myObject.nftGenesis,
+        tokenIndex: myObject.nftTokenIndex,
+        senderWif: privateKey,
+        receiverAddress: inputAddress,
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsShowLoading(false);
+        showNotice(e.message);
+      });
 
     if (transferRes && transferRes.txid) {
       setIsShowLoading(false);
@@ -64,9 +72,6 @@ export default function TransferMvcNftPage({ route }) {
       setTransferSuccedDailogState(true);
       // setrawTx(transferRes.rawtx);
     }
-
-
-
   };
 
   function showNotice(notice: string) {
@@ -241,29 +246,31 @@ export default function TransferMvcNftPage({ route }) {
               Transaction ID
             </Text>
 
-          <TouchableWithoutFeedback onPress={()=>{
-            goToWebScan("mvc",transactionID,"mainnet");
-          }}>
-          <View
-              style={{
-                marginTop: 10,
-                flexDirection: "row",
-                alignItems: "center",
+            <TouchableWithoutFeedback
+              onPress={() => {
+                goToWebScan("mvc", transactionID, "mainnet");
               }}
             >
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="middle"
-                style={{ color: "#333", fontSize: 14, flex: 1 }}
+              <View
+                style={{
+                  marginTop: 10,
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
               >
-                {transactionID}
-              </Text>
-              <Image
-                source={require("../../image/link_ins_icon.png")}
-                style={{ width: 15, height: 15, marginLeft: 2 }}
-              />
-            </View>
-          </TouchableWithoutFeedback>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="middle"
+                  style={{ color: "#333", fontSize: 14, flex: 1 }}
+                >
+                  {transactionID}
+                </Text>
+                <Image
+                  source={require("../../image/link_ins_icon.png")}
+                  style={{ width: 15, height: 15, marginLeft: 2 }}
+                />
+              </View>
+            </TouchableWithoutFeedback>
 
             <View
               style={{

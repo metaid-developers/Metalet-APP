@@ -8,8 +8,10 @@ import { useData } from "../hooks/MyProvider";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
 import { useFocusEffect } from "@react-navigation/native";
-import { btc_network, getCurrentBtcWallet, net_network } from "../wallet/wallet";
+import {  getCurrentBtcWallet } from "../wallet/wallet";
 import { navigate } from "@/base/NavigationService";
+import { getWalletNetwork } from "@/utils/WalletUtils";
+import { Chain } from "@metalet/utxo-wallet-service";
 
 
 // nft
@@ -45,8 +47,10 @@ export default function BtcNftPage() {
   }
 
   const getBtcNftData = async (address: string) => {
+    const network=await getWalletNetwork(Chain.BTC);
+
     let params = {
-      net: net_network,
+      net: network,
       address: address,
       // address:metaletWallet.currentBtcWallet.getAddress(),
       cursor: 0,

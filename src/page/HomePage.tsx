@@ -69,11 +69,9 @@ import {
   fetchSpaceBalance,
 } from "../api/metaletservice";
 import {
-  btc_network,
   getBtcWallet,
   getCurrentBtcWallet,
   getCurrentMvcWallet,
-  net_network,
 } from "../wallet/wallet";
 import { Buffer } from "buffer";
 
@@ -81,7 +79,6 @@ import {
   getCurrentWalletAccount,
   getCurrentWalletSeed,
   getStorageCurrentWallet,
-  setWalletNetwork,
 } from "../utils/WalletUtils";
 import { caculateMvcAndBtcAssert } from "../utils/AssertUtils";
 import { ShowBalance } from "../api/type/Balance";
@@ -136,8 +133,7 @@ export default function HomePage({ navigation }) {
   const [userAvater, setuserAvater] = useState<string[]>([]);
   const [accountName, setaccountName] = useState("");
   const [walletName, setWalletName] = useState("");
-
-  const { network, switchNetwork } = useNetworkStore();
+  // const { initWalletManager } = useWalletManager();
   const {
     getWallets,
     walletManager,
@@ -146,15 +142,35 @@ export default function HomePage({ navigation }) {
   } = useWalletManager();
 
   useEffect(() => {
-    // console.log("HomePage useEffect");
-    switchNetwork("mainnet");
-    initCurrentWallet();
-    initWalletManager().then(async () => {
-      // const btcWallet = await getCurrentChainWallet(Chain.BTC);
-      // console.log("currentBtcWallet", btcWallet.getAddress());
-      // const mvcWallet = await getCurrentChainWallet(Chain.MVC);
-      // console.log("currentMvcWallet", mvcWallet.getAddress());
+    if (!walletManager) {
+      return;
+    }
+    const t1 = performance.now();
+    getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
+      updateBtcAddress(btcWallet.getAddress());
+      console.log("time1", performance.now() - t1);
+
+      console.log("eeeeeee", btcWallet.getAddress());
     });
+    getCurrentChainWallet(Chain.BTC).then((mvcWallet) => {
+      updateMvcAddress(mvcWallet.getAddress());
+
+      console.log("time2", performance.now() - t1);
+      console.log("eeeeeee", mvcWallet.getAddress());
+    });
+  }, [walletManager]);
+
+  useEffect(() => {
+    console.log("HomePage useEffect");
+
+    initCurrentWallet();
+    // initWalletManager();
+    // initWalletManager().then(async () => {
+    //   // const btcWallet = await getCurrentChainWallet(Chain.BTC);
+    //   // console.log("currentBtcWallet", btcWallet.getAddress());
+    //   // const mvcWallet = await getCurrentChainWallet(Chain.MVC);
+    //   // console.log("currentMvcWallet", mvcWallet.getAddress());
+    // });
     eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
       initCurrentWallet();
       setIsShowLoading(true);
@@ -163,18 +179,15 @@ export default function HomePage({ navigation }) {
         setIsShowLoading(false);
       }, 1000);
     });
-
-    setWalletNetwork(btc_network)
   }, []);
 
   useEffect(() => {
     // console.log("HomePage useEffect   btc change");
-
     setIsShowLoading(true);
-    setTimeout(() => {
+    if (btcAddress) {
       setIsShowLoading(false);
       getShowBalance();
-    }, 1000);
+    }
   }, [btcAddress]);
 
   useEffect(() => {
@@ -224,9 +237,9 @@ export default function HomePage({ navigation }) {
   }
 
   const getShowBalance = async () => {
-    const nowMvcWallet=await getCurrentMvcWallet();
-    const nowBtcWallet=await getCurrentBtcWallet();
-    
+    const nowMvcWallet = await getCurrentMvcWallet();
+    const nowBtcWallet = await getCurrentBtcWallet();
+
     const showbalance: ShowBalance = await caculateMvcAndBtcAssert(
       nowMvcWallet.getAddress(),
       nowBtcWallet.getAddress()
@@ -291,25 +304,17 @@ export default function HomePage({ navigation }) {
     getShowBalance();
   }
 
-  useEffect(() => {
-    if (walletManager) {
-      getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
-        // console.log("btc address", network, btcWallet.getAddress());
-      });
-      getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
-        // console.log("mvc address", network, mvcWallet.getAddress());
-      });
-    }
-    setIsShowLoading(false)
-  }, [walletManager]);
-
-  async function changeNetWork() {
-    if (network === "mainnet") {
-      switchNetwork("testnet");
-    } else if (network === "testnet") {
-      switchNetwork("mainnet");
-    }
-  }
+  // useEffect(() => {
+  //   if (walletManager) {
+  //     getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
+  //       // console.log("btc address", network, btcWallet.getAddress());
+  //     });
+  //     getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
+  //       // console.log("mvc address", network, mvcWallet.getAddress());
+  //     });
+  //   }
+  //   setIsShowLoading(false)
+  // }, [walletManager]);
 
   return (
     <SafeAreaView style={metaStyles.parentContainer}>
@@ -864,7 +869,7 @@ export default function HomePage({ navigation }) {
               // updateUserData({ ...userData, name: "校长" });
               //  AsyncStorage.removeItem(network_key);
               // console.log(metaletWallet.btcLegacyWallet.getAddress());
-              // navigate("SendSelectAssertPage");
+              navigate("SendSelectAssertPage");
               // navigate("PasswordPage");
             }}
           >
@@ -951,7 +956,6 @@ export default function HomePage({ navigation }) {
 
               // AsyncStorageUtil.clear();
               await AsyncStorage.clear();
- 
             }}
           >
             <View style={{ marginTop: 20 }}>

@@ -15,36 +15,49 @@ import {
   wallets_key,
 } from "../utils/AsyncStorageUtil";
 
-import { AddressType, Chain, CoinType } from "@metalet/utxo-wallet-service";
+import {
+  AddressType,
+  Chain,
+  CoinType,
+  Net,
+} from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { TypeTest } from "../wallet/TypeTest";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { WalletBean } from "../bean/WalletBean";
 import { Buffer } from "buffer";
-import {
-  btc_network,
-  getCurrentBtcWallet,
-  getCurrentMvcWallet,
-} from "../wallet/wallet";
+import { getCurrentBtcWallet, getCurrentMvcWallet } from "../wallet/wallet";
 import {
   getCurrentWalletAccount,
   getStorageCurrentWallet,
   getWalletBeans,
+  getWalletNetwork,
+  setWalletNetwork,
 } from "../utils/WalletUtils";
-import useWalletManager from "@/hooks/useWalletManager";
 import { goBack, navigate, reSets } from "../base/NavigationService";
+import useNetworkStore from "@/stores/useNetworkStore";
+import { BTC_NETWORK } from "./SettingsPage";
 
 export default function SplashPage(props) {
   const { myWallet, updateMyWallet } = useData();
   const { walletManager, updateWalletManager } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
+  const { network, switchNetwork } = useNetworkStore();
 
   useEffect(() => {
     initDataBase();
   }, []);
 
   async function initDataBase() {
+    // const network = await getWalletNetwork();
+    // if (network) {
+    //   switchNetwork(network as Net);
+    // } else {
+    //   await setWalletNetwork(BTC_NETWORK);
+    //   switchNetwork(BTC_NETWORK);
+    // }
+
     const walletBean = await getStorageCurrentWallet();
     const account = await getCurrentWalletAccount();
     // console.log("walletBean", walletBean);

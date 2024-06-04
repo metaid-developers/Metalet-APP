@@ -38,13 +38,12 @@ import { formatTime } from "../../utils/MetaFunUiils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MvcFtRecordData } from "../../api/type/MvcFtData";
 import { getIconUri } from "@mvc-org/mvc-resources";
-import { formatToDecimal } from "../../utils/WalletUtils";
+import { formatToDecimal, getWalletNetwork } from "../../utils/WalletUtils";
 import {
   caculateOneBtcFtValue,
   caculateOneFtValue,
   getBtcBrc20Icon,
 } from "../../utils/AssertUtils";
-import { net_network } from "@/wallet/wallet";
 import {
   AddressTokenSummary,
   Brc20DetailData,
@@ -55,6 +54,7 @@ import {
   BtcFtOneRecordData,
   InscriptionsList,
 } from "@/api/type/BtcFtOneRecordData";
+import { Chain } from "@metalet/utxo-wallet-service";
 
 export default function BRC20DetailPage({ route }) {
   const [mvcActivityList, setMvcActivityList] = useState<InscriptionsList[]>(
@@ -91,10 +91,11 @@ export default function BRC20DetailPage({ route }) {
     // console.log("assertFt: " + assertFt);
 
     setOneFtAssert(assertFt);
+    const network=await getWalletNetwork(Chain.BTC);
 
     const brc20Balance: Brc20DetailData = await fetchOneBrc20(
       address,
-      net_network,
+      network,
       brc20.ticker
     );
 

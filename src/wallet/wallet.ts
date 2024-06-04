@@ -10,6 +10,7 @@ import {
   getCurrentWalletSeed,
   getStorageCurrentWallet,
   getStorageWallets,
+  getWalletNetwork,
   isNoStorageWallet,
 } from "../utils/WalletUtils";
 import { BtcWallet, MvcWallet, ScriptType } from "@metalet/utxo-wallet-sdk";
@@ -48,12 +49,13 @@ export async function getCurrentBtcWallet(): Promise<BtcWallet> {
   const wallet = await getStorageCurrentWallet();
   const addressType = wallet.addressType;
   const seed = await getCurrentWalletSeed();
+  const network = await getWalletNetwork();
 
   let coinType =
     addressType === AddressType.SameAsMvc ? wallet.mvcTypes : CoinType.BTC;
 
   const btcWallet = new BtcWallet({
-    network: btc_network,
+    network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
     addressType: addressType,
@@ -69,12 +71,13 @@ export async function getBtcWallet(
 ): Promise<BtcWallet> {
   const wallet = await getStorageCurrentWallet();
   const seed = await getCurrentWalletSeed();
+  const network = await getWalletNetwork();
 
   let coinType =
     uAddressType === AddressType.SameAsMvc ? wallet.mvcTypes : CoinType.BTC;
 
   const btcWallet = new BtcWallet({
-    network: btc_network,
+    network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
     addressType: uAddressType,
@@ -90,8 +93,10 @@ export async function getBtCreateWallet(
 ): Promise<BtcWallet> {
   // const wallet = await getStorageCurrentWallet();
   let coinType = CoinType.BTC;
+  const network = await getWalletNetwork();
+
   const btcWallet = new BtcWallet({
-    network: btc_network,
+    network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: walletBean.mnemonic,
     addressIndex: walletBean.isCurrentPathIndex,
     addressType: walletBean.addressType,

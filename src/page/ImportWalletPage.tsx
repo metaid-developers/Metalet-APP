@@ -33,14 +33,14 @@ import {
 import { useData } from "../hooks/MyProvider";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
-import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
+import { AddressType, Chain, CoinType } from "@metalet/utxo-wallet-service";
 import { getRandomColorList } from "../utils/MetaFunUiils";
-import { btc_network } from "../wallet/wallet";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 import {
   getStorageWallets,
   getWalletBeans,
+  getWalletNetwork,
   isNoStorageWallet,
 } from "../utils/WalletUtils";
 
@@ -99,7 +99,8 @@ export default function ImportWalletPage(props) {
     }
 
     console.log(mvcPath);
-    
+    const network=await getWalletNetwork();
+
     let walletBean: WalletBean = {
       id: walletID,
       name: walletName,
@@ -122,7 +123,7 @@ export default function ImportWalletPage(props) {
     };
 
     const btcWallet = new BtcWallet({
-      network: btc_network,
+      network: network=="mainnet"?"mainnet":"testnet",
       mnemonic: walletBean.mnemonic,
       addressIndex: walletBean.accountsOptions[0].addressIndex,
       addressType: walletBean.addressType,

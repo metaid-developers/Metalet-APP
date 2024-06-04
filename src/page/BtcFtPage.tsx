@@ -18,8 +18,10 @@ import { BTC_FT_URL, get } from "../utils/Api";
 import { useData } from "../hooks/MyProvider";
 import { useFocusEffect } from "@react-navigation/native";
 import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
-import { btc_network, getCurrentBtcWallet } from "../wallet/wallet";
+import { getCurrentBtcWallet } from "../wallet/wallet";
 import { navigate } from "@/base/NavigationService";
+import { getWalletNetwork } from "@/utils/WalletUtils";
+import { Chain } from "@metalet/utxo-wallet-service";
 
 // now
 export default function BtcFtPage() {
@@ -57,8 +59,10 @@ export default function BtcFtPage() {
   }
 
   const getBtcFtData = async (address: string) => {
+    const network = await getWalletNetwork(Chain.BTC);
+
     let params = {
-      net: btc_network,
+      net: network,
       // address: metaletWallet.currentBtcWallet.getAddress(),
       address: address,
       ticker: "btc",
@@ -79,7 +83,10 @@ export default function BtcFtPage() {
     }
   };
 
-  const ListItem:React.FC<{index:number;item:BtcFtBean}> = ({ index, item }) => {
+  const ListItem: React.FC<{ index: number; item: BtcFtBean }> = ({
+    index,
+    item,
+  }) => {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
@@ -138,10 +145,10 @@ export default function BtcFtPage() {
     );
   };
 
-    // 定义 renderItem 函数
-    const renderItem: ListRenderItem<BtcFtBean> = ({ item, index }) => {
-      return <ListItem item={item} index={index} />;
-    };
+  // 定义 renderItem 函数
+  const renderItem: ListRenderItem<BtcFtBean> = ({ item, index }) => {
+    return <ListItem item={item} index={index} />;
+  };
 
   return (
     <View style={[metaStyles.varContainer, { backgroundColor: "#fff" }]}>

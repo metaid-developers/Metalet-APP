@@ -2,7 +2,6 @@ import "./globals.js";
 import { useEffect } from "react";
 import { UserProvider } from "./src/hooks/MyProvider";
 import AppNavigator from "./src/base/AppNavigator.jsx";
-import useWalletManager from "@/hooks/useWalletManager";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient({
@@ -16,12 +15,6 @@ const queryClient = new QueryClient({
 });
 
 export default function App() {
-  const { initWalletManager } = useWalletManager();
-
-  useEffect(() => {
-    initWalletManager();
-  }, []);
-
   return (
     <UserProvider>
       <QueryClientProvider client={queryClient}>

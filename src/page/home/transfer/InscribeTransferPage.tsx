@@ -21,14 +21,14 @@ import {
   metaStyles,
   themeColor,
 } from "@/constant/Constants";
-import { parseToSat, parseToSpace } from "@/utils/WalletUtils";
+import { getWalletNetwork, parseToSat, parseToSpace } from "@/utils/WalletUtils";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import * as Clipboard from "expo-clipboard";
 import { navigate } from "@/base/NavigationService";
 import { broadcastBtc, fetchBrc20InscribeCommit } from "@/api/metaletservice";
 import { useData } from "@/hooks/MyProvider";
-import { net_network } from "@/wallet/wallet";
 import { InscribeResultData } from "@/api/type/Inscribe";
+import { Chain } from "@metalet/utxo-wallet-service";
 
 const TabsTop = createMaterialTopTabNavigator();
 export default function InscribeTransferPage({ route }) {
@@ -70,14 +70,14 @@ export default function InscribeTransferPage({ route }) {
 
           console.log(orderID, orderID);
           console.log(btcAddress, btcAddress);
-          console.log(net_network, net_network);
           console.log("raxtx", transRes.rawTx);
+          const network=await getWalletNetwork(Chain.BTC);
 
           const commitRes: InscribeResultData = await fetchBrc20InscribeCommit(
             0,
             orderID,
             btcAddress,
-            net_network,
+            network,
             transRes.rawTx
           );
 
