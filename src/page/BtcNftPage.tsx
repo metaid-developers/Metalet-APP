@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet, Dimensions } from "react-native";
+import { View, Text, FlatList, StyleSheet, Dimensions, TouchableWithoutFeedback } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { NoMoreDataView } from "../constant/Widget";
 import { metaStyles } from "../constant/Constants";
@@ -9,6 +9,7 @@ import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
 import { useFocusEffect } from "@react-navigation/native";
 import { btc_network, getCurrentBtcWallet, net_network } from "../wallet/wallet";
+import { navigate } from "@/base/NavigationService";
 
 
 // nft
@@ -94,14 +95,17 @@ export default function BtcNftPage() {
 
   function ItemList({ index, item }) {
     return (
-      <View
+     <TouchableWithoutFeedback onPress={()=>{
+      navigate('BtcNftDetailPage',{nftDetail:item})
+     }}>
+       <View
         style={{
           backgroundColor: "#171AFF",
           borderRadius: 8,
           height: "auto",
           width: width / 4,
           marginTop: 10,
-          marginLeft: ismany,
+          marginRight:10,
           paddingHorizontal: 10,
           paddingVertical: 10,
           alignItems: "center",
@@ -138,6 +142,7 @@ export default function BtcNftPage() {
           </View>
         </View>
       </View>
+     </TouchableWithoutFeedback>
     );
   }
 

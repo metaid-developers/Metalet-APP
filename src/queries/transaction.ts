@@ -1,14 +1,17 @@
 import { PageResult } from "./types/base";
 // import { getNet } from "@/lib/network";
 import { metaletApiV3 } from "./request";
-import { net_network } from "../wallet/wallet";
+import { getNetwork } from "@/lib/network";
+import { Chain } from "@metalet/utxo-wallet-service";
 // import { useQuery } from '@tanstack/vue-query'
+
+
 
 // TODO: fix network switch
 export const fetchBtcTxHex = async (txId: string): Promise<string> => {
   // const net = getNet();
   return metaletApiV3<{ rawTx: string }>(`/tx/raw`)
-    .get({ net: net_network, txId, chain: "btc" })
+    .get({ net: getNetwork(Chain.BTC), txId, chain: "btc" })
     .then((res) => res.rawTx);
 };
 
@@ -17,7 +20,7 @@ export const broadcastBTCTx = async (rawTx: string) => {
   // const net = getNet();
   return await metaletApiV3<string>(`/tx/broadcast`).post({
     chain: "btc",
-    net: net_network,
+    net: getNetwork(Chain.BTC),
     rawTx,
   });
 };
@@ -32,7 +35,7 @@ export interface FeeRate {
 export const getBTCTRate = async (): Promise<PageResult<FeeRate>> => {
   // const net = getNet()
   return metaletApiV3<PageResult<FeeRate>>(`/btc/fee/summary`).get({
-    net: net_network,
+    net: getNetwork(Chain.BTC),
   });
 };
 

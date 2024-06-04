@@ -1,4 +1,4 @@
-import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
+import { AddressType, Chain, CoinType } from "@metalet/utxo-wallet-service";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { useData } from "../hooks/MyProvider";
 import {
@@ -9,6 +9,7 @@ import {
   createStorage,
   network_btc,
   AsyncStorageUtil,
+  net_wallet_network_key,
 } from "./AsyncStorageUtil";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { removeTrailingZeros } from "./StringUtils";
@@ -120,6 +121,19 @@ export async function verifyPassword(password: string): Promise<boolean> {
   }
 }
 
+export async function getWalletNetwork(chain?: Chain): Promise<string> {
+  const network = await AsyncStorageUtil.getItem(net_wallet_network_key);
+  if (chain === Chain.BTC && network === "mainnet") {
+    return "livenet";
+  }
+
+  return network;
+}
+
+export async function setWalletNetwork(walletNet: string) {
+  await AsyncStorageUtil.setItem(net_wallet_network_key, walletNet);
+}
+
 /////////////change
 export async function changeCurrentWalletAddressType(
   changeAddressType: AddressType
@@ -131,7 +145,6 @@ export async function changeCurrentWalletAddressType(
   await storage.set(wallets_key, wallets);
   // await AsyncStorageUtil.updateItem(wallets_key, [...wallets, wallet]);
   // await AsyncStorageUtil.updateItem(wallets_key, wallets);
-
 }
 
 ///////////utils
@@ -163,7 +176,11 @@ export function caculateToSatDecimal(amount: number, precision: number) {
 }
 
 /////////// fuction
-export async function goToWebScan(chain: string, linkTx: string,network:string) {
+export async function goToWebScan(
+  chain: string,
+  linkTx: string,
+  network: string
+) {
   let url;
   if (chain == "mvc") {
     url = "https://www.mvcscan.com/tx/" + linkTx;
@@ -175,10 +192,9 @@ export async function goToWebScan(chain: string, linkTx: string,network:string) 
     }
   }
 
+  console.log("url", url);
 
-  console.log("url",url);
-  
-  if(url){
+  if (url) {
     const supported = await Linking.canOpenURL(url);
     if (supported) {
       await Linking.openURL(url);
@@ -186,5 +202,4 @@ export async function goToWebScan(chain: string, linkTx: string,network:string) 
       console.log(`Don't know how to open this URL: ${url}`);
     }
   }
-
 }

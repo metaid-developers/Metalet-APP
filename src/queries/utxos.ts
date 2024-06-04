@@ -2,7 +2,9 @@ import { Chain } from "@metalet/utxo-wallet-service";
 // import { getNet } from "@/lib/network";
 import { fetchBtcTxHex } from "./transaction";
 import { mvcApi, mempoolApi, metaletApiV3, unisatApi } from "./request";
-import { net_network } from "../wallet/wallet";
+import { getNetwork } from "@/lib/network";
+import { getWalletNetwork } from "@/utils/WalletUtils";
+
 
 export interface UTXO {
   txId: string;
@@ -29,9 +31,7 @@ export type MvcUtxo = {
 
 // TODO: fix network switch
 const fetchMVCUtxos = async (address: string): Promise<MvcUtxo[]> => {
-  return (
-    await mvcApi<MvcUtxo[]>(`/address/${address}/utxo`, net_network)
-  ).get();
+  return (await mvcApi<MvcUtxo[]>(`/address/${address}/utxo`)).get();
 };
 
 export type Utxo = {
@@ -92,7 +92,8 @@ export interface UnisatUTXO {
 export async function getBtcUtxos(
   address: string,
   needRawTx = false,
-  useUnconfirmed = false
+  // useUnconfirmed = false
+  useUnconfirmed = true
 ): Promise<UTXO[]> {
   // const net = getNet();
   // if (UNISAT_ENABLED) {
@@ -107,13 +108,15 @@ export async function getBtcUtxos(
 
   //   return utxos.filter((utxo) => utxo.confirmed)
   // }
+  const network=await getWalletNetwork(Chain.BTC);
+  console.log("network,",network);
+  
   let utxos =
     (await metaletApiV3<UTXO[]>("/address/btc-utxo").get({
-      net: net_network,
+      net: network,
       address,
       unconfirmed: "1",
     })) || [];
-  
 
   if (!useUnconfirmed) {
     utxos = utxos.filter((utxo) => utxo.confirmed);
@@ -121,7 +124,6 @@ export async function getBtcUtxos(
   if (needRawTx) {
     for (let utxo of utxos) {
       utxo.rawTx = await fetchBtcTxHex(utxo.txId);
-      utxo.rawTx;
     }
   }
   return utxos.sort((a, b) => {
@@ -142,7 +144,7 @@ export async function getRuneUtxos(
     total: number;
     cursor: number;
     list: UTXO[];
-  }>("/runes/address/utxo").get({ net: net_network, address, runeId });
+  }>("/runes/address/utxo").get({ net: getNetwork(Chain.BTC), address, runeId });
   if (needRawTx) {
     for (let utxo of res.list) {
       utxo.rawTx = await fetchBtcTxHex(utxo.txId);
@@ -165,13 +167,16 @@ export async function getRuneUtxos(
 //   return utxos.map((utxo) => formatUnisatUTXO(utxo))
 // }
 
-export async function getInscriptionUtxo(inscriptionId: string): Promise<UTXO> {
-  // const net = getNet();
-  return await metaletApiV3<UTXO>("/inscription/utxo").get({
-    net: net_network,
-    inscriptionId,
-  });
+
+export async function getInscriptionUtxo(inscriptionId: string, needRawTx: boolean = false): Promise<UTXO> {
+  const net = getNetwork(Chain.BTC);
+  const utxo = await metaletApiV3<UTXO>('/inscription/utxo').get({ net, inscriptionId })
+  if (needRawTx) {
+    utxo.rawTx = await fetchBtcTxHex(utxo.txId)
+  }
+  return utxo
 }
+
 
 export interface MempoolUtxo {
   txid: string;

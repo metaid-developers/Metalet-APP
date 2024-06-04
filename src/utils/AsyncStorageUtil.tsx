@@ -76,6 +76,9 @@ export const CurrentWalletIDKey = "CurrentWalletID_key";
 export const CurrentAccountIDKey = "CurrentAccountID_key";
 
 
+export const net_wallet_network_key = "net_network_key";
+
+
 
 
 //创建数据

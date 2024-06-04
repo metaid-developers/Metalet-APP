@@ -860,7 +860,7 @@ export const Line = ({top=10}) => {
     <View
       style={{
         width: "100%",
-        height: 0.8,
+        height: 0.5,
         backgroundColor: "rgba(191, 194, 204, 0.5)",
         marginTop: top,
       }}

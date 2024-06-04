@@ -1,3 +1,5 @@
+import { JsxEmit } from "typescript";
+
 export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
 export const BASE_METALET_URL = "https://www.metalet.space";
@@ -55,6 +57,8 @@ export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => 
 };
 
 export const post = async (url, data = {}) => {
+  console.log("data "+JSON.stringify(data));
+  
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -68,11 +72,12 @@ export const post = async (url, data = {}) => {
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-
+    console.log("response", response.url);
     return await response.json();
   } catch (error) {
-    console.error("Post Rqeuest Error:", error);
-    throw error;
+    console.log("Get Rqeuest Error:", url);
+    console.error("Post Rqeuest Error:", JSON.stringify(error));
+    // throw error;
   }
 };
 

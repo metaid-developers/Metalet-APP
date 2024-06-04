@@ -4,8 +4,13 @@ import { FeedBtcObject } from "../types/btcfeed";
 import { UtxoBean } from "../types/utxoBean";
 import { get, post } from "../utils/Api";
 import { net_network } from "../wallet/wallet";
-import { AddressTokenSummary, Brc20DetailData, SpaceBalance } from "./type/Balance";
+import {
+  AddressTokenSummary,
+  Brc20DetailData,
+  SpaceBalance,
+} from "./type/Balance";
 import { BtcFtOneRecordData } from "./type/BtcFtOneRecordData";
+import { InscribeResultData, PreInscribe, PreInscribeData } from "./type/Inscribe";
 import { MvcFtData, MvcFtRecordData } from "./type/MvcFtData";
 import { MvcNftData } from "./type/MvcNftData";
 import { MvcFtPriceData } from "./type/Price";
@@ -192,6 +197,52 @@ export async function fetchBrc20Record(
     BASE_METALET_URL + "/wallet-api/v3/address/brc20/activities",
     false,
     { chain: chain, tick: ticker, address: address }
+  );
+  return data;
+}
+
+//brc20 inscribe pre
+export async function fetchBrc20InscribePre(
+  receiveAddress: string,
+  feeRate: number,
+  net: string,
+  filename: string
+): Promise<PreInscribeData> {
+  const data: PreInscribeData = await post(
+    BASE_METALET_URL + "/wallet-api/v3/inscribe/pre",
+    {
+      feeRate,
+      files: [
+        {
+          filename,
+          dataURL: Buffer.from(filename).toString("base64"),
+        },
+      ],
+      net,
+      receiveAddress,
+    }
+  );
+  return data;
+}
+
+//brc20 inscribe commit
+export async function fetchBrc20InscribeCommit(
+  version: number,
+  orderId: string,
+  feeAddress: string,
+  net: string,
+  rawTx: string
+) :Promise <InscribeResultData>{
+  const data:InscribeResultData = await post(
+    BASE_METALET_URL + "/wallet-api/v3/inscribe/commit",
+    {
+      version,
+      orderId,
+      feeAddress,
+      net,
+      rawTx,
+      // addressType:1
+    }
   );
   return data;
 }

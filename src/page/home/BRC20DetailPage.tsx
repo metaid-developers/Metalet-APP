@@ -6,6 +6,7 @@ import {
   FlatList,
   Dimensions,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
@@ -18,6 +19,7 @@ import {
 import { goBack, navigate } from "../../base/NavigationService";
 import {
   inputNormalBgColor,
+  litterWhittleBgColor,
   metaStyles,
   themeColor,
 } from "../../constant/Constants";
@@ -49,7 +51,10 @@ import {
   TokenBalance,
   TokenTransfer,
 } from "@/api/type/Balance";
-import { InscriptionsList } from "@/api/type/BtcFtOneRecordData";
+import {
+  BtcFtOneRecordData,
+  InscriptionsList,
+} from "@/api/type/BtcFtOneRecordData";
 
 export default function BRC20DetailPage({ route }) {
   const [mvcActivityList, setMvcActivityList] = useState<InscriptionsList[]>(
@@ -112,7 +117,22 @@ export default function BRC20DetailPage({ route }) {
     // tokeList.push(toke1);
     // tokeList.push(toke2);
     const tokeList: TokenTransfer[] = brc20Balance.data.transferableList;
-    setTokenTransferList(tokeList);
+    const toke2: TokenTransfer = {
+      ticker: "rdex",
+      amount: "2321",
+      inscriptionId: "#3248",
+      inscriptionNumber: 23,
+      timestamp: 32,
+    };
+
+    if (tokeList.length > 0) {
+      let tokeList1 = [];
+      tokeList1.push(tokeList[0]);
+      if (tokeList.length > 1) {
+        tokeList1.push(tokeList[1]);
+      }
+      setTokenTransferList(tokeList1);
+    }
 
     const tokenBalance: TokenBalance = brc20Balance.data.tokenBalance;
 
@@ -125,6 +145,7 @@ export default function BRC20DetailPage({ route }) {
       "btc",
       brc20.ticker
     );
+
     // console.log("resutl  ", mvcActivityListData);
     let brc20RecordList: InscriptionsList[] =
       mvcActivityListData.data.inscriptionsList;
@@ -181,6 +202,12 @@ export default function BRC20DetailPage({ route }) {
       isIncome = false;
     }
 
+    let title="";
+    if(item.actionType=='transfer'){
+      title = isIncome ? "Receive" : "Send";
+    }else{
+      title=item.actionType;
+    }
     // let ImageUrl = getIconUri({
     //   type: "metaContract",
     //   codehash: brc20.codeHash,
@@ -294,7 +321,7 @@ export default function BRC20DetailPage({ route }) {
               <Text
                 style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
               >
-                {isIncome ? "Receive" : "Send"}
+              {title}
               </Text>
               <View style={{ flex: 1 }} />
               <Text
@@ -393,7 +420,11 @@ export default function BRC20DetailPage({ route }) {
         }}
       >
         {isErrorIcon ? (
-          <CircleAvatarLetter widthC={60} heightC={60} letterStr={brc20.ticker.substring(0, 1)} />
+          <CircleAvatarLetter
+            widthC={60}
+            heightC={60}
+            letterStr={brc20.ticker.substring(0, 1)}
+          />
         ) : (
           <CircleAvatar
             imageUrl={ImageUrl}
@@ -608,61 +639,95 @@ export default function BRC20DetailPage({ route }) {
                   columnWrapperStyle={{ justifyContent: "space-between" }}
                   renderItem={({ item, index }) => {
                     return (
-                      <View
-                        style={{
-                          marginTop: 20,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flex: 1,
-                          marginLeft: index == 0 ? 0 : 20,
+                      <TouchableWithoutFeedback
+                        onPress={() => {
+                          if (item.inscriptionNumber === -1) {
+                            console.log("inscriptionNumber===-1");
+                            return;
+                          }
+                          console.log("igo");
                         }}
                       >
                         <View
                           style={{
-                            paddingTop: 10,
-                            width: "100%",
+                            marginTop: 20,
                             flex: 1,
-                            marginBottom: 20,
-                            alignItems: "center",
-                            backgroundColor: "#EDEDED",
-                            borderRadius: 10,
+                            marginLeft: index == 0 ? 0 : 20,
                           }}
                         >
-                          <Text
-                            style={[
-                              metaStyles.grayTextSmall66,
-                              { marginTop: 20 },
-                            ]}
-                          >
-                            {item.ticker.toUpperCase()}
-                          </Text>
-
-                          <Text
-                            style={[
-                              metaStyles.largeDefaultLittleText,
-                              { marginTop: 15 },
-                            ]}
-                          >
-                            {item.amount}
-                          </Text>
-
                           <View
                             style={{
-                              backgroundColor: themeColor,
-                              width: "100%",
-                              borderBottomEndRadius: 10,
-                              borderBottomStartRadius: 10,
+                              paddingTop: 10,
+                              width:
+                                tokenTransferList.length <= 1 ? "50%" : "100%",
+                              marginBottom: 20,
                               alignItems: "center",
-                              paddingVertical: 8,
-                              marginTop: 25,
+                              backgroundColor: litterWhittleBgColor,
+                              borderRadius: 10,
                             }}
                           >
-                            <Text style={{ color: "#fff" }}>
-                              {item.inscriptionId}
+                            <Text
+                              style={[
+                                metaStyles.grayTextSmall66,
+                                { marginTop: 20 },
+                              ]}
+                            >
+                              {item.ticker.toUpperCase()}
                             </Text>
+
+                            <Text
+                              style={[
+                                metaStyles.largeDefaultLittleText,
+                                { marginTop: 15 },
+                              ]}
+                            >
+                              {item.amount}
+                            </Text>
+
+                            {item.inscriptionNumber == -1 && (
+                              <View
+                                style={{
+                                  backgroundColor: "#FF8F1F",
+                                  width: "100%",
+                                  borderBottomEndRadius: 10,
+                                  borderBottomStartRadius: 10,
+                                  alignItems: "center",
+                                  paddingVertical: 8,
+                                  marginTop: 25,
+                                  flexDirection: "row",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <ActivityIndicator
+                                  size={"small"}
+                                  color={"#fff"}
+                                />
+                                <Text style={{ color: "#fff", marginLeft: 5 }}>
+                                  Confirm
+                                </Text>
+                              </View>
+                            )}
+
+                            {item.inscriptionNumber != -1 && (
+                              <View
+                                style={{
+                                  backgroundColor: themeColor,
+                                  width: "100%",
+                                  borderBottomEndRadius: 10,
+                                  borderBottomStartRadius: 10,
+                                  alignItems: "center",
+                                  paddingVertical: 8,
+                                  marginTop: 25,
+                                }}
+                              >
+                                <Text style={{ color: "#fff" }}>
+                                 # {item.inscriptionNumber}
+                                </Text>
+                              </View>
+                            )}
                           </View>
                         </View>
-                      </View>
+                      </TouchableWithoutFeedback>
                     );
                   }}
                 />

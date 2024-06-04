@@ -597,7 +597,7 @@ export default function SendBtcPage() {
                       backgroundColor: "transparent",
                     }}
                     onFocus={() => {
-                      // setFeedModeType(feedModeCustom);
+                      setFeedModeType(feedModeCustom);
                     }}
                   />
                 </View>

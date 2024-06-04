@@ -56,6 +56,12 @@ import PlazaPage from "@/page/PlazaPage";
 import BRC20DetailPage from "@/page/home/BRC20DetailPage";
 import TransferBrc20FirstPage from "@/page/home/transfer/TransferBrc20FirstPage";
 import InscribeFirstPage from "@/page/home/transfer/InscribeFirstPage";
+import InscribePrePage from "@/page/home/transfer/InscribePrePage";
+import InscribeTransferPage from "@/page/home/transfer/InscribeTransferPage";
+import InscribeSuccessPage from "@/page/home/transfer/InscribeSuccessPage";
+import TransferBrc20Page from "@/page/home/transfer/TransferBrc20Page";
+import BtcNftDetailPage from "@/page/home/BtcNftDetailPage";
+import BtcNftTransferPage from "@/page/home/BtcNftTransferPage";
 
 ////////
 
@@ -137,8 +143,20 @@ const StackNavigator = () => (
     <Stack.Screen name="SendMvcFtPage" component={SendMvcFtPage} />
     <Stack.Screen name="SendSuccessPage" component={SendSuccessPage} />
     <Stack.Screen name="BRC20DetailPage" component={BRC20DetailPage} />
-    <Stack.Screen name="TransferBrc20FirstPage" component={TransferBrc20FirstPage} />
+    <Stack.Screen
+      name="TransferBrc20FirstPage"
+      component={TransferBrc20FirstPage}
+    />
     <Stack.Screen name="InscribeFirstPage" component={InscribeFirstPage} />
+    <Stack.Screen name="InscribePrePage" component={InscribePrePage} />
+    <Stack.Screen
+      name="InscribeTransferPage"
+      component={InscribeTransferPage}
+    />
+    <Stack.Screen name="InscribeSuccessPage" component={InscribeSuccessPage} />
+    <Stack.Screen name="TransferBrc20Page" component={TransferBrc20Page} />
+    <Stack.Screen name="BtcNftDetailPage" component={BtcNftDetailPage} />
+    <Stack.Screen name="BtcNftTransferPage" component={BtcNftTransferPage} />
   </Stack.Navigator>
 );
 
@@ -161,9 +179,7 @@ const TabNavigator = () => (
               style={metaStyles.tabImage}
             />
           );
-        } 
-
-        else if (route.name === "WebsPage") {
+        } else if (route.name === "WebsPage") {
           icon = focused ? (
             <Image
               source={require("../../image/me_plaza_select_tab.png")}
@@ -175,19 +191,19 @@ const TabNavigator = () => (
               style={metaStyles.tabImage}
             />
           );
-        
-        // else if (route.name === "PlazaPage") {
-        //   icon = focused ? (
-        //     <Image
-        //       source={require("../../image/me_plaza_select_tab.png")}
-        //       style={metaStyles.tabImage}
-        //     />
-        //   ) : (
-        //     <Image
-        //       source={require("../../image/me_plaza_normal_tab.png")}
-        //       style={metaStyles.tabImage}
-        //     />
-        //   );
+
+          // else if (route.name === "PlazaPage") {
+          //   icon = focused ? (
+          //     <Image
+          //       source={require("../../image/me_plaza_select_tab.png")}
+          //       style={metaStyles.tabImage}
+          //     />
+          //   ) : (
+          //     <Image
+          //       source={require("../../image/me_plaza_normal_tab.png")}
+          //       style={metaStyles.tabImage}
+          //     />
+          //   );
         } else {
           icon = focused ? (
             <Image

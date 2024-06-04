@@ -81,6 +81,7 @@ import {
   getCurrentWalletAccount,
   getCurrentWalletSeed,
   getStorageCurrentWallet,
+  setWalletNetwork,
 } from "../utils/WalletUtils";
 import { caculateMvcAndBtcAssert } from "../utils/AssertUtils";
 import { ShowBalance } from "../api/type/Balance";
@@ -146,6 +147,7 @@ export default function HomePage({ navigation }) {
 
   useEffect(() => {
     // console.log("HomePage useEffect");
+    switchNetwork("mainnet");
     initCurrentWallet();
     initWalletManager().then(async () => {
       // const btcWallet = await getCurrentChainWallet(Chain.BTC);
@@ -161,6 +163,8 @@ export default function HomePage({ navigation }) {
         setIsShowLoading(false);
       }, 1000);
     });
+
+    setWalletNetwork(btc_network)
   }, []);
 
   useEffect(() => {
@@ -290,17 +294,16 @@ export default function HomePage({ navigation }) {
   useEffect(() => {
     if (walletManager) {
       getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
-        console.log("btc address", network, btcWallet.getAddress());
+        // console.log("btc address", network, btcWallet.getAddress());
       });
       getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
-        console.log("mvc address", network, mvcWallet.getAddress());
+        // console.log("mvc address", network, mvcWallet.getAddress());
       });
     }
     setIsShowLoading(false)
   }, [walletManager]);
 
   async function changeNetWork() {
-    setIsShowLoading(true)
     if (network === "mainnet") {
       switchNetwork("testnet");
     } else if (network === "testnet") {
@@ -861,7 +864,7 @@ export default function HomePage({ navigation }) {
               // updateUserData({ ...userData, name: "校长" });
               //  AsyncStorage.removeItem(network_key);
               // console.log(metaletWallet.btcLegacyWallet.getAddress());
-              navigate("SendSelectAssertPage");
+              // navigate("SendSelectAssertPage");
               // navigate("PasswordPage");
             }}
           >

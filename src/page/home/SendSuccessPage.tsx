@@ -1,14 +1,26 @@
 import { View, Text, Image, TouchableWithoutFeedback } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { RoundSimButton, TitleBar } from "../../constant/Widget";
+import {
+  CircleAvatar,
+  CircleAvatarLetter,
+  RoundSimButton,
+  TitleBar,
+} from "../../constant/Widget";
 import { navigate } from "../../base/NavigationService";
 import { metaStyles } from "@/constant/Constants";
 import { goToWebScan } from "@/utils/WalletUtils";
 import { network_btc } from "@/utils/AsyncStorageUtil";
+import { getBtcBrc20Icon } from "@/utils/AssertUtils";
 
 export default function SendSuccessPage({ route }) {
   const { result } = route.params;
+  const [isErrorIcon, setisErrorIcon] = useState(false);
+
+  let ImageUrl = getBtcBrc20Icon(result.symbol);
+  if (!ImageUrl) {
+    ImageUrl = "1";
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -60,10 +72,29 @@ export default function SendSuccessPage({ route }) {
                 alignItems: "center",
               }}
             >
-              <Image
+              {/* <Image
                 source={require("../../../image/logo_space.png")}
                 style={{ width: 36, height: 36 }}
-              />
+              /> */}
+
+              {isErrorIcon ? (
+                <CircleAvatarLetter
+                  widthC={36}
+                  heightC={36}
+                  letterStr={result.symbol.substring(0, 1)}
+                />
+              ) : (
+                <CircleAvatar
+                  widthC={36}
+                  heightC={36}
+                  imageUrl={ImageUrl}
+                  event={() => {
+                    setisErrorIcon(true);
+                    // refreshData(brc20.txid);
+                  }}
+                />
+              )}
+
               <Text style={{ color: "#000", fontSize: 16, marginLeft: 10 }}>
                 {result.amount} {result.symbol}
               </Text>
@@ -107,10 +138,12 @@ export default function SendSuccessPage({ route }) {
 
         <View style={{ flex: 1 }} />
 
-        <TouchableWithoutFeedback onPress={() => {
-          console.log("click");
-          goToWebScan(result.chain,result.txid,network_btc)
-        }}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            console.log("click");
+            goToWebScan(result.chain, result.txid, network_btc);
+          }}
+        >
           <View
             style={{
               flexDirection: "row",
