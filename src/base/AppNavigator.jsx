@@ -36,8 +36,6 @@ import FtBtcPage from "../page/nft/FtBtcPage";
 import FtParentPage from "../page/nft/FtParentPage";
 import SelectReceivePage from "../page/receive/SelectReceivePage";
 import ReceivePage from "../page/receive/ReceivePage";
-import WebPage from "../webs/WebPage";
-import WebPageTest from "../webs/WebPageTest";
 import WebsPage from "../webs/WebsPage";
 import DiscoverPage from "@/webs/DiscoverPage";
 import AssetsMvcDetailPage from "../page/home/AssetsMvcDetailPage";
@@ -118,8 +116,6 @@ const StackNavigator = () => (
     <Stack.Screen name="NetWorkPage" component={NetWorkPage} />
     <Stack.Screen name="SelectReceivePage" component={SelectReceivePage} />
     <Stack.Screen name="ReceivePage" component={ReceivePage} />
-    <Stack.Screen name="WebPage" component={WebPage} />
-    <Stack.Screen name="WebPageTest" component={WebPageTest} />
     <Stack.Screen name="WebsPage" component={WebsPage} />
     <Stack.Screen name="DiscoverPage" component={DiscoverPage} />
     <Stack.Screen name="AssetsMvcDetailPage" component={AssetsMvcDetailPage} />
@@ -181,7 +177,7 @@ const TabNavigator = () => (
               style={metaStyles.tabImage}
             />
           );
-        } else if (route.name === "WebsPage") {
+        } else if (route.name === "DiscoverPage") {
           icon = focused ? (
             <Image
               source={require("../../image/me_plaza_select_tab.png")}

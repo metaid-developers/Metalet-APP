@@ -16,7 +16,7 @@ import * as SignTransactions from "./lib/authorize/sign-transactions";
 import * as ConnectBTC from "./lib/authorize/btc/connect";
 import * as BTCTransfer from "./lib/authorize/btc/transfer";
 import * as SignBTCPsbt from "./lib/authorize/btc/sign-psbt";
-// import * as SignBTCMessage from "./lib/authorize/btc/sign-message";
+import * as SignBTCMessage from "./lib/authorize/btc/sign-message";
 
 function doNothing() {}
 
@@ -156,15 +156,15 @@ export default {
     estimate: doNothing,
     closeAfterProcess: true,
   },
-  // SignBTCMessage: {
-  //   name: "Sign BTC Message",
-  //   title: "Signature request",
-  //   description:
-  //     "Only sign this message if you fully understand the content and trust the requesting site.",
-  //   process: SignBTCMessage.process,
-  //   estimate: doNothing,
-  //   closeAfterProcess: true,
-  // },
+  SignBTCMessage: {
+    name: "Sign BTC Message",
+    title: "Signature request",
+    description:
+      "Only sign this message if you fully understand the content and trust the requesting site.",
+    process: SignBTCMessage.process,
+    estimate: doNothing,
+    closeAfterProcess: true,
+  },
   // Inscribe: {
   //   name: "Inscribe",
   //   title: "Inscribe",

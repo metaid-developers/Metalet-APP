@@ -47,7 +47,6 @@ export default function WebsPage(props) {
   };
 
   const handlerMessage = async (message: Message) => {
-    console.log(message);
     const [actionName, actionType] = message.action.split("-");
     if (actionName === "Connect") {
       message.params.icon = message.icon;
@@ -99,7 +98,7 @@ export default function WebsPage(props) {
   };
 
   return (
-    <SafeAreaView className="w-screen h-screen pb-12 relative">
+    <SafeAreaView className="w-screen h-screen relative">
       <View className="flex flex-row items-center px-2.5 gap-x-2 h-14 py-2">
         <Text className="bg-[#E5EAEE] px-[18px] h-full leading-10 grow rounded-[60px]">
           {uri}

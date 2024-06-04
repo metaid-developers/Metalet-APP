@@ -24,8 +24,7 @@ const postMessage = async function (actionName, actionType, params) {
       host: window.location.host,
       action: actionName + "-" + actionType,
       icon:
-        document.querySelector("link[rel='icon']")?.href ||
-        document.querySelector("link[rel='shortcut icon']")?.href ||
+        document.querySelector("link[rel*='icon']")?.href ||
         "",
     })
   );
@@ -35,6 +34,8 @@ const postMessage = async function (actionName, actionType, params) {
       try {
         const res = JSON.parse(nativeEvent.data);
         if (typeof res === "object" && res.nonce === nonce) {
+          window.removeEventListener("message", eventListener);
+          document.removeEventListener("message", eventListener);
           callback(res.data);
         }
       } catch (e) {
@@ -42,9 +43,9 @@ const postMessage = async function (actionName, actionType, params) {
       }
     };
 
-    // Android
-    window.addEventListener("message", eventListener);
     // IOS
+    window.addEventListener("message", eventListener);
+    // Android
     document.addEventListener("message", eventListener);
   };
 
@@ -74,7 +75,7 @@ const actions = {
   previewTransaction: { action: "PreviewTransaction", type: "query" },
 };
 
-const metalet = { btc: {} };
+const metalet = { btc: {}, token: {} };
 
 Object.keys(actions).forEach((key) => {
   metalet[key] = async function (params) {
@@ -87,7 +88,7 @@ const btcKeys = {
   query: [
     { name: "getBalance", action: "GetBTCBalance" },
     { name: "getAddress", action: "GetBTCAddress" },
-    { name: "getAddresType", action: "GetBTCAddressType" },
+    { name: "getAddressType", action: "GetBTCAddressType" },
     { name: "getPublicKey", action: "GetBTCPublicKey" },
     { name: "getUtxos", action: "GetBTCUtxos" },
     { name: "pushPsbt", action: "PushPsbt" },
@@ -110,6 +111,24 @@ Object.keys(btcKeys).forEach((type) => {
     };
   });
 });
+
+const tokenKeys = {
+  query: [
+    { name: "getBalance", action: "GetTokenBalance" },
+  ],
+};
+
+Object.keys(tokenKeys).forEach((type) => {
+  tokenKeys[type].forEach((item) => {
+    metalet.token[item.name] = async function (params) {
+      return await postMessage(item.action, type, params);
+    };
+  });
+});
+
+metalet.on = () => {};
+
+metalet.removeListener = () => {};
 
 window.metaidwallet = metalet;
 `;
