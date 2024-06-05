@@ -16,7 +16,7 @@ import { metaStyles, themeColor } from "@/constant/Constants";
 
 export default function BackupPage() {
   let [walletList, setWalletList] = useState<WalletBean[]>([]);
-  const [isShowBackUp, setIsShowBackUp] = useState(true);
+  const [isShowBackUp, setIsShowBackUp] = useState(false);
   const [walletBackUp, setWalletBackUp] = useState<WalletBean>();
 
   useEffect(() => {
@@ -34,6 +34,8 @@ export default function BackupPage() {
       <TouchableWithoutFeedback
         onPress={() => {
          setIsShowBackUp(true);
+         console.log(item);
+         
          setWalletBackUp(item);
         }}
       >
@@ -102,7 +104,7 @@ export default function BackupPage() {
                 { marginTop: 20, marginBottom: 30 },
               ]}
             >
-             {walletBackUp.mnemonic}
+             {!walletBackUp.mnemonic!}
             </Text>
 
             {/* <RoundSimButton textColor="#fff" title={"OK"} event={()=>{
