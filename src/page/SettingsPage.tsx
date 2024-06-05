@@ -179,7 +179,9 @@ export default function SettingsPage(props: any) {
             </View>
           </TouchableWithoutFeedback>
 
-          <TouchableWithoutFeedback onPress={() => {}}>
+          <TouchableWithoutFeedback onPress={() => {
+            navigate("BackupPage");
+          }}>
             <View
               style={{
                 flexDirection: "row",

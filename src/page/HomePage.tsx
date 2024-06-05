@@ -145,18 +145,16 @@ export default function HomePage({ navigation }) {
     if (!walletManager) {
       return;
     }
-    const t1 = performance.now();
+    // const t1 = performance.now();
     getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
       updateBtcAddress(btcWallet.getAddress());
-      console.log("time1", performance.now() - t1);
-
-      console.log("eeeeeee", btcWallet.getAddress());
+      // console.log("time1", performance.now() - t1);
+      // console.log("eeeeeee", btcWallet.getAddress());
     });
     getCurrentChainWallet(Chain.BTC).then((mvcWallet) => {
       updateMvcAddress(mvcWallet.getAddress());
-
-      console.log("time2", performance.now() - t1);
-      console.log("eeeeeee", mvcWallet.getAddress());
+      // console.log("time2", performance.now() - t1);
+      // console.log("eeeeeee", mvcWallet.getAddress());
     });
   }, [walletManager]);
 

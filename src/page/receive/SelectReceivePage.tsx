@@ -48,7 +48,7 @@ export default function SelectReceivePage() {
 
             <View>
               <Text style={{ color: "#333", fontSize: 16,textAlign:'right' }}>{metaletWallet.currentBtcBalance} BTC </Text>
-              <Text style={{ color: "#666", fontSize: 14 ,marginTop:10,textAlign:'right'}}>${(metaletWallet.currentBtcBalance * metaletWallet.currentBtcPrice).toFixed(2)}</Text>
+              <Text style={{ color: "#666", fontSize: 14 ,marginTop:10,textAlign:'right'}}>${(metaletWallet.currentBtcAssert )}</Text>
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -82,8 +82,8 @@ export default function SelectReceivePage() {
             <View style={{ flex: 1 }} />
 
             <View>
-              <Text style={{ color: "#333", fontSize: 16,textAlign:'right' }}>{metaletWallet.currentMvcBalance/100000000} SPACE </Text>
-              <Text style={{ color: "#666", fontSize: 14 ,marginTop:10,textAlign:'right'}}>${(metaletWallet.currentMvcBalance/100000000 * metaletWallet.currentMVCPrice).toFixed(2)}</Text>
+              <Text style={{ color: "#333", fontSize: 16,textAlign:'right' }}>{metaletWallet.currentMvcBalance} SPACE </Text>
+              <Text style={{ color: "#666", fontSize: 14 ,marginTop:10,textAlign:'right'}}>${(metaletWallet.currentSpaceAssert)}</Text>
             </View>
           </View>
         </TouchableWithoutFeedback>

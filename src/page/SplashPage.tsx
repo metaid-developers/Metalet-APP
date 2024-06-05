@@ -50,13 +50,13 @@ export default function SplashPage(props) {
   }, []);
 
   async function initDataBase() {
-    // const network = await getWalletNetwork();
-    // if (network) {
-    //   switchNetwork(network as Net);
-    // } else {
-    //   await setWalletNetwork(BTC_NETWORK);
-    //   switchNetwork(BTC_NETWORK);
-    // }
+    const network = await getWalletNetwork();
+    if (network) {
+      switchNetwork(network as Net);
+    } else {
+      await setWalletNetwork(BTC_NETWORK);
+      switchNetwork(BTC_NETWORK);
+    }
 
     const walletBean = await getStorageCurrentWallet();
     const account = await getCurrentWalletAccount();

@@ -61,6 +61,7 @@ import InscribeSuccessPage from "@/page/home/transfer/InscribeSuccessPage";
 import TransferBrc20Page from "@/page/home/transfer/TransferBrc20Page";
 import BtcNftDetailPage from "@/page/home/BtcNftDetailPage";
 import BtcNftTransferPage from "@/page/home/BtcNftTransferPage";
+import BackupPage from "@/page/settings/BackupPage";
 
 ////////
 
@@ -155,6 +156,7 @@ const StackNavigator = () => (
     <Stack.Screen name="TransferBrc20Page" component={TransferBrc20Page} />
     <Stack.Screen name="BtcNftDetailPage" component={BtcNftDetailPage} />
     <Stack.Screen name="BtcNftTransferPage" component={BtcNftTransferPage} />
+    <Stack.Screen name="BackupPage" component={BackupPage} />
   </Stack.Navigator>
 );
 

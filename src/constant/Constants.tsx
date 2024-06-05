@@ -113,6 +113,10 @@ export const metaStyles = StyleSheet.create({
     fontWeight: "bold",
     lineHeight: 30,
   },
+  defaultText18: {
+    color: "#333333",
+    fontSize: 18,
+  },
   defaultText: {
     color: "#333333",
     fontSize: 16,

@@ -24,11 +24,8 @@ import QRCode from "react-native-qrcode-svg";
 import PasswordPay from "react-native-password-pay";
 import { Camera, CameraType } from "expo-camera";
 import { verifyPassword } from "../utils/WalletUtils";
-import {
-  
-  wallet_password_key,
-  createStorage,
-} from "../utils/AsyncStorageUtil";
+import { wallet_password_key, createStorage } from "../utils/AsyncStorageUtil";
+import { SafeAreaView } from "react-native-safe-area-context";
 // import { verifyPassword } from "../utils/WalletUtils";
 
 const storage = createStorage();
@@ -674,9 +671,8 @@ export const VerifyModal = ({
               maxLength={6}
               onChange={async (value) => {
                 if (value.length == 6) {
-                  const passwordLocal =
-                    await storage.get(wallet_password_key);
-                    // await AsyncStorageUtil.getItem(wallet_password_key);
+                  const passwordLocal = await storage.get(wallet_password_key);
+                  // await AsyncStorageUtil.getItem(wallet_password_key);
                   // const isPassword = await verifyPassword(value);
                   console.log("输入的密码：", value);
                   if (passwordLocal == value) {
@@ -853,9 +849,8 @@ export const QRScanner = ({ handleScan }) => {
   );
 };
 
-
 // 14.
-export const Line = ({top=10}) => {
+export const Line = ({ top = 10 }) => {
   return (
     <View
       style={{
@@ -868,21 +863,41 @@ export const Line = ({top=10}) => {
   );
 };
 
-
 // 15.close
-export const CloseView = ({event}) => {
+export const CloseView = ({ event }) => {
   return (
     <TouchableWithoutFeedback
-    onPress={() => {
-      event()
-    }}
-  >
-   <View style={{width:40,height:40,alignItems:'flex-end',justifyContent:'center'}}>
-   <Image
-      source={require("../../image/metalet_close_big_icon.png")}
-      style={{ width: 15, height: 15 }}
-    />
-   </View>
-  </TouchableWithoutFeedback>
+      onPress={() => {
+        event();
+      }}
+    >
+      <View
+        style={{
+          width: 40,
+          height: 40,
+          alignItems: "flex-end",
+          justifyContent: "center",
+        }}
+      >
+        <Image
+          source={require("../../image/metalet_close_big_icon.png")}
+          style={{ width: 15, height: 15 }}
+        />
+      </View>
+    </TouchableWithoutFeedback>
+  );
+};
+
+// 16.base parent view
+export const BaseView = ({ hasTitle = true, titleText = "", ChildView }) => {
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        {hasTitle && <TitleBar title={titleText} />}
+        <View>
+          <ChildView />
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
