@@ -919,7 +919,7 @@ export default function HomePage({ navigation }) {
             onPress={() => {
               // updateAccountIndex(1);
               // AsyncStorageUtil.setItem("account_select", 0);
-              navigate("WebsPage");
+              navigate("DiscoverPage");
               // navigate("WebPageTest");
             }}
           >
@@ -935,25 +935,10 @@ export default function HomePage({ navigation }) {
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={async () => {
-              // getCurrentMvcWallet().then((wallet) => {
-              //   console.log(" 获取的封装mvc 地址是： "+wallet.getAddress());
-              // });
-              // getCurrentBtcWallet().then((wallet) => {
-              //   console.log(" 获取的封装btc 地址是： "+wallet.getAddress());
-              //   console.log(" 获取的封装btc 地址是： "+wallet.getPath());
-              // });
-
-              // fetchBtcActivityRecord("bc1qxwul4ktslh9zumv8nvp2seyukz0jcmdxzq8kx6").then((res) => {
-
-              //   console.log(" 获取的封装btc 地址是： "+res);
-
-              // });
-
+              navigate("DiscoverPage");
               // navigate("WebPageTest");
               // navigate("WebPage");
 
-              // AsyncStorageUtil.clear();
-              await AsyncStorage.clear();
             }}
           >
             <View style={{ marginTop: 20 }}>

@@ -62,6 +62,8 @@ import TransferBrc20Page from "@/page/home/transfer/TransferBrc20Page";
 import BtcNftDetailPage from "@/page/home/BtcNftDetailPage";
 import BtcNftTransferPage from "@/page/home/BtcNftTransferPage";
 import BackupPage from "@/page/settings/BackupPage";
+import SecurityPage from "@/page/settings/SecurityPage";
+import AboutPage from "@/page/settings/AboutPage";
 
 ////////
 
@@ -157,6 +159,8 @@ const StackNavigator = () => (
     <Stack.Screen name="BtcNftDetailPage" component={BtcNftDetailPage} />
     <Stack.Screen name="BtcNftTransferPage" component={BtcNftTransferPage} />
     <Stack.Screen name="BackupPage" component={BackupPage} />
+    <Stack.Screen name="SecurityPage" component={SecurityPage} />
+    <Stack.Screen name="AboutPage" component={AboutPage} />
   </Stack.Navigator>
 );
 

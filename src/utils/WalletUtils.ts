@@ -203,3 +203,14 @@ export async function goToWebScan(
     }
   }
 }
+
+export async function openBrowser(link: string) {
+  if (link) {
+    const supported = await Linking.canOpenURL(link);
+    if (supported) {
+      await Linking.openURL(link);
+    } else {
+      console.log(`Don't know how to open this URL: ${link}`);
+    }
+  }
+}

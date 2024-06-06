@@ -38,6 +38,7 @@ export default function SettingsPage(props: any) {
           setIsShowLoading(false);
         }}
       />
+      
 
       <Modal visible={isShowNetwork} transparent={true}>
         <View
@@ -138,6 +139,7 @@ export default function SettingsPage(props: any) {
         }}
         event={() => {
           setIsShowVerify(false);
+          navigate("BackupPage");
         }}
       />
       <View style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -180,7 +182,7 @@ export default function SettingsPage(props: any) {
           </TouchableWithoutFeedback>
 
           <TouchableWithoutFeedback onPress={() => {
-            navigate("BackupPage");
+           setIsShowVerify(true);
           }}>
             <View
               style={{
@@ -205,7 +207,9 @@ export default function SettingsPage(props: any) {
             </View>
           </TouchableWithoutFeedback>
 
-          <TouchableWithoutFeedback onPress={() => {}}>
+          <TouchableWithoutFeedback onPress={() => {
+            navigate('SecurityPage')
+          }}>
             <View
               style={{
                 flexDirection: "row",
@@ -260,7 +264,9 @@ export default function SettingsPage(props: any) {
             </View>
           </TouchableWithoutFeedback>
 
-          <TouchableWithoutFeedback onPress={() => {}}>
+          <TouchableWithoutFeedback onPress={() => {
+            navigate('AboutPage')
+          }}>
             <View
               style={{
                 flexDirection: "row",

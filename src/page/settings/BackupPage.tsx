@@ -13,11 +13,13 @@ import { WalletBean } from "@/bean/WalletBean";
 import { getCurrentAccountID, getWalletBeans } from "@/utils/WalletUtils";
 import { navigate } from "@/base/NavigationService";
 import { metaStyles, themeColor } from "@/constant/Constants";
+import { AsyncStorageUtil, wallets_key } from "@/utils/AsyncStorageUtil";
 
 export default function BackupPage() {
   let [walletList, setWalletList] = useState<WalletBean[]>([]);
   const [isShowBackUp, setIsShowBackUp] = useState(false);
-  const [walletBackUp, setWalletBackUp] = useState<WalletBean>();
+  const [walletBackUp, setWalletBackUp] = useState("");
+  const [mvcPath, setMvcPath] = useState("");
 
   useEffect(() => {
     getWalletData();
@@ -32,11 +34,20 @@ export default function BackupPage() {
   const ListItem = ({ index, item }) => {
     return (
       <TouchableWithoutFeedback
-        onPress={() => {
-         setIsShowBackUp(true);
-         console.log(item);
-         
-         setWalletBackUp(item);
+        onPress={async () => {
+          setWalletBackUp(item.mnemonic);
+          setMvcPath(item.mvcTypes.toString())
+          setIsShowBackUp(true);
+          const wallets = await getWalletBeans();
+          const wallet = wallets.find((itemWallet) => {
+            console.log(itemWallet.mnemonic);
+            if (itemWallet.mnemonic == item.mnemonic) {
+              return itemWallet;
+            }
+          });
+          wallet.isBackUp = true;
+          await AsyncStorageUtil.updateItem(wallets_key, wallets);
+          getWalletData();
         }}
       >
         <View
@@ -101,10 +112,22 @@ export default function BackupPage() {
             <Text
               style={[
                 metaStyles.defaultText,
-                { marginTop: 20, marginBottom: 30 },
+                { marginTop: 20,  },
               ]}
             >
-             {!walletBackUp.mnemonic!}
+              {walletBackUp}
+            </Text>
+
+            <Text style={[metaStyles.grayTextdefault66, { marginTop: 20}]}>
+              MVC Derivation Path
+            </Text>
+            <Text
+              style={[
+                metaStyles.defaultText,
+                { marginTop: 10, marginBottom: 30 },
+              ]}
+            >
+              m/44'/{mvcPath}'/0'/0/0
             </Text>
 
             {/* <RoundSimButton textColor="#fff" title={"OK"} event={()=>{
@@ -112,7 +135,7 @@ export default function BackupPage() {
            }}/> */}
 
             <TouchableWithoutFeedback
-              onPress={() => {
+              onPress={async () => {
                 setIsShowBackUp(false);
               }}
             >

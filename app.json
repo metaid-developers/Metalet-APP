@@ -4,7 +4,7 @@
     "slug": "Metalet",
     "version": "3.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -17,7 +17,15 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.metalet.wallet",
-      "permissions": ["CAMERA", "PHOTO_LIBRARY_ADD_ONLY"]
+      "permissions": ["CAMERA", "PHOTO_LIBRARY_ADD_ONLY"],
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
+        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
+      }
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#ffffff",
+      "barStyle": "dark-content"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,7 +38,8 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "CAMERA_ROLL",
-        "CAMERA"
+        "CAMERA",
+        "RECORD_AUDIO"
       ],
       "keystore":{
         "keystorePath":"/Users/simkeep/RN/Metalet/metalet.jks",
@@ -46,6 +55,18 @@
       "eas": {
         "projectId": "db161169-c641-419c-998d-583ff238ecd7"
       }
-    }
+    },
+
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
+    ]
+
   }
 }

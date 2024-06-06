@@ -29,7 +29,7 @@ import {
   walllet_address_type_key,
   createStorage,
 } from "../../utils/AsyncStorageUtil";
-import { navigate } from "../../base/NavigationService";
+import { goBack, navigate } from "../../base/NavigationService";
 import * as bip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
 import {  getStorageWallets, isNoStorageWallet } from "../../utils/WalletUtils";
@@ -103,6 +103,8 @@ export default function SetPasswordPage({ route }) {
       
         } else if (type == "import") {
           navigate("ImportWalletPage", { destory: true });
+        }else {
+          goBack();
         }
       } else {
         setNoticeContent("Password must be 6 digits");

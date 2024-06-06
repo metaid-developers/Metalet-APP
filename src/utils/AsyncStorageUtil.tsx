@@ -98,6 +98,8 @@ export const AsyncStorageUtil={
       const result=value != null ? JSON.parse(value) : null;
       return result
     } catch (error) {
+      console.log("key",key);
+      
       console.error('Error retrieving data:', error);
       return null;
     }

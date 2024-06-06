@@ -331,7 +331,7 @@ export default function SendSpacePage() {
             >
               <TextInput
                 placeholder="Recipient's address"
-                // value={inputAddress}
+                value={inputAddress}
                 onChangeText={(text) => {
                   setInputAddress(text);
                   if (text.length > 0 && inputAmount.length > 0) {

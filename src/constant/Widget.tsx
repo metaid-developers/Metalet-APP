@@ -22,7 +22,7 @@ import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import QRCode from "react-native-qrcode-svg";
 import PasswordPay from "react-native-password-pay";
-import { Camera, CameraType } from "expo-camera";
+import { Camera, CameraType} from "expo-camera";
 import { verifyPassword } from "../utils/WalletUtils";
 import { wallet_password_key, createStorage } from "../utils/AsyncStorageUtil";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -843,6 +843,9 @@ export const QRScanner = ({ handleScan }) => {
           ref={(ref) => setCameraRef(ref)}
           // 扫描二维码时触发的回调函数
           onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          barCodeScannerSettings={{
+            barCodeTypes: ['qr']
+          }}
         />
       )}
     </View>

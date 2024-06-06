@@ -46,17 +46,21 @@ export default function SplashPage(props) {
   const { network, switchNetwork } = useNetworkStore();
 
   useEffect(() => {
-    initDataBase();
+    try {
+      initDataBase();
+    } catch (e) {
+      console.log("initDataBase error", e);
+    }
   }, []);
 
   async function initDataBase() {
-    const network = await getWalletNetwork();
-    if (network) {
-      switchNetwork(network as Net);
-    } else {
-      await setWalletNetwork(BTC_NETWORK);
-      switchNetwork(BTC_NETWORK);
-    }
+    // const network = await getWalletNetwork();
+    // if (network) {
+    //   switchNetwork(network as Net);
+    // } else {
+    //   await setWalletNetwork(BTC_NETWORK);
+    //   switchNetwork(BTC_NETWORK);
+    // }
 
     const walletBean = await getStorageCurrentWallet();
     const account = await getCurrentWalletAccount();
