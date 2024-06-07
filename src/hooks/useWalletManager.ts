@@ -1,11 +1,10 @@
+import { WalletMap } from "@/lib/types/wallet";
 import { getCurrentAccountId } from "@/lib/account";
 import useWalletStore from "@/stores/useWalletStore";
 import useNetworkStore from "@/stores/useNetworkStore";
 import { useState, useCallback, useEffect } from "react";
 import {
   Chain,
-  BtcWallet,
-  MvcWallet,
   AddressType,
   WalletManager,
 } from "@metalet/utxo-wallet-service";
@@ -18,10 +17,6 @@ import {
   getActiveWalletOtherAccounts,
 } from "@/lib/wallet";
 
-interface WalletMap {
-  [Chain.BTC]: BtcWallet;
-  [Chain.MVC]: MvcWallet;
-}
 
 const useWalletManager = () => {
   const { network } = useNetworkStore();

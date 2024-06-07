@@ -12,7 +12,7 @@ import * as SignTransaction from "./lib/authorize/sign-transaction";
 import * as SignTransactions from "./lib/authorize/sign-transactions";
 
 // // BTC
-// import * as Inscribe from "./lib/authorize/btc/inscribe";
+import * as Inscribe from "./lib/authorize/btc/inscribe";
 import * as ConnectBTC from "./lib/authorize/btc/connect";
 import * as BTCTransfer from "./lib/authorize/btc/transfer";
 import * as SignBTCPsbt from "./lib/authorize/btc/sign-psbt";
@@ -165,12 +165,12 @@ export default {
     estimate: doNothing,
     closeAfterProcess: true,
   },
-  // Inscribe: {
-  //   name: "Inscribe",
-  //   title: "Inscribe",
-  //   description: "",
-  //   process: Inscribe.process,
-  //   estimate: doNothing,
-  //   closeAfterProcess: true,
-  // },
+  Inscribe: {
+    name: "Inscribe",
+    title: "Inscribe",
+    description: "",
+    process: Inscribe.process,
+    estimate: doNothing,
+    closeAfterProcess: true,
+  },
 } as { [key: string]: AuthorizeAction };

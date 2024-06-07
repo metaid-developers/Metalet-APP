@@ -1971,12 +1971,23 @@
     decimal.js "^10.4.3"
     ecpair "^2.1.0"
 
-"@metalet/utxo-wallet-service@^0.3.5":
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.5.tgz#dad41e8750f438708ee7c511b0fc7086f1cb5b55"
-  integrity sha512-uN1xu3LOXy7XKhvJjfmVcM9KucWQqIVhOVlhREZemxACpuq344bdVVf6OKVqp3Sprji6IXdfTCjcNj35ATzdHw==
+"@metalet/utxo-wallet-sdk@file:../utxo-wallet-sdk":
+  version "0.5.0"
   dependencies:
-    "@metalet/utxo-wallet-sdk" "^0.4.12"
+    "@bitcoinerlab/secp256k1" "^1.1.1"
+    "@magiceden-oss/runestone-lib" "^1.0.2"
+    "@okxweb3/crypto-lib" "^1.0.1"
+    "@scure/bip39" "^1.2.2"
+    bip32 "^4.0.0"
+    bitcoinjs-lib "^6.1.5"
+    bitcore-lib "^10.0.28"
+    decimal.js "^10.4.3"
+    ecpair "^2.1.0"
+
+"@metalet/utxo-wallet-service@file:../utxo-wallet-service":
+  version "0.3.5"
+  dependencies:
+    "@metalet/utxo-wallet-sdk" "file:../utxo-wallet-sdk"
     crypto-js "^4.2.0"
     decimal.js "^10.4.3"
 

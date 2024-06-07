@@ -1,3 +1,5 @@
+import { BtcWallet, Chain, MvcWallet } from "@metalet/utxo-wallet-service";
+
 interface Account {
   id: string;
   name: string;
@@ -13,4 +15,9 @@ export interface Wallet {
   isBackUp: boolean;
   seed: string;
   accountsOptions: Account[];
+}
+
+export interface WalletMap {
+  [Chain.BTC]: BtcWallet;
+  [Chain.MVC]: MvcWallet;
 }

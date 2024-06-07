@@ -1,10 +1,10 @@
 import WebView from "react-native-webview";
 import { actionType } from "./actions/types";
 import { injectedJavaScript } from "./inject";
-import { navigate } from "@/base/NavigationService";
 import CloseIcon from "@/components/icons/CloseIcon";
-import React, { useEffect, useRef, useState } from "react";
 import actionDispatcher from "./actions/action-dispatcher";
+import React, { useEffect, useRef, useState } from "react";
+import { navigate, goBack } from "@/base/NavigationService";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
@@ -104,7 +104,7 @@ export default function WebsPage(props) {
           {uri}
         </Text>
         <TouchableOpacity
-          onPress={() => navigate("DiscoverPage")}
+          onPress={() => goBack()}
           className="border border-[#E7E7E7] rounded-full w-10 h-10 flex items-center justify-center"
         >
           <CloseIcon className="text-black-primary" />
