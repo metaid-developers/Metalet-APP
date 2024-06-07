@@ -27,6 +27,7 @@ import { verifyPassword } from "../utils/WalletUtils";
 import { wallet_password_key, createStorage } from "../utils/AsyncStorageUtil";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import { verifyPassword } from "../utils/WalletUtils";
+import { CameraView } from 'expo-camera/next';
 
 const storage = createStorage();
 
@@ -824,7 +825,7 @@ export const QRScanner = ({ handleScan }) => {
     setScanned(true);
     setShowCamera(false);
     if (cameraRef) {
-      cameraRef.pausePreview(); // 暂停相机预览
+      // cameraRef.pausePreview(); // 暂停相机预览
     }
   };
 
@@ -837,16 +838,26 @@ export const QRScanner = ({ handleScan }) => {
   return (
     <View style={{ flex: 1 }}>
       {showCamera && hasPermission && (
-        <Camera
-          style={{ flex: 1 }}
-          type={CameraType.back}
-          ref={(ref) => setCameraRef(ref)}
-          // 扫描二维码时触发的回调函数
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          barCodeScannerSettings={{
-            barCodeTypes: ['qr']
-          }}
-        />
+        // <Camera
+        //   style={{ flex: 1 }}
+        //   type={CameraType.back}
+        //   ref={(ref) => setCameraRef(ref)}
+        //   // 扫描二维码时触发的回调函数
+        //   onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        //   barCodeScannerSettings={{
+        //     barCodeTypes: ['qr']
+        //   }}
+        // />
+        <CameraView
+        style={{ flex: 1 }}
+        // type={CameraType.back}
+        ref={(ref) => setCameraRef(ref)}
+        // 扫描二维码时触发的回调函数
+        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+        barcodeScannerSettings={{
+          barcodeTypes: ['qr']
+        }}
+      />
       )}
     </View>
   );
