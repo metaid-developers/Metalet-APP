@@ -77,7 +77,7 @@ export default function ImportWalletPage(props) {
     //wallet
     let walletName;
     let walletID = Math.random().toString(36).substr(2, 8);
-    let wallet_addressType = AddressType.Legacy;
+    let wallet_addressType = AddressType.SameAsMvc;
 
     //account
     let accountName = "Account 1";

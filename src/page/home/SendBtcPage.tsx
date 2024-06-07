@@ -172,6 +172,7 @@ export default function SendBtcPage() {
 
   const OpenModal = async () => {
     setIsShowLoading(true);
+ 
     // broadcast
     const { code, message, processingTime, data } = await broadcastBtc(rawTx);
     if (data) {
@@ -180,6 +181,7 @@ export default function SendBtcPage() {
       navigate("SendBtcSuccessPage", {
         result: {
           txid: data,
+          chain: "btc",
           amount: inputAmount,
           address: inputAddress,
         },

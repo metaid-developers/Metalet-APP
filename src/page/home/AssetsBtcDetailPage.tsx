@@ -35,6 +35,9 @@ import {
   changeCurrentWalletAddressType,
   getStorageCurrentWallet,
 } from "../../utils/WalletUtils";
+import useWalletStore from "@/stores/useWalletStore";
+import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
+
 
 export default function AssetsBtcDetailPage({ route }) {
   const { myCoinType } = route.params;
@@ -45,6 +48,8 @@ export default function AssetsBtcDetailPage({ route }) {
   const { metaletWallet, updateMetaletWallet } = useData();
   const [isShowCopy, setIsShowCopy] = useState(false);
   const [addressType, setAddressType] = useState(AddressType.Legacy);
+  const { setCurrentWallet } = useWalletStore();
+
 
 
   //当前btc 地址
@@ -128,6 +133,11 @@ export default function AssetsBtcDetailPage({ route }) {
 
     updateBtcAddress(metaletWallet.currentBtcWallet.getAddress());
     getActivityList(metaletWallet.currentBtcWallet.getAddress());
+
+    const btcWallet:BtcWallet=metaletWallet.currentBtcWallet;
+    const mvcWallet:MvcWallet=metaletWallet.currentMvcWallet;
+    
+    setCurrentWallet({btcWallet,mvcWallet})
     // getActivityList();
   }
 

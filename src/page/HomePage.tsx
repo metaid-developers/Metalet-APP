@@ -83,8 +83,7 @@ import {
 import { caculateMvcAndBtcAssert } from "../utils/AssertUtils";
 import { ShowBalance } from "../api/type/Balance";
 import useWalletManager from "@/hooks/useWalletManager";
-import useNetworkStore from "@/stores/useNetworkStore";
-
+import useWalletStore from "@/stores/useWalletStore";
 // import RNFS from "react-native-fs";
 
 const storage = createStorage();
@@ -103,6 +102,7 @@ export default function HomePage({ navigation }) {
   const { accountIndex, updateAccountIndex } = useData();
 
   const { metaletWallet, updateMetaletWallet } = useData();
+  const { setCurrentWallet } = useWalletStore();
   const { myWallet, updateMyWallet } = useData();
   // const [sumBalance, setSumBalance] = useState<string>("0.0");
   const { currentSumBalance, updateCurrentSumBalance } = useData();
@@ -134,29 +134,29 @@ export default function HomePage({ navigation }) {
   const [accountName, setaccountName] = useState("");
   const [walletName, setWalletName] = useState("");
   // const { initWalletManager } = useWalletManager();
-  const {
-    getWallets,
-    walletManager,
-    initWalletManager,
-    getCurrentChainWallet,
-  } = useWalletManager();
+  // const {
+  //   getWallets,
+  //   walletManager,
+  //   initWalletManager,
+  //   getCurrentChainWallet,
+  // } = useWalletManager();
 
-  useEffect(() => {
-    if (!walletManager) {
-      return;
-    }
-    // const t1 = performance.now();
-    getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
-      updateBtcAddress(btcWallet.getAddress());
-      // console.log("time1", performance.now() - t1);
-      // console.log("eeeeeee", btcWallet.getAddress());
-    });
-    getCurrentChainWallet(Chain.BTC).then((mvcWallet) => {
-      updateMvcAddress(mvcWallet.getAddress());
-      // console.log("time2", performance.now() - t1);
-      // console.log("eeeeeee", mvcWallet.getAddress());
-    });
-  }, [walletManager]);
+  // useEffect(() => {
+  //   if (!walletManager) {
+  //     return;
+  //   }
+  //   // const t1 = performance.now();
+  //   getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
+  //     updateBtcAddress(btcWallet.getAddress());
+  //     // console.log("time1", performance.now() - t1);
+  //     // console.log("eeeeeee", btcWallet.getAddress());
+  //   });
+  //   getCurrentChainWallet(Chain.BTC).then((mvcWallet) => {
+  //     updateMvcAddress(mvcWallet.getAddress());
+  //     // console.log("time2", performance.now() - t1);
+  //     // console.log("eeeeeee", mvcWallet.getAddress());
+  //   });
+  // }, [walletManager]);
 
   useEffect(() => {
     console.log("HomePage useEffect");
@@ -297,6 +297,11 @@ export default function HomePage({ navigation }) {
     metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
     metaletWallet.btcTaprootWallet = btcTaprootWallet;
     metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
+
+    //webs
+    const btcWalletWebs:BtcWallet=metaletWallet.currentBtcWallet;
+    const mvcWalletWebs:MvcWallet=metaletWallet.currentMvcWallet;
+    setCurrentWallet({btcWallet:btcWalletWebs,mvcWallet:mvcWalletWebs})
 
     updateMetaletWallet(metaletWallet);
     getShowBalance();

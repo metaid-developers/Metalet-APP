@@ -261,6 +261,7 @@ export default function SendSpacePage() {
         }}
         event={async () => {
           setIsShowVerify(false);
+        
           const { txid, message } = await broadcastSpace(rawTx);
           if (txid != null) {
             updateNeedRefreshHome(getRandomID());
@@ -268,6 +269,7 @@ export default function SendSpacePage() {
             navigate("SendSpaceSuccessPage", {
               result: {
                 txid: txid,
+                chain: "mvc",
                 amount: inputAmount,
                 address: inputAddress,
               },

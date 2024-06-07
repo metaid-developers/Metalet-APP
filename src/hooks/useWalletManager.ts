@@ -17,7 +17,6 @@ import {
   getActiveWalletOtherAccounts,
 } from "@/lib/wallet";
 
-
 const useWalletManager = () => {
   const { network } = useNetworkStore();
   const { setCurrentWallet } = useWalletStore();
@@ -29,7 +28,7 @@ const useWalletManager = () => {
         return;
       }
       try {
-        // console.log("network", network);
+        console.log("network", network);
 
         // const t1 = performance.now();
         const activeWallet = await getActiveWalletOnlyAccount();
@@ -77,7 +76,7 @@ const useWalletManager = () => {
           throw new Error(`No ${AddressType.LegacyMvc} mvc wallet found.`);
         }
 
-        setCurrentWallet({ btcWallet, mvcWallet });
+        // setCurrentWallet({ btcWallet, mvcWallet });
 
         // const t4 = performance.now();
         // console.log("walletManager", t4 - t3);

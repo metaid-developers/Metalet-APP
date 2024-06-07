@@ -141,7 +141,7 @@ export default function SendSuccessPage({ route }) {
         <TouchableWithoutFeedback
           onPress={() => {
             console.log("click");
-            goToWebScan(result.chain, result.txid, network_btc);
+            goToWebScan(result.chain, result.txid);
           }}
         >
           <View

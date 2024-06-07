@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
-
+// import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
+import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 interface WalletState {
   btcWallet: BtcWallet | null;
   mvcWallet: MvcWallet | null;

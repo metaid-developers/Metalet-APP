@@ -179,7 +179,7 @@ export function caculateToSatDecimal(amount: number, precision: number) {
 export async function goToWebScan(
   chain: string,
   linkTx: string,
-  network: string
+  network?: string
 ) {
   let url;
   if (chain == "mvc") {

@@ -1,4 +1,5 @@
-const SHOW3_SERVICE = "api.show3.space";
+// const SHOW3_SERVICE = "api.show3.space";
+const SHOW3_SERVICE = "api.show3.io";
 
 
 //转换图片

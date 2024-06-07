@@ -1,8 +1,10 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableWithoutFeedback } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RoundSimButton, TitleBar } from "../../constant/Widget";
 import { navigate } from "../../base/NavigationService";
+import { goToWebScan } from "@/utils/WalletUtils";
+import { metaStyles } from "@/constant/Constants";
 
 export default function SendSpaceSuccessPage({route}) {
 
@@ -106,6 +108,29 @@ export default function SendSpaceSuccessPage({route}) {
         </View>
 
         <View style={{ flex: 1 }} />
+        <TouchableWithoutFeedback
+          onPress={() => {
+            console.log("click");
+            goToWebScan(result.chain, result.txid);
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: 20,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={metaStyles.smallDefaultText}>
+              View on Block Explorer
+            </Text>
+            <Image
+              source={require("../../../image/link_ins_icon.png")}
+              style={{ width: 15, height: 15, marginLeft: 2 }}
+            />
+          </View>
+        </TouchableWithoutFeedback>
         <View style={{ marginTop: 20, marginHorizontal: 40, marginBottom: 20 }}>
           <RoundSimButton
             title={"Done"}
