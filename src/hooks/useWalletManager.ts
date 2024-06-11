@@ -28,7 +28,7 @@ const useWalletManager = () => {
         return;
       }
       try {
-        console.log("network", network);
+        // console.log("network", network);
 
         // const t1 = performance.now();
         const activeWallet = await getActiveWalletOnlyAccount();
@@ -76,7 +76,7 @@ const useWalletManager = () => {
           throw new Error(`No ${AddressType.LegacyMvc} mvc wallet found.`);
         }
 
-        // setCurrentWallet({ btcWallet, mvcWallet });
+        setCurrentWallet({ btcWallet, mvcWallet });
 
         // const t4 = performance.now();
         // console.log("walletManager", t4 - t3);
@@ -179,21 +179,39 @@ const useWalletManager = () => {
     chain: T
   ) => Promise<WalletMap[T]> = useCallback(
     async (chain: Chain) => {
+      // const t1 = performance.now();
       const accountChainWallets = await getAccountChainWallets();
       const chainWallets = accountChainWallets[chain];
+      // const t2 = performance.now();
+      // console.log("getAccountChainWallets", t2 - t1);
 
       if (!chainWallets) {
         throw new Error("No chain wallets found.");
       }
+      // const t3 = performance.now();
       const currentWalletId = await getCurrentWalletId();
+
+      // const t4 = performance.now();
+      // console.log("getCurrentWalletId", t4 - t3);
+
+      // const t5 = performance.now();
+
       const addressType =
         chain === Chain.MVC
           ? AddressType.LegacyMvc
           : await getBtcAddressType(currentWalletId);
 
+      // const t6 = performance.now();
+      // console.log("getBtcAddressType", t6 - t5);
+
+      // const t7 = performance.now();
+
       const chainWallet = chainWallets.find(
         (wallet) => wallet.getAddressType() === addressType
       );
+
+      // const t8 = performance.now();
+      // console.log("find chain wallet", t8 - t7);
 
       if (!chainWallet) {
         throw new Error(`No ${addressType} wallet found.`);

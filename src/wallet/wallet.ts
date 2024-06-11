@@ -13,7 +13,7 @@ import {
   getWalletNetwork,
   isNoStorageWallet,
 } from "../utils/WalletUtils";
-import { BtcWallet, MvcWallet, ScriptType } from "@metalet/utxo-wallet-sdk";
+import { BtcWallet, MvcWallet, ScriptType } from "@metalet/utxo-wallet-service";
 import * as bip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
 import { getRandomColorList } from "../utils/MetaFunUiils";

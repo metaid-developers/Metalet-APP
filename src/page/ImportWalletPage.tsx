@@ -36,7 +36,7 @@ import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { AddressType, Chain, CoinType } from "@metalet/utxo-wallet-service";
 import { getRandomColorList } from "../utils/MetaFunUiils";
 import MetaletWallet from "../wallet/MetaletWallet";
-import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
+import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
 import {
   getStorageWallets,
   getWalletBeans,

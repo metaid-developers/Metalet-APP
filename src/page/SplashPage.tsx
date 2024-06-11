@@ -21,7 +21,7 @@ import {
   CoinType,
   Net,
 } from "@metalet/utxo-wallet-service";
-import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
+// import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { TypeTest } from "../wallet/TypeTest";
 import MetaletWallet from "../wallet/MetaletWallet";

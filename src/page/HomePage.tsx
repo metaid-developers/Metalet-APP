@@ -1,14 +1,10 @@
 import {
   View,
   Text,
-  TextInput,
   Image,
   TouchableWithoutFeedback,
-  NativeModules,
   Modal,
-  Platform,
   BackHandler,
-  Button,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { navigate } from "../base/NavigationService";
@@ -21,40 +17,22 @@ import {
   LoadingNoticeModal,
 } from "../constant/Widget";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import WelcomeWalletPage from "./WelcomeWalletPage";
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 import AssetsPage from "./AssetsPage";
 import FtPage from "./FtPage";
 import NftPage from "./NftPage";
-import {
-  get,
-  BASE_MVC_API_URL,
-  BALANCE_PRICE_URL,
-  BASE_METALET_URL,
-} from "../utils/Api";
 import { useData } from "../hooks/MyProvider";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   network_all,
   network_btc,
   network_key,
   network_mvc,
-  wallets_key,
   createStorage,
 } from "../utils/AsyncStorageUtil";
-import { AddressType, Chain, CoinType } from "@metalet/utxo-wallet-service";
-import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
-import { RootPriceObject } from "../bean/PriceBean";
-import { RootBtcBalanceObject } from "../bean/BtcBalanceBean";
+import { AddressType, Chain } from "@metalet/utxo-wallet-service";
+import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
 import * as Clipboard from "expo-clipboard";
-import { WalletBean } from "../bean/WalletBean";
-import {
-  EventBus,
-  eventBus,
-  refreshBtcFtEvent,
-  refreshHomeLoadingEvent,
-  refreshMvcFtEvent,
-} from "../utils/EventBus";
+import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 import FtParentPage from "./nft/FtParentPage";
 import FtMvcPage from "./nft/FtMvcPage";
 import FtBtcPage from "./nft/FtBtcPage";
@@ -62,45 +40,26 @@ import NftParentPage from "./nft/NftParentPage";
 import NftBtcPage from "./nft/NftBtcPage";
 import NftMvcPage from "./nft/NftMvcPage";
 import {
-  fetchAssetsPrice,
-  fetchBtcActivityRecord,
-  fetchBtcBalance,
-  fetchMvcActivityComfird,
-  fetchSpaceBalance,
-} from "../api/metaletservice";
-import {
   getBtcWallet,
   getCurrentBtcWallet,
   getCurrentMvcWallet,
 } from "../wallet/wallet";
-import { Buffer } from "buffer";
 
 import {
   getCurrentWalletAccount,
-  getCurrentWalletSeed,
   getStorageCurrentWallet,
 } from "../utils/WalletUtils";
 import { caculateMvcAndBtcAssert } from "../utils/AssertUtils";
 import { ShowBalance } from "../api/type/Balance";
-import useWalletManager from "@/hooks/useWalletManager";
 import useWalletStore from "@/stores/useWalletStore";
-// import RNFS from "react-native-fs";
+import useWalletManager from "@/hooks/useWalletManager";
 
 const storage = createStorage();
 
 // Home 开发
 const TabsTop = createMaterialTopTabNavigator();
 
-type Balance = {
-  // {"address": "1C2XjqoXHRegJNnmJqGDMt3rbAcrYLX4L9", "confirmed": 17190, "unconfirmed": 0}
-  address: string;
-  confirmed: number;
-  unconfirmed: number;
-};
-
 export default function HomePage({ navigation }) {
-  const { accountIndex, updateAccountIndex } = useData();
-
   const { metaletWallet, updateMetaletWallet } = useData();
   const { setCurrentWallet } = useWalletStore();
   const { myWallet, updateMyWallet } = useData();
@@ -133,60 +92,46 @@ export default function HomePage({ navigation }) {
   const [userAvater, setuserAvater] = useState<string[]>([]);
   const [accountName, setaccountName] = useState("");
   const [walletName, setWalletName] = useState("");
-  // const { initWalletManager } = useWalletManager();
-  // const {
-  //   getWallets,
-  //   walletManager,
-  //   initWalletManager,
-  //   getCurrentChainWallet,
-  // } = useWalletManager();
-
-  // useEffect(() => {
-  //   if (!walletManager) {
-  //     return;
-  //   }
-  //   // const t1 = performance.now();
-  //   getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
-  //     updateBtcAddress(btcWallet.getAddress());
-  //     // console.log("time1", performance.now() - t1);
-  //     // console.log("eeeeeee", btcWallet.getAddress());
-  //   });
-  //   getCurrentChainWallet(Chain.BTC).then((mvcWallet) => {
-  //     updateMvcAddress(mvcWallet.getAddress());
-  //     // console.log("time2", performance.now() - t1);
-  //     // console.log("eeeeeee", mvcWallet.getAddress());
-  //   });
-  // }, [walletManager]);
+  const { walletManager, getCurrentChainWallet } = useWalletManager();
 
   useEffect(() => {
-    console.log("HomePage useEffect");
+    if (!walletManager) {
+      return;
+    }
+    // const t1 = performance.now();
+    getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
+      // updateBtcAddress(btcWallet.getAddress());
+      // console.log("time1", performance.now() - t1);
+      // console.log("btc address", btcWallet.getAddress());
+    });
+    getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
+      // updateMvcAddress(mvcWallet.getAddress());
+      // console.log("time2", performance.now() - t1);
+      // console.log("mvc address", mvcWallet.getAddress());
+    });
+  }, [walletManager]);
 
-    initCurrentWallet();
-    // initWalletManager();
-    // initWalletManager().then(async () => {
-    //   // const btcWallet = await getCurrentChainWallet(Chain.BTC);
-    //   // console.log("currentBtcWallet", btcWallet.getAddress());
-    //   // const mvcWallet = await getCurrentChainWallet(Chain.MVC);
-    //   // console.log("currentMvcWallet", mvcWallet.getAddress());
-    // });
+  useEffect(() => {
+    setIsShowLoading(true);
+    initCurrentWallet().then(() => {
+      setIsShowLoading(false);
+    });
+
     eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
-      initCurrentWallet();
+      console.log("in eventBus", message);
       setIsShowLoading(true);
-      console.log("in eventBus");
-      setTimeout(() => {
+      initCurrentWallet().then(() => {
         setIsShowLoading(false);
-      }, 1000);
+      });
     });
   }, []);
 
-  useEffect(() => {
-    // console.log("HomePage useEffect   btc change");
-    setIsShowLoading(true);
-    if (btcAddress) {
-      setIsShowLoading(false);
-      getShowBalance();
-    }
-  }, [btcAddress]);
+  // useEffect(() => {
+  //   if (btcAddress && mvcAddress) {
+  //     // console.log("btcAddress", btcAddress);
+  //     getShowBalance();
+  //   }
+  // }, [btcAddress, mvcAddress]);
 
   useEffect(() => {
     // console.log("HomePage needRefreshHome ");
@@ -299,9 +244,9 @@ export default function HomePage({ navigation }) {
     metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
 
     //webs
-    const btcWalletWebs:BtcWallet=metaletWallet.currentBtcWallet;
-    const mvcWalletWebs:MvcWallet=metaletWallet.currentMvcWallet;
-    setCurrentWallet({btcWallet:btcWalletWebs,mvcWallet:mvcWalletWebs})
+    const btcWalletWebs = metaletWallet.currentBtcWallet;
+    const mvcWalletWebs = metaletWallet.currentMvcWallet;
+    setCurrentWallet({ btcWallet: btcWalletWebs, mvcWallet: mvcWalletWebs });
 
     updateMetaletWallet(metaletWallet);
     getShowBalance();
@@ -943,7 +888,6 @@ export default function HomePage({ navigation }) {
               navigate("DiscoverPage");
               // navigate("WebPageTest");
               // navigate("WebPage");
-
             }}
           >
             <View style={{ marginTop: 20 }}>
