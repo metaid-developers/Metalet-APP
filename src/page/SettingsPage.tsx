@@ -18,7 +18,7 @@ import { metaStyles } from "@/constant/Constants";
 import Constants from "expo-constants";
 import { navigate } from "@/base/NavigationService";
 import useNetworkStore from "@/stores/useNetworkStore";
-import { setWalletNetwork } from "@/utils/WalletUtils";
+import { getRandomID, setWalletNetwork } from "@/utils/WalletUtils";
 
 export const BTC_NETWORK = "mainnet";
 export const BTC_NETWORK_TEST = "testnet";
@@ -28,6 +28,8 @@ export default function SettingsPage(props: any) {
   const [isShowNetwork, setShowNetwork] = useState(false);
   const { network, switchNetwork } = useNetworkStore();
   const [isShowLoading, setIsShowLoading] = useState(false);
+  // const { needRefreshHome, updateNeedRefreshHome } = useData();
+  const { needInitWallet, updateNeedInitWallet } = useData();
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -39,7 +41,6 @@ export default function SettingsPage(props: any) {
         }}
       />
       
-
       <Modal visible={isShowNetwork} transparent={true}>
         <View
           style={{
@@ -76,7 +77,10 @@ export default function SettingsPage(props: any) {
                 setIsShowLoading(true);
                 await setWalletNetwork(BTC_NETWORK);
                 switchNetwork(BTC_NETWORK);
-                setIsShowLoading(false);
+                updateNeedInitWallet(getRandomID());
+                setTimeout(() => {
+                  setIsShowLoading(false);
+                }, 100);
               }}
             >
               <View
@@ -106,7 +110,10 @@ export default function SettingsPage(props: any) {
                 setIsShowLoading(true);
                 await setWalletNetwork(BTC_NETWORK_TEST);
                 switchNetwork(BTC_NETWORK_TEST);
-                setIsShowLoading(false);
+                updateNeedInitWallet(getRandomID());
+                setTimeout(() => {
+                  setIsShowLoading(false);
+                }, 100);
               }}
             >
               <View
@@ -142,6 +149,7 @@ export default function SettingsPage(props: any) {
           navigate("BackupPage");
         }}
       />
+
       <View style={{ flex: 1, backgroundColor: "#fff" }}>
         <View style={{ margin: 20, flex: 1 }}>
           <Text
@@ -294,6 +302,7 @@ export default function SettingsPage(props: any) {
           </TouchableWithoutFeedback>
         </View>
       </View>
+
     </SafeAreaView>
   );
 }

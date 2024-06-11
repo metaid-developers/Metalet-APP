@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { navigate } from "../base/NavigationService";
-import { metaStyles } from "../constant/Constants";
+import { metaStyles, themeColor } from "../constant/Constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   CustomTabBar,
@@ -53,6 +53,7 @@ import { caculateMvcAndBtcAssert } from "../utils/AssertUtils";
 import { ShowBalance } from "../api/type/Balance";
 import useWalletStore from "@/stores/useWalletStore";
 import useWalletManager from "@/hooks/useWalletManager";
+import useNetworkStore from "@/stores/useNetworkStore";
 
 const storage = createStorage();
 
@@ -83,6 +84,8 @@ export default function HomePage({ navigation }) {
 
   // 当前网络
   const { netWork, updateNetWork } = useData();
+  const { network, switchNetwork } = useNetworkStore();
+
   //当前网络地址
   const { mvcAddress, updateMvcAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
@@ -126,21 +129,23 @@ export default function HomePage({ navigation }) {
     });
   }, []);
 
-  // useEffect(() => {
-  //   if (btcAddress && mvcAddress) {
-  //     // console.log("btcAddress", btcAddress);
-  //     getShowBalance();
-  //   }
-  // }, [btcAddress, mvcAddress]);
+  useEffect(() => {
+    // console.log("HomePage useEffect   btc change");
+    setIsShowLoading(true);
+    if (btcAddress) {
+      setIsShowLoading(false);
+      getShowBalance();
+    }
+  }, [btcAddress]);
 
   useEffect(() => {
-    // console.log("HomePage needRefreshHome ");
+    console.log("HomePage needRefreshHome ");
     getShowBalance();
   }, [needRefreshHome]);
 
   useEffect(() => {
     // console.log("HomePage needInitWallet ");
-    // initCurrentWallet();
+    initCurrentWallet();
   }, [needInitWallet]);
 
   useEffect(() => {
@@ -804,6 +809,36 @@ export default function HomePage({ navigation }) {
               {"$ " + currentSumBalance}
             </Text>
           </View>
+
+          <View style={{ flex: 1 }} />
+
+         {network=='testnet' &&( <View
+            style={{
+              flexDirection: "row",
+              backgroundColor: "#F3F3FF",
+              borderRadius: 5,
+              paddingHorizontal: 5,
+              paddingVertical:5,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              source={require("../../image/net_icon.png")}
+              style={{ width: 15, height: 15 }}
+            />
+
+            <Text
+              style={{
+                color: themeColor,
+                textAlign: "center",
+                marginLeft: 5,
+                fontSize: 14,
+              }}
+            >
+              Testnet
+            </Text>
+          </View>)}
         </View>
 
         <View

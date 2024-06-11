@@ -33,9 +33,10 @@ export const net_network = "livenet";
 export async function getCurrentMvcWallet(): Promise<MvcWallet> {
   const wallet = await getStorageCurrentWallet();
   const seed = await getCurrentWalletSeed();
+  const network = await getWalletNetwork();
 
   const mvcWallet = new MvcWallet({
-    network: "mainnet",
+    network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
     addressType: AddressType.LegacyMvc,
