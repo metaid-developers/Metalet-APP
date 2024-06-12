@@ -5,7 +5,6 @@ import { mvcApi, mempoolApi, metaletApiV3, unisatApi } from "./request";
 import { getNetwork } from "@/lib/network";
 import { getWalletNetwork } from "@/utils/WalletUtils";
 
-
 export interface UTXO {
   txId: string;
   outputIndex: number;
@@ -45,7 +44,7 @@ export type Utxo = {
 };
 
 export const fetchUtxos = async (
-  chain: Chain.MVC,
+  chain: Chain,
   address: string
 ): Promise<any[]> => {
   if (chain === Chain.MVC) {
@@ -108,9 +107,9 @@ export async function getBtcUtxos(
 
   //   return utxos.filter((utxo) => utxo.confirmed)
   // }
-  const network=await getWalletNetwork(Chain.BTC);
-  console.log("network,",network);
-  
+  const network = await getWalletNetwork(Chain.BTC);
+  console.log("network,", network);
+
   let utxos =
     (await metaletApiV3<UTXO[]>("/address/btc-utxo").get({
       net: network,
@@ -144,7 +143,11 @@ export async function getRuneUtxos(
     total: number;
     cursor: number;
     list: UTXO[];
-  }>("/runes/address/utxo").get({ net: getNetwork(Chain.BTC), address, runeId });
+  }>("/runes/address/utxo").get({
+    net: getNetwork(Chain.BTC),
+    address,
+    runeId,
+  });
   if (needRawTx) {
     for (let utxo of res.list) {
       utxo.rawTx = await fetchBtcTxHex(utxo.txId);
@@ -167,16 +170,20 @@ export async function getRuneUtxos(
 //   return utxos.map((utxo) => formatUnisatUTXO(utxo))
 // }
 
-
-export async function getInscriptionUtxo(inscriptionId: string, needRawTx: boolean = false): Promise<UTXO> {
+export async function getInscriptionUtxo(
+  inscriptionId: string,
+  needRawTx: boolean = false
+): Promise<UTXO> {
   const net = getNetwork(Chain.BTC);
-  const utxo = await metaletApiV3<UTXO>('/inscription/utxo').get({ net, inscriptionId })
+  const utxo = await metaletApiV3<UTXO>("/inscription/utxo").get({
+    net,
+    inscriptionId,
+  });
   if (needRawTx) {
-    utxo.rawTx = await fetchBtcTxHex(utxo.txId)
+    utxo.rawTx = await fetchBtcTxHex(utxo.txId);
   }
-  return utxo
+  return utxo;
 }
-
 
 export interface MempoolUtxo {
   txid: string;

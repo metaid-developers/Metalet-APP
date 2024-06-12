@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "module": "ESNext",
+    "target": "ESNext",
+    "jsx": "react-native",
     "paths": {
       "@/*": ["./src/*"]
     }

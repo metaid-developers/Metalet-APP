@@ -1,7 +1,9 @@
+import { lazy } from "react";
 import * as Pay from "./lib/authorize/pay";
 import * as Merge from "./lib/authorize/merge";
 import * as Connect from "./lib/authorize/connect";
 import * as Transfer from "./lib/authorize/transfer";
+import { AuthorizeAction } from "./action-dispatcher";
 import * as Disconnect from "./lib/authorize/disconnect";
 import * as SignMessage from "./lib/authorize/sign-message";
 import * as EciesDecrypt from "./lib/authorize/ecies-decrypt";
@@ -20,157 +22,164 @@ import * as SignBTCMessage from "./lib/authorize/btc/sign-message";
 
 function doNothing() {}
 
-type AuthorizeAction = {
-  name: string;
-  title: string;
-  description: string | string[];
-  process: Function;
-  estimate: Function;
-  closeAfterProcess: boolean;
-};
-
 export default {
   Connect: {
     name: "Connect",
     title: "Connect",
-    description: "Connect",
+    descriptions: ["Connect"],
     process: Connect.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   Disconnect: {
     name: "Disconnect",
     title: "Disconnect",
-    description: "Disconnect",
+    descriptions: ["Disconnect"],
     process: Disconnect.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   SwitchNetwork: {
     name: "SwitchNetwork",
     title: "SwitchNetwork",
-    description: "SwitchNetwork",
+    descriptions: ["SwitchNetwork"],
     process: SwitchNetwork.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   TokenTransfer: {
     name: "TokenTransfer",
     title: "Token Transfer",
-    description: "Transfer tokens from my wallet to another",
+    descriptions: ["Transfer tokens from my wallet to another"],
     process: TransferToken.process,
     estimate: TransferToken.estimate,
     closeAfterProcess: false,
+    component: lazy(() => import("../components/ComponentA")),
   },
   Transfer: {
     name: "Transfer",
     title: "Transfer",
-    description: "Transfer tokens from my wallet to another",
+    descriptions: ["Transfer tokens from my wallet to another"],
     process: Transfer.process,
     estimate: doNothing,
     closeAfterProcess: false,
+    component: lazy(() => import("../components/ComponentA")),
   },
   Merge: {
     name: "Merge",
     title: "Merge",
-    description: "Merge all the UTXOs into one in my wallet",
+    descriptions: ["Merge all the UTXOs into one in my wallet"],
     process: Merge.process,
     estimate: doNothing,
     closeAfterProcess: false,
+    component: lazy(() => import("../components/ComponentA")),
   },
   SignTransaction: {
     name: "Sign a Transaction",
     title: "Sign a Transaction",
-    description: ["Sign a transaction with my wallet"],
+    descriptions: ["Sign a transaction with my wallet"],
     process: SignTransaction.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   SignTransactions: {
     name: "Sign Transactions",
     title: "Sign Multiple Transactions",
-    description: ["Sign multiple transactions with my wallet as once"],
+    descriptions: ["Sign multiple transactions with my wallet at once"],
     process: SignTransactions.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   Pay: {
     name: "Pay",
     title: "Pay for transactions",
-    description: [
+    descriptions: [
       "Third party apps create functional transaction(s), and ask Metalet to pay for them.",
     ],
     process: Pay.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   EciesEncrypt: {
     name: "ECIES Encrypt",
     title: "ECIES Encrypt",
-    description: "Encrypt a message with ECIES algorithm",
+    descriptions: ["Encrypt a message with ECIES algorithm"],
     process: EciesEncrypt.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   EciesDecrypt: {
     name: "ECIES Decrypt",
     title: "ECIES Decrypt",
-    description: ["Decrypt an encrypted message with ECIES algorithm"],
+    descriptions: ["Decrypt an encrypted message with ECIES algorithm"],
     process: EciesDecrypt.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   SignMessage: {
     name: "Sign Message",
     title: "Sign Message",
-    description: ["Sign a message with ECDSA algorithm"],
+    descriptions: ["Sign a message with ECDSA algorithm"],
     process: SignMessage.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
-
-  // BTC
   SignBTCPsbt: {
     name: "SignBTCPsbt",
-    title: "Sign for Psbt",
-    description: [
-      "Third party apps requests signing of the PSBT(s), and ask Metalet to sign for them.",
+    title: "Sign Transaction",
+    descriptions: [
+      "Third party apps request signing of the PSBT(s), and ask Metalet to sign for them.",
     ],
     process: SignBTCPsbt.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/SignBTCPsbt")),
   },
   ConnectBTC: {
     name: "Connect BTC",
     title: "Connect Account",
-    description: ["Connect Account"],
+    descriptions: ["Connect Account"],
     process: ConnectBTC.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   BTCTransfer: {
-    name: "",
-    title: "",
-    description: [""],
+    name: "BTC Transfer",
+    title: "BTC Transfer",
+    descriptions: [""],
     process: BTCTransfer.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   SignBTCMessage: {
     name: "Sign BTC Message",
     title: "Signature request",
-    description:
+    descriptions: [
       "Only sign this message if you fully understand the content and trust the requesting site.",
+    ],
     process: SignBTCMessage.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
   Inscribe: {
     name: "Inscribe",
     title: "Inscribe",
-    description: "",
+    descriptions: [""],
     process: Inscribe.process,
     estimate: doNothing,
     closeAfterProcess: true,
+    component: lazy(() => import("../components/ComponentA")),
   },
 } as { [key: string]: AuthorizeAction };

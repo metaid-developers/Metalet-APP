@@ -1,11 +1,13 @@
 import WebView from "react-native-webview";
-import { actionType } from "./actions/types";
+import { ActionType } from "./actions/types";
 import { injectedJavaScript } from "./inject";
 import CloseIcon from "@/components/icons/CloseIcon";
+import { createElement, ComponentType } from "react";
 import actionDispatcher from "./actions/action-dispatcher";
 import React, { useEffect, useRef, useState } from "react";
 import { navigate, goBack } from "@/base/NavigationService";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CheckBadgeIcon from "@/components/icons/CheckBadgeIcon";
 import {
   View,
   Text,
@@ -14,6 +16,7 @@ import {
   Button,
   Platform,
   Pressable,
+  ScrollView,
   TouchableOpacity,
 } from "react-native";
 
@@ -23,7 +26,7 @@ interface Message {
   nonce: string;
   channel: "to-metaidwallet";
   params: Record<string, unknown>;
-  action: `${string}-${actionType}`;
+  action: `${string}-${ActionType}`;
 }
 
 export default function WebsPage(props) {
@@ -31,8 +34,13 @@ export default function WebsPage(props) {
   const [uri, setURI] = useState("");
   const [icon, setIcon] = useState("");
   const [host, setHost] = useState("");
+  const [params, setParams] = useState({});
+  const [actionName, setActionName] = useState("");
+  const [descriptions, setDescriptions] = useState([]);
   const [actionMsg, setActionMsg] = useState<Message>();
   const [modalVisible, setModalVisible] = useState(false);
+  const [component, setComponent] =
+    useState<ComponentType<{ params: object }>>(null);
 
   useEffect(() => {
     if (!props.route.params?.url) {
@@ -53,12 +61,20 @@ export default function WebsPage(props) {
     }
     setActionMsg(message);
 
-    if (actionType === "authorize") {
+    if (actionType === ActionType.Authorize) {
       setModalVisible(true);
       setIcon(message.icon);
       setHost(message.host);
-    } else {
-      const { process } = actionDispatcher(message.action);
+      const { title, descriptions, component } = actionDispatcher(
+        actionName,
+        actionType
+      );
+      setActionName(title);
+      setComponent(component);
+      setParams(message.params);
+      setDescriptions(descriptions);
+    } else if (actionType === ActionType.Query) {
+      const { process } = actionDispatcher(actionName, ActionType.Query);
       const data = await process(message.params, message.host);
       postMessage(
         JSON.stringify({
@@ -82,7 +98,8 @@ export default function WebsPage(props) {
   };
 
   const confirmAction = async () => {
-    const { process } = actionDispatcher(actionMsg.action);
+    const [actionName, actionType] = actionMsg.action.split("-");
+    const { process } = actionDispatcher(actionName, actionType as ActionType);
     const data = await process(actionMsg.params, actionMsg.host);
     postMessage(
       JSON.stringify({
@@ -131,9 +148,28 @@ export default function WebsPage(props) {
             {`${host} would like to:`}
           </Text>
 
-          <View className="grow overflow-y-auto rounded-lg bg-gray-50 px-4 py-6 text-sm w-full">
-            <Text>{JSON.stringify(actionMsg)}</Text>
-          </View>
+          <ScrollView className="overflow-y-auto rounded-lg bg-gray-50 text-sm w-full">
+            <View className="p-4 space-y-2">
+              {component
+                ? createElement(
+                    component,
+                    { params },
+                    <View className="space-y-2">
+                      <Text>{actionName}</Text>
+                      {descriptions.map((description, index) => (
+                        <View
+                          className="flex flex-row gap-x-0.5 w-full"
+                          key={index}
+                        >
+                          <CheckBadgeIcon className="w-6 h-6 -mt-0.5" />
+                          <Text className="flex-1">{description}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )
+                : null}
+            </View>
+          </ScrollView>
 
           <View className="flex flex-row items-center justify-center pt-6 pb-12 w-full gap-2">
             <Pressable

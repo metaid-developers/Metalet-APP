@@ -4,5 +4,5 @@ import { Chain } from "@metalet/utxo-wallet-service";
 
 export async function process() {
   const address = getCurrentWallet(Chain.BTC).getAddress();
-  return fetchUtxos(Chain.MVC, address);
+  return fetchUtxos(Chain.BTC, address);
 }
