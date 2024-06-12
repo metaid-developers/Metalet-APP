@@ -20,11 +20,11 @@ export default ({ psbtHex, symbol, visible, close }) => {
         let value = 0;
         let address = "";
         if (inputData?.witnessUtxo?.script) {
+          // TODO: fix this
           address = btcAddress.fromOutputScript(
             inputData.witnessUtxo.script,
             network
           );
-          value = inputData.witnessUtxo?.value || 0;
         }
         if (inputData?.nonWitnessUtxo) {
           const tx = Transaction.fromBuffer(inputData.nonWitnessUtxo);

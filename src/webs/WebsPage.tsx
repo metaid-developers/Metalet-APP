@@ -39,6 +39,7 @@ export default function WebsPage(props) {
   const [descriptions, setDescriptions] = useState([]);
   const [actionMsg, setActionMsg] = useState<Message>();
   const [modalVisible, setModalVisible] = useState(false);
+  const [needEstimated, setNeedEstimated] = useState(false);
   const [component, setComponent] =
     useState<ComponentType<{ params: object }>>(null);
 
@@ -65,14 +66,13 @@ export default function WebsPage(props) {
       setModalVisible(true);
       setIcon(message.icon);
       setHost(message.host);
-      const { title, descriptions, component } = actionDispatcher(
-        actionName,
-        actionType
-      );
+      const { title, descriptions, component, needEstimated } =
+        actionDispatcher(actionName, actionType);
       setActionName(title);
       setComponent(component);
       setParams(message.params);
       setDescriptions(descriptions);
+      setNeedEstimated(needEstimated);
     } else if (actionType === ActionType.Query) {
       const { process } = actionDispatcher(actionName, ActionType.Query);
       const data = await process(message.params, message.host);
@@ -99,15 +99,29 @@ export default function WebsPage(props) {
 
   const confirmAction = async () => {
     const [actionName, actionType] = actionMsg.action.split("-");
-    const { process } = actionDispatcher(actionName, actionType as ActionType);
-    const data = await process(actionMsg.params, actionMsg.host);
-    postMessage(
-      JSON.stringify({
-        data,
-        nonce: actionMsg.nonce,
-      })
-    );
-    setModalVisible(false);
+    if (actionType === ActionType.Authorize && needEstimated) {
+      const { estimate, nextComponent } = actionDispatcher(
+        actionName,
+        ActionType.Authorize
+      );
+      const params = await estimate(actionMsg.params, actionMsg.host);
+      setParams(params);
+      setNeedEstimated(true);
+      setComponent(nextComponent);
+    } else {
+      const { process } = actionDispatcher(
+        actionName,
+        actionType as ActionType
+      );
+      const data = await process(actionMsg.params, actionMsg.host);
+      postMessage(
+        JSON.stringify({
+          data,
+          nonce: actionMsg.nonce,
+        })
+      );
+      setModalVisible(false);
+    }
   };
 
   const postMessage = async (message: unknown) => {
@@ -124,7 +138,7 @@ export default function WebsPage(props) {
           onPress={() => goBack()}
           className="border border-[#E7E7E7] rounded-full w-10 h-10 flex items-center justify-center"
         >
-          <CloseIcon className="text-black-primary" />
+          <CloseIcon className="text-black-primary w-2.5 h-2.5" />
         </TouchableOpacity>
       </View>
       <Modal animationType="slide" visible={modalVisible}>
@@ -158,8 +172,8 @@ export default function WebsPage(props) {
                       <Text>{actionName}</Text>
                       {descriptions.map((description, index) => (
                         <View
-                          className="flex flex-row gap-x-0.5 w-full"
                           key={index}
+                          className="flex flex-row gap-x-0.5 w-full"
                         >
                           <CheckBadgeIcon className="w-6 h-6 -mt-0.5" />
                           <Text className="flex-1">{description}</Text>

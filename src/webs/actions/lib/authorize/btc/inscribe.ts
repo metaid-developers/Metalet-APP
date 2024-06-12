@@ -1,11 +1,11 @@
 import { sleep } from "@/lib/helpers";
+import { getBtcUtxos } from "@/queries/utxos";
+import { getCurrentWallet } from "@/lib/wallet";
+import { broadcastBTCTx } from "@/queries/transaction";
 import {
   getMetaIdPinUnspentOutputsObj,
   setMetaIdPinUnspentOutputsObj,
 } from "@/lib/metaIdPin";
-import { getCurrentWallet } from "@/lib/wallet";
-import { broadcastBTCTx } from "@/queries/transaction";
-import { getBtcUtxos } from "@/queries/utxos";
 import {
   Chain,
   ScriptType,
@@ -139,7 +139,7 @@ export async function process({
     });
     return { commitTxId, revealTxIds, commitCost, revealCost, totalCost };
   }
-  
+
   return {
     commitTxHex: commitTx.rawTx,
     revealTxsHex: revealTxs.map((revealTx) => revealTx.rawTx),

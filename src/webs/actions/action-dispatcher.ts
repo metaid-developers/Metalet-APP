@@ -13,8 +13,9 @@ export interface AuthorizeAction {
   process: Function;
   estimate: Function;
   descriptions: string[];
-  closeAfterProcess: boolean;
+  needEstimated: boolean;
   component: ComponentType<{ params: object; children: ReactNode }>;
+  nextComponent?: ComponentType<{ params: object; children: ReactNode }>;
 }
 
 type ActionDispatcherReturnType<T extends ActionType> =
