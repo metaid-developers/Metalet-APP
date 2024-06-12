@@ -33,7 +33,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.metalet.wallet",
-      "icon": "./assets/icon.png",
+      "icon": "./assets/logo_metalet.png",
       "versionCode": 16,
       "permissions": [
         "READ_EXTERNAL_STORAGE",
