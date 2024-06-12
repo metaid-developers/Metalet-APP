@@ -8,13 +8,13 @@ import { openBrowser } from "@/utils/WalletUtils";
 
 export default function AboutPage() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1,backgroundColor:'#fff' }}>
       <View style={{ flex: 1 }}>
         <TitleBar />
         <View style={{ padding: 20, flex: 1 }}>
           <View style={{ alignItems: "center", alignContent: "center" }}>
             <Image
-              source={require("../../../image/me_app_icon.png")}
+              source={require("../../../assets/icon.png")}
               style={{ width: 100, height: 100 }}
               resizeMode="contain"
             />

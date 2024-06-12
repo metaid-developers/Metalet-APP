@@ -717,9 +717,8 @@ export default function HomePage({ navigation }) {
           { height: 45, alignItems: "center" },
         ]}
       >
-        {/* <Image source={require('../assets/images/logo.png')} style={metaStyles.logo}/> */}
         <Image
-          source={require("../../assets/logo.png")}
+          source={require("../../assets/icon.png")}
           style={{ width: 44, height: 44 }}
         />
         <View style={{ flex: 1 }} />
