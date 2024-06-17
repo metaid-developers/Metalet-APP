@@ -263,7 +263,7 @@ export default function SettingsPage(props: any) {
               </Text>
               <View style={{ flex: 1 }} />
               <Text style={metaStyles.defaultText}>
-               {network}
+               {network==='mainnet'?'Mainnet':'Testnet'}
               </Text>
               <Image
                 source={require("../../image/list_icon_ins.png")}

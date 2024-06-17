@@ -7,6 +7,7 @@ import {
   Button,
   StyleSheet,
   TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -36,6 +37,7 @@ import {  getStorageWallets, isNoStorageWallet } from "../../utils/WalletUtils";
 import { useData } from "../../hooks/MyProvider";
 import MetaletWallet from "../../wallet/MetaletWallet";
 import { createMetaletWallet } from "../../wallet/wallet";
+import Toast from "react-native-toast-message";
 
 const storage = createStorage();
 
@@ -104,6 +106,7 @@ export default function SetPasswordPage({ route }) {
         } else if (type == "import") {
           navigate("ImportWalletPage", { destory: true });
         }else {
+          Toast.show({text1:"Successful"});
           goBack();
         }
       } else {
@@ -124,7 +127,12 @@ export default function SetPasswordPage({ route }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+   <TouchableWithoutFeedback onPress={()=>{
+    console.log("click");
+    Keyboard.dismiss()
+    
+   }}>
+     <SafeAreaView style={{ flex: 1 }}>
       <LoadingModal
         isShow={isShowLoading}
         isCancel={true}
@@ -303,6 +311,7 @@ export default function SetPasswordPage({ route }) {
         />
       </View>
     </SafeAreaView>
+   </TouchableWithoutFeedback>
   );
 }
 

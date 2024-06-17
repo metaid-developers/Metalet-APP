@@ -2,6 +2,7 @@ import { BtcFtBean } from "@/bean/BtcFtBean";
 import {
   fetchAssetsPrice,
   fetchBtcBalance,
+  fetchIcons,
   fetchMvcFtBalance,
   fetchMvcFtPrice,
   fetchSpaceBalance,
@@ -9,7 +10,8 @@ import {
 import { ShowBalance } from "../api/type/Balance";
 import { MvcFtData } from "../api/type/MvcFtData";
 import { MvcFtPriceData } from "../api/type/Price";
-import { formatToDecimal, parseToSpace } from "./WalletUtils";
+import { formatToDecimal, getWalletNetwork, parseToSpace } from "./WalletUtils";
+import { Brc20, IcoinsData } from "@/api/type/IcoinsData";
 
 // FT
 export function caculateOneFtValue(
@@ -63,22 +65,26 @@ export async function caculateMvcAndBtcAssert(
 ): Promise<ShowBalance> {
   const balance: ShowBalance = new ShowBalance();
   const assertPrice = await fetchAssetsPrice();
+  const network = await getWalletNetwork();
+  let isMain = network === "mainnet" ? true : false;
   const btcPrice = assertPrice.data.priceInfo.btc;
   const spacePrice = assertPrice.data.priceInfo.space;
 
   const spaceBalanceData = await fetchSpaceBalance(mvcAddrss);
-  const spaceSumBalance = parseToSpace(
-    (spaceBalanceData.confirmed + spaceBalanceData.unconfirmed).toString()
-  );
+  const spaceSumBalance = parseFloat(
+    parseToSpace(
+      (spaceBalanceData.confirmed + spaceBalanceData.unconfirmed).toString()
+    )
+  ).toString();
   balance.spaceBalance = spaceSumBalance;
   const spaceAssert = toFloorNum(spacePrice * parseFloat(spaceSumBalance), 2);
-  balance.spaceAssert = spaceAssert.toFixed(2);
+  balance.spaceAssert = isMain ? spaceAssert.toFixed(2) : "0.0";
 
   const btcBalanceData = await fetchBtcBalance(btcAddress);
   const btcBalance = (balance.btcBalance =
     btcBalanceData.data.balance.toString());
   const btcAssert = toFloorNum(btcPrice * parseFloat(btcBalance), 2);
-  balance.btcAssert = btcAssert.toString();
+  balance.btcAssert = isMain ? btcAssert.toString() : "0.0";
   let assertSum = toFloorNum(spaceAssert + btcAssert, 2);
   const ftPriceData = await fetchMvcFtPrice();
 
@@ -157,4 +163,17 @@ export function getBtcBrc20Icon(ftName: string) {
       break;
   }
   return iconPic;
+}
+
+export  function getOneIcons(tag:string,ticker:string,iconsData: IcoinsData) {
+  let icon;
+  // const iconsData: IcoinsData = await fetchIcons();
+  // console.log(iconsData);
+  if (tag === "brc20") {
+    const brc20: Brc20 = iconsData.data.brc20_coin;
+    if (ticker in brc20) {
+      icon = brc20[ticker];
+    }
+  }
+  return icon;
 }

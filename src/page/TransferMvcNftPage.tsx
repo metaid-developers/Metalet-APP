@@ -248,7 +248,7 @@ export default function TransferMvcNftPage({ route }) {
 
             <TouchableWithoutFeedback
               onPress={() => {
-                goToWebScan("mvc", transactionID, "mainnet");
+                goToWebScan("mvc", transactionID);
               }}
             >
               <View

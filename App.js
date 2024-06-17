@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { UserProvider } from "./src/hooks/MyProvider";
 import AppNavigator from "./src/base/AppNavigator.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Toast from 'react-native-toast-message';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +21,7 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <AppNavigator />
       </QueryClientProvider>
+      <Toast/>
     </UserProvider>
   );
 }

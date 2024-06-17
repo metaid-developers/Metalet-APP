@@ -281,7 +281,7 @@ export default function SendBtcPage() {
             >
               <Text style={{ color: "#666", fontSize: 14 }}>Amount</Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                {inputAmount} BTC
+                 {parseFloat(inputAmount).toFixed(8)} BTC
               </Text>
             </View>
 
@@ -589,11 +589,11 @@ export default function SendBtcPage() {
                     keyboardType="numeric"
                     onChangeText={(text) => {
                       if (feedModeType == feedModeCustom) {
-                        // const numericInput = text.replace(/[^0-9]/g, '');
-                        setFeedReady(text);
-                        // setFeed(parseInt(numericInput));
+                        const numericInput = text.replace(/[^0-9]/g, '');
+                        setFeedReady(numericInput);
                       }
                     }}
+                    value={feedReady}
                     style={{
                       width: "100%",
                       backgroundColor: "transparent",

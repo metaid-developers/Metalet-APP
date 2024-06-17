@@ -5,6 +5,8 @@ import {
   TouchableWithoutFeedback,
   Modal,
   BackHandler,
+  Platform,
+  ImageBackground,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { navigate } from "../base/NavigationService";
@@ -15,6 +17,7 @@ import {
   GradientAvatar,
   LoadingModal,
   LoadingNoticeModal,
+  RoundSimButtonFlee,
 } from "../constant/Widget";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
@@ -48,12 +51,17 @@ import {
 import {
   getCurrentWalletAccount,
   getStorageCurrentWallet,
+  openBrowser,
 } from "../utils/WalletUtils";
-import { caculateMvcAndBtcAssert } from "../utils/AssertUtils";
+import { caculateMvcAndBtcAssert, getOneIcons } from "../utils/AssertUtils";
 import { ShowBalance } from "../api/type/Balance";
 import useWalletStore from "@/stores/useWalletStore";
 import useWalletManager from "@/hooks/useWalletManager";
 import useNetworkStore from "@/stores/useNetworkStore";
+import { fetchCheckUpgrade } from "@/api/metaletservice";
+import { UpdateData } from "@/api/type/Update";
+import Constants from "expo-constants";
+import Toast from "react-native-toast-message";
 
 const storage = createStorage();
 
@@ -97,6 +105,13 @@ export default function HomePage({ navigation }) {
   const [walletName, setWalletName] = useState("");
   const { walletManager, getCurrentChainWallet } = useWalletManager();
 
+  const [hasUpdate, setUpdate] = useState(false);
+  const [updateUrl, setUpdateUrl] = useState("");
+
+  const versionCode = Constants.expoConfig?.android.versionCode;
+  const buildNumber = Constants.expoConfig?.ios.buildNumber;
+  const platformNow = Platform.OS;
+ 
   useEffect(() => {
     if (!walletManager) {
       return;
@@ -127,6 +142,8 @@ export default function HomePage({ navigation }) {
         setIsShowLoading(false);
       });
     });
+
+    checkUpgrade();
   }, []);
 
   useEffect(() => {
@@ -184,9 +201,31 @@ export default function HomePage({ navigation }) {
     }, 800);
   }
 
+  async function checkUpgrade() {
+
+    if (platformNow === "android") {
+      const check: UpdateData = await fetchCheckUpgrade('android');
+      //  console.log(JSON.stringify(check));
+      const codeVersion = check.data.version_code;
+      setUpdateUrl(check.data.url);
+      if (codeVersion > versionCode) {
+        setUpdate(true);
+      }
+    } else {
+      const check: UpdateData = await fetchCheckUpgrade("ios");
+       // console.log(JSON.stringify(check));
+      const codeVersion = check.data.version_code;
+      setUpdateUrl(check.data.url);
+      if (codeVersion > parseFloat(buildNumber)) {
+        setUpdate(true);
+      }
+    }
+  }
+
   const getShowBalance = async () => {
     const nowMvcWallet = await getCurrentMvcWallet();
     const nowBtcWallet = await getCurrentBtcWallet();
+
 
     const showbalance: ShowBalance = await caculateMvcAndBtcAssert(
       nowMvcWallet.getAddress(),
@@ -271,617 +310,752 @@ export default function HomePage({ navigation }) {
 
   return (
     <SafeAreaView style={metaStyles.parentContainer}>
-      <LoadingModal
-        isShow={isShowLoading}
-        isCancel={true}
-        event={() => {
-          setIsShowLoading(false);
+      {/* <Image
+        source={require("../../assets/splash.png")}
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          zIndex: -1,
         }}
-      />
-      <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
+      /> */}
 
-      {/* 底部地址 */}
-      <Modal transparent={true} visible={isShowCopy}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "#fff",
-              borderTopRightRadius: 10,
-              borderTopLeftRadius: 10,
-
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingTop: 20,
-              paddingBottom: 30,
+      {/* <ImageBackground
+        source={require("../../image/me_first_choose_wallet.png")} // 替换为你的图片路径
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      > */}
+        <View style={{ flex: 1, width: "100%", height: "100%" ,backgroundColor: "#fff"}}>
+          <LoadingModal
+            isShow={isShowLoading}
+            isCancel={true}
+            event={() => {
+              setIsShowLoading(false);
             }}
-          >
+          />
+          <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
+
+          {/* upgrade  */}
+          <Modal visible={hasUpdate} transparent={true}>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
+                flex: 1,
                 justifyContent: "center",
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
               }}
             >
-              <Text
+              <View
                 style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  flex: 1,
+                  backgroundColor: "#fff",
+                  borderRadius: 10,
+                  paddingHorizontal: 30,
+                  marginHorizontal: 25,
+                  paddingTop: 20,
+                  paddingBottom: 10,
                 }}
               >
-                Select Wallet Address
-              </Text>
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* <Image
+                source={require("../../image/receive_mvc_icon.png")}
+                style={{ width: 50, height: 50 }}
+              /> */}
 
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setIsShowCopy(false);
+                  <Text
+                    style={{
+                      color: "#333",
+                      textAlign: "center",
+                      lineHeight: 20,
+                      marginTop: 20,
+                      fontSize: 18,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    New version
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 10,
+                  }}
+                >
+                  <Text style={{ color: "#333", fontSize: 14 }}>
+                    New version available. Would you like to download the update
+                    now?
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 40,
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <RoundSimButtonFlee
+                    title={"Cancel"}
+                    style={{
+                      borderRadius: 10,
+                      height: 40,
+                      width: "45%",
+                      borderWidth: 1,
+                      borderColor: themeColor,
+                    }}
+                    color="#fff"
+                    textColor="#171AFF"
+                    event={() => {
+                      setUpdate(false);
+                    }}
+                  />
+
+                  <RoundSimButtonFlee
+                    title={"Confirm"}
+                    style={{ borderRadius: 10, height: 40, width: "45%" }}
+                    textColor="#fff"
+                    event={() => {
+                      setUpdate(false);
+                      openBrowser(updateUrl);
+                    }}
+                  />
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+          {/* 底部地址 */}
+          <Modal transparent={true} visible={isShowCopy}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "flex-end",
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  borderTopRightRadius: 10,
+                  borderTopLeftRadius: 10,
+
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  paddingTop: 20,
+                  paddingBottom: 30,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      flex: 1,
+                    }}
+                  >
+                    Select Wallet Address
+                  </Text>
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      setIsShowCopy(false);
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/metalet_close_big_icon.png")}
+                      style={{ width: 15, height: 15 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+
+                {/* btc Legacy */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                        Bitcoin
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          marginLeft: 5,
+                          backgroundColor: "#F5F7F9",
+                          paddingHorizontal: 5,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#666",
+                            fontSize: 10,
+                            textAlign: "center",
+                          }}
+                        >
+                          Legacy
+                        </Text>
+                      </View>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {legacyAddress}
+                    </Text>
+                  </View>
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      ShowNotice(legacyAddress);
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/meta_copy_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+
+                {/* btc nested segwit */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                        Bitcoin
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          marginLeft: 5,
+                          backgroundColor: "#F5F7F9",
+                          paddingHorizontal: 5,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#666",
+                            fontSize: 10,
+                            textAlign: "center",
+                          }}
+                        >
+                          Nested SegWit
+                        </Text>
+                      </View>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {nestedSegwitAddress}
+                    </Text>
+                  </View>
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      ShowNotice(nestedSegwitAddress);
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/meta_copy_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+
+                {/* native segwit */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                        Bitcoin
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          marginLeft: 5,
+                          backgroundColor: "#F5F7F9",
+                          paddingHorizontal: 5,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#666",
+                            fontSize: 10,
+                            textAlign: "center",
+                          }}
+                        >
+                          Native SegWit
+                        </Text>
+                      </View>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {nativeSegwitAddress}
+                    </Text>
+                  </View>
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      ShowNotice(nativeSegwitAddress);
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/meta_copy_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+                {/* taproot */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                        Bitcoin
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          marginLeft: 5,
+                          backgroundColor: "#F5F7F9",
+                          paddingHorizontal: 5,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#666",
+                            fontSize: 10,
+                            textAlign: "center",
+                          }}
+                        >
+                          Taproot
+                        </Text>
+                      </View>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {taprootAddress}
+                    </Text>
+                  </View>
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      if (
+                        metaletWallet.btcTaprootWallet &&
+                        metaletWallet.btcTaprootWallet.getAddress()
+                      ) {
+                        ShowNotice(taprootAddress);
+                      }
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/meta_copy_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+
+                {/* sameAsMvc */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                        Bitcoin
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          marginLeft: 5,
+                          backgroundColor: "#F5F7F9",
+                          paddingHorizontal: 5,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#666",
+                            fontSize: 10,
+                            textAlign: "center",
+                          }}
+                        >
+                          Same as MVC
+                        </Text>
+                      </View>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {sameBtcAsMvcAddress}
+                    </Text>
+                  </View>
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      ShowNotice(sameBtcAsMvcAddress);
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/meta_copy_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+
+                {/* mvc */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../image/logo_space.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={{ fontSize: 14, fontWeight: "bold" }}>
+                        MVC
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          marginLeft: 5,
+                          backgroundColor: "#F5F7F9",
+                          paddingHorizontal: 5,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#666",
+                            fontSize: 10,
+                            textAlign: "center",
+                          }}
+                        >
+                          MVC
+                        </Text>
+                      </View>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 10, color: "#666" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {mvcAddress}
+                    </Text>
+                  </View>
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      ShowNotice(mvcAddress);
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/meta_copy_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+
+                {/* over */}
+              </View>
+            </View>
+          </Modal>
+
+          {/* 中部 */}
+          <View
+            style={[
+              metaStyles.rowMarginContainer,
+              { height: 45, alignItems: "center" },
+            ]}
+          >
+            <Image
+              source={require("../../assets/icon.png")}
+              style={{ width: 44, height: 44 }}
+            />
+            <View style={{ flex: 1 }} />
+            {network == "testnet" && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  backgroundColor: "#F3F3FF",
+                  borderRadius: 5,
+                  paddingHorizontal: 5,
+                  paddingVertical: 5,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 10,
                 }}
               >
                 <Image
-                  source={require("../../image/metalet_close_big_icon.png")}
+                  source={require("../../image/net_icon.png")}
                   style={{ width: 15, height: 15 }}
                 />
-              </TouchableWithoutFeedback>
-            </View>
 
-            {/* btc Legacy */}
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 20,
-                marginHorizontal: 10,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={require("../../image/logo_btc.png")}
-                style={{ width: 35, height: 35, marginLeft: 20 }}
-              />
-
-              <View style={{ marginLeft: 10, flex: 1 }}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
-                    Bitcoin
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      marginLeft: 5,
-                      backgroundColor: "#F5F7F9",
-                      paddingHorizontal: 5,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#666",
-                        fontSize: 10,
-                        textAlign: "center",
-                      }}
-                    >
-                      Legacy
-                    </Text>
-                  </View>
-                </View>
                 <Text
-                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
+                  style={{
+                    color: themeColor,
+                    textAlign: "center",
+                    marginLeft: 5,
+                    fontSize: 12,
+                  }}
                 >
-                  {legacyAddress}
+                  Testnet
                 </Text>
               </View>
+            )}
+            {netWork == null ||
+              (netWork == network_all && (
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    navigate("NetWorkPage");
+                  }}
+                >
+                  <Image
+                    source={require("../../image/metalet_network_all_icon.png")}
+                    style={{ width: 24, height: 24 }}
+                  />
+                </TouchableWithoutFeedback>
+              ))}
 
+            {netWork == network_btc && (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  ShowNotice(legacyAddress);
+                  navigate("NetWorkPage");
                 }}
               >
                 <Image
-                  source={require("../../image/meta_copy_icon.png")}
-                  style={{ width: 20, height: 20, marginRight: 10 }}
+                  source={require("../../image/meta_btc_icon.png")}
+                  style={{ width: 24, height: 24 }}
                 />
               </TouchableWithoutFeedback>
-            </View>
+            )}
 
-            {/* btc nested segwit */}
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 20,
-                marginHorizontal: 10,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={require("../../image/logo_btc.png")}
-                style={{ width: 35, height: 35, marginLeft: 20 }}
-              />
-
-              <View style={{ marginLeft: 10, flex: 1 }}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
-                    Bitcoin
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      marginLeft: 5,
-                      backgroundColor: "#F5F7F9",
-                      paddingHorizontal: 5,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#666",
-                        fontSize: 10,
-                        textAlign: "center",
-                      }}
-                    >
-                      Nested SegWit
-                    </Text>
-                  </View>
-                </View>
-                <Text
-                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {nestedSegwitAddress}
-                </Text>
-              </View>
-
+            {netWork == network_mvc && (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  ShowNotice(nestedSegwitAddress);
+                  navigate("NetWorkPage");
                 }}
               >
                 <Image
-                  source={require("../../image/meta_copy_icon.png")}
-                  style={{ width: 20, height: 20, marginRight: 10 }}
+                  source={require("../../image/logo_space.png")}
+                  style={{ width: 24, height: 24 }}
                 />
               </TouchableWithoutFeedback>
-            </View>
-
-            {/* native segwit */}
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 20,
-                marginHorizontal: 10,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={require("../../image/logo_btc.png")}
-                style={{ width: 35, height: 35, marginLeft: 20 }}
-              />
-
-              <View style={{ marginLeft: 10, flex: 1 }}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
-                    Bitcoin
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      marginLeft: 5,
-                      backgroundColor: "#F5F7F9",
-                      paddingHorizontal: 5,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#666",
-                        fontSize: 10,
-                        textAlign: "center",
-                      }}
-                    >
-                      Native SegWit
-                    </Text>
-                  </View>
-                </View>
-                <Text
-                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {nativeSegwitAddress}
-                </Text>
-              </View>
-
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  ShowNotice(nativeSegwitAddress);
-                }}
-              >
-                <Image
-                  source={require("../../image/meta_copy_icon.png")}
-                  style={{ width: 20, height: 20, marginRight: 10 }}
-                />
-              </TouchableWithoutFeedback>
-            </View>
-            {/* taproot */}
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 20,
-                marginHorizontal: 10,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={require("../../image/logo_btc.png")}
-                style={{ width: 35, height: 35, marginLeft: 20 }}
-              />
-
-              <View style={{ marginLeft: 10, flex: 1 }}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
-                    Bitcoin
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      marginLeft: 5,
-                      backgroundColor: "#F5F7F9",
-                      paddingHorizontal: 5,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#666",
-                        fontSize: 10,
-                        textAlign: "center",
-                      }}
-                    >
-                      Taproot
-                    </Text>
-                  </View>
-                </View>
-                <Text
-                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {taprootAddress}
-                </Text>
-              </View>
-
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  if (
-                    metaletWallet.btcTaprootWallet &&
-                    metaletWallet.btcTaprootWallet.getAddress()
-                  ) {
-                    ShowNotice(taprootAddress);
-                  }
-                }}
-              >
-                <Image
-                  source={require("../../image/meta_copy_icon.png")}
-                  style={{ width: 20, height: 20, marginRight: 10 }}
-                />
-              </TouchableWithoutFeedback>
-            </View>
-
-            {/* sameAsMvc */}
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 20,
-                marginHorizontal: 10,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={require("../../image/logo_btc.png")}
-                style={{ width: 35, height: 35, marginLeft: 20 }}
-              />
-
-              <View style={{ marginLeft: 10, flex: 1 }}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>
-                    Bitcoin
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      marginLeft: 5,
-                      backgroundColor: "#F5F7F9",
-                      paddingHorizontal: 5,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#666",
-                        fontSize: 10,
-                        textAlign: "center",
-                      }}
-                    >
-                      Same as MVC
-                    </Text>
-                  </View>
-                </View>
-                <Text
-                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {sameBtcAsMvcAddress}
-                </Text>
-              </View>
-
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  ShowNotice(sameBtcAsMvcAddress);
-                }}
-              >
-                <Image
-                  source={require("../../image/meta_copy_icon.png")}
-                  style={{ width: 20, height: 20, marginRight: 10 }}
-                />
-              </TouchableWithoutFeedback>
-            </View>
-
-            {/* mvc */}
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 20,
-                marginHorizontal: 10,
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={require("../../image/logo_space.png")}
-                style={{ width: 35, height: 35, marginLeft: 20 }}
-              />
-
-              <View style={{ marginLeft: 10, flex: 1 }}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={{ fontSize: 14, fontWeight: "bold" }}>MVC</Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      marginLeft: 5,
-                      backgroundColor: "#F5F7F9",
-                      paddingHorizontal: 5,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#666",
-                        fontSize: 10,
-                        textAlign: "center",
-                      }}
-                    >
-                      MVC
-                    </Text>
-                  </View>
-                </View>
-                <Text
-                  style={{ marginTop: 5, fontSize: 10, color: "#666" }}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {mvcAddress}
-                </Text>
-              </View>
-
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  ShowNotice(mvcAddress);
-                }}
-              >
-                <Image
-                  source={require("../../image/meta_copy_icon.png")}
-                  style={{ width: 20, height: 20, marginRight: 10 }}
-                />
-              </TouchableWithoutFeedback>
-            </View>
-
-            {/* over */}
-          </View>
-        </View>
-      </Modal>
-
-      {/* 中部 */}
-      <View
-        style={[
-          metaStyles.rowMarginContainer,
-          { height: 45, alignItems: "center" },
-        ]}
-      >
-        <Image
-          source={require("../../assets/icon.png")}
-          style={{ width: 44, height: 44 }}
-        />
-        <View style={{ flex: 1 }} />
-        {netWork == null ||
-          (netWork == network_all && (
-            <TouchableWithoutFeedback
-              onPress={() => {
-                navigate("NetWorkPage");
-              }}
-            >
-              <Image
-                source={require("../../image/metalet_network_all_icon.png")}
-                style={{ width: 24, height: 24 }}
-              />
-            </TouchableWithoutFeedback>
-          ))}
-
-        {netWork == network_btc && (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              navigate("NetWorkPage");
-            }}
-          >
+            )}
             <Image
-              source={require("../../image/meta_btc_icon.png")}
-              style={{ width: 24, height: 24 }}
+              source={require("../../image/meta_last_icon.png")}
+              style={{ width: 8, height: 6, marginLeft: 5 }}
             />
-          </TouchableWithoutFeedback>
-        )}
 
-        {netWork == network_mvc && (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              navigate("NetWorkPage");
-            }}
-          >
-            <Image
-              source={require("../../image/logo_space.png")}
-              style={{ width: 24, height: 24 }}
-            />
-          </TouchableWithoutFeedback>
-        )}
-        <Image
-          source={require("../../image/meta_last_icon.png")}
-          style={{ width: 8, height: 6, marginLeft: 5 }}
-        />
-
-        {/* <Button onPress={changeNetWork} title={network} />
+            {/* <Button onPress={changeNetWork} title={network} />
         <Button onPress={getWallets} title="getWallets" /> */}
-      </View>
+          </View>
 
-      <View style={[metaStyles.varContainer, { marginHorizontal: 30 }]}>
-        <View style={[metaStyles.rowContainer, { alignItems: "center" }]}>
-          <GradientAvatar isRand={false} defaultAvatarColor={userAvater} />
-          <View style={{ marginLeft: 10 }}>
-            <View style={[metaStyles.rowCenterContainer, { height: 20 }]}>
+          <View style={[metaStyles.varContainer, { marginHorizontal: 30 }]}>
+            <View style={[metaStyles.rowContainer, { alignItems: "center" }]}>
+              <GradientAvatar isRand={false} defaultAvatarColor={userAvater} />
+              <View style={{ marginLeft: 10 }}>
+                <View style={[metaStyles.rowCenterContainer, { height: 20 }]}>
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      navigate("WalletsPage");
+                    }}
+                  >
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Text style={metaStyles.grayTextdefault66}>
+                        {walletName}-
+                      </Text>
+                      <Text style={metaStyles.defaultText}>{accountName}</Text>
+                    </View>
+                  </TouchableWithoutFeedback>
+
+                  <Image
+                    source={require("../../image/meta_last_icon.png")}
+                    style={{ width: 8, height: 6, marginLeft: 5 }}
+                  />
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      if (metaletWallet.currentMvcWallet != null)
+                        setIsShowCopy(true);
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/meta_copy_icon.png")}
+                      style={{ width: 14, height: 14, marginLeft: 10 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+                <Text
+                  style={[metaStyles.bigLargeDefaultText, { marginTop: 3 }]}
+                >
+                  {"$ " + currentSumBalance}
+                </Text>
+              </View>
+
+              <View style={{ flex: 1 }} />
+            </View>
+
+            <View
+              style={[
+                metaStyles.rowContainer,
+                { justifyContent: "space-between", marginTop: 10 },
+              ]}
+            >
               <TouchableWithoutFeedback
                 onPress={() => {
-                  navigate("WalletsPage");
+                  // updateUserData({ ...userData, name: "校长" });
+                  //  AsyncStorage.removeItem(network_key);
+                  // console.log(metaletWallet.btcLegacyWallet.getAddress());
+                  // navigate("PasswordPage");
+                  // Toast.show({
+                  //   type: 'info',
+                  //   text1: 'Hello',
+                  //   visibilityTime: 2000,
+                  // });
+
+                  navigate("SendSelectAssertPage");
+
                 }}
               >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text style={metaStyles.grayTextdefault66}>
-                    {walletName}-
+                <View style={{ marginTop: 20 }}>
+                  <Image
+                    source={require("../../image/meta_home_send_icon.png")}
+                    style={{ width: 40, height: 40 }}
+                  />
+                  <Text
+                    style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
+                  >
+                    Send
                   </Text>
-                  <Text style={metaStyles.defaultText}>{accountName}</Text>
                 </View>
               </TouchableWithoutFeedback>
 
-              <Image
-                source={require("../../image/meta_last_icon.png")}
-                style={{ width: 8, height: 6, marginLeft: 5 }}
-              />
               <TouchableWithoutFeedback
                 onPress={() => {
-                  if (metaletWallet.currentMvcWallet != null)
-                    setIsShowCopy(true);
+                  navigate("SelectReceivePage");
                 }}
               >
-                <Image
-                  source={require("../../image/meta_copy_icon.png")}
-                  style={{ width: 14, height: 14, marginLeft: 10 }}
-                />
+                <View style={{ marginTop: 20 }}>
+                  <Image
+                    source={require("../../image/meta_home_receive_icon.png")}
+                    style={{ width: 40, height: 40 }}
+                  />
+                  <Text
+                    style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
+                  >
+                    Receive
+                  </Text>
+                </View>
               </TouchableWithoutFeedback>
-            </View>
-            <Text style={[metaStyles.bigLargeDefaultText, { marginTop: 3 }]}>
-              {"$ " + currentSumBalance}
-            </Text>
-          </View>
-
-          <View style={{ flex: 1 }} />
-
-         {network=='testnet' &&( <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "#F3F3FF",
-              borderRadius: 5,
-              paddingHorizontal: 5,
-              paddingVertical:5,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Image
-              source={require("../../image/net_icon.png")}
-              style={{ width: 15, height: 15 }}
-            />
-
-            <Text
-              style={{
-                color: themeColor,
-                textAlign: "center",
-                marginLeft: 5,
-                fontSize: 14,
-              }}
-            >
-              Testnet
-            </Text>
-          </View>)}
-        </View>
-
-        <View
-          style={[
-            metaStyles.rowContainer,
-            { justifyContent: "space-between", marginTop: 10 },
-          ]}
-        >
-          <TouchableWithoutFeedback
-            onPress={() => {
-              // updateUserData({ ...userData, name: "校长" });
-              //  AsyncStorage.removeItem(network_key);
-              // console.log(metaletWallet.btcLegacyWallet.getAddress());
-              navigate("SendSelectAssertPage");
-              // navigate("PasswordPage");
-            }}
-          >
-            <View style={{ marginTop: 20 }}>
-              <Image
-                source={require("../../image/meta_home_send_icon.png")}
-                style={{ width: 40, height: 40 }}
-              />
-              <Text style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}>
-                Send
-              </Text>
-            </View>
-          </TouchableWithoutFeedback>
-
-          <TouchableWithoutFeedback
-            onPress={() => {
-              navigate("SelectReceivePage");
-            }}
-          >
-            <View style={{ marginTop: 20 }}>
-              <Image
-                source={require("../../image/meta_home_receive_icon.png")}
-                style={{ width: 40, height: 40 }}
-              />
-              <Text style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}>
-                Receive
-              </Text>
-            </View>
-          </TouchableWithoutFeedback>
-          {/* 
+              {/* 
           <TouchableWithoutFeedback
             onPress={() => {
               console.log("click");
@@ -899,54 +1073,60 @@ export default function HomePage({ navigation }) {
             </View>
           </TouchableWithoutFeedback> */}
 
-          <TouchableWithoutFeedback
-            onPress={() => {
-              // updateAccountIndex(1);
-              // AsyncStorageUtil.setItem("account_select", 0);
-              navigate("DiscoverPage");
-              // navigate("WebPageTest");
-            }}
-          >
-            <View style={{ marginTop: 20 }}>
-              <Image
-                source={require("../../image/meta_home_swap_icon.png")}
-                style={{ width: 40, height: 40 }}
-              />
-              <Text style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}>
-                Swap
-              </Text>
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  // updateAccountIndex(1);
+                  // AsyncStorageUtil.setItem("account_select", 0);
+                  navigate("DiscoverPage");
+                  // navigate("WebPageTest");
+                }}
+              >
+                <View style={{ marginTop: 20 }}>
+                  <Image
+                    source={require("../../image/meta_home_swap_icon.png")}
+                    style={{ width: 40, height: 40 }}
+                  />
+                  <Text
+                    style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
+                  >
+                    Swap
+                  </Text>
+                </View>
+              </TouchableWithoutFeedback>
+              <TouchableWithoutFeedback
+                onPress={async () => {
+                  navigate("DiscoverPage");
+                  // navigate("WebPageTest");
+                  // navigate("WebPage");
+                }}
+              >
+                <View style={{ marginTop: 20 }}>
+                  <Image
+                    source={require("../../image/meta_home_bridge_icon.png")}
+                    style={{ width: 40, height: 40 }}
+                  />
+                  <Text
+                    style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
+                  >
+                    Bridge
+                  </Text>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback
-            onPress={async () => {
-              navigate("DiscoverPage");
-              // navigate("WebPageTest");
-              // navigate("WebPage");
-            }}
-          >
-            <View style={{ marginTop: 20 }}>
-              <Image
-                source={require("../../image/meta_home_bridge_icon.png")}
-                style={{ width: 40, height: 40 }}
-              />
-              <Text style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}>
-                Bridge
-              </Text>
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
 
-        {/* <MyTabs /> */}
-        {/* {[network_all].includes(netWork) && <MyTabs01 />}
+            {/* <MyTabs /> */}
+            {/* {[network_all].includes(netWork) && <MyTabs01 />}
         {[, network_btc].includes(netWork) && <MyTabs02 />}
         {[, network_mvc].includes(netWork) && <MyTabs03 />} */}
 
-        {netWork == network_all && <MyTabs01 />}
+            {netWork == network_all && <MyTabs01 />}
 
-        {netWork == network_btc && <MyTabs02 />}
+            {netWork == network_btc && <MyTabs02 />}
 
-        {netWork == network_mvc && <MyTabs03 />}
-      </View>
+            {netWork == network_mvc && <MyTabs03 />}
+          </View>
+        </View>
+      {/* </ImageBackground> */}
     </SafeAreaView>
   );
 }

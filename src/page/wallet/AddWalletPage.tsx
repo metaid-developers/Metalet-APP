@@ -1,15 +1,68 @@
 import { View, Text, Image, TouchableWithoutFeedback } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { metaStyles } from "../../constant/Constants";
-import { TitleBar } from "../../constant/Widget";
+import { LoadingModal, TitleBar } from "../../constant/Widget";
 import { navigate } from "../../base/NavigationService";
+import { createMetaletWallet } from "@/wallet/wallet";
+import { getStorageWallets, isNoStorageWallet } from "@/utils/WalletUtils";
+import MetaletWallet from "@/wallet/MetaletWallet";
+import { useData } from "@/hooks/MyProvider";
+import {
+  CurrentAccountIDKey,
+  CurrentWalletIDKey,
+  createStorage,
+  wallets_key,
+} from "@/utils/AsyncStorageUtil";
 
 export default function AddWalletPage() {
+  const [isShowLoading, setIsShowLoading] = useState(false);
+  const { myWallet, updateMyWallet } = useData();
+  const { metaletWallet, updateMetaletWallet } = useData();
+  const { mvcAddress, updateMvcAddress } = useData();
+  const { btcAddress, updateBtcAddress } = useData();
+
+  async function createWallet() {
+    setIsShowLoading(true);
+    const { btcWallet, mvcWallet, walletBean } =
+      await createMetaletWallet(10001);
+    const wallets = await getStorageWallets();
+    const hasNoWallets = await isNoStorageWallet();
+
+    let metaletWallet = new MetaletWallet();
+    updateMvcAddress(mvcWallet.getAddress());
+    updateBtcAddress(btcWallet.getAddress());
+    metaletWallet.currentBtcWallet = btcWallet;
+    metaletWallet.currentMvcWallet = mvcWallet;
+    updateMetaletWallet(metaletWallet);
+    const storage = createStorage();
+
+    if (hasNoWallets) {
+      await storage.set(wallets_key, [walletBean]);
+    } else {
+      const newWallets = [...wallets, walletBean];
+      await storage.set(wallets_key, newWallets);
+    }
+    updateMyWallet(walletBean);
+    await storage.set(CurrentWalletIDKey, walletBean.id);
+    await storage.set(CurrentAccountIDKey, walletBean.accountsOptions[0].id);
+    setIsShowLoading(false);
+    navigate("CongratulationsPage", {
+      type: "Successfully created",
+    });
+  }
+
   return (
     <SafeAreaView
       style={[metaStyles.varContainer, { backgroundColor: "#fff" }]}
     >
+      <LoadingModal
+        isShow={isShowLoading}
+        isCancel={true}
+        event={() => {
+          setIsShowLoading(false);
+        }}
+      />
       <View style={metaStyles.varContainer}>
         <TitleBar />
         <View>
@@ -24,7 +77,11 @@ export default function AddWalletPage() {
             Add Wallet
           </Text>
 
-          <TouchableWithoutFeedback>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              createWallet();
+            }}
+          >
             <View
               style={[
                 {
@@ -35,7 +92,7 @@ export default function AddWalletPage() {
                   backgroundColor: "#F5F7F9",
                   borderRadius: 10,
                   padding: 10,
-                  height:123
+                  height: 123,
                 },
               ]}
             >
@@ -57,9 +114,11 @@ export default function AddWalletPage() {
               />
             </View>
           </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback  onPress={()=>{
-            navigate('ImportWalletPage')
-          }}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigate("ImportWalletPage");
+            }}
+          >
             <View
               style={[
                 {
@@ -70,7 +129,7 @@ export default function AddWalletPage() {
                   backgroundColor: "#F5F7F9",
                   borderRadius: 10,
                   padding: 10,
-                  height:123
+                  height: 123,
                 },
               ]}
             >
@@ -81,7 +140,7 @@ export default function AddWalletPage() {
                   Import wallet
                 </Text>
                 <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
-                  import using menmonic phrase 
+                  import using menmonic phrase
                 </Text>
               </View>
 

@@ -27,6 +27,7 @@ import { MvcActivityRecord } from "../../types/mvcrecord";
 import {
   fetchBrc20Record,
   fetchBtcFtPrice,
+  fetchIcons,
   fetchMvcActivityComfird,
   fetchMvcFtPrice,
   fetchMvcFtRecord,
@@ -43,6 +44,7 @@ import {
   caculateOneBtcFtValue,
   caculateOneFtValue,
   getBtcBrc20Icon,
+  getOneIcons,
 } from "../../utils/AssertUtils";
 import {
   AddressTokenSummary,
@@ -55,6 +57,7 @@ import {
   InscriptionsList,
 } from "@/api/type/BtcFtOneRecordData";
 import { Chain } from "@metalet/utxo-wallet-service";
+import { IcoinsData } from "@/api/type/IcoinsData";
 
 export default function BRC20DetailPage({ route }) {
   const [mvcActivityList, setMvcActivityList] = useState<InscriptionsList[]>(
@@ -77,6 +80,7 @@ export default function BRC20DetailPage({ route }) {
   const [tokenTransferList, setTokenTransferList] = useState([]);
   const [tokenPingList, setTokenPingList] = useState([]);
   const [isSelectTransfer, setIsSelectTransfer] = useState(true);
+  const [brc20Icons, setBrc20Icons] = useState<IcoinsData>();
 
   useEffect(() => {
     // console.log("brc20: " + JSON.stringify(brc20));
@@ -84,6 +88,11 @@ export default function BRC20DetailPage({ route }) {
   }, []);
 
   async function getActivityList(address: string) {
+    const iconsData: IcoinsData = await fetchIcons();
+    if(iconsData){
+      setBrc20Icons(iconsData);
+    }
+
     const ftPriceData = await fetchBtcFtPrice();
     // console.log("ftPriceData: " + JSON.stringify(ftPriceData));
 
@@ -91,7 +100,7 @@ export default function BRC20DetailPage({ route }) {
     // console.log("assertFt: " + assertFt);
 
     setOneFtAssert(assertFt);
-    const network=await getWalletNetwork(Chain.BTC);
+    const network = await getWalletNetwork(Chain.BTC);
 
     const brc20Balance: Brc20DetailData = await fetchOneBrc20(
       address,
@@ -203,23 +212,16 @@ export default function BRC20DetailPage({ route }) {
       isIncome = false;
     }
 
-    let title="";
-    if(item.actionType=='transfer'){
+    let title = "";
+    if (item.actionType == "transfer") {
       title = isIncome ? "Receive" : "Send";
-    }else{
-      title=item.actionType;
+    } else {
+      title = item.actionType;
     }
-    // let ImageUrl = getIconUri({
-    //   type: "metaContract",
-    //   codehash: brc20.codeHash,
-    //   genesis: brc20.genesis,
-    // });
 
-    // return (
-    //   <View>
-    //     <Text> niaho </Text>
-    //   </View>
-    // );
+    // let ImageUrl = getOneIcons('brc20',item.ticker,brc20Icons);
+    // console.log("brc20 头像 ： ",ImageUrl);
+
     return (
       <View>
         <View
@@ -322,7 +324,7 @@ export default function BRC20DetailPage({ route }) {
               <Text
                 style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
               >
-              {title}
+                {title}
               </Text>
               <View style={{ flex: 1 }} />
               <Text
@@ -722,7 +724,7 @@ export default function BRC20DetailPage({ route }) {
                                 }}
                               >
                                 <Text style={{ color: "#fff" }}>
-                                 # {item.inscriptionNumber}
+                                  # {item.inscriptionNumber}
                                 </Text>
                               </View>
                             )}

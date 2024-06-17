@@ -19,6 +19,8 @@ import { MvcFtData, MvcFtRecordData } from "./type/MvcFtData";
 import { MvcNftData } from "./type/MvcNftData";
 import { MvcFtPriceData } from "./type/Price";
 import { getWalletNetwork } from "@/utils/WalletUtils";
+import { UpdateData } from "./type/Update";
+import { IcoinsData } from "./type/IcoinsData";
 
 export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
@@ -149,8 +151,11 @@ export async function fetchMvcFtPrice(): Promise<MvcFtPriceData> {
 export async function fetchSpaceBalance(
   address: string
 ): Promise<SpaceBalance> {
+  const network = await getWalletNetwork();
   const dataMvcBalance: SpaceBalance = await get(
-    BASE_MVC_API_URL + "/address/" + address + "/balance"
+    network == "mainnet"
+      ? BASE_MVC_API_URL+ "/address/" + address + "/balance"
+      : BASE_MVC_API_URL_TESTNET + "/address/" + address + "/balance"
   );
   return dataMvcBalance;
 }
@@ -211,7 +216,7 @@ export async function fetchBrc20Record(
   return data;
 }
 
-//brc20 inscribe pre
+//17.brc20 inscribe pre
 export async function fetchBrc20InscribePre(
   receiveAddress: string,
   feeRate: number,
@@ -235,7 +240,7 @@ export async function fetchBrc20InscribePre(
   return data;
 }
 
-//brc20 inscribe commit
+//18.brc20 inscribe commit
 export async function fetchBrc20InscribeCommit(
   version: number,
   orderId: string,
@@ -253,6 +258,27 @@ export async function fetchBrc20InscribeCommit(
       rawTx,
       // addressType:1
     }
+  );
+  return data;
+}
+
+// 19.check upgrade
+export async function fetchCheckUpgrade(platform:string): Promise<UpdateData> {
+  const data: UpdateData = await post(
+    BASE_METALET_URL + "/app-base/v1/app/upgrade/info",
+    {
+      app_name: "Metalet-v3",
+      platform:platform
+    }
+  );
+  return data;
+}
+
+//20. icons
+export async function fetchIcons(): Promise<IcoinsData> {
+  const data: IcoinsData = await get(
+    BASE_METALET_URL + "/wallet-api/v3/coin/icons",
+    true,
   );
   return data;
 }

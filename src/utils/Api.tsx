@@ -57,7 +57,7 @@ export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => 
 };
 
 export const post = async (url, data = {}) => {
-  console.log("data "+JSON.stringify(data));
+  // console.log("data "+JSON.stringify(data));
   
   try {
     const response = await fetch(url, {
@@ -72,7 +72,7 @@ export const post = async (url, data = {}) => {
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-    console.log("response", response.url);
+    // console.log("response", response.url);
     return await response.json();
   } catch (error) {
     console.log("Get Rqeuest Error:", url);

@@ -28,6 +28,7 @@ import { wallet_password_key, createStorage } from "../utils/AsyncStorageUtil";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import { verifyPassword } from "../utils/WalletUtils";
 import { CameraView } from 'expo-camera/next';
+import Toast from "react-native-toast-message";
 
 const storage = createStorage();
 
@@ -600,7 +601,7 @@ export const VerifyModal = ({
       <View
         style={{
           flex: 1,
-          justifyContent: "flex-end",
+          justifyContent: "center",
           backgroundColor: "rgba(0, 0, 0, 0.5)",
         }}
       >
@@ -609,9 +610,10 @@ export const VerifyModal = ({
             backgroundColor: "#fff",
             borderTopLeftRadius: 10,
             borderTopRightRadius: 10,
-            paddingBottom: 40,
-            paddingTop: 30,
+            borderRadius: 10,
             paddingHorizontal: 20,
+            paddingVertical: 30,
+            marginHorizontal:20
           }}
         >
           <View style={{ flexDirection: "row" }}>
@@ -679,7 +681,14 @@ export const VerifyModal = ({
                   if (passwordLocal == value) {
                     event(inputText);
                   } else {
-                    console.log("密码错误");
+                    console.log("Password Error");
+                    eventCancel();
+                    ToastView({text:"Password Error",type:'error'})
+                    // Toast.show({
+                    //   type: 'error',
+                    //   text1: 'password error',
+                    //   visibilityTime: 2000,
+                    // });
                   }
                 }
               }}
@@ -915,3 +924,16 @@ export const BaseView = ({ hasTitle = true, titleText = "", ChildView }) => {
     </SafeAreaView>
   );
 };
+
+
+//17.simple notice
+export const ToastView=({text,time=2000,type="info"})=>{
+  Toast.show({
+    type,
+    text1: text,
+    visibilityTime: time,
+    autoHide: true,
+    position: 'top',
+  });
+}
+

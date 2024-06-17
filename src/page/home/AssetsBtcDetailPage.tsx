@@ -63,6 +63,8 @@ export default function AssetsBtcDetailPage({ route }) {
     // );
     let btcActivityListData: BtcRootRecord =
       await fetchBtcActivityRecord(address);
+      console.log("btcActivityListData", btcActivityListData);
+      
     let datalist = btcActivityListData.data.transactionList;
 
     if (datalist.length == 0) {
@@ -149,7 +151,7 @@ export default function AssetsBtcDetailPage({ route }) {
 
     return (
       <View>
-        {item.txId != "1" ? (
+        {item?.txId !== "1" ? (
           <View
             style={{
               width: "100%",

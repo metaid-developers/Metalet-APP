@@ -15,8 +15,9 @@
       "**/*"
     ],
     "ios": {
+      "buildNumber": "1",
       "supportsTablet": true,
-      "bundleIdentifier": "com.metalet.wallet",
+      "bundleIdentifier": "com.metalet.swallet",
       "permissions": ["CAMERA", "PHOTO_LIBRARY_ADD_ONLY"],
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
@@ -32,9 +33,9 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.metalet.wallet",
+      "package": "com.metalet.swallet",
       "icon": "./assets/logo_metalet.png",
-      "versionCode": 16,
+      "versionCode": 1,
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",

@@ -176,17 +176,18 @@ export function caculateToSatDecimal(amount: number, precision: number) {
 }
 
 /////////// fuction
-export async function goToWebScan(
-  chain: string,
-  linkTx: string,
-  network?: string
-) {
+export async function goToWebScan(chain: string, linkTx: string) {
   let url;
+  const network = await getWalletNetwork();
   if (chain == "mvc") {
-    url = "https://www.mvcscan.com/tx/" + linkTx;
+    if (network == "testnet") {
+      url = "https://test.mvcscan.com/" + linkTx;
+    } else {
+      url = "https://www.mvcscan.com/tx/" + linkTx;
+    }
   } else if (chain == "btc") {
     if (network == "testnet") {
-      url = "https://mempool.space/zh/tx/" + linkTx;
+      url = "https://mempool.space/testnet/tx/" + linkTx;
     } else {
       url = "https://mempool.space/tx/" + linkTx;
     }
