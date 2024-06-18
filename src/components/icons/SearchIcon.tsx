@@ -1,4 +1,4 @@
-import Svg, { Path, Rect, Circle } from "react-native-svg";
+import Svg, { Path, Circle } from "react-native-svg";
 
 const CloseIcon = (props) => (
   <Svg

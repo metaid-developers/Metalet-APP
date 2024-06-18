@@ -34,7 +34,8 @@ export const useBTCRateQuery = (options?: { enabled: boolean }) => {
   return useQuery({
     queryKey: ["BTCTRate"],
     queryFn: () => getBTCTRate(),
-    select: (result) => result.list.reverse(),
+    refetchInterval: 30000,
+    select: (result) => result.list,
     ...options,
   });
 };

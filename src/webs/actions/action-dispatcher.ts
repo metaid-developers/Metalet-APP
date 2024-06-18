@@ -1,7 +1,7 @@
 import { ActionType } from "./types";
-import { ComponentType, ReactNode } from "react";
 import queryActions from "./query-actions";
 import authorizeActions from "./authorize-actions";
+import { ComponentType, ReactNode, MutableRefObject } from "react";
 
 export interface QueryAction {
   process: Function;
@@ -14,8 +14,15 @@ export interface AuthorizeAction {
   estimate: Function;
   descriptions: string[];
   needEstimated: boolean;
-  component: ComponentType<{ params: object; children: ReactNode }>;
-  nextComponent?: ComponentType<{ params: object; children: ReactNode }>;
+  component: ComponentType<{
+    params: object;
+    children: ReactNode;
+    ref?: MutableRefObject<unknown>;
+  }>;
+  nextComponent?: ComponentType<{
+    params: object;
+    children: ReactNode;
+  }>;
 }
 
 type ActionDispatcherReturnType<T extends ActionType> =

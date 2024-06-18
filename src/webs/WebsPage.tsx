@@ -40,8 +40,16 @@ export default function WebsPage(props) {
   const [actionMsg, setActionMsg] = useState<Message>();
   const [modalVisible, setModalVisible] = useState(false);
   const [needEstimated, setNeedEstimated] = useState(false);
-  const [component, setComponent] =
-    useState<ComponentType<{ params: object }>>(null);
+  const [component, setComponent] = useState<
+    ComponentType<{
+      params: object;
+      ref?: React.MutableRefObject<any>;
+    }>
+  >(null);
+
+  const metaidComponentRef = useRef<{
+    getEstimatedData: () => null;
+  } | null>(null);
 
   useEffect(() => {
     if (!props.route.params?.url) {
@@ -100,13 +108,13 @@ export default function WebsPage(props) {
   const confirmAction = async () => {
     const [actionName, actionType] = actionMsg.action.split("-");
     if (actionType === ActionType.Authorize && needEstimated) {
-      const { estimate, nextComponent } = actionDispatcher(
+      const params = metaidComponentRef.current.getEstimatedData();
+      setParams(params);
+      const { nextComponent } = actionDispatcher(
         actionName,
         ActionType.Authorize
       );
-      const params = await estimate(actionMsg.params, actionMsg.host);
-      setParams(params);
-      setNeedEstimated(true);
+      setNeedEstimated(false);
       setComponent(nextComponent);
     } else {
       const { process } = actionDispatcher(
@@ -167,7 +175,10 @@ export default function WebsPage(props) {
               {component
                 ? createElement(
                     component,
-                    { params },
+                    {
+                      params,
+                      ref: needEstimated ? metaidComponentRef : undefined,
+                    },
                     <View className="space-y-2">
                       <Text>{actionName}</Text>
                       {descriptions.map((description, index) => (

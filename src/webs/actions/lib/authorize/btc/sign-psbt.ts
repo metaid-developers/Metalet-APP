@@ -45,7 +45,7 @@ export async function process({
 }): Promise<string> {
   const psbtNetwork = await getBtcNetwork();
   const wallet = await getCurrentWallet(Chain.BTC);
-  const pubkey = wallet.getPublicKeyHex();
+  const pubkey = wallet.getPublicKey().toString('hex');
 
   if (!options) {
     options = { toSignInputs: undefined, autoFinalized: true };
@@ -99,7 +99,7 @@ const formatOptionsToSignInputs = async (
   options?: SignPsbtOptions
 ) => {
   const wallet = await getCurrentWallet(Chain.BTC);
-  const pubkey = wallet.getPublicKeyHex();
+  const pubkey = wallet.getPublicKey().toString('hex');
   const btcAddress = wallet.getAddress();
   const account = { pubkey, address: btcAddress };
 
