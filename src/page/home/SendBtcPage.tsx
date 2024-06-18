@@ -5,6 +5,9 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Modal,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -98,7 +101,7 @@ export default function SendBtcPage() {
   const [isShowLoading, setIsShowLoading] = useState(false);
   const [noticeContent, setNoticeContent] = useState("Successful");
   const [confirmDailogState, setConfirmDailogState] = useState(false);
-  const {needRefreshHome,updateNeedRefreshHome}=useData();
+  const { needRefreshHome, updateNeedRefreshHome } = useData();
 
   // verfiy
   const [isShowVerify, setIsShowVerify] = useState(false);
@@ -150,7 +153,6 @@ export default function SendBtcPage() {
       utxos
     );
     console.log(rawTx);
-    
 
     const amount = parseToSat(inputAmount);
     const gas = parseInt(cost) - amount;
@@ -172,12 +174,12 @@ export default function SendBtcPage() {
 
   const OpenModal = async () => {
     setIsShowLoading(true);
- 
+
     // broadcast
     const { code, message, processingTime, data } = await broadcastBtc(rawTx);
     if (data) {
       setIsShowLoading(false);
-      updateNeedRefreshHome(getRandomID())
+      updateNeedRefreshHome(getRandomID());
       navigate("SendBtcSuccessPage", {
         result: {
           txid: data,
@@ -281,7 +283,7 @@ export default function SendBtcPage() {
             >
               <Text style={{ color: "#666", fontSize: 14 }}>Amount</Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                 {parseFloat(inputAmount).toFixed(8)} BTC
+                {parseFloat(inputAmount).toFixed(8)} BTC
               </Text>
             </View>
 
@@ -435,7 +437,7 @@ export default function SendBtcPage() {
                     <Text style={{ marginTop: 3, color: "#000" }}>
                       {userSlowFeed.feeRate} sat/vB
                     </Text>
-                    <Text style={{ color: "#666", fontSize: 12, marginTop: 3 }}>
+                    <Text style={{ color: "#666", fontSize: 10, marginTop: 3 }}>
                       {userSlowFeed.desc}
                     </Text>
                   </View>
@@ -487,7 +489,7 @@ export default function SendBtcPage() {
                     <Text style={{ marginTop: 3, color: "#000" }}>
                       {userAvgFeed.feeRate} sat/vB
                     </Text>
-                    <Text style={{ color: "#666", fontSize: 12, marginTop: 3 }}>
+                    <Text style={{ color: "#666", fontSize: 10, marginTop: 3 }}>
                       {userAvgFeed.desc}
                     </Text>
                   </View>
@@ -539,7 +541,7 @@ export default function SendBtcPage() {
                     <Text style={{ marginTop: 3, color: "#000" }}>
                       {userFastFeed.feeRate} sat/vB
                     </Text>
-                    <Text style={{ color: "#666", fontSize: 12, marginTop: 3 }}>
+                    <Text style={{ color: "#666", fontSize: 10, marginTop: 3 }}>
                       {userFastFeed.desc}
                     </Text>
                   </View>
@@ -586,11 +588,14 @@ export default function SendBtcPage() {
                   <TextInput
                     placeholder="sat/vB"
                     ref={textInputRef}
-                    keyboardType="numeric"
+                    keyboardType={Platform.OS === "ios"?undefined:"numeric"}
                     onChangeText={(text) => {
                       if (feedModeType == feedModeCustom) {
-                        const numericInput = text.replace(/[^0-9]/g, '');
+                        const numericInput = text.replace(/[^0-9]/g, "");
                         setFeedReady(numericInput);
+                        // if (Platform.OS === "ios") {
+                        //   Keyboard.dismiss();
+                        // }
                       }
                     }}
                     value={feedReady}
@@ -792,8 +797,20 @@ export default function SendBtcPage() {
             >
               <TextInput
                 placeholder="Amount"
+                keyboardType={Platform.OS == "android" ? "numeric" : undefined}
+                value={inputAmount}
                 onChangeText={(text) => {
-                  setInputAmount(text);
+                  console.log(123);
+
+                  if (Platform.OS === "android") {
+                    const decimalRegex = /^(\d+(\.\d*)?)?$/;
+                    if (decimalRegex.test(text)) {
+                      setInputAmount(text);
+                    }
+                  } else {
+                    setInputAmount(text);
+                  }
+
                   if (text.length > 0 && inputAddress.length > 0) {
                     setNextBtnColor("rgba(23, 26, 255, 1)");
                   } else {
@@ -820,7 +837,10 @@ export default function SendBtcPage() {
 
           <View style={{ marginHorizontal: 20, paddingHorizontal: 25 }}>
             <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
             >
               <Text style={{ color: "#666", fontSize: 14 }}>Balance</Text>
               <Text style={{ color: "#999", fontSize: 14 }}>

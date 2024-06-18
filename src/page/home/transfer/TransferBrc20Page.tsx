@@ -5,6 +5,8 @@ import {
   TouchableWithoutFeedback,
   Image,
   TextInput,
+  Platform,
+  Keyboard,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -223,7 +225,7 @@ export default function TransferBrc20Page({ route }) {
                     <Text style={{ marginTop: 3, color: "#000" }}>
                       {userSlowFeed.feeRate} sat/vB
                     </Text>
-                    <Text style={{ color: "#666", fontSize: 12, marginTop: 3 }}>
+                    <Text style={{ color: "#666", fontSize: 10, marginTop: 3 }}>
                       {userSlowFeed.desc}
                     </Text>
                   </View>
@@ -275,7 +277,7 @@ export default function TransferBrc20Page({ route }) {
                     <Text style={{ marginTop: 3, color: "#000" }}>
                       {userAvgFeed.feeRate} sat/vB
                     </Text>
-                    <Text style={{ color: "#666", fontSize: 12, marginTop: 3 }}>
+                    <Text style={{ color: "#666", fontSize: 10, marginTop: 3 }}>
                       {userAvgFeed.desc}
                     </Text>
                   </View>
@@ -327,7 +329,7 @@ export default function TransferBrc20Page({ route }) {
                     <Text style={{ marginTop: 3, color: "#000" }}>
                       {userFastFeed.feeRate} sat/vB
                     </Text>
-                    <Text style={{ color: "#666", fontSize: 12, marginTop: 3 }}>
+                    <Text style={{ color: "#666", fontSize: 10, marginTop: 3 }}>
                       {userFastFeed.desc}
                     </Text>
                   </View>
@@ -374,12 +376,16 @@ export default function TransferBrc20Page({ route }) {
                   <TextInput
                     placeholder="sat/vB"
                     ref={textInputRef}
-                    keyboardType="numeric"
+                    keyboardType={Platform.OS === "ios"?undefined:"numeric"}
+                    value={feedReady}
                     onChangeText={(text) => {
                       if (feedModeType == feedModeCustom) {
-                        // const numericInput = text.replace(/[^0-9]/g, '');
-                        setFeedReady(text);
+                        const numericInput = text.replace(/[^0-9]/g, '');
+                        setFeedReady(numericInput);
                         // setFeed(parseInt(numericInput));
+                        // if(Platform.OS === "ios" ){
+                        //   Keyboard.dismiss();
+                        // }
                       }
                     }}
                     style={{

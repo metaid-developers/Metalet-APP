@@ -32,7 +32,7 @@ export default function SettingsPage(props: any) {
   const { needInitWallet, updateNeedInitWallet } = useData();
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 ,backgroundColor:'#fff'}}>
       <LoadingModal
         isShow={isShowLoading}
         isCancel={true}
