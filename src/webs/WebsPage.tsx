@@ -34,18 +34,18 @@ export default function WebsPage(props) {
   const [uri, setURI] = useState("");
   const [icon, setIcon] = useState("");
   const [host, setHost] = useState("");
-  const [params, setParams] = useState({});
   const [actionName, setActionName] = useState("");
   const [descriptions, setDescriptions] = useState([]);
   const [actionMsg, setActionMsg] = useState<Message>();
   const [modalVisible, setModalVisible] = useState(false);
   const [needEstimated, setNeedEstimated] = useState(false);
-  const [component, setComponent] = useState<
-    ComponentType<{
+  const [componentInfo, setComponentInfo] = useState<{
+    params: Record<string, unknown>;
+    component: ComponentType<{
       params: object;
       ref?: React.MutableRefObject<any>;
-    }>
-  >(null);
+    }>;
+  }>(null);
 
   const metaidComponentRef = useRef<{
     getEstimatedData: () => null;
@@ -68,6 +68,8 @@ export default function WebsPage(props) {
     if (actionName === "Connect") {
       message.params.icon = message.icon;
     }
+    console.log("message", message);
+
     setActionMsg(message);
 
     if (actionType === ActionType.Authorize) {
@@ -77,13 +79,14 @@ export default function WebsPage(props) {
       const { title, descriptions, component, needEstimated } =
         actionDispatcher(actionName, actionType);
       setActionName(title);
-      setComponent(component);
-      setParams(message.params);
+      setComponentInfo({ component, params: message.params });
       setDescriptions(descriptions);
       setNeedEstimated(needEstimated);
     } else if (actionType === ActionType.Query) {
       const { process } = actionDispatcher(actionName, ActionType.Query);
       const data = await process(message.params, message.host);
+      console.log("data", data);
+
       postMessage(
         JSON.stringify({
           data,
@@ -108,26 +111,30 @@ export default function WebsPage(props) {
   const confirmAction = async () => {
     const [actionName, actionType] = actionMsg.action.split("-");
     if (actionType === ActionType.Authorize && needEstimated) {
-      const params = metaidComponentRef.current.getEstimatedData();
-      setParams(params);
-      const { nextComponent } = actionDispatcher(
+      const data = metaidComponentRef.current.getEstimatedData();
+      const { nextComponent, estimate } = actionDispatcher(
         actionName,
         ActionType.Authorize
       );
+      const params = await estimate(data);
       setNeedEstimated(false);
-      setComponent(nextComponent);
+      setComponentInfo({ component: nextComponent, params });
     } else {
       const { process } = actionDispatcher(
         actionName,
         actionType as ActionType
       );
-      const data = await process(actionMsg.params, actionMsg.host);
-      postMessage(
-        JSON.stringify({
-          data,
-          nonce: actionMsg.nonce,
-        })
-      );
+      console.log("params", componentInfo.params);
+
+      const data = await process(componentInfo.params, actionMsg.host);
+      console.log("data", data);
+
+      // postMessage(
+      //   JSON.stringify({
+      //     data,
+      //     nonce: actionMsg.nonce,
+      //   })
+      // );
       setModalVisible(false);
     }
   };
@@ -172,15 +179,15 @@ export default function WebsPage(props) {
 
           <ScrollView className="overflow-y-auto rounded-lg bg-gray-50 text-sm w-full">
             <View className="p-4 space-y-2">
-              {component
+              {componentInfo
                 ? createElement(
-                    component,
+                    componentInfo.component,
                     {
-                      params,
+                      params: componentInfo.params,
                       ref: needEstimated ? metaidComponentRef : undefined,
                     },
                     <View className="space-y-2">
-                      <Text>{actionName}</Text>
+                      <Text className="text-base">{actionName}</Text>
                       {descriptions.map((description, index) => (
                         <View
                           key={index}
@@ -209,7 +216,9 @@ export default function WebsPage(props) {
               onPress={confirmAction}
               className="w-[120px] rounded-3xl bg-blue-primary py-4"
             >
-              <Text className="text-center text-sm text-white">Confirm</Text>
+              <Text className="text-center text-sm text-white">
+                {needEstimated ? "Next" : "Confirm"}
+              </Text>
             </Pressable>
           </View>
         </View>

@@ -1,9 +1,8 @@
-import { Chain } from "@metalet/utxo-wallet-service";
-// import { getNet } from "@/lib/network";
-import { fetchBtcTxHex } from "./transaction";
-import { mvcApi, mempoolApi, metaletApiV3, unisatApi } from "./request";
 import { getNetwork } from "@/lib/network";
+import { fetchBtcTxHex } from "./transaction";
+import { Chain } from "@metalet/utxo-wallet-service";
 import { getWalletNetwork } from "@/utils/WalletUtils";
+import { mvcApi, mempoolApi, metaletApiV3 } from "./request";
 
 export interface UTXO {
   txId: string;
@@ -108,7 +107,6 @@ export async function getBtcUtxos(
   //   return utxos.filter((utxo) => utxo.confirmed)
   // }
   const network = await getWalletNetwork(Chain.BTC);
-  console.log("network,", network);
 
   let utxos =
     (await metaletApiV3<UTXO[]>("/address/btc-utxo").get({

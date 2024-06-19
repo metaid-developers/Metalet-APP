@@ -177,10 +177,12 @@ export default {
     name: "Inscribe",
     title: "Inscribe",
     descriptions: [],
-    estimate: Inscribe.process,
+    estimate: Inscribe.estimate,
     process: Inscribe.process,
     needEstimated: true,
-    component: lazy(() => import("../components/InscribeMetaPin/Estimator")),
-    nextComponent: lazy(() => import("../components/InscribeMetaPin/Result")),
+    component: lazy(() => import("../components/InscribeMetaPin/Info")),
+    nextComponent: lazy(
+      () => import("../components/InscribeMetaPin/Estimator")
+    ),
   },
 } as { [key: string]: AuthorizeAction };
