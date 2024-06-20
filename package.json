@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@expo/webpack-config": "~19.0.1",
-    "@metalet/utxo-wallet-service": "/Users/aricredemption/Projects/utxo-wallet-service",
+    "@metalet/utxo-wallet-service": "0.3.7",
     "@mvc-org/mvc-resources": "^1.0.6",
     "@react-native-async-storage/async-storage": "1.21.0",
     "@react-native-community/hooks": "^3.0.0",

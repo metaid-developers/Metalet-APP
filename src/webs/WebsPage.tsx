@@ -63,7 +63,14 @@ export default function WebsPage(props) {
     console.log("onError", nativeEvent);
   };
 
-  const handlerMessage = async (message: Message) => {
+  const handlerMessage = async (
+    message: Message & { type: string; data: unknown }
+  ) => {
+    console.log("message", message);
+    if (message.type === "Console") {
+      console.info(`[Console] ${JSON.stringify(message.data)}`);
+      return;
+    }
     const [actionName, actionType] = message.action.split("-");
     if (actionName === "Connect") {
       message.params.icon = message.icon;
