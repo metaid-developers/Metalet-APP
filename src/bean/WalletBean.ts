@@ -15,6 +15,9 @@ export type WalletBean = {
   //当前钱包选中的account 对应 addressIndex
   isCurrentPathIndex: number;
   seed: string;
+  isColdWalletMode?: boolean;
+  coldAddress?: string;
+  coldPublicKey?: string;
 };
 
 export type AccountsOptions = {

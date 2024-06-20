@@ -189,6 +189,35 @@ export default function SettingsPage(props: any) {
             </View>
           </TouchableWithoutFeedback>
 
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigate("WalletsPage");
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 30,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Image
+                source={require("../../image/settings_wallet_icon.png")}
+                style={{ width: 45, height: 45 }}
+              />
+              <Text style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}>
+                Cold Wallet 
+              </Text>
+              <View style={{ flex: 1 }} />
+              <Image
+                source={require("../../image/list_icon_ins.png")}
+                style={{ width: 20, height: 20 }}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+
+
           <TouchableWithoutFeedback onPress={() => {
            setIsShowVerify(true);
           }}>
