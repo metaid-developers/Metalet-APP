@@ -142,7 +142,7 @@ export default function TransferBrc20Page({ route }) {
         <View
           style={{
             flex: 1,
-            justifyContent: "flex-end",
+            justifyContent: Platform.OS === "ios"?"center":"flex-end",
             backgroundColor: "rgba(0, 0, 0, 0.5)",
           }}
         >
@@ -153,6 +153,9 @@ export default function TransferBrc20Page({ route }) {
               borderTopRightRadius: 10,
               borderTopLeftRadius: 10,
               paddingBottom: 40,
+              borderBottomLeftRadius:Platform.OS === "ios"?10:0,
+              borderBottomRightRadius:Platform.OS === "ios"?10:0,
+              marginHorizontal:Platform.OS === "ios"?10:0,
             }}
           >
             <View style={{ flexDirection: "row" }}>

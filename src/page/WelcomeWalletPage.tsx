@@ -61,6 +61,7 @@ export default function WelcomeWalletPage(props) {
     metaletWallet.currentBtcWallet = btcWallet;
     metaletWallet.currentMvcWallet = mvcWallet;
     updateMetaletWallet(metaletWallet);
+    
 
     if (hasNoWallets) {
       await storage.set(wallets_key, [walletBean]);

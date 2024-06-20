@@ -18,10 +18,11 @@ import {
   RoundSimButton,
   RoundSimButtonFlee,
   TitleBar,
+  ToastView,
   VerifyModal,
   styles,
 } from "../../constant/Widget";
-import { inputNormalBgColor, themeColor } from "../../constant/Constants";
+import { grayNormalColor, inputNormalBgColor, themeColor } from "../../constant/Constants";
 import { FeedBean, FeedBtcObject } from "../../types/btcfeed";
 import {
   broadcastBtc,
@@ -146,27 +147,36 @@ export default function SendBtcPage() {
     console.log("交易参数 utxos:" + JSON.stringify(utxos));
     console.log("当前钱包地址：" + btcWallet.getAddress());
 
-    const { rawTx, cost } = btcWallet.send(
-      inputAddress,
-      inputAmount,
-      parseInt(feed),
-      utxos
-    );
-    console.log(rawTx);
+    console.log("jjjjj");
 
-    const amount = parseToSat(inputAmount);
-    const gas = parseInt(cost) - amount;
-    const fee = parseToSpace(gas.toString()).toString();
-    const total = parseToSpace(cost.toString()).toString();
-    settotal(total);
-    setfee(fee);
+    try {
+      const { rawTx, cost } = btcWallet.send(
+        inputAddress,
+        inputAmount,
+        parseInt(feed),
+        utxos
+      );
 
-    console.log(rawTx);
-    console.log(cost);
+      console.log("rawTx:", rawTx);
 
-    setRawTx(rawTx);
+      const amount = parseToSat(inputAmount);
+      const gas = parseInt(cost) - amount;
+      const fee = parseToSpace(gas.toString()).toString();
+      const total = parseToSpace(cost.toString()).toString();
+      settotal(total);
+      setfee(fee);
 
-    setConfirmDailogState(true);
+      console.log(rawTx);
+      console.log(cost);
+
+      setRawTx(rawTx);
+
+      setConfirmDailogState(true);
+    } catch (e) {
+      console.log("send error", e);
+      ToastView({ text: e.toString() ,type: "error" });
+    }
+
     // const txId = await broadcastBTCTx(rawTx).catch((err) => {
     //   console.log(err);
     // });
@@ -257,7 +267,7 @@ export default function SendBtcPage() {
             </View>
 
             <View>
-              <Text style={{ marginTop: 15, color: "#666", fontSize: 14 }}>
+              <Text style={{ marginTop: 15, color:grayNormalColor, fontSize: 14 }}>
                 From
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
@@ -266,7 +276,7 @@ export default function SendBtcPage() {
             </View>
 
             <View>
-              <Text style={{ marginTop: 10, color: "#666", fontSize: 14 }}>
+              <Text style={{ marginTop: 10, color: grayNormalColor, fontSize: 14 }}>
                 To
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
@@ -281,7 +291,7 @@ export default function SendBtcPage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>Amount</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Amount</Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                 {parseFloat(inputAmount).toFixed(8)} BTC
               </Text>
@@ -294,7 +304,7 @@ export default function SendBtcPage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
                 Fees(Estimated)
               </Text>
               <Text style={{ color: "#333", fontSize: 14 }}>{fee} BTC</Text>
@@ -307,7 +317,7 @@ export default function SendBtcPage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>Total</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Total</Text>
               <Text style={{ color: "#333", fontSize: 14 }}>{total} BTC</Text>
             </View>
 
@@ -354,7 +364,7 @@ export default function SendBtcPage() {
         <View
           style={{
             flex: 1,
-            justifyContent: "flex-end",
+            justifyContent: Platform.OS === "ios"?"center":"flex-end",
             backgroundColor: "rgba(0, 0, 0, 0.5)",
           }}
         >
@@ -365,6 +375,9 @@ export default function SendBtcPage() {
               borderTopRightRadius: 10,
               borderTopLeftRadius: 10,
               paddingBottom: 40,
+              borderBottomLeftRadius:Platform.OS === "ios"?10:0,
+              borderBottomRightRadius:Platform.OS === "ios"?10:0,
+              marginHorizontal:Platform.OS === "ios"?10:0,
             }}
           >
             <View style={{ flexDirection: "row" }}>
@@ -588,7 +601,7 @@ export default function SendBtcPage() {
                   <TextInput
                     placeholder="sat/vB"
                     ref={textInputRef}
-                    keyboardType={Platform.OS === "ios"?undefined:"numeric"}
+                    keyboardType={Platform.OS === "ios" ? undefined : "numeric"}
                     onChangeText={(text) => {
                       if (feedModeType == feedModeCustom) {
                         const numericInput = text.replace(/[^0-9]/g, "");
@@ -842,7 +855,7 @@ export default function SendBtcPage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>Balance</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Balance</Text>
               <Text style={{ color: "#999", fontSize: 14 }}>
                 {btcBalance.balance} BTC
               </Text>
@@ -860,7 +873,7 @@ export default function SendBtcPage() {
                 marginTop: 10,
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>Pending</Text>
+              <Text style={{ color:grayNormalColor, fontSize: 14 }}>Pending</Text>
               <Text style={{ color: "#999", fontSize: 14 }}>
                 {btcBalance.pinsBalance} BTC
               </Text>
@@ -872,7 +885,7 @@ export default function SendBtcPage() {
                 marginTop: 10,
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>Available</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Available</Text>
               <Text style={{ color: "#999", fontSize: 14 }}>
                 {btcBalance.safeBalance} BTC
               </Text>
@@ -890,7 +903,7 @@ export default function SendBtcPage() {
                   alignItems: "center",
                 }}
               >
-                <Text style={{ color: "#666", fontSize: 14 }}>Fee Rate</Text>
+                <Text style={{ color: grayNormalColor, fontSize: 14 }}>Fee Rate</Text>
                 <View style={{ flex: 1 }} />
                 <Text style={{ color: "#999", fontSize: 14 }}>
                   {feed} sat/vB

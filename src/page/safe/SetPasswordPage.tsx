@@ -100,7 +100,7 @@ export default function SetPasswordPage({ route }) {
           await storage.set(CurrentAccountIDKey, walletBean.accountsOptions[0].id)
           setIsShowLoading(false);
           navigate("CongratulationsPage", {
-            type: "create Successfully",
+            type: "Create Successfully",
           });
       
         } else if (type == "import") {

@@ -181,7 +181,7 @@ export async function goToWebScan(chain: string, linkTx: string) {
   const network = await getWalletNetwork();
   if (chain == "mvc") {
     if (network == "testnet") {
-      url = "https://test.mvcscan.com/" + linkTx;
+      url = "https://test.mvcscan.com/tx/" + linkTx;
     } else {
       url = "https://www.mvcscan.com/tx/" + linkTx;
     }

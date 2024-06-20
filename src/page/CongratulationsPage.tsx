@@ -15,7 +15,7 @@ export default function CongratulationsPage({ route ,props}) {
        <Image source={require("../../image/meta_congratulations_icon.png") } style={{width: 200, height: 200,marginTop: 50}} />
 
         <Text style={[metaStyles.largeDefaultText,{marginTop: 20}]}>{type}</Text>
-        <Text style={[metaStyles.defaultText,{marginTop: 20}]}>Now you can explore 90+ public chain crypto wallets</Text>
+        <Text style={[metaStyles.defaultText,{marginTop: 20}]}>Metalet currently supports the Bitcoin network and MicrovisionChain.</Text>
 
         <View style={{flex:1}}/>
 

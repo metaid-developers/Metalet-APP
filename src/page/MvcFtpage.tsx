@@ -171,7 +171,7 @@ export default function MvcFtPage() {
                 textAlign: "right",
               }}
             >
-              {formatToDecimal(item.confirmed, item.decimal)}
+              {formatToDecimal(item.confirmed+item.unconfirmed, item.decimal)}
               {/* {removeTrailingZeros(item.balance)} */}
             </Text>
             <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>

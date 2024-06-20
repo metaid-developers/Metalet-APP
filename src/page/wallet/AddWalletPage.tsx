@@ -14,6 +14,7 @@ import {
   createStorage,
   wallets_key,
 } from "@/utils/AsyncStorageUtil";
+import Toast from "react-native-toast-message";
 
 export default function AddWalletPage() {
   const [isShowLoading, setIsShowLoading] = useState(false);
@@ -36,6 +37,7 @@ export default function AddWalletPage() {
     metaletWallet.currentMvcWallet = mvcWallet;
     updateMetaletWallet(metaletWallet);
     const storage = createStorage();
+
 
     if (hasNoWallets) {
       await storage.set(wallets_key, [walletBean]);

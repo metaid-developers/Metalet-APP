@@ -39,7 +39,7 @@ export async function getCurrentMvcWallet(): Promise<MvcWallet> {
     network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
-    addressType: AddressType.LegacyMvc,
+    addressType: wallet.addressType,
     coinType: wallet.mvcTypes,
     seed: seed,
   });

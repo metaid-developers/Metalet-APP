@@ -30,6 +30,7 @@ import {
   caculateToSatDecimal,
   formatToDecimal,
   getRandomID,
+  getWalletNetwork,
 } from "../../utils/WalletUtils";
 import { getIconUri } from "@mvc-org/mvc-resources";
 import { removeTrailingZeros } from "@/utils/StringUtils";
@@ -94,7 +95,10 @@ export default function SendMvcFtPage({ route }) {
     //   mvcFtData.decimal
     // );
 
-    const amoutResult=caculateToSatDecimal(parseFloat(inputAmount),mvcFtData.decimal);
+    const amoutResult = caculateToSatDecimal(
+      parseFloat(inputAmount),
+      mvcFtData.decimal
+    );
 
     if (parseFloat(amoutResult) <= 0) {
       return;
@@ -103,8 +107,10 @@ export default function SendMvcFtPage({ route }) {
     const privateKey: string = metaletWallet.currentMvcWallet.getPrivateKey();
     // const wallet = new Wallet(priviteKey, API_NET.MAIN, 1, API_TARGET.MVC);
     setIsShowLoading(true);
+    const network = await getWalletNetwork();
+
     const ftManager = new FtManager({
-      network: API_NET.MAIN,
+      network: network === "mainnet" ? API_NET.MAIN : API_NET.TEST,
       purse: privateKey,
     });
     // const largestUtxo = await ftManager.api
@@ -354,8 +360,8 @@ export default function SendMvcFtPage({ route }) {
 
             navigate("SendSuccessPage", {
               result: {
-                chain:"mvc",
-                symbol:mvcFtData.symbol.toUpperCase(),
+                chain: "mvc",
+                symbol: mvcFtData.symbol.toUpperCase(),
                 txid: txid,
                 amount: inputAmount,
                 address: inputAddress,

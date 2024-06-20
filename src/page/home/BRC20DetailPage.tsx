@@ -89,7 +89,7 @@ export default function BRC20DetailPage({ route }) {
 
   async function getActivityList(address: string) {
     const iconsData: IcoinsData = await fetchIcons();
-    if(iconsData){
+    if (iconsData) {
       setBrc20Icons(iconsData);
     }
 
@@ -224,24 +224,26 @@ export default function BRC20DetailPage({ route }) {
 
     return (
       <View>
-        <View
-          style={{
-            width: "100%",
-            marginTop: 20,
-            borderRadius: 10,
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 20,
-          }}
-        >
-          {isIncome ? (
-            <View>
-              <Image
-                source={require("../../../image/record_type_in.png")}
-                style={{ width: 35, height: 35 }}
-              />
-              {/* {brc20.imageError ? (
+        {item.txId != "1" ? (
+          <View>
+            <View
+              style={{
+                width: "100%",
+                marginTop: 20,
+                borderRadius: 10,
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 20,
+              }}
+            >
+              {isIncome ? (
+                <View>
+                  <Image
+                    source={require("../../../image/record_type_in.png")}
+                    style={{ width: 35, height: 35 }}
+                  />
+                  {/* {brc20.imageError ? (
                   <View>
                     <CircleAvatarLetter
                       letterStr={brc20.name.substring(0, 1)}
@@ -304,84 +306,104 @@ export default function BRC20DetailPage({ route }) {
                   //   />
                   // </View>
                 )} */}
-            </View>
-          ) : (
-            // <Image
-            //   source={require("../../../image/assert_mvcrecord_send_icon.png")}
-            //   style={{ width: 35, height: 35 }}
-            // />
-            <Image
-              source={require("../../../image/record_type_out.png")}
-              style={{
-                width: 35,
-                height: 35,
-              }}
-            />
-          )}
+                </View>
+              ) : (
+                // <Image
+                //   source={require("../../../image/assert_mvcrecord_send_icon.png")}
+                //   style={{ width: 35, height: 35 }}
+                // />
+                <Image
+                  source={require("../../../image/record_type_out.png")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                  }}
+                />
+              )}
 
-          <View style={{ flex: 1 }}>
-            <View style={{ flex: 1, marginLeft: 10, flexDirection: "row" }}>
-              <Text
-                style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
-              >
-                {title}
-              </Text>
-              <View style={{ flex: 1 }} />
-              <Text
-                style={{
-                  fontSize: 16,
-                  color: isIncome ? "green" : "red",
-                  marginBottom: 10,
-                  // textAlign: "right",
-                }}
-              >
-                {isIncome ? "+" + showAmount : showAmount}{" "}
-                {item.token.toString().toUpperCase()}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flex: 1,
-                marginLeft: 10,
-
-                alignItems: "flex-end",
-              }}
-            >
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  ShowNotice(item.txId);
-                }}
-              >
-                <View style={{ flexDirection: "row" }}>
-                  <Text style={metaStyles.grayTextSmall66}>
-                    {formatTime(parseFloat(item.time))}
+              <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, marginLeft: 10, flexDirection: "row" }}>
+                  <Text
+                    style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
+                  >
+                    {title}
                   </Text>
                   <View style={{ flex: 1 }} />
                   <Text
-                    numberOfLines={1}
-                    ellipsizeMode="middle"
-                    style={[
-                      metaStyles.grayTextSmall66,
-                      { textAlign: "right", width: 100 },
-                    ]}
+                    style={{
+                      fontSize: 16,
+                      color: isIncome ? "green" : "red",
+                      marginBottom: 10,
+                      // textAlign: "right",
+                    }}
                   >
-                    {item.txId}
+                    {isIncome ? "+" + showAmount : showAmount}{" "}
+                    {item.token.toString().toUpperCase()}
                   </Text>
-
-                  <Image
-                    source={require("../../../image/meta_copy_icon.png")}
-                    style={{ width: 15, height: 15, marginLeft: 5 }}
-                  />
                 </View>
-              </TouchableWithoutFeedback>
+
+                <View
+                  style={{
+                    flex: 1,
+                    marginLeft: 10,
+
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      ShowNotice(item.txId);
+                    }}
+                  >
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={metaStyles.grayTextSmall66}>
+                        {formatTime(parseFloat(item.time))}
+                      </Text>
+                      <View style={{ flex: 1 }} />
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="middle"
+                        style={[
+                          metaStyles.grayTextSmall66,
+                          { textAlign: "right", width: 100 },
+                        ]}
+                      >
+                        {item.txId}
+                      </Text>
+
+                      <Image
+                        source={require("../../../image/meta_copy_icon.png")}
+                        style={{ width: 15, height: 15, marginLeft: 5 }}
+                      />
+                    </View>
+                  </TouchableWithoutFeedback>
+                </View>
+              </View>
             </View>
           </View>
-        </View>
+        ) : (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              // width: "100%",
+              // height: "100%",
+              // opacity: isShow?1:0,
+            }}
+          >
+            <Image
+              source={require("../../../image/assert_record_nodata_icon.png")}
+              style={{ width: 38, height: 53, marginTop: 50 }}
+            />
+
+            <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
+              No activities
+            </Text>
+          </View>
+        )}
       </View>
     );
   };
-
   const EmptyView = () => {
     return (
       <View

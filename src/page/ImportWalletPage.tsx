@@ -6,6 +6,8 @@ import {
   Modal,
   Button,
   StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import {
@@ -323,7 +325,11 @@ export default function ImportWalletPage(props) {
   const [obj, setObj] = useState({ title: "", isShow: false, isCancel: false });
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <TouchableWithoutFeedback onPress={()=>{
+      console.log("click");
+      Keyboard.dismiss()
+     }}>
+       <SafeAreaView style={{ flex: 1 }}>
       <EasyToast ref={toastRef} position="center" />
       <TitleBar />
 
@@ -371,7 +377,7 @@ export default function ImportWalletPage(props) {
           <Text style={metaStyles.defaultText}>m/44'/</Text>
           <TextInput
             placeholder="10001"
-            keyboardType="numeric"
+            // keyboardType="numeric"
             style={{
               borderRadius: 5,
               backgroundColor: semiTransparentGray,
@@ -430,6 +436,8 @@ export default function ImportWalletPage(props) {
         />
       </View>
     </SafeAreaView>
+      </TouchableWithoutFeedback>
+   
   );
 }
 

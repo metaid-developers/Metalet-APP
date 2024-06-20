@@ -15,16 +15,17 @@ import {
   RoundSimButton,
   RoundSimButtonFlee,
   TitleBar,
+  ToastView,
   VerifyModal,
   styles,
 } from "../../constant/Widget";
-import { themeColor } from "../../constant/Constants";
+import { grayNormalColor, themeColor } from "../../constant/Constants";
 import { navigate } from "../../base/NavigationService";
 import { useData } from "../../hooks/MyProvider";
 import { Wallet, API_TARGET, API_NET } from "meta-contract";
 import { Transaction } from "bitcoinjs-lib";
 import { broadcastSpace } from "../../api/metaletservice";
-import { getRandomID } from "../../utils/WalletUtils";
+import { getRandomID, getWalletNetwork } from "../../utils/WalletUtils";
 
 export default function SendSpacePage() {
   const [nextBtnColor, setNextBtnColor] = useState("rgba(23, 26, 255, 0.5)");
@@ -64,8 +65,11 @@ export default function SendSpacePage() {
     }
 
     const priviteKey: string = metaletWallet.currentMvcWallet.getPrivateKey();
-    const wallet = new Wallet(priviteKey, API_NET.MAIN, 1, API_TARGET.MVC);
+    const network = await getWalletNetwork();
+    const wallet = new Wallet(priviteKey,network === "mainnet" ? API_NET.MAIN :API_NET.TEST, 1, API_TARGET.MVC);
 
+
+    
     //
     console.log(wallet.address.toString());
     console.log(inputAddress);
@@ -76,9 +80,13 @@ export default function SendSpacePage() {
       .send(inputAddress, amount, { noBroadcast: true })
       .catch((err) => {
         console.log(err);
+        ToastView({ text: err.toString() ,type: "error" });
       });
 
+      console.log(sentRes);
+      
     if (sentRes) {
+      setConfirmDailogState(true);
       const fee = Transaction.fromHex(sentRes.txHex).virtualSize();
       const total = amount + fee;
       setrawTx(sentRes.txHex);
@@ -161,7 +169,7 @@ export default function SendSpacePage() {
             </View>
 
             <View>
-              <Text style={{ marginTop: 15, color: "#666", fontSize: 14 }}>
+              <Text style={{ marginTop: 15, color: grayNormalColor, fontSize: 14 }}>
                 From
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
@@ -170,7 +178,7 @@ export default function SendSpacePage() {
             </View>
 
             <View>
-              <Text style={{ marginTop: 10, color: "#666", fontSize: 14 }}>
+              <Text style={{ marginTop: 10, color:grayNormalColor, fontSize: 14 }}>
                 To
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
@@ -185,7 +193,7 @@ export default function SendSpacePage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>Amount</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Amount</Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                 {inputAmount} SPACE
               </Text>
@@ -198,7 +206,7 @@ export default function SendSpacePage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
                 Fees(Estimated)
               </Text>
               <Text style={{ color: "#333", fontSize: 14 }}>{fee} SPACE</Text>
@@ -211,7 +219,7 @@ export default function SendSpacePage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>Total</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Total</Text>
               <Text style={{ color: "#333", fontSize: 14 }}>{total} SPACE</Text>
             </View>
 
@@ -434,7 +442,6 @@ export default function SendSpacePage() {
             <RoundSimButton
               title={"Next"}
               event={() => {
-                setConfirmDailogState(true);
                 sendSpace();
               }}
               roundStytle={{ marginTop: 50 }}

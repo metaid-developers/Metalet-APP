@@ -98,7 +98,14 @@ export async function fetchBtcUtxo(address: string): Promise<UtxoBean> {
 export async function broadcastSpace(
   hex: string
 ): Promise<{ txid: string; message: string }> {
-  const data = await post(BASE_MVC_API_URL + "/tx/broadcast", { hex: hex });
+  const network = await getWalletNetwork();
+
+  const data = await post(
+    network == "mainnet"
+      ? BASE_MVC_API_URL
+      : BASE_MVC_API_URL_TESTNET + "/tx/broadcast",
+    { hex: hex }
+  );
   return data;
 }
 
@@ -154,7 +161,7 @@ export async function fetchSpaceBalance(
   const network = await getWalletNetwork();
   const dataMvcBalance: SpaceBalance = await get(
     network == "mainnet"
-      ? BASE_MVC_API_URL+ "/address/" + address + "/balance"
+      ? BASE_MVC_API_URL + "/address/" + address + "/balance"
       : BASE_MVC_API_URL_TESTNET + "/address/" + address + "/balance"
   );
   return dataMvcBalance;
@@ -263,12 +270,12 @@ export async function fetchBrc20InscribeCommit(
 }
 
 // 19.check upgrade
-export async function fetchCheckUpgrade(platform:string): Promise<UpdateData> {
+export async function fetchCheckUpgrade(platform: string): Promise<UpdateData> {
   const data: UpdateData = await post(
     BASE_METALET_URL + "/app-base/v1/app/upgrade/info",
     {
       app_name: "Metalet-v3",
-      platform:platform
+      platform: platform,
     }
   );
   return data;
@@ -278,7 +285,7 @@ export async function fetchCheckUpgrade(platform:string): Promise<UpdateData> {
 export async function fetchIcons(): Promise<IcoinsData> {
   const data: IcoinsData = await get(
     BASE_METALET_URL + "/wallet-api/v3/coin/icons",
-    true,
+    true
   );
   return data;
 }

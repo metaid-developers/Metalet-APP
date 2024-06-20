@@ -11,10 +11,10 @@ import {
   TitleBar,
   VerifyModal,
 } from "../../constant/Widget";
-import {  wallets_key ,createStorage} from "../../utils/AsyncStorageUtil";
+import { wallets_key, createStorage } from "../../utils/AsyncStorageUtil";
 import { navigate } from "../../base/NavigationService";
 import { eventBus, refreshHomeLoadingEvent } from "../../utils/EventBus";
-import { getStorageWallets } from "../../utils/WalletUtils";
+import { getStorageWallets, setCurrentAccountID, setCurrentWalletID } from "../../utils/WalletUtils";
 
 export default function WalletDetelePage({ route }) {
   const [isAgree, setIsAgree] = useState(false);
@@ -34,6 +34,8 @@ export default function WalletDetelePage({ route }) {
       wallets.splice(postion, 1);
       if (wallets.length > 0) {
         wallets[0].accountsOptions[0].isSelect = true;
+        await setCurrentWalletID(wallets[0].id);
+        await setCurrentAccountID(wallets[0].accountsOptions[0].id);
       }
       setIsDelete(true);
       await storage.set(wallets_key, wallets).then(() => {
