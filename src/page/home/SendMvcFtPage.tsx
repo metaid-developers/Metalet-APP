@@ -24,7 +24,6 @@ import { themeColor } from "../../constant/Constants";
 import { navigate } from "../../base/NavigationService";
 import { useData } from "../../hooks/MyProvider";
 import { Wallet, API_TARGET, API_NET, FtManager } from "meta-contract";
-import { Transaction } from "bitcoinjs-lib";
 import { broadcastSpace } from "../../api/metaletservice";
 import {
   caculateToSatDecimal,

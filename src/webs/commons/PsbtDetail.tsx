@@ -1,11 +1,15 @@
+import { Psbt } from "bitcoinjs-lib";
 import { useState, useEffect } from "react";
 import { getBtcNetwork } from "@/lib/network";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon";
 import { prettifyAddress, prettifyBalance } from "@/lib/formatters";
-import { Psbt, Transaction, address as btcAddress } from "bitcoinjs-lib";
 import ChevronDoubleRightIcon from "@/components/icons/ChevronDoubleRightIcon";
 import { Text, View, TouchableOpacity, Modal, ScrollView } from "react-native";
+import {
+  Transaction,
+  getAddressFromScript,
+} from "@metalet/utxo-wallet-service";
 
 export default ({ psbtHex, symbol, visible, close }) => {
   const [inputs, setInputs] = useState([]);
@@ -21,15 +25,12 @@ export default ({ psbtHex, symbol, visible, close }) => {
         let address = "";
         if (inputData?.witnessUtxo?.script) {
           // TODO: fix this
-          address = btcAddress.fromOutputScript(
-            inputData.witnessUtxo.script,
-            network
-          );
+          address = getAddressFromScript(inputData.witnessUtxo.script, network);
         }
         if (inputData?.nonWitnessUtxo) {
           const tx = Transaction.fromBuffer(inputData.nonWitnessUtxo);
           const output = tx.outs[psbt.txInputs[index].index];
-          address = btcAddress.fromOutputScript(output.script, network);
+          address = getAddressFromScript(output.script, network);
           value = output.value;
         }
         return { address, value };

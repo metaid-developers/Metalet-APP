@@ -56,7 +56,7 @@ export default {
     descriptions: ["Transfer tokens from my wallet to another"],
     process: TransferToken.process,
     estimate: TransferToken.estimate,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
   Transfer: {
@@ -66,7 +66,7 @@ export default {
     process: Transfer.process,
     estimate: doNothing,
     needEstimated: false,
-    component: lazy(() => import("../components/ComponentA")),
+    component: lazy(() => import("../components/Transfer/Info")),
   },
   Merge: {
     name: "Merge",
@@ -83,7 +83,7 @@ export default {
     descriptions: ["Sign a transaction with my wallet"],
     process: SignTransaction.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
   SignTransactions: {
@@ -92,7 +92,7 @@ export default {
     descriptions: ["Sign multiple transactions with my wallet at once"],
     process: SignTransactions.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
   Pay: {
@@ -103,7 +103,7 @@ export default {
     ],
     process: Pay.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
   EciesEncrypt: {
@@ -112,7 +112,7 @@ export default {
     descriptions: ["Encrypt a message with ECIES algorithm"],
     process: EciesEncrypt.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
   EciesDecrypt: {
@@ -121,7 +121,7 @@ export default {
     descriptions: ["Decrypt an encrypted message with ECIES algorithm"],
     process: EciesDecrypt.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
   SignMessage: {
@@ -130,7 +130,7 @@ export default {
     descriptions: ["Sign a message with ECDSA algorithm"],
     process: SignMessage.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
   SignBTCPsbt: {
@@ -141,7 +141,7 @@ export default {
     ],
     process: SignBTCPsbt.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/SignBTCPsbt")),
   },
   ConnectBTC: {
@@ -150,7 +150,7 @@ export default {
     descriptions: ["Connect Account"],
     process: ConnectBTC.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
   BTCTransfer: {
@@ -159,7 +159,7 @@ export default {
     descriptions: [],
     process: BTCTransfer.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
   SignBTCMessage: {
@@ -170,17 +170,19 @@ export default {
     ],
     process: SignBTCMessage.process,
     estimate: doNothing,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
-    nextComponent: lazy(() => import("../components/ComponentA")),
   },
   Inscribe: {
     name: "Inscribe",
     title: "Inscribe",
     descriptions: [],
-    estimate: Inscribe.process,
+    estimate: Inscribe.estimate,
     process: Inscribe.process,
     needEstimated: true,
-    component: lazy(() => import("../components/InscribeMetaPin")),
+    component: lazy(() => import("../components/InscribeMetaPin/Info")),
+    nextComponent: lazy(
+      () => import("../components/InscribeMetaPin/Estimator")
+    ),
   },
 } as { [key: string]: AuthorizeAction };

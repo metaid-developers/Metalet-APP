@@ -11,14 +11,15 @@ import {
   ScriptType,
   SignType,
   Transaction,
+  TxDetail,
 } from "@metalet/utxo-wallet-service";
 
 interface InscribeHexResult {
-  commitTxHex: string;
-  revealTxsHex: string[];
+  totalCost: number;
   commitCost: number;
   revealCost: number;
-  totalCost: number;
+  commitTxHex: string;
+  revealTxsHex: string[];
 }
 
 interface InscribeTxIdResult {
@@ -72,13 +73,21 @@ function initOptions() {
   return { noBroadcast: false };
 }
 
-export async function process({
+export async function estimate({
   data: { metaidDataList, service, feeRate, revealOutValue },
   options = initOptions(),
 }: {
   data: Omit<InscriptionRequest, "commitTxPrevOutputList">;
   options?: { noBroadcast: boolean };
-}): Promise<InscribeHexResult | InscribeTxIdResult> {
+}): Promise<{
+  feeRate: number;
+  totalCost: number;
+  commitCost: number;
+  revealCost: number;
+  commitTx: TxDetail;
+  revealTxs: TxDetail[];
+  options?: { noBroadcast: boolean };
+}> {
   const wallet = await getCurrentWallet(Chain.BTC);
   const address = wallet.getAddress();
   const utxos = await getBtcUtxos(
@@ -124,12 +133,42 @@ export async function process({
       .length *
       revealOutValue;
 
+  return {
+    feeRate,
+    commitTx,
+    revealTxs,
+    commitCost,
+    revealCost,
+    totalCost,
+    options,
+  };
+}
+
+export async function process({
+  options,
+  commitTx,
+  revealTxs,
+  totalCost,
+  commitCost,
+  revealCost,
+}: {
+  totalCost: number;
+  commitCost: number;
+  revealCost: number;
+  commitTx: TxDetail;
+  revealTxs: TxDetail[];
+  options: { noBroadcast: boolean };
+}): Promise<InscribeHexResult | InscribeTxIdResult> {
   if (!options.noBroadcast) {
-    const commitTxId = await broadcastBTCTx(commitTx.txId);
+    const commitTxId = await broadcastBTCTx(commitTx.rawTx);
     await sleep(1000);
     const [...revealTxIds] = await Promise.all([
-      ...revealTxs.map((revealTx) => broadcastBTCTx(revealTx.txId)),
+      ...revealTxs.map((revealTx) => broadcastBTCTx(revealTx.rawTx)),
     ]);
+    const wallet = await getCurrentWallet(Chain.BTC);
+    const address = wallet.getAddress();
+    const metaIdPinUnspentOutputsObj = await getMetaIdPinUnspentOutputsObj();
+    const metaIdPinUnspentOutputs = metaIdPinUnspentOutputsObj[address] || [];
     metaIdPinUnspentOutputs.push(
       `${commitTxId}:${Transaction.fromHex(commitTx.rawTx).outs.length - 1}`
     );
@@ -141,10 +180,10 @@ export async function process({
   }
 
   return {
-    commitTxHex: commitTx.rawTx,
-    revealTxsHex: revealTxs.map((revealTx) => revealTx.rawTx),
+    totalCost,
     commitCost,
     revealCost,
-    totalCost,
+    commitTxHex: commitTx.rawTx,
+    revealTxsHex: revealTxs.map((revealTx) => revealTx.rawTx),
   };
 }

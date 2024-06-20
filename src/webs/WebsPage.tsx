@@ -34,14 +34,22 @@ export default function WebsPage(props) {
   const [uri, setURI] = useState("");
   const [icon, setIcon] = useState("");
   const [host, setHost] = useState("");
-  const [params, setParams] = useState({});
   const [actionName, setActionName] = useState("");
   const [descriptions, setDescriptions] = useState([]);
   const [actionMsg, setActionMsg] = useState<Message>();
   const [modalVisible, setModalVisible] = useState(false);
   const [needEstimated, setNeedEstimated] = useState(false);
-  const [component, setComponent] =
-    useState<ComponentType<{ params: object }>>(null);
+  const [componentInfo, setComponentInfo] = useState<{
+    params: Record<string, unknown>;
+    component: ComponentType<{
+      params: object;
+      ref?: React.MutableRefObject<any>;
+    }>;
+  }>(null);
+
+  const metaidComponentRef = useRef<{
+    getEstimatedData: () => null;
+  } | null>(null);
 
   useEffect(() => {
     if (!props.route.params?.url) {
@@ -55,11 +63,23 @@ export default function WebsPage(props) {
     console.log("onError", nativeEvent);
   };
 
-  const handlerMessage = async (message: Message) => {
+  const handlerMessage = async (
+    message: Message & { type: string; data: unknown }
+  ) => {
+    if (message.type === "Console") {
+      console.info(`[Console] ${JSON.stringify(message.data)}`);
+      return;
+    }
     const [actionName, actionType] = message.action.split("-");
+
+    // if (actionName === "Transfer") {
+    //   console.log("message", message);
+    // }
+
     if (actionName === "Connect") {
       message.params.icon = message.icon;
     }
+
     setActionMsg(message);
 
     if (actionType === ActionType.Authorize) {
@@ -69,13 +89,13 @@ export default function WebsPage(props) {
       const { title, descriptions, component, needEstimated } =
         actionDispatcher(actionName, actionType);
       setActionName(title);
-      setComponent(component);
-      setParams(message.params);
+      setComponentInfo({ component, params: message.params });
       setDescriptions(descriptions);
       setNeedEstimated(needEstimated);
     } else if (actionType === ActionType.Query) {
       const { process } = actionDispatcher(actionName, ActionType.Query);
       const data = await process(message.params, message.host);
+
       postMessage(
         JSON.stringify({
           data,
@@ -100,20 +120,24 @@ export default function WebsPage(props) {
   const confirmAction = async () => {
     const [actionName, actionType] = actionMsg.action.split("-");
     if (actionType === ActionType.Authorize && needEstimated) {
-      const { estimate, nextComponent } = actionDispatcher(
+      const data = metaidComponentRef.current.getEstimatedData();
+      const { nextComponent, estimate } = actionDispatcher(
         actionName,
         ActionType.Authorize
       );
-      const params = await estimate(actionMsg.params, actionMsg.host);
-      setParams(params);
-      setNeedEstimated(true);
-      setComponent(nextComponent);
+      const params = await estimate(data);
+      setNeedEstimated(false);
+      setComponentInfo({ component: nextComponent, params });
     } else {
       const { process } = actionDispatcher(
         actionName,
         actionType as ActionType
       );
-      const data = await process(actionMsg.params, actionMsg.host);
+      // console.log("confirmAction params", componentInfo.params);
+
+      const data = await process(componentInfo.params, actionMsg.host);
+      // console.log("confirmAction data", data);
+
       postMessage(
         JSON.stringify({
           data,
@@ -151,7 +175,7 @@ export default function WebsPage(props) {
             AUTHORIZE
           </Text> */}
           {icon ? (
-            <Image source={{ uri: icon }} className="w-24 h-24" />
+            <Image source={{ uri: icon }} className="w-24 h-24 rounded-lg" />
           ) : (
             <Text className="w-24 h-24 rounded-full bg-blue-primary flex items-center justify-center">
               {host[0] || ""}
@@ -164,12 +188,15 @@ export default function WebsPage(props) {
 
           <ScrollView className="overflow-y-auto rounded-lg bg-gray-50 text-sm w-full">
             <View className="p-4 space-y-2">
-              {component
+              {componentInfo
                 ? createElement(
-                    component,
-                    { params },
+                    componentInfo.component,
+                    {
+                      params: componentInfo.params,
+                      ref: needEstimated ? metaidComponentRef : undefined,
+                    },
                     <View className="space-y-2">
-                      <Text>{actionName}</Text>
+                      <Text className="text-base">{actionName}</Text>
                       {descriptions.map((description, index) => (
                         <View
                           key={index}
@@ -198,7 +225,9 @@ export default function WebsPage(props) {
               onPress={confirmAction}
               className="w-[120px] rounded-3xl bg-blue-primary py-4"
             >
-              <Text className="text-center text-sm text-white">Confirm</Text>
+              <Text className="text-center text-sm text-white">
+                {needEstimated ? "Next" : "Confirm"}
+              </Text>
             </Pressable>
           </View>
         </View>

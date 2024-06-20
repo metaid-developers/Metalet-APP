@@ -1784,27 +1784,27 @@
   resolved "https://registry.yarnpkg.com/@magiceden-oss/runestone-lib/-/runestone-lib-1.0.2.tgz#524394b49119d1acace0edc351f9cd5d7ed1ad73"
   integrity sha512-C4XoE7tHxxaWQNzovBIEndXGrTesotshnKQA8DXlnoVDvriD6G26ezUoj9AlEb2UAPbEijSga4Dtwd86Z0a1jg==
 
-"@metalet/utxo-wallet-sdk@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.5.0.tgz#651f096ca0752f66a2d9b6c690ce21171e91d146"
-  integrity sha512-PRZ2P/iFRGGsdlX6jbVdfLBszfa8ovW11p2H2qYun6DLC49XlfuamEupYVML3K3WP2atUzsg0jD6odJl7zgDIw==
+"@metalet/utxo-wallet-sdk@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.5.2.tgz#e9660e20511c4dbd490aee77891b8424753cdef4"
+  integrity sha512-HrANjXwnJMpIC/OBcB8UYuaWioXC9ejzlACBB2qwMB/iWM4bTirrLC7T92NtRTsTy3rgIUNI19Do0MtJOtA81w==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.1.1"
     "@magiceden-oss/runestone-lib" "^1.0.2"
     "@okxweb3/crypto-lib" "^1.0.1"
-    "@scure/bip39" "^1.2.2"
     bip32 "^4.0.0"
+    bip39 "^3.1.0"
     bitcoinjs-lib "^6.1.5"
     bitcore-lib "^10.0.28"
     decimal.js "^10.4.3"
     ecpair "^2.1.0"
 
-"@metalet/utxo-wallet-service@0.3.6":
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.6.tgz#2b97e97dda404f37c68bad7bd51dfd02e0121d27"
-  integrity sha512-Fhz0IQkgAVzGbDfPam/3TPijzjllAmaHx/4bPS3ew+g4+XKazdQryUi7G21NAtAG6HRcJPAiHtel2go5V+/kSQ==
+"@metalet/utxo-wallet-service@0.3.7":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.7.tgz#d114bce855e82abd9985e30000ca612b2f76cd80"
+  integrity sha512-zJmnMrFpsS/BWTlqXSY8WAZ4y7GiGyiqx3VBKzb2MINGGg3NDbNTvdAC7XSdnqJ+sb9GVIc+A8DqRGROS5x1Uw==
   dependencies:
-    "@metalet/utxo-wallet-sdk" "0.5.0"
+    "@metalet/utxo-wallet-sdk" "0.5.2"
     crypto-js "^4.2.0"
     decimal.js "^10.4.3"
 
@@ -3646,6 +3646,13 @@ bip32@^4.0.0:
     "@scure/base" "^1.1.1"
     typeforce "^1.11.5"
     wif "^2.0.6"
+
+bip39@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/bip39/-/bip39-3.1.0.tgz#c55a418deaf48826a6ceb34ac55b3ee1577e18a3"
+  integrity sha512-c9kiwdk45Do5GL0vJMe7tS95VjCii65mYAH7DfWl3uW8AVzXKQVUm64i3hzVybBDMp9r7j9iNxR85+ul8MdN/A==
+  dependencies:
+    "@noble/hashes" "^1.2.0"
 
 bitcoinjs-lib@^6.1.5:
   version "6.1.5"
@@ -8923,6 +8930,11 @@ react-native-tab-view@^3.5.2:
   integrity sha512-nE5WqjbeEPsWQx4mtz81QGVvgHRhujTNIIZiMCx3Bj6CBFDafbk7XZp9ocmtzXUQaZ4bhtVS43R4FIiR4LboJw==
   dependencies:
     use-latest-callback "^0.1.5"
+
+react-native-table-component@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/react-native-table-component/-/react-native-table-component-1.2.2.tgz#1c9bdcd8f1fd7edf10d1e93ebc3b7877ecd74def"
+  integrity sha512-7bbsi5431iWcjj3toASh8lFHGi6AG/+MTd4M7GuksXKxx/CFs/Qwv1Ys7D2wgyuYKe3hxWNfSVrteFj0tOYXYw==
 
 react-native-toast-message@^2.2.0:
   version "2.2.0"

@@ -16,6 +16,6 @@ export async function process(_: unknown, host: string): Promise<AccountInfo> {
   }
   await connector.connect(currentAccountId, host);
   const address = wallet.getAddress();
-  const pubKey = wallet.getPublicKeyHex();
+  const pubKey = wallet.getPublicKey().toString('hex');
   return { address, pubKey };
 }
