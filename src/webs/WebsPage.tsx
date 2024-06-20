@@ -66,16 +66,19 @@ export default function WebsPage(props) {
   const handlerMessage = async (
     message: Message & { type: string; data: unknown }
   ) => {
-    console.log("message", message);
     if (message.type === "Console") {
       console.info(`[Console] ${JSON.stringify(message.data)}`);
       return;
     }
     const [actionName, actionType] = message.action.split("-");
+
+    // if (actionName === "Transfer") {
+    //   console.log("message", message);
+    // }
+
     if (actionName === "Connect") {
       message.params.icon = message.icon;
     }
-    console.log("message", message);
 
     setActionMsg(message);
 
@@ -92,7 +95,6 @@ export default function WebsPage(props) {
     } else if (actionType === ActionType.Query) {
       const { process } = actionDispatcher(actionName, ActionType.Query);
       const data = await process(message.params, message.host);
-      console.log("data", data);
 
       postMessage(
         JSON.stringify({
@@ -131,17 +133,17 @@ export default function WebsPage(props) {
         actionName,
         actionType as ActionType
       );
-      console.log("params", componentInfo.params);
+      // console.log("confirmAction params", componentInfo.params);
 
       const data = await process(componentInfo.params, actionMsg.host);
-      console.log("data", data);
+      // console.log("confirmAction data", data);
 
-      // postMessage(
-      //   JSON.stringify({
-      //     data,
-      //     nonce: actionMsg.nonce,
-      //   })
-      // );
+      postMessage(
+        JSON.stringify({
+          data,
+          nonce: actionMsg.nonce,
+        })
+      );
       setModalVisible(false);
     }
   };
@@ -173,7 +175,7 @@ export default function WebsPage(props) {
             AUTHORIZE
           </Text> */}
           {icon ? (
-            <Image source={{ uri: icon }} className="w-24 h-24" />
+            <Image source={{ uri: icon }} className="w-24 h-24 rounded-lg" />
           ) : (
             <Text className="w-24 h-24 rounded-full bg-blue-primary flex items-center justify-center">
               {host[0] || ""}

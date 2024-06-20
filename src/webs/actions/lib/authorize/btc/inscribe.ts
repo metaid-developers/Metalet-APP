@@ -15,11 +15,11 @@ import {
 } from "@metalet/utxo-wallet-service";
 
 interface InscribeHexResult {
-  commitTxHex: string;
-  revealTxsHex: string[];
+  totalCost: number;
   commitCost: number;
   revealCost: number;
-  totalCost: number;
+  commitTxHex: string;
+  revealTxsHex: string[];
 }
 
 interface InscribeTxIdResult {
@@ -88,8 +88,6 @@ export async function estimate({
   revealTxs: TxDetail[];
   options?: { noBroadcast: boolean };
 }> {
-  console.log("feeRate", feeRate);
-
   const wallet = await getCurrentWallet(Chain.BTC);
   const address = wallet.getAddress();
   const utxos = await getBtcUtxos(
@@ -161,20 +159,11 @@ export async function process({
   revealTxs: TxDetail[];
   options: { noBroadcast: boolean };
 }): Promise<InscribeHexResult | InscribeTxIdResult> {
-  console.log("data", {
-    options,
-    commitTx,
-    revealTxs,
-    totalCost,
-    commitCost,
-    revealCost,
-  });
-
   if (!options.noBroadcast) {
-    const commitTxId = await broadcastBTCTx(commitTx.txId);
+    const commitTxId = await broadcastBTCTx(commitTx.rawTx);
     await sleep(1000);
     const [...revealTxIds] = await Promise.all([
-      ...revealTxs.map((revealTx) => broadcastBTCTx(revealTx.txId)),
+      ...revealTxs.map((revealTx) => broadcastBTCTx(revealTx.rawTx)),
     ]);
     const wallet = await getCurrentWallet(Chain.BTC);
     const address = wallet.getAddress();

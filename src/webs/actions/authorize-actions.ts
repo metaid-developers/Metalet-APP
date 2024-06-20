@@ -66,7 +66,7 @@ export default {
     process: Transfer.process,
     estimate: doNothing,
     needEstimated: false,
-    component: lazy(() => import("../components/ComponentA")),
+    component: lazy(() => import("../components/Transfer/Info")),
   },
   Merge: {
     name: "Merge",

@@ -22,7 +22,7 @@ import { themeColor } from "../../constant/Constants";
 import { navigate } from "../../base/NavigationService";
 import { useData } from "../../hooks/MyProvider";
 import { Wallet, API_TARGET, API_NET } from "meta-contract";
-import { Transaction } from "bitcoinjs-lib";
+import { Transaction } from "@metalet/utxo-wallet-service";
 import { broadcastSpace } from "../../api/metaletservice";
 import { getRandomID } from "../../utils/WalletUtils";
 
