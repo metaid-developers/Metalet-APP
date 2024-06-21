@@ -27,9 +27,14 @@ import { fetchMvcFtBalance, fetchMvcFtPrice } from "../api/metaletservice";
 import { MvcFtData } from "../api/type/MvcFtData";
 import { getIconUri } from "@mvc-org/mvc-resources";
 import { getCurrentMvcWallet } from "../wallet/wallet";
-import { formatToDecimal } from "../utils/WalletUtils";
+import {
+  formatToDecimal,
+  getStorageCurrentWallet,
+  isColdWalletMode,
+} from "../utils/WalletUtils";
 import { caculateOneFtValue } from "../utils/AssertUtils";
 import { navigate } from "../base/NavigationService";
+import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
 
 export default function MvcFtPage() {
   const { userData, updateUserData } = useData();
@@ -39,6 +44,7 @@ export default function MvcFtPage() {
   let [ftList, setftList] = useState<MvcFtData[]>();
   const { metaletWallet, updateMetaletWallet } = useData();
   const { mvcAddress, updateMvcAddress } = useData();
+  const { walletMode, updateWalletMode } = useData();
 
   // let mvcAddress;
 
@@ -58,15 +64,23 @@ export default function MvcFtPage() {
   );
 
   async function refresh() {
-    if (mvcAddress) {
-      getMvcFtData(mvcAddress);
-    } else {
-      const mvcWallet = await getCurrentMvcWallet();
-      getMvcFtData(mvcWallet.getAddress());
-    }
+    // if (mvcAddress) {
+      // getMvcFtData(mvcAddress);
+    // } else {
+      // if (walletMode == wallet_mode_cold) {
+      const isCold = await isColdWalletMode();
+      if (isCold) {
+        const wallet = await getStorageCurrentWallet();
+        getMvcFtData(wallet.coldAddress);
+      } else {
+        const mvcWallet = await getCurrentMvcWallet();
+        getMvcFtData(mvcWallet.getAddress());
+      }
+    // }
   }
 
   async function getMvcFtData(address: string) {
+
     const ftdata = await fetchMvcFtBalance(address);
     const ftPriceData = await fetchMvcFtPrice();
 
@@ -136,6 +150,7 @@ export default function MvcFtPage() {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
+          console.log(mvcAddress);
           navigate("AssetsMvcFtDetailPage", {
             mvcFtData: item,
           });
@@ -171,7 +186,7 @@ export default function MvcFtPage() {
                 textAlign: "right",
               }}
             >
-              {formatToDecimal(item.confirmed+item.unconfirmed, item.decimal)}
+              {formatToDecimal(item.confirmed + item.unconfirmed, item.decimal)}
               {/* {removeTrailingZeros(item.balance)} */}
             </Text>
             <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>
@@ -185,7 +200,20 @@ export default function MvcFtPage() {
 
   return (
     <View style={[metaStyles.varContainer, { backgroundColor: "#fff" }]}>
-      {ftList == null || (ftList.length == 0 && <NoMoreDataView />)}
+      {ftList == null || (ftList.length == 0 && <TouchableWithoutFeedback onPress={()=>{
+        console.log(mvcAddress);
+        
+      }}>
+        <View style={{flex:1}}>
+          <TouchableWithoutFeedback onPress={()=>{
+            console.log(mvcAddress);
+          }}>
+            <Text> </Text>
+          </TouchableWithoutFeedback>
+        <NoMoreDataView />
+        </View>
+      
+      </TouchableWithoutFeedback>)}
       {/* {hasData && userData!=null &&<Text>名称： {ftList[0]}  年龄：{11}</Text>} */}
       {ftList != null && (
         <View>

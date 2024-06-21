@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, Image } from "react-native";
 import { NavigationContainerRef } from "@react-navigation/native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -64,6 +64,9 @@ import BtcNftTransferPage from "@/page/home/BtcNftTransferPage";
 import BackupPage from "@/page/settings/BackupPage";
 import SecurityPage from "@/page/settings/SecurityPage";
 import AboutPage from "@/page/settings/AboutPage";
+import ColdWalletPage from "@/page/settings/ColdWalletPage";
+import { useData } from "@/hooks/MyProvider";
+import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
 
 ////////
 
@@ -71,7 +74,11 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // 创建一个包裹整个应用的NavigationContainer，并将ref关联起来
-const AppNavigator = () => {
+export default function AppNavigator() {
+  const { walletMode, updateWalletMode } = useData();
+
+  useEffect(() => {}, []);
+
   return (
     <NavigationContainer
       ref={(navigatorRef) => {
@@ -87,8 +94,8 @@ const AppNavigator = () => {
       <StackNavigator />
     </NavigationContainer>
   );
-};
-export default AppNavigator;
+}
+// export default AppNavigator;
 
 const StackNavigator = () => (
   <Stack.Navigator
@@ -161,73 +168,81 @@ const StackNavigator = () => (
     <Stack.Screen name="BackupPage" component={BackupPage} />
     <Stack.Screen name="SecurityPage" component={SecurityPage} />
     <Stack.Screen name="AboutPage" component={AboutPage} />
+    <Stack.Screen name="ColdWalletPage" component={ColdWalletPage} />
   </Stack.Navigator>
 );
 
-const TabNavigator = () => (
-  <Tab.Navigator
-    screenOptions={({ route }) => ({
-      tabBarShowLabel: false,
-      headerShown: false,
-      tabBarIcon: ({ focused, color, size }) => {
-        let icon;
-        if (route.name === "HomePage") {
-          icon = focused ? (
-            <Image
-              source={require("../../image/me_index_select_tab.png")}
-              style={metaStyles.tabImage}
-            />
-          ) : (
-            <Image
-              source={require("../../image/me_index_normal_tab.png")}
-              style={metaStyles.tabImage}
-            />
-          );
-        } else if (route.name === "DiscoverPage") {
-          icon = focused ? (
-            <Image
-              source={require("../../image/me_plaza_select_tab.png")}
-              style={metaStyles.tabImage}
-            />
-          ) : (
-            <Image
-              source={require("../../image/me_plaza_normal_tab.png")}
-              style={metaStyles.tabImage}
-            />
-          );
+const TabNavigator = () => {
+  const { walletMode, updateWalletMode } = useData();
+  // console.log("walletMode", walletMode);
 
-          // else if (route.name === "PlazaPage") {
-          //   icon = focused ? (
-          //     <Image
-          //       source={require("../../image/me_plaza_select_tab.png")}
-          //       style={metaStyles.tabImage}
-          //     />
-          //   ) : (
-          //     <Image
-          //       source={require("../../image/me_plaza_normal_tab.png")}
-          //       style={metaStyles.tabImage}
-          //     />
-          //   );
-        } else {
-          icon = focused ? (
-            <Image
-              source={require("../../image/me_settings_select_tab.png")}
-              style={metaStyles.tabImage}
-            />
-          ) : (
-            <Image
-              source={require("../../image/me_settings_normal_tab.png")}
-              style={metaStyles.tabImage}
-            />
-          );
-        }
-        return icon;
-      },
-    })}
-  >
-    <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
-    {/* <Tab.Screen name="PlazaPage" component={PlazaPage} /> */}
-    <Tab.Screen name="DiscoverPage" component={DiscoverPage} />
-    <Tab.Screen name="SettingsPage" component={SettingsPage} />
-  </Tab.Navigator>
-);
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarShowLabel: false,
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let icon;
+          if (route.name === "HomePage") {
+            icon = focused ? (
+              <Image
+                source={require("../../image/me_index_select_tab.png")}
+                style={metaStyles.tabImage}
+              />
+            ) : (
+              <Image
+                source={require("../../image/me_index_normal_tab.png")}
+                style={metaStyles.tabImage}
+              />
+            );
+          } else if (route.name === "DiscoverPage") {
+            icon = focused ? (
+              <Image
+                source={require("../../image/me_plaza_select_tab.png")}
+                style={metaStyles.tabImage}
+              />
+            ) : (
+              <Image
+                source={require("../../image/me_plaza_normal_tab.png")}
+                style={metaStyles.tabImage}
+              />
+            );
+
+            // else if (route.name === "PlazaPage") {
+            //   icon = focused ? (
+            //     <Image
+            //       source={require("../../image/me_plaza_select_tab.png")}
+            //       style={metaStyles.tabImage}
+            //     />
+            //   ) : (
+            //     <Image
+            //       source={require("../../image/me_plaza_normal_tab.png")}
+            //       style={metaStyles.tabImage}
+            //     />
+            //   );
+          } else {
+            icon = focused ? (
+              <Image
+                source={require("../../image/me_settings_select_tab.png")}
+                style={metaStyles.tabImage}
+              />
+            ) : (
+              <Image
+                source={require("../../image/me_settings_normal_tab.png")}
+                style={metaStyles.tabImage}
+              />
+            );
+          }
+          return icon;
+        },
+      })}
+    >
+      <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
+      {/* <Tab.Screen name="PlazaPage" component={PlazaPage} /> */}
+      {walletMode != wallet_mode_cold && (
+        <Tab.Screen name="DiscoverPage" component={DiscoverPage} />
+      )}
+      <Tab.Screen name="SettingsPage" component={SettingsPage} />
+    </Tab.Navigator>
+  );
+};

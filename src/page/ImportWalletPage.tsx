@@ -40,6 +40,7 @@ import { getRandomColorList } from "../utils/MetaFunUiils";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
 import {
+  getRandomID,
   getStorageWallets,
   getWalletBeans,
   getWalletNetwork,
@@ -58,6 +59,7 @@ export default function ImportWalletPage(props) {
   const { metaletWallet, updateMetaletWallet } = useData();
   const { mvcAddress, updateMvcAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
+  const { needInitWallet, updateNeedInitWallet } = useData();
 
 
   //import 
@@ -156,11 +158,14 @@ export default function ImportWalletPage(props) {
     if (hasNoWallets) {
       await storage.set(wallets_key, [walletBean]);
     } else {
+      console.log('refresh');
+      updateNeedInitWallet(getRandomID());
       const newWallets = [...wallets, walletBean];
       await storage.set(wallets_key, newWallets);
     }
     // const updataWallets = addWallet(wallets, walletBean);
     updateMyWallet(walletBean);
+ 
     await storage.set(CurrentWalletIDKey, walletBean.id);
     await storage.set(
       CurrentAccountIDKey,
@@ -175,6 +180,8 @@ export default function ImportWalletPage(props) {
     console.log("wallets " + getWalletBeans());
     setObj({ ...obj, isShow: false });
     // props.navigation.navigate('HomePage')
+
+  
 
     props.navigation.navigate("CongratulationsPage", {
       type: "Imported Successfully",

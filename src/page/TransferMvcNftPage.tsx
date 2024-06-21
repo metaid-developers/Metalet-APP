@@ -22,7 +22,7 @@ import { navigate } from "../base/NavigationService";
 import { useData } from "../hooks/MyProvider";
 import { API_NET, API_TARGET, NftManager } from "meta-contract";
 import { MvcGenesisItemBean } from "@/bean/MvcGenesisBean";
-import { goToWebScan } from "@/utils/WalletUtils";
+import { goToWebScan, isColdWalletMode } from "@/utils/WalletUtils";
 
 export default function TransferMvcNftPage({ route }) {
   const { myObject } = route.params;
@@ -317,7 +317,11 @@ export default function TransferMvcNftPage({ route }) {
         }}
         event={async () => {
           setIsShowVerify(false);
-          sendNft();
+          const isCold=await isColdWalletMode();
+          if(!isCold){
+            sendNft();
+          }
+         
           // const { txid, message } = await broadcastSpace(rawTx);
           // if (txid != null) {
           //   updateNeedRefreshHome(getRandomID());

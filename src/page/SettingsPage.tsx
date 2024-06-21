@@ -191,7 +191,7 @@ export default function SettingsPage(props: any) {
 
           <TouchableWithoutFeedback
             onPress={() => {
-              navigate("WalletsPage");
+              navigate("ColdWalletPage");
             }}
           >
             <View

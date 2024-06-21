@@ -30,8 +30,9 @@ type GlobalContext = {
   needRefreshHome:string,
   updateNeedRefreshHome,
   needInitWallet:string,
-  updateNeedInitWallet
-  
+  updateNeedInitWallet,
+  walletMode,
+  updateWalletMode
 };
 
 const UserContext = createContext<GlobalContext>(undefined);
@@ -97,7 +98,7 @@ export const UserProvider = ({ children }) => {
 
 
   //4.当前的钱包管理类
-  const [metaletWallet, setMetaletWallet] = useState<MetaletWallet>(null);
+  const [metaletWallet, setMetaletWallet] = useState<MetaletWallet>(new MetaletWallet());
   const updateMetaletWallet = (newData) => {
     setMetaletWallet(newData);
   };
@@ -114,6 +115,11 @@ export const UserProvider = ({ children }) => {
     setAccountIndex(newData);
   };
 
+  //6
+  const [walletMode,setWalletMode] = useState("");
+  const updateWalletMode = (newData) => {
+    setWalletMode(newData);
+  };
 
 
   // 将需要共享的数据和更新方法放在上下文的 value 中
@@ -141,7 +147,9 @@ export const UserProvider = ({ children }) => {
     needRefreshHome,
     updateNeedRefreshHome,
     needInitWallet,
-    updateNeedInitWallet
+    updateNeedInitWallet,
+    walletMode,
+    updateWalletMode
   };
 
   return (

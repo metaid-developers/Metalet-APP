@@ -65,7 +65,7 @@ const useWalletManager = () => {
         );
 
         if (!btcWallet) {
-          throw new Error(`No ${btcAddressType} btc wallet found.`);
+          // throw new Error(`No ${btcAddressType} btc wallet found.`);
         }
 
         const mvcWallet = chainWallets.mvc.find(
@@ -73,7 +73,7 @@ const useWalletManager = () => {
         );
 
         if (!mvcWallet) {
-          throw new Error(`No ${AddressType.LegacyMvc} mvc wallet found.`);
+          // throw new Error(`No ${AddressType.LegacyMvc} mvc wallet found.`);
         }
 
         setCurrentWallet({ btcWallet, mvcWallet });
@@ -86,7 +86,7 @@ const useWalletManager = () => {
         return walletManager;
       } catch (err) {
         console.error(err.message);
-        throw err;
+        // throw err;
       }
     }, [network]);
 
@@ -137,10 +137,10 @@ const useWalletManager = () => {
     async (walletId, accountId) => {
       const wallet = await getWalletOtherAccounts(walletId, accountId);
       if (!wallet) {
-        throw new Error("No wallet found. Please select a wallet.");
+        // throw new Error("No wallet found. Please select a wallet.");
       }
       if (walletManager === null) {
-        throw new Error("Wallet manager not initialized.");
+        // throw new Error("Wallet manager not initialized.");
       }
 
       for (let account of wallet.accountsOptions) {
@@ -160,7 +160,8 @@ const useWalletManager = () => {
       const currentAccountId = await getCurrentAccountId();
 
       if (walletManager === null) {
-        throw new Error("Wallet manager not initialized.");
+        console.error("Wallet manager not initialized.");
+        // throw new Error("Wallet manager not initialized.");
       }
 
       return (
@@ -171,7 +172,7 @@ const useWalletManager = () => {
       );
     } catch (error) {
       console.error("getAccountChainWallets Error :", error);
-      throw error;
+      // throw error;
     }
   }, [walletManager]);
 
@@ -186,7 +187,8 @@ const useWalletManager = () => {
       // console.log("getAccountChainWallets", t2 - t1);
 
       if (!chainWallets) {
-        throw new Error("No chain wallets found.");
+        console.error("No chain wallets found.");
+        // throw new Error("No chain wallets found.");
       }
       // const t3 = performance.now();
       const currentWalletId = await getCurrentWalletId();
@@ -214,7 +216,9 @@ const useWalletManager = () => {
       // console.log("find chain wallet", t8 - t7);
 
       if (!chainWallet) {
-        throw new Error(`No ${addressType} wallet found.`);
+        // throw new Error(`No ${addressType} wallet found.`);
+        console.log("No chain wallet found.");
+        
       }
       return chainWallet;
     },
@@ -223,7 +227,7 @@ const useWalletManager = () => {
 
   const getWallets = useCallback(async () => {
     if (walletManager === null) {
-      throw new Error("Wallet manager not initialized.");
+      // throw new Error("Wallet manager not initialized.");
     }
     console.log("wallets", JSON.stringify(walletManager.getWallets()));
   }, [walletManager]);

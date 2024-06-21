@@ -10,14 +10,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LoadingNoticeModal, MyQrCode, TitleBar } from "../../constant/Widget";
 import * as Clipboard from "expo-clipboard";
 import { useData } from "../../hooks/MyProvider";
+import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
 
 export default function ReceivePage({ route }) {
   const { width } = Dimensions.get("window");
   const { metaletWallet, updateMetaletWallet } = useData();
   const [isShowNotice, setIsShowNotice] = useState(false);
   const [noticeContent, setNoticeContent] = useState("Copy successful");
-
+  const { walletMode, updateWalletMode } = useData();
   const { myCoinType } = route.params;
+  const { btcAddress, updateBtcAddress } = useData();
+  const { mvcAddress, updateMvcAddress } = useData();
 
   function ShowNotice(notice) {
     Clipboard.setString(notice);
@@ -27,6 +30,11 @@ export default function ReceivePage({ route }) {
       setIsShowNotice(false);
     }, 800);
   }
+
+
+ let isCold=walletMode===wallet_mode_cold;
+ 
+
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -76,12 +84,14 @@ export default function ReceivePage({ route }) {
             </Text>
 
             <View style={{ marginTop: 40 }}>
-              <MyQrCode qrData={metaletWallet.currentBtcWallet.getAddress()} size={width - 130} />
+              {/* <MyQrCode qrData={metaletWallet.currentBtcWallet.getAddress()} size={width - 130} /> */}
+              <MyQrCode qrData={btcAddress} size={width - 130} />
             </View>
 
             <TouchableWithoutFeedback
               onPress={() => {
-                ShowNotice(metaletWallet.currentBtcWallet.getAddress());
+                // ShowNotice(metaletWallet.currentBtcWallet.getAddress());
+                ShowNotice(btcAddress);
                 // Clipboard.setString(
                 //   metaletWallet.currentBtcWallet.getAddress()
                 // );
@@ -101,7 +111,8 @@ export default function ReceivePage({ route }) {
                 }}
               >
                 <Text numberOfLines={1} ellipsizeMode="middle" style={{}}>
-                  {metaletWallet.currentBtcWallet.getAddress()}
+                  {/* {metaletWallet.currentBtcWallet.getAddress()} */}
+                  {mvcAddress}
                 </Text>
 
                 <View style={{ flex: 1 }} />
@@ -166,12 +177,14 @@ export default function ReceivePage({ route }) {
             </Text>
 
             <View style={{ marginTop: 40 }}>
-              <MyQrCode qrData={metaletWallet.currentMvcWallet.getAddress()} size={width - 130} />
+              {/* <MyQrCode qrData={metaletWallet.currentMvcWallet.getAddress()} size={width - 130} /> */}
+              <MyQrCode qrData={mvcAddress} size={width - 130} />
             </View>
             <TouchableWithoutFeedback
               onPress={() => {
                 //   Clipboard.setString("Address");
-                ShowNotice(metaletWallet.currentMvcWallet.getAddress());
+                // ShowNotice(metaletWallet.currentMvcWallet.getAddress());
+                ShowNotice(mvcAddress);
               }}
             >
               <View

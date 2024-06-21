@@ -194,7 +194,7 @@ export default function AssetsPage() {
 
             <View>
               <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
-                {metaletWallet.currentBtcBalance} BTC{" "}
+                {metaletWallet.currentBtcBalance!} BTC{" "}
               </Text>
               <Text
                 style={{

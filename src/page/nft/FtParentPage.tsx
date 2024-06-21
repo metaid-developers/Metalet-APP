@@ -48,7 +48,7 @@ function TabsTopNavigator() {
 
       <TabsTop.Screen
         name="AnetMvcFtpage"
-        options={{ title: "Space" }}
+        options={{ title: "MVC" }}
         component={MvcFtPage}
       />
     </TabsTop.Navigator>

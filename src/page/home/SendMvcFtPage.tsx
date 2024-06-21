@@ -30,6 +30,7 @@ import {
   formatToDecimal,
   getRandomID,
   getWalletNetwork,
+  isColdWalletMode,
 } from "../../utils/WalletUtils";
 import { getIconUri } from "@mvc-org/mvc-resources";
 import { removeTrailingZeros } from "@/utils/StringUtils";
@@ -569,8 +570,11 @@ export default function SendMvcFtPage({ route }) {
 
             <RoundSimButton
               title={"Next"}
-              event={() => {
-                sendSpace();
+              event={async () => {
+                const isCold=await isColdWalletMode();
+                if(!isCold){
+                  sendSpace();
+                }
               }}
               roundStytle={{ marginTop: 50 }}
               textColor="#fff"

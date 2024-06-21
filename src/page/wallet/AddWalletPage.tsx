@@ -5,7 +5,7 @@ import { metaStyles } from "../../constant/Constants";
 import { LoadingModal, TitleBar } from "../../constant/Widget";
 import { navigate } from "../../base/NavigationService";
 import { createMetaletWallet } from "@/wallet/wallet";
-import { getStorageWallets, isNoStorageWallet } from "@/utils/WalletUtils";
+import { getRandomID, getStorageWallets, isNoStorageWallet } from "@/utils/WalletUtils";
 import MetaletWallet from "@/wallet/MetaletWallet";
 import { useData } from "@/hooks/MyProvider";
 import {
@@ -22,6 +22,7 @@ export default function AddWalletPage() {
   const { metaletWallet, updateMetaletWallet } = useData();
   const { mvcAddress, updateMvcAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
+  const { needInitWallet, updateNeedInitWallet } = useData();
 
   async function createWallet() {
     setIsShowLoading(true);
@@ -42,13 +43,18 @@ export default function AddWalletPage() {
     if (hasNoWallets) {
       await storage.set(wallets_key, [walletBean]);
     } else {
+      console.log('refresh');
+      updateNeedInitWallet(getRandomID());
       const newWallets = [...wallets, walletBean];
       await storage.set(wallets_key, newWallets);
     }
     updateMyWallet(walletBean);
+   
     await storage.set(CurrentWalletIDKey, walletBean.id);
     await storage.set(CurrentAccountIDKey, walletBean.accountsOptions[0].id);
     setIsShowLoading(false);
+
+
     navigate("CongratulationsPage", {
       type: "Successfully created",
     });

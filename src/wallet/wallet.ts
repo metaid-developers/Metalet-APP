@@ -36,8 +36,8 @@ export async function getCurrentMvcWallet(): Promise<MvcWallet> {
   const network = await getWalletNetwork();
 
   const mvcWallet = new MvcWallet({
-    network:"regtest",
-    // network: network === "mainnet" ? "mainnet" : "testnet",
+    // network:"regtest",
+    network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
     addressType: wallet.addressType,
@@ -79,8 +79,8 @@ export async function getBtcWallet(
     uAddressType === AddressType.SameAsMvc ? wallet.mvcTypes : CoinType.BTC;
 
   const btcWallet = new BtcWallet({
-    network:"regtest",
-    // network: network === "mainnet" ? "mainnet" : "testnet",
+    // network:"regtest",
+    network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
     addressType: uAddressType,
@@ -95,7 +95,8 @@ export async function getBtCreateWallet(
   walletBean: WalletBean
 ): Promise<BtcWallet> {
   // const wallet = await getStorageCurrentWallet();
-  let coinType = CoinType.BTC;
+  // let coinType = CoinType.BTC;
+  let coinType = CoinType.MVC;
   const network = await getWalletNetwork();
 
   const btcWallet = new BtcWallet({
@@ -137,7 +138,7 @@ export async function createMetaletWallet(mvcPath): Promise<{
   //wallet
   let walletName;
   let walletID = Math.random().toString(36).substr(2, 8);
-  let wallet_addressType = AddressType.Legacy;
+  let wallet_addressType = AddressType.SameAsMvc;
   //account
   let accountName = "Account 1";
   let accountID = Math.random().toString(36).substr(2, 8);

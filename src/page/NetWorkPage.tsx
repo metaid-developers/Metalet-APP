@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  SafeAreaView,
   TouchableWithoutFeedback,
   Image,
 } from "react-native";
@@ -19,6 +18,7 @@ import {
 } from "../utils/AsyncStorageUtil";
 import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 import { navigate } from "../base/NavigationService";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const storage = createStorage();
 

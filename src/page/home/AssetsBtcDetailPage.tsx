@@ -30,7 +30,7 @@ import { useData } from "../../hooks/MyProvider";
 import * as Clipboard from "expo-clipboard";
 import { formatTime } from "../../utils/MetaFunUiils";
 import { AddressType, Chain } from "@metalet/utxo-wallet-service";
-import { walllet_address_type_key } from "../../utils/AsyncStorageUtil";
+import { wallet_mode_cold, wallet_mode_hot, walllet_address_type_key } from "../../utils/AsyncStorageUtil";
 import {
   changeCurrentWalletAddressType,
   getStorageCurrentWallet,
@@ -63,8 +63,8 @@ export default function AssetsBtcDetailPage({ route }) {
     // );
     let btcActivityListData: BtcRootRecord =
       await fetchBtcActivityRecord(address);
-      console.log("btcActivityListData", btcActivityListData);
-      
+    console.log("btcActivityListData", btcActivityListData);
+
     let datalist = btcActivityListData.data.transactionList;
 
     if (datalist.length == 0) {
@@ -88,6 +88,8 @@ export default function AssetsBtcDetailPage({ route }) {
 
     const currentWallet = await getStorageCurrentWallet();
     const addressType = currentWallet.addressType;
+    console.log("addressType11111", addressType);
+
     setAddressType(addressType);
   }
 
@@ -131,6 +133,11 @@ export default function AssetsBtcDetailPage({ route }) {
     }
 
     updateBtcAddress(metaletWallet.currentBtcWallet.getAddress());
+    console.log(
+      "currentBtcWallet",
+      metaletWallet.currentBtcWallet.getAddress()
+    );
+
     getActivityList(metaletWallet.currentBtcWallet.getAddress());
 
     setCurrentChainWallet(Chain.BTC, metaletWallet.currentBtcWallet);
@@ -379,6 +386,7 @@ export default function AssetsBtcDetailPage({ route }) {
   //   const listHeaderComponent = mvcActivityList.length === 0 ? ListHeader() : null;
 
   console.log("当前地址类型： " + addressType);
+  const { walletMode, updateWalletMode } = useData();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -706,16 +714,18 @@ export default function AssetsBtcDetailPage({ route }) {
             ]}
           ></Text>
 
-          {myCoinType == "BTC" && (
+          {walletMode != wallet_mode_cold && (
             <TouchableWithoutFeedback
               onPress={() => {
                 setIsShowCopy(true);
               }}
             >
-              <Image
-                source={require("../../../image/assert_adress_type_icon.png")}
-                style={{ width: 22, height: 22 }}
-              />
+              {myCoinType == "BTC" && (
+                <Image
+                  source={require("../../../image/assert_adress_type_icon.png")}
+                  style={{ width: 22, height: 22 }}
+                />
+              )}
             </TouchableWithoutFeedback>
           )}
           <Text style={{ marginRight: 20, color: "#333", fontSize: 16 }}>

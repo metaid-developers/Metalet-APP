@@ -11,6 +11,8 @@ import { metaStyles } from "../constant/Constants";
 import { useData } from "../hooks/MyProvider";
 import {
   account_select_key,
+  wallet_mode_cold,
+  wallet_mode_hot,
   wallet_password_key,
   wallets_key,
 } from "../utils/AsyncStorageUtil";
@@ -33,6 +35,7 @@ import {
   getStorageCurrentWallet,
   getWalletBeans,
   getWalletNetwork,
+  isColdWalletMode,
   setWalletNetwork,
 } from "../utils/WalletUtils";
 import { goBack, navigate, reSets } from "../base/NavigationService";
@@ -44,6 +47,7 @@ export default function SplashPage(props) {
   const { walletManager, updateWalletManager } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
   const { network, switchNetwork } = useNetworkStore();
+  const { walletMode, updateWalletMode } = useData();
 
   useEffect(() => {
     try {
@@ -69,12 +73,20 @@ export default function SplashPage(props) {
 
     if (walletBean && account) {
       updateMyWallet(walletBean);
-      const btcWallet = await getCurrentBtcWallet();
-      const mvcWallet = await getCurrentMvcWallet();
-      let metaletWallet = new MetaletWallet();
-      metaletWallet.currentBtcWallet = btcWallet;
-      metaletWallet.currentMvcWallet = mvcWallet;
-      updateMetaletWallet(metaletWallet);
+      const isCold = await isColdWalletMode();
+      
+      if(!isCold){
+        const btcWallet = await getCurrentBtcWallet();
+        const mvcWallet = await getCurrentMvcWallet();
+        let metaletWallet = new MetaletWallet();
+        metaletWallet.currentBtcWallet = btcWallet;
+        metaletWallet.currentMvcWallet = mvcWallet;
+        updateMetaletWallet(metaletWallet);
+        updateWalletMode(wallet_mode_hot);
+      }else{
+        updateWalletMode(wallet_mode_cold);
+      }
+     
       // props.navigation.navigate("Tabs");
       // reSets()
       // navigate("Tabs",{destory:true});

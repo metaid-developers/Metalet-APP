@@ -450,7 +450,7 @@ export default function BtcNftTransferPage({ route }) {
 
             <TouchableWithoutFeedback
               onPress={() => {
-                goToWebScan("btc", transactionID, "mainnet");
+                goToWebScan("btc", transactionID);
               }}
             >
               <View

@@ -20,7 +20,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
 import { getCurrentBtcWallet } from "../wallet/wallet";
 import { navigate } from "@/base/NavigationService";
-import { getWalletNetwork } from "@/utils/WalletUtils";
+import { getStorageCurrentWallet, getWalletNetwork, isColdWalletMode } from "@/utils/WalletUtils";
 import { Chain } from "@metalet/utxo-wallet-service";
 
 // now
@@ -53,8 +53,15 @@ export default function BtcFtPage() {
     if (btcAddress) {
       getBtcFtData(btcAddress);
     } else {
-      const mvcWallet = await getCurrentBtcWallet();
-      getBtcFtData(mvcWallet.getAddress());
+      const isCold=await isColdWalletMode();
+      if(isCold){
+        const wallet=await getStorageCurrentWallet();
+        getBtcFtData(wallet.coldAddress);
+      }else{
+        const mvcWallet = await getCurrentBtcWallet();
+        getBtcFtData(mvcWallet.getAddress());
+      }
+    
     }
   }
 

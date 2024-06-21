@@ -31,6 +31,9 @@ import {
   network_key,
   network_mvc,
   createStorage,
+  AsyncStorageUtil,
+  wallet_mode_key,
+  wallet_mode_cold,
 } from "../utils/AsyncStorageUtil";
 import { AddressType, Chain } from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
@@ -51,6 +54,7 @@ import {
 import {
   getCurrentWalletAccount,
   getStorageCurrentWallet,
+  isColdWalletMode,
   openBrowser,
 } from "../utils/WalletUtils";
 import { caculateMvcAndBtcAssert, getOneIcons } from "../utils/AssertUtils";
@@ -72,6 +76,7 @@ export default function HomePage({ navigation }) {
   const { metaletWallet, updateMetaletWallet } = useData();
   const { setCurrentWallet } = useWalletStore();
   const { myWallet, updateMyWallet } = useData();
+  const { walletMode, updateWalletMode } = useData();
   // const [sumBalance, setSumBalance] = useState<string>("0.0");
   const { currentSumBalance, updateCurrentSumBalance } = useData();
 
@@ -103,7 +108,7 @@ export default function HomePage({ navigation }) {
   const [userAvater, setuserAvater] = useState<string[]>([]);
   const [accountName, setaccountName] = useState("");
   const [walletName, setWalletName] = useState("");
-  const { walletManager, getCurrentChainWallet } = useWalletManager();
+  // const { walletManager, getCurrentChainWallet } = useWalletManager();
 
   const [hasUpdate, setUpdate] = useState(false);
   const [updateUrl, setUpdateUrl] = useState("");
@@ -112,22 +117,35 @@ export default function HomePage({ navigation }) {
   const buildNumber = Constants.expoConfig?.ios.buildNumber;
   const platformNow = Platform.OS;
 
-  useEffect(() => {
-    if (!walletManager) {
-      return;
-    }
-    // const t1 = performance.now();
-    getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
-      // updateBtcAddress(btcWallet.getAddress());
-      // console.log("time1", performance.now() - t1);
-      // console.log("btc address", btcWallet.getAddress());
-    });
-    getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
-      // updateMvcAddress(mvcWallet.getAddress());
-      // console.log("time2", performance.now() - t1);
-      // console.log("mvc address", mvcWallet.getAddress());
-    });
-  }, [walletManager]);
+  // useEffect(() => {
+  //   if (!walletManager) {
+  //     return;
+  //   }
+
+  //   const initWalletManager = async () => {
+  //     try {
+  //       const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
+  //       if (!mode || wallet_mode_cold != mode) {
+  //         // console.log("initWalletManager");
+  //         // const t1 = performance.now();
+  //         getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
+  //           // updateBtcAddress(btcWallet.getAddress());
+  //           // console.log("time1", performance.now() - t1);
+  //           // console.log("btc address", btcWallet.getAddress());
+  //         });
+  //         getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
+  //           // updateMvcAddress(mvcWallet.getAddress());
+  //           // console.log("time2", performance.now() - t1);
+  //           // console.log("mvc address", mvcWallet.getAddress());
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   initWalletManager();
+  // }, [walletManager]);
 
   useEffect(() => {
     setIsShowLoading(true);
@@ -178,6 +196,8 @@ export default function HomePage({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
+      console.log("Home page is focused");
+      
       // Add event listener for back button press
       const backHandler = BackHandler.addEventListener(
         "hardwareBackPress",
@@ -222,12 +242,29 @@ export default function HomePage({ navigation }) {
   }
 
   const getShowBalance = async () => {
-    const nowMvcWallet = await getCurrentMvcWallet();
-    const nowBtcWallet = await getCurrentBtcWallet();
+    
+    const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
+    let nowMvcAddress;
+    let nowBtcAddress;
+
+    if (mode && wallet_mode_cold === mode) {
+      const swallet = await getStorageCurrentWallet();
+      nowBtcAddress = swallet.coldAddress;
+      nowMvcAddress = swallet.coldAddress;
+      // console.log("nowBtcAddress", nowBtcAddress);
+      
+    } else {
+      const nowMvcWallet = await getCurrentMvcWallet();
+      const nowBtcWallet = await getCurrentBtcWallet();
+      nowMvcAddress = nowMvcWallet.getAddress();
+      nowBtcAddress = nowBtcWallet.getAddress();
+    }
+
+
 
     const showbalance: ShowBalance = await caculateMvcAndBtcAssert(
-      nowMvcWallet.getAddress(),
-      nowBtcWallet.getAddress()
+      nowMvcAddress,
+      nowBtcAddress
     );
     metaletWallet.currentMvcBalance = showbalance.spaceBalance;
     metaletWallet.currentBtcBalance = showbalance.btcBalance;
@@ -240,61 +277,81 @@ export default function HomePage({ navigation }) {
   };
   //初始化所有钱包
   async function initCurrentWallet() {
-    await storage.get(network_key).then(async (saveNet) => {
-      if (saveNet == null) {
-        // console.log("saveNet is null" + saveNet);
-        await storage.set(network_key, network_all);
-        // await AsyncStorageUtil.setItem(network_key, network_all);
-        updateNetWork(network_all);
-      } else {
-        // console.log(saveNet);
-
-        updateNetWork(saveNet);
-      }
-    });
-
-    const nowWallet = await getStorageCurrentWallet();
-    const nowAccount = await getCurrentWalletAccount();
-
-    setWalletName(nowWallet.name);
-    setaccountName(nowAccount.name);
-    setuserAvater(nowAccount.defaultAvatarColor);
-
-    updateMyWallet(nowWallet);
-    const btcTaprootWallet = await getBtcWallet(AddressType.Taproot);
-    setTaprootAddress(btcTaprootWallet.getAddress());
-    const btcNativeSegwitWallet = await getBtcWallet(AddressType.NativeSegwit);
-    setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
-    const btcNestedSegwitWallet = await getBtcWallet(AddressType.NestedSegwit);
-    setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
-    const btcLegacyWallet = await getBtcWallet(AddressType.Legacy);
-    setLegacyAddress(btcLegacyWallet.getAddress());
-    const btcSameAsLegacyWallet = await getBtcWallet(AddressType.SameAsMvc);
-    setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
-    const mvcWallet = await getCurrentMvcWallet();
-    const currentBtcWallet = await getCurrentBtcWallet();
-
-    updateMvcAddress(mvcWallet.getAddress());
-    updateBtcAddress(currentBtcWallet.getAddress());
-
-    metaletWallet.currentBtcWallet = currentBtcWallet;
-    metaletWallet.currentMvcWallet = mvcWallet;
-    metaletWallet.btcLegacyWallet = btcLegacyWallet;
-    metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
-    metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
-    metaletWallet.btcTaprootWallet = btcTaprootWallet;
-    metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
-
-    console.log("metaletWallet", metaletWallet.btcLegacyWallet.getAddress());
+    console.log("initCurrentWallet");
     
+    const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
+    if (mode && wallet_mode_cold === mode) {
+      
+      const nowWallet = await getStorageCurrentWallet();
+      const nowAccount = await getCurrentWalletAccount();
 
-    //webs
-    const btcWalletWebs = metaletWallet.currentBtcWallet;
-    const mvcWalletWebs = metaletWallet.currentMvcWallet;
-    setCurrentWallet({ btcWallet: btcWalletWebs, mvcWallet: mvcWalletWebs });
+      setWalletName(nowWallet.name);
+      setaccountName(nowAccount.name);
+      setuserAvater(nowAccount.defaultAvatarColor);
+      updateMvcAddress(nowWallet.coldAddress);
+      updateBtcAddress(nowWallet.coldAddress);
+      getShowBalance();
+    } else {
+      
+      await storage.get(network_key).then(async (saveNet) => {
+        if (saveNet == null) {
+          // console.log("saveNet is null" + saveNet);
+          await storage.set(network_key, network_all);
+          // await AsyncStorageUtil.setItem(network_key, network_all);
+          updateNetWork(network_all);
+        } else {
+          // console.log(saveNet);
 
-    updateMetaletWallet(metaletWallet);
-    getShowBalance();
+          updateNetWork(saveNet);
+        }
+      });
+
+      const nowWallet = await getStorageCurrentWallet();
+      const nowAccount = await getCurrentWalletAccount();
+
+      setWalletName(nowWallet.name);
+      setaccountName(nowAccount.name);
+      setuserAvater(nowAccount.defaultAvatarColor);
+
+      updateMyWallet(nowWallet);
+      const btcTaprootWallet = await getBtcWallet(AddressType.Taproot);
+      setTaprootAddress(btcTaprootWallet.getAddress());
+      const btcNativeSegwitWallet = await getBtcWallet(
+        AddressType.NativeSegwit
+      );
+      setNativeSegwitAddress(btcNativeSegwitWallet.getAddress());
+      const btcNestedSegwitWallet = await getBtcWallet(
+        AddressType.NestedSegwit
+      );
+      setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
+      const btcLegacyWallet = await getBtcWallet(AddressType.Legacy);
+      setLegacyAddress(btcLegacyWallet.getAddress());
+      const btcSameAsLegacyWallet = await getBtcWallet(AddressType.SameAsMvc);
+      setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
+      const mvcWallet = await getCurrentMvcWallet();
+      const currentBtcWallet = await getCurrentBtcWallet();
+
+      
+      updateMvcAddress(mvcWallet.getAddress());
+      updateBtcAddress(currentBtcWallet.getAddress());
+
+      metaletWallet.currentBtcWallet = currentBtcWallet;
+      metaletWallet.currentMvcWallet = mvcWallet;
+      metaletWallet.btcLegacyWallet = btcLegacyWallet;
+      metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
+      metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
+      metaletWallet.btcTaprootWallet = btcTaprootWallet;
+      metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
+
+
+      //webs
+      const btcWalletWebs = metaletWallet.currentBtcWallet;
+      const mvcWalletWebs = metaletWallet.currentMvcWallet;
+      setCurrentWallet({ btcWallet: btcWalletWebs, mvcWallet: mvcWalletWebs });
+
+      updateMetaletWallet(metaletWallet);
+      getShowBalance();
+    }
   }
 
   // useEffect(() => {
@@ -999,6 +1056,7 @@ export default function HomePage({ navigation }) {
                   />
                 </TouchableWithoutFeedback>
               </View>
+
               <Text style={[metaStyles.bigLargeDefaultText, { marginTop: 3 }]}>
                 {"$ " + currentSumBalance}
               </Text>
@@ -1079,10 +1137,19 @@ export default function HomePage({ navigation }) {
           </TouchableWithoutFeedback> */}
 
             <TouchableWithoutFeedback
-              onPress={() => {
+              onPress={async () => {
                 // updateAccountIndex(1);
                 // AsyncStorageUtil.setItem("account_select", 0);
-                navigate("DiscoverPage");
+                const isCold= await isColdWalletMode();
+                if (isCold) {
+                } else {
+                  navigate("WebsPage", {
+                    url: "https://app.orders.exchange/",
+                  });
+                }
+
+              
+                // navigate("DiscoverPage");
                 // navigate("WebPageTest");
               }}
             >
@@ -1098,7 +1165,14 @@ export default function HomePage({ navigation }) {
             </TouchableWithoutFeedback>
             <TouchableWithoutFeedback
               onPress={async () => {
-                navigate("DiscoverPage");
+                // navigate("DiscoverPage");
+                const isCold= await isColdWalletMode();
+                if (isCold) {
+                } else {
+                  navigate("WebsPage", {
+                    url: "https://octopus.space/",
+                  });
+                }
                 // navigate("WebPageTest");
                 // navigate("WebPage");
               }}

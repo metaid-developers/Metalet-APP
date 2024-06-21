@@ -70,7 +70,8 @@ export const post = async (url, data = {}) => {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-      throw new Error(response.statusText);
+      console.log("fullUrl请求出错的接口 ： ", url);
+      // throw new Error(response.statusText);
     }
     // console.log("response", response.url);
     return await response.json();

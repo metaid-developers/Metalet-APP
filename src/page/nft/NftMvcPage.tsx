@@ -45,7 +45,7 @@ function TabsTopNavigator() {
      
         <TabsTop.Screen
           name="MvcNftPage"
-          options={{ title: "Space" }}
+          options={{ title: "MVC" }}
           component={MvcNftPage}
         />
      

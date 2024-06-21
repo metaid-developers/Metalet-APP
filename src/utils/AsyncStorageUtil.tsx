@@ -78,6 +78,10 @@ export const CurrentAccountIDKey = "CurrentAccountID_key";
 
 export const net_wallet_network_key = "net_network_key";
 
+export const wallet_mode_key = "wallet_mode_key";
+export const wallet_mode_cold = "cold";
+export const wallet_mode_hot = "hot";
+
 
 
 

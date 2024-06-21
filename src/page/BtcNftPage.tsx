@@ -1,4 +1,11 @@
-import { View, Text, FlatList, StyleSheet, Dimensions, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+  TouchableWithoutFeedback,
+} from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { NoMoreDataView } from "../constant/Widget";
 import { metaStyles } from "../constant/Constants";
@@ -8,11 +15,14 @@ import { useData } from "../hooks/MyProvider";
 import { MetaletWalletManager } from "../wallet/MetaletWalletManager";
 import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
 import { useFocusEffect } from "@react-navigation/native";
-import {  getCurrentBtcWallet } from "../wallet/wallet";
+import { getCurrentBtcWallet } from "../wallet/wallet";
 import { navigate } from "@/base/NavigationService";
-import { getWalletNetwork } from "@/utils/WalletUtils";
+import {
+  getStorageCurrentWallet,
+  getWalletNetwork,
+  isColdWalletMode,
+} from "@/utils/WalletUtils";
 import { Chain } from "@metalet/utxo-wallet-service";
-
 
 // nft
 export default function BtcNftPage() {
@@ -41,13 +51,19 @@ export default function BtcNftPage() {
     if (btcAddress) {
       getBtcNftData(btcAddress);
     } else {
-      const btcWallet = await getCurrentBtcWallet();
-      getBtcNftData(btcWallet.getAddress());
+      const isCold = await isColdWalletMode();
+      if (isCold) {
+        const wallet = await getStorageCurrentWallet();
+        getBtcNftData(wallet.coldAddress);
+      } else {
+        const btcWallet = await getCurrentBtcWallet();
+        getBtcNftData(btcWallet.getAddress());
+      }
     }
   }
 
   const getBtcNftData = async (address: string) => {
-    const network=await getWalletNetwork(Chain.BTC);
+    const network = await getWalletNetwork(Chain.BTC);
 
     let params = {
       net: network,
@@ -62,7 +78,6 @@ export default function BtcNftPage() {
     let list = [];
     if (data.data != null) {
       if (data.data.list != null) {
-      
         // for(let i=0;i<data.data.list.length;i++){
         //  let nftData:BtcNftBean=data.data.list[i];
         //  let reslut=await get(nftData.content,true)
@@ -83,12 +98,12 @@ export default function BtcNftPage() {
           list.push(nftData);
         }
 
-        if(data.data.list.length>=3){
-          setIsmany(10)
-        }else{
-          setIsmany(0)
+        if (data.data.list.length >= 3) {
+          setIsmany(10);
+        } else {
+          setIsmany(0);
         }
-        setNftList([...data.data.list])
+        setNftList([...data.data.list]);
       } else {
         setNftList([]);
       }
@@ -99,54 +114,56 @@ export default function BtcNftPage() {
 
   function ItemList({ index, item }) {
     return (
-     <TouchableWithoutFeedback onPress={()=>{
-      navigate('BtcNftDetailPage',{nftDetail:item})
-     }}>
-       <View
-        style={{
-          backgroundColor: "#171AFF",
-          borderRadius: 8,
-          height: "auto",
-          width: width / 4,
-          marginTop: 10,
-          marginRight:10,
-          paddingHorizontal: 10,
-          paddingVertical: 10,
-          alignItems: "center",
+      <TouchableWithoutFeedback
+        onPress={() => {
+          navigate("BtcNftDetailPage", { nftDetail: item });
         }}
       >
-        <View>
-          {/* <Text style={{color:'#fff',fontSize:10}}>{JSON.stringify(item.nftShowContent)}</Text> */}
-          <Text style={{ color: "#fff", fontSize: 10 }}>
-            {item.contentBody}
-          </Text>
-          <View style={{ height: 10 }} />
-          <View style={{ justifyContent: "flex-end", flexDirection: "row" }}>
-            <View
-              style={{
-                justifyContent: "center",
-                flexDirection: "row",
-                width: 50,
-                backgroundColor: "#767EFF",
-                borderRadius: 5,
-              }}
-            >
-              <Text
+        <View
+          style={{
+            backgroundColor: "#171AFF",
+            borderRadius: 8,
+            height: "auto",
+            width: width / 4,
+            marginTop: 10,
+            marginRight: 10,
+            paddingHorizontal: 10,
+            paddingVertical: 10,
+            alignItems: "center",
+          }}
+        >
+          <View>
+            {/* <Text style={{color:'#fff',fontSize:10}}>{JSON.stringify(item.nftShowContent)}</Text> */}
+            <Text style={{ color: "#fff", fontSize: 10 }}>
+              {item.contentBody}
+            </Text>
+            <View style={{ height: 10 }} />
+            <View style={{ justifyContent: "flex-end", flexDirection: "row" }}>
+              <View
                 style={{
-                  color: "#fff",
-                  fontSize: 10,
-                  paddingHorizontal: 2,
-                  paddingVertical: 2,
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  width: 50,
+                  backgroundColor: "#767EFF",
+                  borderRadius: 5,
                 }}
               >
-                {" "}
-                546 sat{" "}
-              </Text>
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 10,
+                    paddingHorizontal: 2,
+                    paddingVertical: 2,
+                  }}
+                >
+                  {" "}
+                  546 sat{" "}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-     </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
     );
   }
 

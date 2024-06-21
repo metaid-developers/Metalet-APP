@@ -10,6 +10,8 @@ import {
   network_btc,
   AsyncStorageUtil,
   net_wallet_network_key,
+  wallet_mode_key,
+  wallet_mode_cold,
 } from "./AsyncStorageUtil";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { removeTrailingZeros } from "./StringUtils";
@@ -99,10 +101,12 @@ export async function isNoWalletPassword(): Promise<boolean> {
 }
 
 export async function isNoStorageWallet(): Promise<boolean> {
-  const wallets = await storage.get(wallets_key);
+  const wallets:WalletBean[] = await storage.get(wallets_key);
   // const wallets = await AsyncStorageUtil.getItem(wallets_key);
+  console.log("isNoStorageWallet", wallets.length);
+
   if (wallets) {
-    return false;
+    if (wallets.length > 0) return false;
   }
   return true;
 }
@@ -132,6 +136,19 @@ export async function getWalletNetwork(chain?: Chain): Promise<string> {
 
 export async function setWalletNetwork(walletNet: string) {
   await AsyncStorageUtil.setItem(net_wallet_network_key, walletNet);
+}
+
+export async function isColdWalletMode() {
+  const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
+  if (mode && wallet_mode_cold === mode) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export async function setWalletMode(mode: string) {
+  await AsyncStorageUtil.setItem(wallet_mode_key, mode);
 }
 
 /////////////change

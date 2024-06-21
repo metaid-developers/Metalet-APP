@@ -14,14 +14,14 @@ class MetaletWallet {
   btcSameAsWallet: BtcWallet;
 
   //当前钱包余额
-  currentSumAssert: string;
-  currentMvcBalance: string;
-  currentBtcBalance: string;
-  currentSpaceAssert: string;
-  currentBtcAssert: string;
+  currentSumAssert: string="$0.00";
+  currentMvcBalance: string="0.00";
+  currentBtcBalance: string="0.00";
+  currentSpaceAssert: string="$0.00";
+  currentBtcAssert: string="0.00";
 
-  currentMVCPrice: number;
-  currentBtcPrice: number;
+  currentMVCPrice: number=0;
+  currentBtcPrice: number=0;
 }
 
 export default MetaletWallet;

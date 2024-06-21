@@ -21,8 +21,9 @@ import {
 import { metaStyles } from "../constant/Constants";
 import {
   createStorage,
+  wallet_mode_cold,
+  wallet_mode_hot,
   wallets_key,
-
 } from "../utils/AsyncStorageUtil";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { goBack, navigate } from "../base/NavigationService";
@@ -35,7 +36,8 @@ import {
   getWalletBeans,
   setCurrentAccountID,
   setCurrentWalletID,
-  getStorageWallets
+  getStorageWallets,
+  setWalletMode,
 } from "../utils/WalletUtils";
 
 export default function WalletsPage() {
@@ -63,7 +65,7 @@ export default function WalletsPage() {
   const [currentAccountID, setcurrentAccountID] = useState("");
   const { needInitWallet, updateNeedInitWallet } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
-
+  const { walletMode, updateWalletMode } = useData();
 
   // let changeWallet:WalletBean;
 
@@ -134,7 +136,7 @@ export default function WalletsPage() {
 
       await storage.set(wallets_key, wallets);
       getWalletData();
-      updateNeedInitWallet(getRandomID())
+      updateNeedInitWallet(getRandomID());
       eventBus.publish(refreshHomeLoadingEvent, { data: "" });
       navigate("Tabs");
     });
@@ -145,32 +147,39 @@ export default function WalletsPage() {
     walletIndex: number,
     accountIndex: number
   ) {
-   
-    const wallets= await getStorageWallets();
+    const wallets = await getStorageWallets();
     // await getStorageWallets().then(async (wallets) => {
-      // wallets.forEach((wallet) => {
-      //   wallet.accountsOptions.forEach((account) => {
-      //     account.isSelect = false;
-      //   });
-      // });
+    // wallets.forEach((wallet) => {
+    //   wallet.accountsOptions.forEach((account) => {
+    //     account.isSelect = false;
+    //   });
+    // });
 
-      const nowWallet = wallets[walletIndex];
-      nowWallet.isCurrentPathIndex = accountIndex;
-      nowWallet.accountsOptions[accountIndex].isSelect = true;
-      setcurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
-      await setCurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
-      await setCurrentWalletID(nowWallet.id);
-      updateMyWallet(nowWallet);
-      console.log("nowWallet", JSON.stringify(wallets));
-      
-      await storage.set(wallets_key, wallets);
-      getWalletData();
-      navigate("Tabs");
-      updateNeedInitWallet(getRandomID())
+    const nowWallet = wallets[walletIndex];
+    nowWallet.isCurrentPathIndex = accountIndex;
+    nowWallet.accountsOptions[accountIndex].isSelect = true;
+    setcurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
+    await setCurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
+    await setCurrentWalletID(nowWallet.id);
+    if (nowWallet.isColdWalletMode) {
+      updateWalletMode(wallet_mode_cold);
+      await setWalletMode(wallet_mode_cold);
+    } else {
+      updateWalletMode(wallet_mode_hot);
+      await setWalletMode(wallet_mode_hot);
+    }
+    updateMyWallet(nowWallet);
+    // console.log("nowWallet", JSON.stringify(wallets));
 
-      eventBus.publish(refreshHomeLoadingEvent, { data: "" });
+    await storage.set(wallets_key, wallets);
+    getWalletData();
+    navigate("Tabs");
+    updateNeedInitWallet(getRandomID());
+ 
 
-      // chooseMyWallet(nowWallet);
+    eventBus.publish(refreshHomeLoadingEvent, { data: "" });
+
+    // chooseMyWallet(nowWallet);
     // });
   }
 
