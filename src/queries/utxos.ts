@@ -27,6 +27,27 @@ export type MvcUtxo = {
   height: number;
 };
 
+export interface MRC20UTXO extends UTXO {
+  chain: Chain
+  address: string
+  scriptPk: string
+  timestamp: number
+  mrc20s: MRC20Info[]
+  blockHeight: number
+}
+
+interface MRC20Info {
+  tick: string
+  mrc20Id: string
+  txPoint: string
+  amount: string
+  balance: string
+  decimals: string
+  tokenName: string
+}
+
+
+
 // TODO: fix network switch
 const fetchMVCUtxos = async (address: string): Promise<MvcUtxo[]> => {
   return (await mvcApi<MvcUtxo[]>(`/address/${address}/utxo`)).get();
@@ -130,6 +151,59 @@ export async function getBtcUtxos(
     return a.satoshis - b.satoshis;
   });
 }
+
+
+// export async function getMRC20Utxos(address: string, mrc20TickId: string, needRawTx = false): Promise<MRC20UTXO[]> {
+//   // const net = getNet()
+//   const network = await getWalletNetwork(Chain.BTC);
+
+//   console.log("getMRC20Utxos", network, address, mrc20TickId, needRawTx);
+  
+//   const { list: utxos } = await metaletApiV3<{
+//     total: number
+//     list: MRC20UTXO[]
+//   }>(`/mrc20/address/utxo`).get({
+//     network,
+//     address,
+//     tickId: mrc20TickId,
+//   })
+//   console.log("mrc20Utxos list", utxos);
+
+//   if (needRawTx) {
+//     for (let utxo of utxos) {
+//       utxo.rawTx = await fetchBtcTxHex(utxo.txId)
+//     }
+//   }
+//   return utxos.sort((a, b) => {
+//     if (a.confirmed !== b.confirmed) {
+//       return b.confirmed ? 1 : -1
+//     }
+//     return a.satoshis - b.satoshis
+//   })
+// }
+
+
+export async function getMRC20Utxos(address: string, tickId: string, needRawTx = false) {
+  const network = await getWalletNetwork(Chain.BTC);
+    // console.log("getMRC20Utxos", network, address, tickId, needRawTx);
+
+  const { list: mrc20Utxos } = await metaletApiV3<{
+    total: number
+    list: MRC20UTXO[]
+  }>(`/mrc20/address/utxo`).get({
+    net: network,
+    address,
+    tickId,
+  })
+
+  if (needRawTx) {
+    for (let utxo of mrc20Utxos) {
+      utxo.rawTx = await fetchBtcTxHex(utxo.txId)
+    }
+  }
+  return mrc20Utxos;
+}
+
 
 export async function getRuneUtxos(
   address: string,

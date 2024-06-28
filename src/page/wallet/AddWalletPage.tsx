@@ -44,9 +44,9 @@ export default function AddWalletPage() {
       await storage.set(wallets_key, [walletBean]);
     } else {
       console.log('refresh');
-      updateNeedInitWallet(getRandomID());
       const newWallets = [...wallets, walletBean];
       await storage.set(wallets_key, newWallets);
+      updateNeedInitWallet(getRandomID());
     }
     updateMyWallet(walletBean);
    

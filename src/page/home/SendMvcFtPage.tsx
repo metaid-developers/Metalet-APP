@@ -437,7 +437,6 @@ export default function SendMvcFtPage({ route }) {
                 marginTop: 10,
                 backgroundColor: "rgba(23, 26, 255, 0.2)",
                 padding: 5,
-                width: 85,
                 alignItems: "center",
                 justifyContent: "center",
                 borderRadius: 5,
@@ -450,7 +449,7 @@ export default function SendMvcFtPage({ route }) {
                   textAlign: "center",
                 }}
               >
-                MetaContract
+                MetaContract 
               </Text>
             </View>
 

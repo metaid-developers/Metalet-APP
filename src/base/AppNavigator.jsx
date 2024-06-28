@@ -67,6 +67,11 @@ import AboutPage from "@/page/settings/AboutPage";
 import ColdWalletPage from "@/page/settings/ColdWalletPage";
 import { useData } from "@/hooks/MyProvider";
 import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
+import SendColdBtcPrePage from "@/page/home/transfer/SendColdBtcPrePage";
+import ScanPage from "@/page/settings/ScanPage";
+import Mrc20DetailPage from "@/page/home/Mrc20DetailPage";
+import SendMrc20Page from "@/page/home/SendMrc20Page";
+import SendSuccessNormalPage from "@/page/home/SendSuccessNormalPage";
 
 ////////
 
@@ -169,6 +174,11 @@ const StackNavigator = () => (
     <Stack.Screen name="SecurityPage" component={SecurityPage} />
     <Stack.Screen name="AboutPage" component={AboutPage} />
     <Stack.Screen name="ColdWalletPage" component={ColdWalletPage} />
+    <Stack.Screen name="SendColdBtcPrePage" component={SendColdBtcPrePage} />
+    <Stack.Screen name="ScanPage" component={ScanPage} />
+    <Stack.Screen name="Mrc20DetailPage" component={Mrc20DetailPage} />
+    <Stack.Screen name="SendMrc20Page" component={SendMrc20Page} />
+    <Stack.Screen name="SendSuccessNormalPage" component={SendSuccessNormalPage} />
   </Stack.Navigator>
 );
 

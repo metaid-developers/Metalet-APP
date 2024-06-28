@@ -101,12 +101,11 @@ export async function isNoWalletPassword(): Promise<boolean> {
 }
 
 export async function isNoStorageWallet(): Promise<boolean> {
-  const wallets:WalletBean[] = await storage.get(wallets_key);
+  const wallets: WalletBean[] = await storage.get(wallets_key);
   // const wallets = await AsyncStorageUtil.getItem(wallets_key);
-  console.log("isNoStorageWallet", wallets.length);
 
-  if (wallets) {
-    if (wallets.length > 0) return false;
+  if (Array.isArray(wallets) && wallets.length > 0) {
+    return false;
   }
   return true;
 }

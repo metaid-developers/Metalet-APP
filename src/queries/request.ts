@@ -136,6 +136,11 @@ interface MetaletV3Result<T> {
 
 const metaletV3Request = <T>(url: string, options: RequestOption): Promise<T> =>
   request<MetaletV3Result<T>>(url, options).then((result) => {
+    // console.log("metaletV3Request url ", url);
+
+    // console.log("metaletV3Request", result);
+    // console.log("options", options.params);
+
     if (result.code === MetaletV3_CODE.FAILED) {
       throw new Error(result.message);
     }

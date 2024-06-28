@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MyQrCode, QRScanner, TitleBar } from "@/constant/Widget";
 import { goBack, navigate } from "@/base/NavigationService";
 import { useData } from "@/hooks/MyProvider";
-import { MetaletColdRr } from "@/bean/MetaletColdRr";
+import { ActionType, MetaletColdRr } from "@/bean/MetaletColdRr";
 import { AddressType } from "@metalet/utxo-wallet-service";
 import { getRandomID, getStorageWallets } from "@/utils/WalletUtils";
 import { WalletBean } from "@/bean/WalletBean";
@@ -32,9 +32,9 @@ export default function ColdWalletPage() {
   const { needInitWallet, updateNeedInitWallet } = useData();
 
   let qrData = "1";
-  const publicKey = metaletWallet.currentBtcWallet.getAddress();
+  let publicKey = metaletWallet.currentBtcWallet.getAddress();
   const qrDataReady: MetaletColdRr = {
-    name: "metaletCold",
+    name: ActionType.CONNECT,
     publicKey: publicKey,
   };
 
@@ -46,7 +46,7 @@ export default function ColdWalletPage() {
   async function parseScan(data) {
     try {
       const result: MetaletColdRr = JSON.parse(data);
-      if (result.name === "metaletCold") {
+      if (result.name === ActionType.CONNECT) {
         //wallet
         let walletName;
         let walletID = Math.random().toString(36).substr(2, 8);

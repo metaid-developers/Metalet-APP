@@ -159,9 +159,9 @@ export default function ImportWalletPage(props) {
       await storage.set(wallets_key, [walletBean]);
     } else {
       console.log('refresh');
-      updateNeedInitWallet(getRandomID());
       const newWallets = [...wallets, walletBean];
       await storage.set(wallets_key, newWallets);
+      updateNeedInitWallet(getRandomID());
     }
     // const updataWallets = addWallet(wallets, walletBean);
     updateMyWallet(walletBean);
@@ -177,7 +177,7 @@ export default function ImportWalletPage(props) {
     //   walletBean.accountsOptions[0].id
     // );
 
-    console.log("wallets " + getWalletBeans());
+    // console.log("wallets " + getWalletBeans());
     setObj({ ...obj, isShow: false });
     // props.navigation.navigate('HomePage')
 
@@ -329,7 +329,7 @@ export default function ImportWalletPage(props) {
     return [...wallets, newWallet];
   };
 
-  const [obj, setObj] = useState({ title: "", isShow: false, isCancel: false });
+  const [obj, setObj] = useState({ title: "", isShow: false, isCancel: true });
 
   return (
     <TouchableWithoutFeedback onPress={()=>{

@@ -20,12 +20,17 @@ import { useFocusEffect } from "@react-navigation/native";
 import { eventBus, refreshBtcFtEvent } from "../utils/EventBus";
 import { getCurrentBtcWallet } from "../wallet/wallet";
 import { navigate } from "@/base/NavigationService";
-import { getStorageCurrentWallet, getWalletNetwork, isColdWalletMode } from "@/utils/WalletUtils";
+import {
+  getStorageCurrentWallet,
+  getWalletNetwork,
+  isColdWalletMode,
+} from "@/utils/WalletUtils";
 import { Chain } from "@metalet/utxo-wallet-service";
+import { fetchMrc20List } from "@/api/metaletservice";
 
 // now
 export default function BtcFtPage() {
-  let [btcFtList, setBtcFtList] = useState<BtcFtBean[]>([]);
+  let [btcFtList, setBtcFtList] = useState([]);
   const { walletManager, updateWalletManager } = useData();
   const { accountIndex, updateAccountIndex } = useData();
 
@@ -53,21 +58,37 @@ export default function BtcFtPage() {
     if (btcAddress) {
       getBtcFtData(btcAddress);
     } else {
-      const isCold=await isColdWalletMode();
-      if(isCold){
-        const wallet=await getStorageCurrentWallet();
+      const isCold = await isColdWalletMode();
+      if (isCold) {
+        const wallet = await getStorageCurrentWallet();
         getBtcFtData(wallet.coldAddress);
-      }else{
+      } else {
         const mvcWallet = await getCurrentBtcWallet();
         getBtcFtData(mvcWallet.getAddress());
       }
-    
     }
   }
 
   const getBtcFtData = async (address: string) => {
     const network = await getWalletNetwork(Chain.BTC);
 
+    let list = [];
+    const simData = await fetchMrc20List(
+      network,
+      address
+    );
+
+    // console.log("simData", JSON.stringify(simData));
+    if (simData&&simData.data) {
+      if (simData.data!.list != null&& simData.data!.list.length > 0) {
+        simData.data.list.forEach((item) => {
+          if(item){
+            item.type="mrc20";
+            list.push(item);
+          }
+        });
+      }
+    }
     let params = {
       net: network,
       // address: metaletWallet.currentBtcWallet.getAddress(),
@@ -77,37 +98,122 @@ export default function BtcFtPage() {
       size: 10000,
     };
 
-    let data: RootBtcFtObject = await get(BTC_FT_URL, false, params);
+    let dataBrc20: RootBtcFtObject = await get(BTC_FT_URL, false, params);
 
-    if (data.data != null) {
-      if (data.data.list != null) {
-        setBtcFtList([...data.data.list]);
-      } else {
-        setBtcFtList([]);
+    if (dataBrc20&&dataBrc20.data) {
+      if (dataBrc20.data.list != null&& dataBrc20.data.list.length > 0) {
+        dataBrc20.data.list.forEach((item) => {
+        if(item){
+          item.type="brc20";
+          list.push(item);
+        }
+        });
       }
+    }
+
+    // console.log("list", JSON.stringify(list));
+    
+    if (list != null && list.length > 0) {
+      setBtcFtList([...list]);
     } else {
       setBtcFtList([]);
     }
+
+    // if (data.data != null) {
+    //   if (data.data.list != null) {
+    //     setBtcFtList([...data.data.list]);
+    //   } else {
+    //     setBtcFtList([]);
+    //   }
+    // } else {
+    //   setBtcFtList([]);
+    // }
   };
 
-  const ListItem: React.FC<{ index: number; item: BtcFtBean }> = ({
-    index,
-    item,
-  }) => {
-    return (
-      <TouchableWithoutFeedback
+  const ListItem: React.FC<{ index: number; item }> = ({ index, item }) => {
+    
+    if (item.type === "brc20") {
+      return (
+        <TouchableWithoutFeedback
+          onPress={() => {
+            navigate("BRC20DetailPage", {
+              brc20: item,
+            });
+          }}
+        >
+          <View style={styles.flatListStyle}>
+            <CircleAvatarLetter letterStr={item.ticker.substring(0, 1)} />
+
+            <View style={{ marginLeft: 10 }}>
+              <Text
+                style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
+              >
+                {item.ticker.toUpperCase()}
+              </Text>
+
+              <View
+                style={{
+                  backgroundColor: "rgba(247, 147, 26, 0.2)",
+                  borderRadius: 3,
+                  padding: 5,
+                }}
+              >
+                <Text style={{ fontSize: 10, color: "#FF981C" }}>BRC20</Text>
+              </View>
+            </View>
+
+            <View style={{ flex: 1 }} />
+
+            <View style={{ marginLeft: 10, marginRight: 10 }}>
+              <Text
+                numberOfLines={2}
+                ellipsizeMode="tail"
+                style={{ fontSize: 16, color: "#000000", textAlign: "right" }}
+              >
+                {item.overallBalance!}
+              </Text>
+              <Text
+                style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
+              >
+                - - - - - - - - - -{" "}
+              </Text>
+              <Text
+                style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
+              >
+                Transferable:{" "}
+              </Text>
+              <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
+                {item.transferableBalance!}{" "}
+              </Text>
+              <Text
+                style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
+              >
+                Available:{" "}
+              </Text>
+              <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
+                {item.availableBalance!}{" "}
+              </Text>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      );
+    } else {
+      return (
+        <TouchableWithoutFeedback
         onPress={() => {
-          navigate("BRC20DetailPage", {
-            brc20: item,
+          navigate("Mrc20DetailPage", {
+            mrc20Data: item,
           });
         }}
       >
-        <View style={styles.flatListStyle}>
-          <CircleAvatarLetter letterStr={item.ticker.substring(0, 1)} />
+        <View style={[styles.flatListStyle,{paddingTop:20,paddingBottom:20}]}>
+          <CircleAvatarLetter letterStr={item.tokenName.substring(0, 1)} />
 
           <View style={{ marginLeft: 10 }}>
-            <Text style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}>
-              {item.ticker.toUpperCase()}
+            <Text
+              style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
+            >
+              {item.tokenName.toUpperCase()}
             </Text>
 
             <View
@@ -115,41 +221,31 @@ export default function BtcFtPage() {
                 backgroundColor: "rgba(247, 147, 26, 0.2)",
                 borderRadius: 3,
                 padding: 5,
+                width:50,  
               }}
             >
-              <Text style={{ fontSize: 10, color: "#FF981C" }}>BRC20</Text>
+              <Text style={{ fontSize: 10, color: "#FF981C" }}>MRC20</Text>
             </View>
+            
           </View>
 
           <View style={{ flex: 1 }} />
 
           <View style={{ marginLeft: 10, marginRight: 10 }}>
             <Text
-              numberOfLines={2}
-              ellipsizeMode="tail"
-              style={{ fontSize: 16, color: "#000000", textAlign: "right" }}
+              style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
             >
-              {item.overallBalance!}
-            </Text>
-            <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>
-              - - - - - - - - - -{" "}
-            </Text>
-            <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>
-              Transferable:{" "}
+             {/* balance */}
             </Text>
             <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
-              {item.transferableBalance!}{" "}
+              {item.balance!}{" "}
             </Text>
-            <Text style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}>
-              Available:{" "}
-            </Text>
-            <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
-              {item.availableBalance!}{" "}
-            </Text>
+          
           </View>
         </View>
       </TouchableWithoutFeedback>
-    );
+      );
+    }
   };
 
   // 定义 renderItem 函数

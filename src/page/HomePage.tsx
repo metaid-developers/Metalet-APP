@@ -34,6 +34,7 @@ import {
   AsyncStorageUtil,
   wallet_mode_key,
   wallet_mode_cold,
+  wallet_mode_hot,
 } from "../utils/AsyncStorageUtil";
 import { AddressType, Chain } from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
@@ -130,10 +131,14 @@ export default function HomePage({ navigation }) {
   //         // const t1 = performance.now();
   //         getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
   //           // updateBtcAddress(btcWallet.getAddress());
+  //         console.log(btcWallet.getAddress());
+          
   //           // console.log("time1", performance.now() - t1);
   //           // console.log("btc address", btcWallet.getAddress());
   //         });
   //         getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
+  //           console.log(mvcWallet.getAddress());
+
   //           // updateMvcAddress(mvcWallet.getAddress());
   //           // console.log("time2", performance.now() - t1);
   //           // console.log("mvc address", mvcWallet.getAddress());
@@ -284,7 +289,7 @@ export default function HomePage({ navigation }) {
       
       const nowWallet = await getStorageCurrentWallet();
       const nowAccount = await getCurrentWalletAccount();
-
+      updateWalletMode(wallet_mode_cold);
       setWalletName(nowWallet.name);
       setaccountName(nowAccount.name);
       setuserAvater(nowAccount.defaultAvatarColor);
@@ -292,7 +297,8 @@ export default function HomePage({ navigation }) {
       updateBtcAddress(nowWallet.coldAddress);
       getShowBalance();
     } else {
-      
+      updateWalletMode(wallet_mode_hot);
+
       await storage.get(network_key).then(async (saveNet) => {
         if (saveNet == null) {
           // console.log("saveNet is null" + saveNet);

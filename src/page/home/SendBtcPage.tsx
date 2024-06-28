@@ -22,7 +22,11 @@ import {
   VerifyModal,
   styles,
 } from "../../constant/Widget";
-import { grayNormalColor, inputNormalBgColor, themeColor } from "../../constant/Constants";
+import {
+  grayNormalColor,
+  inputNormalBgColor,
+  themeColor,
+} from "../../constant/Constants";
 import { FeedBean, FeedBtcObject } from "../../types/btcfeed";
 import {
   broadcastBtc,
@@ -38,6 +42,7 @@ import { broadcastBTCTx } from "../../queries/transaction";
 import { navigate } from "../../base/NavigationService";
 import { getCurrentBtcWallet } from "../../wallet/wallet";
 import { getRandomID, parseToSat, parseToSpace } from "../../utils/WalletUtils";
+import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
 
 export default function SendBtcPage() {
   const [nextBtnColor, setNextBtnColor] = useState("rgba(23, 26, 255, 0.5)");
@@ -112,6 +117,9 @@ export default function SendBtcPage() {
   const [total, settotal] = useState("");
   const [rawTx, setRawTx] = useState<string>();
 
+  const [aboutFee, setAboutFee] = useState(3000);
+  const { walletMode, updateWalletMode } = useData();
+
   useEffect(() => {
     getFeed();
     getBtcBalance();
@@ -147,7 +155,6 @@ export default function SendBtcPage() {
     console.log("交易参数 utxos:" + JSON.stringify(utxos));
     console.log("当前钱包地址：" + btcWallet.getAddress());
 
-    console.log("jjjjj");
 
     try {
       const { rawTx, cost } = btcWallet.send(
@@ -174,12 +181,34 @@ export default function SendBtcPage() {
       setConfirmDailogState(true);
     } catch (e) {
       console.log("send error", e);
-      ToastView({ text: e.toString() ,type: "error" });
+      ToastView({ text: e.toString(), type: "error" });
     }
 
     // const txId = await broadcastBTCTx(rawTx).catch((err) => {
     //   console.log(err);
     // });
+  }
+
+  async function sendColdBtc() {
+    console.log("send cold btc");
+    try {
+      const { rawTx, cost } = { rawTx: "rawTx_data", cost: "3200" };
+      settotal("42000");
+      setfee("3200");
+      setRawTx(rawTx);
+      setConfirmDailogState(true);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async function sendColdBtcConfirm() {
+    navigate("SendColdBtcPrePage", {
+      result: {
+        chain: "btc",
+        rawTx: rawTx,
+      },
+    });
   }
 
   const OpenModal = async () => {
@@ -267,16 +296,21 @@ export default function SendBtcPage() {
             </View>
 
             <View>
-              <Text style={{ marginTop: 15, color:grayNormalColor, fontSize: 14 }}>
+              <Text
+                style={{ marginTop: 15, color: grayNormalColor, fontSize: 14 }}
+              >
                 From
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                {metaletWallet.currentBtcWallet.getAddress()}
+                {/* {metaletWallet.currentBtcWallet.getAddress()} */}
+                {btcAddress}
               </Text>
             </View>
 
             <View>
-              <Text style={{ marginTop: 10, color: grayNormalColor, fontSize: 14 }}>
+              <Text
+                style={{ marginTop: 10, color: grayNormalColor, fontSize: 14 }}
+              >
                 To
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
@@ -291,7 +325,9 @@ export default function SendBtcPage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Amount</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                Amount
+              </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                 {parseFloat(inputAmount).toFixed(8)} BTC
               </Text>
@@ -317,7 +353,9 @@ export default function SendBtcPage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Total</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                Total
+              </Text>
               <Text style={{ color: "#333", fontSize: 14 }}>{total} BTC</Text>
             </View>
 
@@ -364,7 +402,7 @@ export default function SendBtcPage() {
         <View
           style={{
             flex: 1,
-            justifyContent: Platform.OS === "ios"?"center":"flex-end",
+            justifyContent: Platform.OS === "ios" ? "center" : "flex-end",
             backgroundColor: "rgba(0, 0, 0, 0.5)",
           }}
         >
@@ -375,9 +413,9 @@ export default function SendBtcPage() {
               borderTopRightRadius: 10,
               borderTopLeftRadius: 10,
               paddingBottom: 40,
-              borderBottomLeftRadius:Platform.OS === "ios"?10:0,
-              borderBottomRightRadius:Platform.OS === "ios"?10:0,
-              marginHorizontal:Platform.OS === "ios"?10:0,
+              borderBottomLeftRadius: Platform.OS === "ios" ? 10 : 0,
+              borderBottomRightRadius: Platform.OS === "ios" ? 10 : 0,
+              marginHorizontal: Platform.OS === "ios" ? 10 : 0,
             }}
           >
             <View style={{ flexDirection: "row" }}>
@@ -677,7 +715,13 @@ export default function SendBtcPage() {
         }}
         event={() => {
           setIsShowVerify(false);
-          OpenModal();
+
+          if (walletMode === wallet_mode_cold) {
+            sendColdBtcConfirm();
+          } else {
+            OpenModal();
+          }
+        
         }}
       />
 
@@ -855,7 +899,9 @@ export default function SendBtcPage() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Balance</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                Balance
+              </Text>
               <Text style={{ color: "#999", fontSize: 14 }}>
                 {btcBalance.balance} BTC
               </Text>
@@ -873,7 +919,9 @@ export default function SendBtcPage() {
                 marginTop: 10,
               }}
             >
-              <Text style={{ color:grayNormalColor, fontSize: 14 }}>Pending</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                Pending
+              </Text>
               <Text style={{ color: "#999", fontSize: 14 }}>
                 {btcBalance.pinsBalance} BTC
               </Text>
@@ -885,7 +933,9 @@ export default function SendBtcPage() {
                 marginTop: 10,
               }}
             >
-              <Text style={{ color: grayNormalColor, fontSize: 14 }}>Available</Text>
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                Available
+              </Text>
               <Text style={{ color: "#999", fontSize: 14 }}>
                 {btcBalance.safeBalance} BTC
               </Text>
@@ -903,7 +953,9 @@ export default function SendBtcPage() {
                   alignItems: "center",
                 }}
               >
-                <Text style={{ color: grayNormalColor, fontSize: 14 }}>Fee Rate</Text>
+                <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                  Fee Rate
+                </Text>
                 <View style={{ flex: 1 }} />
                 <Text style={{ color: "#999", fontSize: 14 }}>
                   {feed} sat/vB
@@ -927,7 +979,22 @@ export default function SendBtcPage() {
             <RoundSimButton
               title={"Next"}
               event={() => {
-                sendBtc();
+                if (!inputAddress) {
+                  ToastView({ text: "Please input address", type: "error" });
+                  return;
+                }
+
+                if (!inputAmount) {
+                  ToastView({ text: "Please input amount", type: "error" });
+                  return;
+                }
+
+                if (walletMode === wallet_mode_cold) {
+                  sendColdBtc();
+                } else {
+                  sendBtc();
+                }
+                // sendBtc();
                 // navigate('SendBtcConfirmPage')
                 // setConfirmDailogState(true);
               }}

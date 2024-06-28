@@ -19,6 +19,7 @@ export default function MvcNftDetailPage({ route }) {
           <Image
             source={{ uri: imgNftUrl }}
             style={{ width: 200, height: 200 }}
+            resizeMode='contain'
           />
         </View>
 
@@ -110,23 +111,28 @@ export default function MvcNftDetailPage({ route }) {
             marginTop: 20,
             flexDirection: "row",
             justifyContent: "space-between",
+            marginRight:48
           }}
         >
           <Text style={{ color: "#666666", fontSize: 15 }}>
             Seriers Genesis:{" "}
           </Text>
+        
           <Text
             numberOfLines={1}
             ellipsizeMode="middle"
             style={{
+             
               color: "#333333",
               fontSize: 15,
               marginHorizontal: 30,
-              paddingRight: 60,
+              marginRight:60,
+             
             }}
           >
             {myObject.nftGenesis!}{" "}
           </Text>
+         
         </View>
         <View
           style={{

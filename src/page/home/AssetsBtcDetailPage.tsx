@@ -394,7 +394,7 @@ export default function AssetsBtcDetailPage({ route }) {
       <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
 
       {/* 切换address */}
-      <Modal transparent={true} visible={isShowCopy}>
+     {walletMode != wallet_mode_cold && ( <Modal transparent={true} visible={isShowCopy}>
         <View
           style={{
             flex: 1,
@@ -677,7 +677,7 @@ export default function AssetsBtcDetailPage({ route }) {
             {/* over */}
           </View>
         </View>
-      </Modal>
+      </Modal>)}
 
       <View style={{ flex: 1 }}>
         {/* 头部 */}

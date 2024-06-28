@@ -15,7 +15,7 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "2",
+      "buildNumber": "6",
       "supportsTablet": true,
       "bundleIdentifier": "com.metalet.swallet",
       "permissions": ["CAMERA", "PHOTO_LIBRARY_ADD_ONLY"],
@@ -35,7 +35,7 @@
       },
       "package": "com.metalet.swallet",
       "icon": "./assets/logo_metalet.png",
-      "versionCode": 2,
+      "versionCode": 6,
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",

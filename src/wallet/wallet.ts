@@ -35,12 +35,13 @@ export async function getCurrentMvcWallet(): Promise<MvcWallet> {
   const seed = await getCurrentWalletSeed();
   const network = await getWalletNetwork();
 
+  
   const mvcWallet = new MvcWallet({
-    // network:"regtest",
     network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
-    addressType: wallet.addressType,
+    // addressType: wallet.addressType, 
+    addressType:AddressType.LegacyMvc,
     coinType: wallet.mvcTypes,
     seed: seed,
   });
@@ -79,7 +80,6 @@ export async function getBtcWallet(
     uAddressType === AddressType.SameAsMvc ? wallet.mvcTypes : CoinType.BTC;
 
   const btcWallet = new BtcWallet({
-    // network:"regtest",
     network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
