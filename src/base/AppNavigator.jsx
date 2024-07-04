@@ -72,6 +72,10 @@ import ScanPage from "@/page/settings/ScanPage";
 import Mrc20DetailPage from "@/page/home/Mrc20DetailPage";
 import SendMrc20Page from "@/page/home/SendMrc20Page";
 import SendSuccessNormalPage from "@/page/home/SendSuccessNormalPage";
+import MetaIDPinsPage from "@/page/nft/MetaIDPinsPage";
+import MetaIDPage from "@/page/nft/MetaIDPage";
+import MetaIDPinsDetails from "@/page/home/MetaIDPinsDetails";
+import PinNftTransferPage from "@/page/home/PinNftTransferPage";
 
 ////////
 
@@ -179,6 +183,10 @@ const StackNavigator = () => (
     <Stack.Screen name="Mrc20DetailPage" component={Mrc20DetailPage} />
     <Stack.Screen name="SendMrc20Page" component={SendMrc20Page} />
     <Stack.Screen name="SendSuccessNormalPage" component={SendSuccessNormalPage} />
+    <Stack.Screen name="MetaIDPinsPage" component={MetaIDPinsPage} />
+    <Stack.Screen name="MetaIDPage" component={MetaIDPage} />
+    <Stack.Screen name="MetaIDPinsDetails" component={MetaIDPinsDetails} />
+    <Stack.Screen name="PinNftTransferPage" component={PinNftTransferPage} />
   </Stack.Navigator>
 );
 

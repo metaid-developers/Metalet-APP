@@ -262,9 +262,10 @@ export default function Mrc20DetailPage({ route }) {
           />
         )} */}
 
-        <CircleAvatarLetter letterStr={mrc20Data.tokenName.substring(0, 1)}
-        widthC={70}
-        heightC={70}
+        <CircleAvatarLetter
+          letterStr={mrc20Data.tokenName.substring(0, 1)}
+          widthC={70}
+          heightC={70}
         />
         <Text
           style={{
@@ -373,6 +374,48 @@ export default function Mrc20DetailPage({ route }) {
             </View>
           </TouchableWithoutFeedback>
         </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            marginTop: 15,
+            alignItems: "center",
+
+            marginHorizontal: 20,
+          }}
+        >
+          <Text style={{ color: "#666", fontSize: 16 }}>Token ID</Text>
+          <View style={{ flex: 1 }} />
+        </View>
+     <TouchableWithoutFeedback onPress={()=>{
+      ShowNotice(mrc20Data.mrc20Id)
+     }}>
+     <View
+          style={{
+            flexDirection: "row",
+            marginTop: 5,
+            alignItems: "center",
+            marginHorizontal: 20,
+          }}
+        >
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="middle"
+            style={{
+              color: "#999",
+              fontSize: 14,
+              width: "40%",
+            }}
+          >
+            {mrc20Data.mrc20Id}
+          </Text>
+          <Image
+            source={require("../../../image/meta_copy_icon.png")}
+            style={{ width: 18, height: 18, }}
+          />
+          <View style={{ flex: 1 }} />
+        </View>
+     </TouchableWithoutFeedback>
       </View>
     );
   };

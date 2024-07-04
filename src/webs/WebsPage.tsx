@@ -19,6 +19,10 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+import { CircleAvatarLetter } from "@/constant/Widget";
+import { LinearGradient } from "expo-linear-gradient";
+import MaskedView from "@react-native-masked-view/masked-view";
+import { inputNormalBgColor, litterWhittleBgColor } from "@/constant/Constants";
 
 interface Message {
   host: string;
@@ -56,6 +60,7 @@ export default function WebsPage(props) {
       navigate("DiscoverPage");
     } else {
       setURI(props.route.params.url);
+      setIcon(props.route.params.icon);
     }
   }, []);
 
@@ -66,6 +71,8 @@ export default function WebsPage(props) {
   const handlerMessage = async (
     message: Message & { type: string; data: unknown }
   ) => {
+    // console.log("handlerMessage", message);
+
     if (message.type === "Console") {
       console.info(`[Console] ${JSON.stringify(message.data)}`);
       return;
@@ -83,8 +90,12 @@ export default function WebsPage(props) {
     setActionMsg(message);
 
     if (actionType === ActionType.Authorize) {
+      console.log("message", message);
+
       setModalVisible(true);
-      setIcon(message.icon);
+      if(message.icon){
+        setIcon(message.icon);
+      }
       setHost(message.host);
       const { title, descriptions, component, needEstimated } =
         actionDispatcher(actionName, actionType);
@@ -95,6 +106,7 @@ export default function WebsPage(props) {
     } else if (actionType === ActionType.Query) {
       const { process } = actionDispatcher(actionName, ActionType.Query);
       const data = await process(message.params, message.host);
+      console.log("data", data);
 
       postMessage(
         JSON.stringify({
@@ -136,7 +148,7 @@ export default function WebsPage(props) {
       // console.log("confirmAction params", componentInfo.params);
 
       const data = await process(componentInfo.params, actionMsg.host);
-      // console.log("confirmAction data", data);
+      console.log("confirmAction data", data);
 
       postMessage(
         JSON.stringify({
@@ -153,33 +165,72 @@ export default function WebsPage(props) {
   };
 
   return (
-    <SafeAreaView className="w-screen h-screen relative">
-      <View className="flex flex-row items-center px-2.5 gap-x-2 h-14 py-2">
-        <Text className="bg-[#E5EAEE] px-[18px] h-full leading-10 grow rounded-[60px]">
-          {uri}
-        </Text>
-        <TouchableOpacity
-          onPress={() => goBack()}
-          className="border border-[#E7E7E7] rounded-full w-10 h-10 flex items-center justify-center"
-        >
-          <CloseIcon className="text-black-primary w-2.5 h-2.5" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={{ flex: 1 }}>
       <Modal animationType="slide" visible={modalVisible}>
-        <View className="w-screen h-screen flex flex-col items-center px-4">
-          <Text className="text-blue-primary text-2xl tracking-wide py-6">
+        {/* <View className="w-screen h-screen flex flex-col items-center px-4"> */}
+      <SafeAreaView style={{ flex: 1 ,margin:Platform.OS === "ios"?30:0 ,}}>
+      <View
+          style={{
+            flex: 1,
+            margin: 20,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {/* <Text className="text-blue-primary text-2xl tracking-wide py-6">
             AUTHORIZE
-          </Text>
+          </Text> */}
+
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: 20,
+            }}
+          >
+            <MaskedView
+              style={{
+                flexDirection: "row",
+                height: 60,
+              }}
+              maskElement={
+                <Text
+                  style={{
+                    fontSize: 20,
+                    textAlign: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    fontWeight: "bold",
+                  }}
+                >
+                  AUTHORIZE
+                </Text>
+              }
+            >
+              <LinearGradient
+                colors={["#6CE5F7", "#1F2CFF"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ flex: 1 }}
+              />
+            </MaskedView>
+          </View>
           {/* FIXME: color unwork */}
           {/* <Text className="bg-gradient-to-r from-teal-primary to-blue-primary bg-clip-text text-transparent text-lg tracking-wide">
             AUTHORIZE
           </Text> */}
           {icon ? (
-            <Image source={{ uri: icon }} className="w-24 h-24 rounded-lg" />
+            // <Image source={{ uri: icon }} className="w-24 h-24 rounded-lg" />
+            <Image source={{ uri: icon }} style={{ width: 80, height: 80 ,borderRadius:10}} />
           ) : (
-            <Text className="w-24 h-24 rounded-full bg-blue-primary flex items-center justify-center">
-              {host[0] || ""}
-            </Text>
+            <CircleAvatarLetter
+              widthC={70}
+              heightC={70}
+              letterStr={host[0] || ""}
+            />
+            // <Text className="w-24 h-24 rounded-full bg-blue-primary flex items-center justify-center">
+            //   {host[0] || ""}
+            // </Text>
           )}
 
           <Text className="text-sm text-gray-500 py-6">
@@ -231,7 +282,40 @@ export default function WebsPage(props) {
             </Pressable>
           </View>
         </View>
+      </SafeAreaView>
       </Modal>
+
+      {/* className="flex flex-row items-center px-2.5 gap-x-2 h-14 py-2" */}
+      <View
+        style={{
+          flexDirection: "row",
+          padding: 10,
+          alignItems: "center",
+          backgroundColor: "#fff",
+        }}
+      >
+        {/* className="bg-[#E5EAEE] px-[18px] h-full leading-10 grow rounded-[60px]" */}
+        {/* <Text  style={{backgroundColor:'#E5EAEE',flex:1,padding:10,borderRadius:10, overflow: 'hidden',}}> */}
+        <Text
+          style={{
+            backgroundColor: litterWhittleBgColor,
+            flex: 1,
+            padding: 10,
+            borderRadius: 10,
+            overflow: "hidden",
+          }}
+        >
+          {uri}
+        </Text>
+        <TouchableOpacity
+          onPress={() => goBack()}
+          className="border border-[#E7E7E7] rounded-full w-10 h-10 flex items-center justify-center"
+          style={{ marginLeft: 10 }}
+        >
+          <CloseIcon className="text-black-primary w-2.5 h-2.5" />
+        </TouchableOpacity>
+      </View>
+
       {Platform.OS === "web" ? (
         <View className="w-full h-full flex flex-col items-center justify-center">
           <Text className="mb-4">GetWebView does not support on web</Text>

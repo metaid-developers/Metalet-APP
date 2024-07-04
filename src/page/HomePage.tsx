@@ -67,6 +67,7 @@ import { fetchCheckUpgrade } from "@/api/metaletservice";
 import { UpdateData } from "@/api/type/Update";
 import Constants from "expo-constants";
 import Toast from "react-native-toast-message";
+import MetaIDPage from "./nft/MetaIDPage";
 
 const storage = createStorage();
 
@@ -132,7 +133,7 @@ export default function HomePage({ navigation }) {
   //         getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
   //           // updateBtcAddress(btcWallet.getAddress());
   //         console.log(btcWallet.getAddress());
-          
+
   //           // console.log("time1", performance.now() - t1);
   //           // console.log("btc address", btcWallet.getAddress());
   //         });
@@ -202,7 +203,7 @@ export default function HomePage({ navigation }) {
   useFocusEffect(
     React.useCallback(() => {
       console.log("Home page is focused");
-      
+
       // Add event listener for back button press
       const backHandler = BackHandler.addEventListener(
         "hardwareBackPress",
@@ -231,7 +232,8 @@ export default function HomePage({ navigation }) {
       const check: UpdateData = await fetchCheckUpgrade("android");
       //  console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;
-      setUpdateUrl(check.data.url);
+      // setUpdateUrl(check.data.url);
+      setUpdateUrl(check.data.apkUrl);
       if (codeVersion > versionCode) {
         setUpdate(true);
       }
@@ -247,7 +249,6 @@ export default function HomePage({ navigation }) {
   }
 
   const getShowBalance = async () => {
-    
     const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
     let nowMvcAddress;
     let nowBtcAddress;
@@ -257,15 +258,12 @@ export default function HomePage({ navigation }) {
       nowBtcAddress = swallet.coldAddress;
       nowMvcAddress = swallet.coldAddress;
       // console.log("nowBtcAddress", nowBtcAddress);
-      
     } else {
       const nowMvcWallet = await getCurrentMvcWallet();
       const nowBtcWallet = await getCurrentBtcWallet();
       nowMvcAddress = nowMvcWallet.getAddress();
       nowBtcAddress = nowBtcWallet.getAddress();
     }
-
-
 
     const showbalance: ShowBalance = await caculateMvcAndBtcAssert(
       nowMvcAddress,
@@ -283,10 +281,9 @@ export default function HomePage({ navigation }) {
   //初始化所有钱包
   async function initCurrentWallet() {
     console.log("initCurrentWallet");
-    
+
     const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
     if (mode && wallet_mode_cold === mode) {
-      
       const nowWallet = await getStorageCurrentWallet();
       const nowAccount = await getCurrentWalletAccount();
       updateWalletMode(wallet_mode_cold);
@@ -337,8 +334,8 @@ export default function HomePage({ navigation }) {
       const mvcWallet = await getCurrentMvcWallet();
       const currentBtcWallet = await getCurrentBtcWallet();
 
-      
       updateMvcAddress(mvcWallet.getAddress());
+      console.log('address:',currentBtcWallet.getAddress())
       updateBtcAddress(currentBtcWallet.getAddress());
 
       metaletWallet.currentBtcWallet = currentBtcWallet;
@@ -348,7 +345,6 @@ export default function HomePage({ navigation }) {
       metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
       metaletWallet.btcTaprootWallet = btcTaprootWallet;
       metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
-
 
       //webs
       const btcWalletWebs = metaletWallet.currentBtcWallet;
@@ -1089,7 +1085,13 @@ export default function HomePage({ navigation }) {
                 //   visibilityTime: 2000,
                 // });
 
-                navigate("SendSelectAssertPage");
+                if (netWork == network_mvc) {
+                  navigate("SendSpacePage");
+                } else if (netWork == network_btc) {
+                  navigate("SendBtcPage");
+                } else if (netWork == network_all) {
+                  navigate("SendSelectAssertPage");
+                }
               }}
             >
               <View style={{ marginTop: 20, alignItems: "center" }}>
@@ -1146,7 +1148,7 @@ export default function HomePage({ navigation }) {
               onPress={async () => {
                 // updateAccountIndex(1);
                 // AsyncStorageUtil.setItem("account_select", 0);
-                const isCold= await isColdWalletMode();
+                const isCold = await isColdWalletMode();
                 if (isCold) {
                 } else {
                   navigate("WebsPage", {
@@ -1154,7 +1156,6 @@ export default function HomePage({ navigation }) {
                   });
                 }
 
-              
                 // navigate("DiscoverPage");
                 // navigate("WebPageTest");
               }}
@@ -1172,7 +1173,7 @@ export default function HomePage({ navigation }) {
             <TouchableWithoutFeedback
               onPress={async () => {
                 // navigate("DiscoverPage");
-                const isCold= await isColdWalletMode();
+                const isCold = await isColdWalletMode();
                 if (isCold) {
                 } else {
                   navigate("WebsPage", {
@@ -1271,6 +1272,12 @@ function MyTabs01() {
         options={{ title: "NFTs" }}
         component={NftParentPage}
       />
+
+      <TabsTop.Screen
+        name="MetaID1"
+        options={{ title: "PIN" }}
+        component={MetaIDPage}
+      />
     </TabsTop.Navigator>
   );
 }
@@ -1298,6 +1305,11 @@ function MyTabs02() {
         options={{ title: "NFTs" }}
         component={NftBtcPage}
       />
+      <TabsTop.Screen
+        name="MetaID2"
+        options={{ title: "PIN" }}
+        component={MetaIDPage}
+      />
     </TabsTop.Navigator>
   );
 }
@@ -1324,6 +1336,11 @@ function MyTabs03() {
         name="NFT3"
         options={{ title: "NFTs" }}
         component={NftMvcPage}
+      />
+      <TabsTop.Screen
+        name="MetaID3"
+        options={{ title: "PIN" }}
+        component={MetaIDPage}
       />
     </TabsTop.Navigator>
   );

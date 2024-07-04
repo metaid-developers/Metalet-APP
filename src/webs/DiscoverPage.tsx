@@ -15,7 +15,7 @@ export default function DiscoverPage() {
     enabled: !!network,
   });
 
-  console.log("discoverData", discoverData);
+  // console.log("discoverData", discoverData);
   
 
   return (
@@ -143,6 +143,7 @@ export default function DiscoverPage() {
                   onPress={() => {
                     navigate("WebsPage", {
                       url: top.url,
+                      icon: `${METALET_WALLET_PREFIX}${top.icon}`,
                     });
                   }}
                 >

@@ -24,7 +24,7 @@ import { broadcastBtc, fetchBtcFeed } from "@/api/metaletservice";
 import { navigate } from "@/base/NavigationService";
 
 export default function BtcNftTransferPage({ route }) {
-  const { nftDetail } = route.params;
+  const {type, nftDetail } = route.params;
 
   const [inputAddress, setInputAddress] = useState("");
 

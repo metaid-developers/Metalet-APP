@@ -19,6 +19,9 @@ import * as ConnectBTC from "./lib/authorize/btc/connect";
 import * as BTCTransfer from "./lib/authorize/btc/transfer";
 import * as SignBTCPsbt from "./lib/authorize/btc/sign-psbt";
 import * as SignBTCMessage from "./lib/authorize/btc/sign-message";
+import * as MRC20Deploy from "./lib/authorize/btc/mrc20-deploy";
+import * as MRC20Mint from "./lib/authorize/btc/mrc20-mint";
+import * as MRC20Transfer from "./lib/authorize/btc/mrc20-transfer";
 
 function doNothing() {}
 
@@ -184,5 +187,35 @@ export default {
     nextComponent: lazy(
       () => import("../components/InscribeMetaPin/Estimator")
     ),
+  },
+  MRC20Deploy: {
+    name: "MRC20Deploy",
+    title: "MRC20 Deploy",
+    descriptions: [],
+    estimate: doNothing,
+    process: MRC20Deploy.process,
+    needEstimated: false,
+    component: lazy(() => import("../components/ComponentA")),
+    // nextComponent: lazy(
+    //   () => import("../components/InscribeMetaPin/Estimator")
+    // ),
+  },
+  MRC20Transfer: {
+    name: "MRC20Transfer",
+    title: "MRC20 Transfer",
+    descriptions: [],
+    estimate: doNothing,
+    process: MRC20Transfer.process,
+    needEstimated: false,
+    component: lazy(() => import("../components/ComponentA")),
+  },
+  MRC20Mint: {
+    name: "MRC20Mint",
+    title: "MRC20 Mint",
+    descriptions: [],
+    estimate: doNothing,
+    process: MRC20Mint.process,
+    needEstimated: false,
+    component: lazy(() => import("../components/ComponentA")),
   },
 } as { [key: string]: AuthorizeAction };

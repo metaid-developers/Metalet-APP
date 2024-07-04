@@ -13,6 +13,7 @@ export interface Update {
   version_code: number;
   mandatory_code: number;
   contents: Contents;
+  apkUrl:string;
 }
 
 interface Contents {

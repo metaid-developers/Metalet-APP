@@ -191,6 +191,7 @@ export default function SendMrc20Page({ route }) {
       const { commitTx, revealTx } = btcWallet.signTx(SignType.MRC20_TRANSFER, {
         utxos,
         flag: network === "mainnet" ? "metaid" : "testid",
+        amount:inputAmount,
         // metaIdPinUtxos,
         commitFeeRate: parseInt(feed),
         revealFeeRate: parseInt(feed),

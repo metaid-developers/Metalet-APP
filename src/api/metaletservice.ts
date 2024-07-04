@@ -22,6 +22,7 @@ import { getWalletNetwork } from "@/utils/WalletUtils";
 import { UpdateData } from "./type/Update";
 import { IcoinsData } from "./type/IcoinsData";
 import { RootMrc20Data } from "@/bean/BtcFtBean";
+import { MetaIDPinsData } from "./type/MetaIDPinsData";
 
 export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
@@ -298,6 +299,17 @@ export async function fetchMrc20List(net:string,address:string): Promise<RootMrc
     BASE_METALET_URL + "/wallet-api/v3/mrc20/address/balance-list",
     false,
     {net,address}
+  );
+  return data;
+}
+
+
+// 22. pins
+export async function fetchMetaIDPinsList(net:string,address:string): Promise<MetaIDPinsData> {
+  const data: MetaIDPinsData = await get(
+    BASE_METALET_URL + "/wallet-api/v3/address/pins",
+    false,
+    {net,address,cursor:0,size:1000}
   );
   return data;
 }

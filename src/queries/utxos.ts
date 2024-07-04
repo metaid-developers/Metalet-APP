@@ -46,6 +46,37 @@ interface MRC20Info {
   tokenName: string
 }
 
+export interface MetaIDPin {
+  id: string
+  pop: string
+  popLv: number
+  number: number
+  rootTxId: string
+  address: string
+  output: string
+  outputValue: number
+  timestamp: number
+  genesisFee: number
+  genesisHeight: number
+  genesisTransaction: string
+  txInIndex: number
+  txInOffset: number
+  operation: string
+  path: string
+  parentPath: string
+  encryption: string
+  version: string
+  preview: string
+  content: string
+  contentType: string
+  contentBody: string
+  contentLength: number
+  contentSummary: string
+  contentTypeDetect: string
+  status: number
+  rawTx?: string
+}
+
 
 
 // TODO: fix network switch
@@ -152,35 +183,20 @@ export async function getBtcUtxos(
   });
 }
 
+export async function getMetaPin(pinId: string, needRawTx: boolean = false): Promise<MetaIDPin> {
+  // const net = getNet()
+  const net = await getWalletNetwork(Chain.BTC);
 
-// export async function getMRC20Utxos(address: string, mrc20TickId: string, needRawTx = false): Promise<MRC20UTXO[]> {
-//   // const net = getNet()
-//   const network = await getWalletNetwork(Chain.BTC);
-
-//   console.log("getMRC20Utxos", network, address, mrc20TickId, needRawTx);
-  
-//   const { list: utxos } = await metaletApiV3<{
-//     total: number
-//     list: MRC20UTXO[]
-//   }>(`/mrc20/address/utxo`).get({
-//     network,
-//     address,
-//     tickId: mrc20TickId,
-//   })
-//   console.log("mrc20Utxos list", utxos);
-
-//   if (needRawTx) {
-//     for (let utxo of utxos) {
-//       utxo.rawTx = await fetchBtcTxHex(utxo.txId)
-//     }
-//   }
-//   return utxos.sort((a, b) => {
-//     if (a.confirmed !== b.confirmed) {
-//       return b.confirmed ? 1 : -1
-//     }
-//     return a.satoshis - b.satoshis
-//   })
-// }
+  const metaIdPin = await metaletApiV3<MetaIDPin>('/pin/utxo').get({
+    net,
+    pinId,
+  })
+  if (needRawTx) {
+    const txId = metaIdPin.output.split(':')[0]
+    metaIdPin.rawTx = await fetchBtcTxHex(txId)
+  }
+  return metaIdPin
+}
 
 
 export async function getMRC20Utxos(address: string, tickId: string, needRawTx = false) {

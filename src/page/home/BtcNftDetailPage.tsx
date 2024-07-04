@@ -92,7 +92,7 @@ export default function BtcNftDetailPage({ route }) {
 
             <View style={{ alignItems: "center", marginTop: 20 }}>
              <TouchableWithoutFeedback onPress={()=>{
-                navigate("BtcNftTransferPage",{nftDetail:nftDetail})
+                navigate("BtcNftTransferPage",{type:"brc20",nftDetail:nftDetail})
              }}>
              <View
                 style={{

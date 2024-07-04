@@ -79,7 +79,7 @@ export default function WelcomeWalletPage(props) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container,{backgroundColor:"#fff"}]}>
       <LoadingModal
         isShow={isShowLoading}
         isCancel={true}
@@ -146,8 +146,11 @@ export default function WelcomeWalletPage(props) {
 
 const styles = StyleSheet.create({
   container: {
-    margin: 20,
-    marginTop: 50,
+    // margin: 20,
+    // marginTop: 50,
+    paddingTop:50,
+    paddingHorizontal:20,
+    paddingBottom:20,
     alignItems: "center",
     flexDirection: "column",
     flex: 1,

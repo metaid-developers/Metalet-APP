@@ -741,10 +741,10 @@ export default function SendBtcPage() {
             style={{
               justifyContent: "center",
               // backgroundColor: "#fff",
-              margin: 20,
+              // margin: 20,
               // borderRadius: 10,
               alignItems: "center",
-              padding: 20,
+              padding: 25,
             }}
           >
             <Image

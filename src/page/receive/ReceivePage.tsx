@@ -90,8 +90,11 @@ export default function ReceivePage({ route }) {
 
             <TouchableWithoutFeedback
               onPress={() => {
+                
                 // ShowNotice(metaletWallet.currentBtcWallet.getAddress());
                 ShowNotice(btcAddress);
+                // updateBtcAddress(btcAddress);
+
                 // Clipboard.setString(
                 //   metaletWallet.currentBtcWallet.getAddress()
                 // );
@@ -112,7 +115,7 @@ export default function ReceivePage({ route }) {
               >
                 <Text numberOfLines={1} ellipsizeMode="middle" style={{}}>
                   {/* {metaletWallet.currentBtcWallet.getAddress()} */}
-                  {mvcAddress}
+                  {btcAddress}
                 </Text>
 
                 <View style={{ flex: 1 }} />

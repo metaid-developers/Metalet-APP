@@ -1784,10 +1784,10 @@
   resolved "https://registry.yarnpkg.com/@magiceden-oss/runestone-lib/-/runestone-lib-1.0.2.tgz#524394b49119d1acace0edc351f9cd5d7ed1ad73"
   integrity sha512-C4XoE7tHxxaWQNzovBIEndXGrTesotshnKQA8DXlnoVDvriD6G26ezUoj9AlEb2UAPbEijSga4Dtwd86Z0a1jg==
 
-"@metalet/utxo-wallet-sdk@0.5.3":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.5.3.tgz#31df1d513aaf6ce73e3b419c832045be08f2c2b2"
-  integrity sha512-YSx4gtr0QyeRwOkmheGJfLmKBmrHuMjWrDurWNlzVsK1h7jss7yh6MjzrN/iHK/7cpW9xEset8zKCa8LzdcLFA==
+"@metalet/utxo-wallet-sdk@0.5.5":
+  version "0.5.5"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.5.5.tgz#412dde5f4b34e1859a8e722151dffbfcd372eed7"
+  integrity sha512-eBqzLOW0HK2U3tYFMBZzPVBewnYULkNB5kbS/68/DpYxwdq4B4sZqRtkSb7TKOTtlB9/y+42a4heuFQNvx71Ag==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.1.1"
     "@magiceden-oss/runestone-lib" "^1.0.2"
@@ -1800,12 +1800,12 @@
     ecpair "^2.1.0"
     undici "^6.19.2"
 
-"@metalet/utxo-wallet-service@^0.3.8":
-  version "0.3.8"
-  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.8.tgz#04465808e901e5e66d0b4743c3f53ed0197d864b"
-  integrity sha512-4m15OqJXuQ4dDAVaJwUH7EVUEU1aE/niH54UurEYFBZoxnna3SaWsAt7y/D8Ve5neWK8aYa+xx4ehP1xExBhqg==
+"@metalet/utxo-wallet-service@^0.3.11":
+  version "0.3.11"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.11.tgz#2647ac0bd605a1017934e6fc6a582a12836af536"
+  integrity sha512-vEXyh6Uk9lJyhNx8V9ygs1cauliqeyVqDfUOPKyo5QpOkTTo5ag1h9vEeLn9NCWlSXq9SnfNxBRqjsceJTGduQ==
   dependencies:
-    "@metalet/utxo-wallet-sdk" "0.5.3"
+    "@metalet/utxo-wallet-sdk" "0.5.5"
     crypto-js "^4.2.0"
     decimal.js "^10.4.3"
 
@@ -2118,6 +2118,11 @@
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@react-native-community/hooks/-/hooks-3.0.0.tgz#af5f2ca32eea59b792ce9e3d9a4cf0354f9b195f"
   integrity sha512-g2OyxXHfwIytXUJitBR6Z/ISoOfp0WKx5FOv+NqJ/CrWjRDcTw6zXE5I1C9axfuh30kJqzWchVfCDrkzZYTxqg==
+
+"@react-native-masked-view/masked-view@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@react-native-masked-view/masked-view/-/masked-view-0.3.0.tgz#bd29fae18d148a685331910a3c7b766ce87eafcc"
+  integrity sha512-qLyoObcjzrkpNcoJjXquUePXfL1dXjHtuv+yX0zZ0Q4kG5yvVqd620+tSh7WbRoHkjpXhFBfLwvGhcWB2I0Lpw==
 
 "@react-native/assets-registry@0.73.1", "@react-native/assets-registry@~0.73.1":
   version "0.73.1"
@@ -2891,9 +2896,9 @@
     undici-types "~5.26.4"
 
 "@types/node@>=13.7.0":
-  version "20.14.8"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.8.tgz#45c26a2a5de26c3534a9504530ddb3b27ce031ac"
-  integrity sha512-DO+2/jZinXfROG7j7WKFn/3C6nFwxy2lLpgLjEXJz+0XKphZlTLJ14mo8Vfg8X5BWN6XjyESXq+LcYdT7tR3bA==
+  version "20.14.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.9.tgz#12e8e765ab27f8c421a1820c99f5f313a933b420"
+  integrity sha512-06OCtnTXtWOZBJlRApleWndH4JsRVs1pDCc8dLSQp+7PpUpX3ePdHyeNSFTeSe7FtKyQkrlPvHwJOW3SLd8Oyg==
   dependencies:
     undici-types "~5.26.4"
 

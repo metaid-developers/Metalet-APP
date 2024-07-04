@@ -101,6 +101,9 @@ const btcKeys = {
     { name: "signMessage", action: "SignBTCMessage" },
     { name: "inscribe", action: "Inscribe" },
     { name: "transfer", action: "BTCTransfer" },
+    { name: 'deployMRC20', action: 'MRC20Deploy' },
+    { name: 'mintMRC20', action: 'MRC20Mint' },
+    { name: 'transferMRC20', action: 'MRC20Transfer' },
   ],
   inscribe: [{ name: "inscribeTransfer", action: "InscribeTransfer" }],
 };
