@@ -25,3 +25,11 @@ export default function App() {
     </UserProvider>
   );
 }
+
+
+// "keystore":{
+//   "keystorePath":"/Users/simkeep/RN/Metalet/metalet.jks",
+//   "keystorePassword": "123456",
+//   "keyAlias": "key0",
+//   "keyPassword": "123456"
+// }

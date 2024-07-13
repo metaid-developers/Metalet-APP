@@ -46,7 +46,7 @@ import {
 import { getBtcUtxos, getMRC20Utxos } from "../../queries/utxos";
 import { broadcastBTCTx } from "../../queries/transaction";
 import { navigate } from "../../base/NavigationService";
-import { getCurrentBtcWallet } from "../../wallet/wallet";
+import { addMetaletSafeUtxo, getCurrentBtcWallet } from "../../wallet/wallet";
 import {
   getRandomID,
   getWalletNetwork,
@@ -280,6 +280,7 @@ export default function SendMrc20Page({ route }) {
           address: inputAddress,
         },
       });
+      addMetaletSafeUtxo(rawTx,data);
     }
     // setTimeout(() => {
     //   setIsShowLoading(false);

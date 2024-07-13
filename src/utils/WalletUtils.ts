@@ -1,4 +1,4 @@
-import { AddressType, Chain, CoinType } from "@metalet/utxo-wallet-service";
+import { AddressType, BtcWallet, Chain, CoinType } from "@metalet/utxo-wallet-service";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { useData } from "../hooks/MyProvider";
 import {
@@ -231,3 +231,4 @@ export async function openBrowser(link: string) {
     }
   }
 }
+

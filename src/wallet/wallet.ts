@@ -1,4 +1,4 @@
-import { AddressType, CoinType } from "@metalet/utxo-wallet-service";
+import { AddressType, CoinType, Transaction, getAddressFromScript } from "@metalet/utxo-wallet-service";
 import { WalletBean } from "../bean/WalletBean";
 import {
   wallet_password_key,
@@ -18,6 +18,7 @@ import * as bip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
 import { getRandomColorList } from "../utils/MetaFunUiils";
 import { getBtcUtxos } from "@/queries/utxos";
+import { addSafeUtxo } from "@/lib/utxo";
 
 // READY
 export const btc_network = "mainnet";
@@ -34,7 +35,6 @@ export async function getCurrentMvcWallet(): Promise<MvcWallet> {
   const wallet = await getStorageCurrentWallet();
   const seed = await getCurrentWalletSeed();
   const network = await getWalletNetwork();
-
   
   const mvcWallet = new MvcWallet({
     network: network === "mainnet" ? "mainnet" : "testnet",
@@ -214,3 +214,15 @@ export async function sendBtcTransaction(
 
   return result;
 }
+
+
+//function
+// add safe utxo 
+export async function addMetaletSafeUtxo(rawTx: string,txID:string) {
+  const wallet:BtcWallet = await getCurrentBtcWallet();
+  const tx = Transaction.fromHex(rawTx)
+  if (tx.outs.length > 1 && getAddressFromScript(tx.outs[tx.outs.length - 1].script,wallet.getNetwork()) === wallet.getAddress()) {
+   console.log("change utxo", `${txID}:${tx.outs.length - 1}`,'btcAddress'+wallet.getAddress());
+    await addSafeUtxo(wallet.getAddress(), `${txID}:${tx.outs.length - 1}`)
+  }
+ }

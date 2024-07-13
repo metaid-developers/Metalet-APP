@@ -17,11 +17,13 @@ import {
 import { FeedBean, FeedBtcObject } from "@/types/btcfeed";
 import { inputNormalBgColor, themeColor } from "@/constant/Constants";
 import { useData } from "@/hooks/MyProvider";
-import { ScriptType } from "@metalet/utxo-wallet-service";
+import { ScriptType, Transaction, getAddressFromScript } from "@metalet/utxo-wallet-service";
 import { getBtcUtxos, getInscriptionUtxo } from "@/queries/utxos";
-import { getRandomID, goToWebScan, parseToSpace } from "@/utils/WalletUtils";
+import {  getRandomID, goToWebScan, parseToSpace } from "@/utils/WalletUtils";
 import { broadcastBtc, fetchBtcFeed } from "@/api/metaletservice";
 import { navigate } from "@/base/NavigationService";
+import { addSafeUtxo } from "@/lib/utxo";
+import { addMetaletSafeUtxo } from "@/wallet/wallet";
 
 export default function BtcNftTransferPage({ route }) {
   const {type, nftDetail } = route.params;
@@ -107,7 +109,6 @@ export default function BtcNftTransferPage({ route }) {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {/* feed */}
       <Modal transparent={true} visible={isShowFeed}>
         <View
           style={{
@@ -530,6 +531,7 @@ export default function BtcNftTransferPage({ route }) {
             updateNeedRefreshHome(getRandomID());
             setTransactionID(data);
             setTransferSuccedDailogState(true);
+            addMetaletSafeUtxo(rawTx,data);
           }
         }}
       />

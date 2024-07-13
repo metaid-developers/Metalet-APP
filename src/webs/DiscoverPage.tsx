@@ -81,9 +81,9 @@ export default function DiscoverPage() {
                     </View>
                   ))
                 : discoverData.recommend.map((recommend) => (
+                  // className="w-40"
                     <TouchableOpacity
-                      className="w-40"
-                      style={{marginLeft:recommend.name=="Orders.Exchange"? 0:20}}
+                      style={{marginLeft:recommend.name=="Orders.Exchange"? 0:20,}}
                       key={recommend.url}
                       onPress={() => {
                         console.log('url',recommend.url);
@@ -93,13 +93,13 @@ export default function DiscoverPage() {
                         });
                       }}
                     >
+                        {/* className="w-full aspect-square rounded-2xl" */}
                       <Image
-                        className="w-full aspect-square rounded-2xl"
-                        // style={{
-                        //   width: 40,
-                        //   height: 40,
-                        //   borderRadius: 20,
-                        // }}
+                        style={{
+                          width: width/2-30,
+                          height: width/2-30,
+                          borderRadius: 20,
+                        }}
                         source={{
                           uri: `${METALET_WALLET_PREFIX}${recommend.recover}`,
                         }}

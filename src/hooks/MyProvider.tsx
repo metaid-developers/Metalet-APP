@@ -24,15 +24,19 @@ type GlobalContext = {
   currentSumBalance: string;
   updateCurrentSumBalance;
   netWork: string;
-  updateNetWork,
-  btcAddress:string,
-  updateBtcAddress,
-  needRefreshHome:string,
-  updateNeedRefreshHome,
-  needInitWallet:string,
-  updateNeedInitWallet,
-  walletMode,
-  updateWalletMode
+  updateNetWork;
+  btcAddress: string;
+  updateBtcAddress;
+  needRefreshHome: string;
+  updateNeedRefreshHome;
+  needInitWallet: string;
+  updateNeedInitWallet;
+  walletMode;
+  updateWalletMode;
+  spaceBalance;
+  updateSpaceBalance;
+  btcBalance;
+  updateSetBtcBalance;
 };
 
 const UserContext = createContext<GlobalContext>(undefined);
@@ -86,19 +90,20 @@ export const UserProvider = ({ children }) => {
     setBtcAddress(newData);
   };
 
-  const [needRefreshHome, setNeedRefreshHome]=useState("")
+  const [needRefreshHome, setNeedRefreshHome] = useState("");
   const updateNeedRefreshHome = (newData) => {
     setNeedRefreshHome(newData);
   };
 
-  const [needInitWallet, setNeedInitWallet]=useState("")
+  const [needInitWallet, setNeedInitWallet] = useState("");
   const updateNeedInitWallet = (newData) => {
     setNeedInitWallet(newData);
   };
 
-
   //4.当前的钱包管理类
-  const [metaletWallet, setMetaletWallet] = useState<MetaletWallet>(new MetaletWallet());
+  const [metaletWallet, setMetaletWallet] = useState<MetaletWallet>(
+    new MetaletWallet()
+  );
   const updateMetaletWallet = (newData) => {
     setMetaletWallet(newData);
   };
@@ -116,11 +121,20 @@ export const UserProvider = ({ children }) => {
   };
 
   //6
-  const [walletMode,setWalletMode] = useState("");
+  const [walletMode, setWalletMode] = useState("");
   const updateWalletMode = (newData) => {
     setWalletMode(newData);
   };
 
+  const [spaceBalance, setSpaceBalance] = useState("");
+  const updateSpaceBalance = (newData) => {
+    setSpaceBalance(newData);
+  };
+
+  const [btcBalance, setBtcBalance] = useState("");
+  const updateSetBtcBalance = (newData) => {
+    setBtcBalance(newData);
+  };
 
   // 将需要共享的数据和更新方法放在上下文的 value 中
   const contextValue = {
@@ -149,7 +163,11 @@ export const UserProvider = ({ children }) => {
     needInitWallet,
     updateNeedInitWallet,
     walletMode,
-    updateWalletMode
+    updateWalletMode,
+    spaceBalance,
+    updateSpaceBalance,
+    btcBalance,
+    updateSetBtcBalance,
   };
 
   return (

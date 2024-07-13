@@ -74,6 +74,7 @@ const actions = {
   verifySignature: { action: "VerifySignature", type: "query" },
   previewTransaction: { action: "PreviewTransaction", type: "query" },
   transfer: { action: "Transfer", type: "authorize" },
+  signMessage: { action: "SignMessage", type: "authorize" },
 };
 
 const metalet = { btc: {}, token: {} };
@@ -94,6 +95,7 @@ const btcKeys = {
     { name: "getUtxos", action: "GetBTCUtxos" },
     { name: "pushPsbt", action: "PushPsbt" },
     { name: "verifyMessage", action: "BTCVerifyMessage" },
+    { name: 'addSafeUtxo', action: 'AddSafeUtxo' },
   ],
   authorize: [
     { name: "connect", action: "ConnectBTC" },

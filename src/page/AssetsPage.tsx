@@ -19,12 +19,15 @@ import {
 } from "../utils/AsyncStorageUtil";
 import { useData } from "../hooks/MyProvider";
 import { navigate } from "../base/NavigationService";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function AssetsPage() {
   const { myWallet, updateMyWallet } = useData();
   const { accountIndex, updateAccountIndex } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
   const { netWork, updateNetWork } = useData();
+  const { spaceBalance, updateSpaceBalance } = useData();
+  const { btcBalance, updateSetBtcBalance } = useData();
 
   const [hasData, setHasData] = useState(false);
   const [myfile, setFolders] = useState<string[]>([]);
@@ -36,6 +39,13 @@ export default function AssetsPage() {
       console.log("Toast dismissed")
     );
   }, [toastRef]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+     console.log("AssetsPage page is focused");
+     
+    }, [])
+  );
 
   async function getMVCBalance() {
     // try {
@@ -64,6 +74,7 @@ export default function AssetsPage() {
     showToast();
     getMVCBalance();
   }, []);
+
 
   // AsyncStorageUtil.setItem("test", "test1111");
   // AsyncStorageUtil.getItem("test").then((res) => {
@@ -101,7 +112,7 @@ export default function AssetsPage() {
 
             <View>
               <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
-                {metaletWallet.currentBtcBalance} BTC{" "}
+                {btcBalance} BTC{" "}
               </Text>
               <Text
                 style={{
@@ -111,7 +122,7 @@ export default function AssetsPage() {
                   textAlign: "right",
                 }}
               >
-                ${metaletWallet.currentBtcBalance}
+                ${metaletWallet.currentBtcAssert}
               </Text>
             </View>
           </View>
@@ -147,7 +158,8 @@ export default function AssetsPage() {
 
             <View>
               <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
-                {metaletWallet.currentMvcBalance} SPACE{" "}
+                {/* {metaletWallet.currentMvcBalance} SPACE{" "} */}
+                {spaceBalance} SPACE{" "}
               </Text>
               <Text
                 style={{
@@ -194,7 +206,8 @@ export default function AssetsPage() {
 
             <View>
               <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
-                {metaletWallet.currentBtcBalance!} BTC{" "}
+                {/* {metaletWallet.currentBtcBalance!} BTC{" "} */}
+                {btcBalance!} BTC{" "}
               </Text>
               <Text
                 style={{
@@ -240,7 +253,7 @@ export default function AssetsPage() {
 
             <View>
               <Text style={{ color: "#333", fontSize: 16, textAlign: "right" }}>
-                {metaletWallet.currentMvcBalance } SPACE{" "}
+                {spaceBalance! } SPACE{" "}
               </Text>
               <Text
                 style={{

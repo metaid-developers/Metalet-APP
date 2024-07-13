@@ -79,6 +79,8 @@ export default function HomePage({ navigation }) {
   const { setCurrentWallet } = useWalletStore();
   const { myWallet, updateMyWallet } = useData();
   const { walletMode, updateWalletMode } = useData();
+  const { spaceBalance, updateSpaceBalance } = useData();
+  const { btcBalance, updateSetBtcBalance } = useData();
   // const [sumBalance, setSumBalance] = useState<string>("0.0");
   const { currentSumBalance, updateCurrentSumBalance } = useData();
 
@@ -132,14 +134,18 @@ export default function HomePage({ navigation }) {
   //         // const t1 = performance.now();
   //         getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
   //           // updateBtcAddress(btcWallet.getAddress());
-  //         console.log(btcWallet.getAddress());
+  //           console.log(btcWallet.getAddress());
 
   //           // console.log("time1", performance.now() - t1);
   //           // console.log("btc address", btcWallet.getAddress());
   //         });
   //         getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
-  //           console.log(mvcWallet.getAddress());
-
+  //           // console.log("mvc walletManager ",mvcWallet.getAddress());
+  //           // console.log("mvc walletManager ",mvcWallet.getAddressIndex());
+  //           // console.log("mvc walletManager ",mvcWallet.getAddressType());
+  //           // console.log("mvc walletManager ",mvcWallet.getScriptType());
+  //           // console.log("mvc walletManager ",mvcWallet.getPath());
+  //           // console.log("mvc walletManager ",mvcWallet.getSeed().toString('hex'));
   //           // updateMvcAddress(mvcWallet.getAddress());
   //           // console.log("time2", performance.now() - t1);
   //           // console.log("mvc address", mvcWallet.getAddress());
@@ -232,8 +238,8 @@ export default function HomePage({ navigation }) {
       const check: UpdateData = await fetchCheckUpgrade("android");
       //  console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;
-      // setUpdateUrl(check.data.url);
-      setUpdateUrl(check.data.apkUrl);
+      setUpdateUrl(check.data.url);
+      // setUpdateUrl(check.data.apkUrl);
       if (codeVersion > versionCode) {
         setUpdate(true);
       }
@@ -274,6 +280,10 @@ export default function HomePage({ navigation }) {
     metaletWallet.currentSumAssert = showbalance.sumAssert;
     metaletWallet.currentBtcAssert = showbalance.btcAssert;
     metaletWallet.currentSpaceAssert = showbalance.spaceAssert;
+
+    console.log("metaletWallet 余额刷新 ",  metaletWallet.currentMvcBalance);
+    updateSpaceBalance(showbalance.spaceBalance);
+    updateSetBtcBalance(showbalance.btcBalance);
 
     updateCurrentSumBalance(showbalance.sumAssert);
     updateMetaletWallet(metaletWallet);
@@ -335,7 +345,7 @@ export default function HomePage({ navigation }) {
       const currentBtcWallet = await getCurrentBtcWallet();
 
       updateMvcAddress(mvcWallet.getAddress());
-      console.log('address:',currentBtcWallet.getAddress())
+      // console.log('address mvc : ',mvcWallet.getAddress())
       updateBtcAddress(currentBtcWallet.getAddress());
 
       metaletWallet.currentBtcWallet = currentBtcWallet;
@@ -1177,7 +1187,8 @@ export default function HomePage({ navigation }) {
                 if (isCold) {
                 } else {
                   navigate("WebsPage", {
-                    url: "https://octopus.space/",
+                    // url: "https://octopus.space/",
+                    url: "https://octopus.space/#/wrapping",
                   });
                 }
                 // navigate("WebPageTest");

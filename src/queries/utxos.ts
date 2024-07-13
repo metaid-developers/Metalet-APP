@@ -3,6 +3,7 @@ import { fetchBtcTxHex } from "./transaction";
 import { Chain } from "@metalet/utxo-wallet-service";
 import { getWalletNetwork } from "@/utils/WalletUtils";
 import { mvcApi, mempoolApi, metaletApiV3 } from "./request";
+import { getSafeUtxos } from "@/lib/utxo";
 
 export interface UTXO {
   txId: string;
@@ -142,7 +143,6 @@ export interface UnisatUTXO {
 export async function getBtcUtxos(
   address: string,
   needRawTx = false,
-  // useUnconfirmed = false
   useUnconfirmed = true
 ): Promise<UTXO[]> {
   // const net = getNet();
@@ -167,9 +167,11 @@ export async function getBtcUtxos(
       unconfirmed: "1",
     })) || [];
 
-  if (!useUnconfirmed) {
-    utxos = utxos.filter((utxo) => utxo.confirmed);
-  }
+    if (!useUnconfirmed) {
+      utxos = utxos.filter((utxo) => utxo.confirmed)
+    } else {
+      utxos = await getSafeUtxos(address, utxos)
+    }
   if (needRawTx) {
     for (let utxo of utxos) {
       utxo.rawTx = await fetchBtcTxHex(utxo.txId);

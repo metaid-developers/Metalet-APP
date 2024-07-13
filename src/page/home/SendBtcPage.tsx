@@ -40,8 +40,8 @@ import { AddressType, ScriptType } from "@metalet/utxo-wallet-service";
 import { getBtcUtxos } from "../../queries/utxos";
 import { broadcastBTCTx } from "../../queries/transaction";
 import { navigate } from "../../base/NavigationService";
-import { getCurrentBtcWallet } from "../../wallet/wallet";
-import { getRandomID, parseToSat, parseToSpace } from "../../utils/WalletUtils";
+import { addMetaletSafeUtxo, getCurrentBtcWallet } from "../../wallet/wallet";
+import {  getRandomID, parseToSat, parseToSpace } from "../../utils/WalletUtils";
 import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
 
 export default function SendBtcPage() {
@@ -227,6 +227,7 @@ export default function SendBtcPage() {
           address: inputAddress,
         },
       });
+      addMetaletSafeUtxo(rawTx,data);
     }
     // setTimeout(() => {
     //   setIsShowLoading(false);

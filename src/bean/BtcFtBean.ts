@@ -42,5 +42,7 @@ export interface Mrc20Data {
   balance: string;
   amount: string;
   decimals: string;
+  metaData: string;
   type: string;
 }
+

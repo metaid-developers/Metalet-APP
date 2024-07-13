@@ -7,5 +7,7 @@ export async function process(
   // encoding?: BufferEncoding
 ): Promise<string> {
   const wallet = await getCurrentWallet(Chain.BTC);
+  // console.log("singback: ",wallet.signMessage(message, "base64"));
+  
   return wallet.signMessage(message, "base64");
 }

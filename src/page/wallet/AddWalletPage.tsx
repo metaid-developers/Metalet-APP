@@ -111,7 +111,7 @@ export default function AddWalletPage() {
                   Create wallet
                 </Text>
                 <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
-                  create a new mennic wallet
+                  create a new menmonic wallet
                 </Text>
               </View>
 

@@ -73,17 +73,15 @@ export default function BtcFtPage() {
     const network = await getWalletNetwork(Chain.BTC);
 
     let list = [];
-    const simData = await fetchMrc20List(
-      network,
-      address
-    );
+    const simData = await fetchMrc20List(network, address);
 
     // console.log("simData", JSON.stringify(simData));
-    if (simData&&simData.data) {
-      if (simData.data!.list != null&& simData.data!.list.length > 0) {
+    if (simData && simData.data) {
+      if (simData.data!.list != null && simData.data!.list.length > 0) {
         simData.data.list.forEach((item) => {
-          if(item){
-            item.type="mrc20";
+          if (item) {
+            item.type = "mrc20";
+            item.tokenName = item.tick;
             list.push(item);
           }
         });
@@ -100,19 +98,19 @@ export default function BtcFtPage() {
 
     let dataBrc20: RootBtcFtObject = await get(BTC_FT_URL, false, params);
 
-    if (dataBrc20&&dataBrc20.data) {
-      if (dataBrc20.data.list != null&& dataBrc20.data.list.length > 0) {
+    if (dataBrc20 && dataBrc20.data) {
+      if (dataBrc20.data.list != null && dataBrc20.data.list.length > 0) {
         dataBrc20.data.list.forEach((item) => {
-        if(item){
-          item.type="brc20";
-          list.push(item);
-        }
+          if (item) {
+            item.type = "brc20";
+            list.push(item);
+          }
         });
       }
     }
 
     // console.log("list", JSON.stringify(list));
-    
+
     if (list != null && list.length > 0) {
       setBtcFtList([...list]);
     } else {
@@ -131,7 +129,9 @@ export default function BtcFtPage() {
   };
 
   const ListItem: React.FC<{ index: number; item }> = ({ index, item }) => {
-    
+    const showBalance =
+      parseFloat(item.unsafeBalance) + parseFloat(item.balance);
+
     if (item.type === "brc20") {
       return (
         <TouchableWithoutFeedback
@@ -149,6 +149,7 @@ export default function BtcFtPage() {
                 style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
               >
                 {item.ticker.toUpperCase()}
+                {/* {item.ticker} */}
               </Text>
 
               <View
@@ -198,52 +199,102 @@ export default function BtcFtPage() {
         </TouchableWithoutFeedback>
       );
     } else {
+      let mrc20Img;
+
+      const metaData = item.metaData;
+
+      if (
+        metaData &&
+        metaData != null &&
+        metaData != undefined &&
+        metaData != "" &&
+        metaData != "undefined"
+      ) {
+        // console.log("metaData", metaData);
+
+        const metaDataObject = JSON.parse(metaData);
+        // console.log("metaDataObject icon", metaDataObject.icon);
+        const startIndex =
+          metaData.indexOf("metafile://") + "metafile://".length;
+        const endIndex = metaData.indexOf('"', startIndex);
+        const extractedString = metaData.substring(startIndex, endIndex);
+
+        if (netWork === "mainnet") {
+          if (metaDataObject.icon.startsWith("http")) {
+            mrc20Img = metaDataObject.icon;
+          } else {
+            mrc20Img = "https://man.metaid.io/content/" + extractedString;
+          }
+        } else {
+          if (metaDataObject.icon.startsWith("http")) {
+            mrc20Img = metaDataObject.icon;
+          } else {
+            mrc20Img = "https://man-test.metaid.io/content/" + extractedString;
+          }
+        }
+
+      }
+
       return (
         <TouchableWithoutFeedback
-        onPress={() => {
-          navigate("Mrc20DetailPage", {
-            mrc20Data: item,
-          });
-        }}
-      >
-        <View style={[styles.flatListStyle,{paddingTop:20,paddingBottom:20}]}>
-          <CircleAvatarLetter letterStr={item.tokenName.substring(0, 1)} />
+          onPress={() => {
+            navigate("Mrc20DetailPage", {
+              mrc20Data: item,
+            });
+          }}
+        >
+          <View
+            style={[
+              styles.flatListStyle,
+              { paddingTop: 20, paddingBottom: 20 },
+            ]}
+          >
+            {mrc20Img != null ? (
+              <CircleAvatar
+                imageUrl={mrc20Img}
+                event={() => {
+                  // refreshData(item.name);
+                }}
+              />
+            ) : (
+              <CircleAvatarLetter letterStr={item.tokenName.substring(0, 1)} />
+            )}
 
-          <View style={{ marginLeft: 10 }}>
-            <Text
-              style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
-            >
-              {item.tokenName.toUpperCase()}
-            </Text>
+            <View style={{ marginLeft: 10 }}>
+              <Text
+                style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
+              >
+                {item.tokenName.toUpperCase()}
+                {/* {item.tokenName} */}
+              </Text>
 
-            <View
-              style={{
-                backgroundColor: "rgba(247, 147, 26, 0.2)",
-                borderRadius: 3,
-                padding: 5,
-                width:50,  
-              }}
-            >
-              <Text style={{ fontSize: 10, color: "#FF981C" }}>MRC20</Text>
+              <View
+                style={{
+                  backgroundColor: "rgba(214, 240, 255, 0.5)",
+                  borderRadius: 3,
+                  padding: 5,
+                  width: 50,
+                }}
+              >
+                <Text style={{ fontSize: 10, color: "#1472FF" }}>MRC20</Text>
+              </View>
             </View>
-            
-          </View>
 
-          <View style={{ flex: 1 }} />
+            <View style={{ flex: 1 }} />
 
-          <View style={{ marginLeft: 10, marginRight: 10 }}>
-            <Text
-              style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
-            >
-             {/* balance */}
-            </Text>
-            <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
-              {item.balance!}{" "}
-            </Text>
-          
+            <View style={{ marginLeft: 10, marginRight: 10 }}>
+              <Text
+                style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
+              >
+                {/* balance */}
+              </Text>
+              <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
+                {/* {item.balance!}{" "} */}
+                {showBalance}
+              </Text>
+            </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
       );
     }
   };

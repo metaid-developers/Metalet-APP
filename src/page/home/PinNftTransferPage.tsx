@@ -24,6 +24,7 @@ import { getBtcUtxos, getInscriptionUtxo, getMetaPin } from "@/queries/utxos";
 import { getRandomID, goToWebScan, parseToSpace } from "@/utils/WalletUtils";
 import { broadcastBtc, fetchBtcFeed } from "@/api/metaletservice";
 import { navigate } from "@/base/NavigationService";
+import { addMetaletSafeUtxo } from "@/wallet/wallet";
 
 export default function PinNftTransferPage({ route }) {
   const { nftDetail } = route.params;
@@ -75,34 +76,39 @@ export default function PinNftTransferPage({ route }) {
   }, []);
 
   async function sendBRC20() {
-    const needRawTx =
-      metaletWallet.currentBtcWallet.getScriptType() === ScriptType.P2PKH;
-    // const utxo = await getInscriptionUtxo(nftDetail.inscriptionId, needRawTx);
-    console.log("nft", nftDetail.id);
+    try {
+      const needRawTx =
+        metaletWallet.currentBtcWallet.getScriptType() === ScriptType.P2PKH;
+      // const utxo = await getInscriptionUtxo(nftDetail.inscriptionId, needRawTx);
+      console.log("nft", nftDetail.id);
 
-    const metaPin = await getMetaPin(nftDetail.id, needRawTx);
-    const [txId, outputIndex] = metaPin.output.split(":");
-    const utxo = {
-      txId,
-      outputIndex: Number(outputIndex),
-      satoshis: metaPin.outputValue,
-      confirmed: metaPin.genesisHeight > 0,
-      rawTx: metaPin.rawTx,
-    };
+      const metaPin = await getMetaPin(nftDetail.id, needRawTx);
+      const [txId, outputIndex] = metaPin.output.split(":");
+      const utxo = {
+        txId,
+        outputIndex: Number(outputIndex),
+        satoshis: metaPin.outputValue,
+        confirmed: metaPin.genesisHeight > 0,
+        rawTx: metaPin.rawTx,
+      };
 
-    const utxos = await getBtcUtxos(btcAddress, needRawTx);
-    const { fee, rawTx, cost } = metaletWallet.currentBtcWallet.sendBRC20(
-      inputAddress,
-      [utxo],
-      parseFloat(feed),
-      utxos
-    );
+      const utxos = await getBtcUtxos(btcAddress, needRawTx);
+      const { fee, rawTx, cost } = metaletWallet.currentBtcWallet.sendBRC20(
+        inputAddress,
+        [utxo],
+        parseFloat(feed),
+        utxos
+      );
 
-    if (rawTx) {
-      console.log("rawTx", rawTx);
-      setfee(parseToSpace(fee.toString()));
-      setRawTx(rawTx);
-      setConfirmDailogState(true);
+      if (rawTx) {
+        console.log("rawTx", rawTx);
+        setfee(parseToSpace(fee.toString()));
+        setRawTx(rawTx);
+        setConfirmDailogState(true);
+      }
+    } catch (e) {
+      ToastView({ text: e.toString(), type: "error" });
+      console.log(e);
     }
   }
 
@@ -120,9 +126,11 @@ export default function PinNftTransferPage({ route }) {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={() => {
-      Keyboard.dismiss();
-    }}>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
       <SafeAreaView style={{ flex: 1 }}>
         {/* feed */}
         <Modal transparent={true} visible={isShowFeed}>
@@ -557,6 +565,7 @@ export default function PinNftTransferPage({ route }) {
               updateNeedRefreshHome(getRandomID());
               setTransactionID(data);
               setTransferSuccedDailogState(true);
+              addMetaletSafeUtxo(rawTx, data);
             }
           }}
         />

@@ -79,7 +79,7 @@ export default function MvcNftPage(props) {
       false,
       params
     );
-    if (data.data.results.items != null) {
+    if (data.data.results.items !==undefined&&data.data.results.items != null) {
       // setNftList(data.data.results.items);
       // console.log('有数据刷新');
       setNftList([...data.data.results.items]);

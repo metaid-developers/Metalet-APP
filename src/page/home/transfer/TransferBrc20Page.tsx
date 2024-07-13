@@ -30,6 +30,7 @@ import { ScriptType } from "@metalet/utxo-wallet-service";
 import { getBtcUtxos, getInscriptionUtxo } from "@/queries/utxos";
 import { broadcastBtc, fetchBtcFeed } from "@/api/metaletservice";
 import { getRandomID, parseToSpace } from "@/utils/WalletUtils";
+import { addMetaletSafeUtxo } from "@/wallet/wallet";
 
 export default function TransferBrc20Page({ route }) {
   const [isShowFeed, setIsShowFeed] = useState(false);
@@ -102,7 +103,8 @@ export default function TransferBrc20Page({ route }) {
   }
 
   async function sendBRC20() {
-    const needRawTx =
+    try {
+       const needRawTx =
       metaletWallet.currentBtcWallet.getScriptType() === ScriptType.P2PKH;
     const utxo = await getInscriptionUtxo(
       tokenTransfer.inscriptionId,
@@ -123,6 +125,10 @@ export default function TransferBrc20Page({ route }) {
       setRawTx(rawTx);
       setConfirmDailogState(true);
     }
+    }catch(e) {
+      console.log(e);
+    }
+   
   }
 
   return (
@@ -637,6 +643,8 @@ export default function TransferBrc20Page({ route }) {
                   symbol: tokenTransfer.ticker,
                 },
               });
+
+              addMetaletSafeUtxo(rawTx,data);
             }
         }}
       />

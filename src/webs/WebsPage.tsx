@@ -19,7 +19,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { CircleAvatarLetter } from "@/constant/Widget";
+import { CircleAvatarLetter, ToastView } from "@/constant/Widget";
 import { LinearGradient } from "expo-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { inputNormalBgColor, litterWhittleBgColor } from "@/constant/Constants";
@@ -50,6 +50,7 @@ export default function WebsPage(props) {
       ref?: React.MutableRefObject<any>;
     }>;
   }>(null);
+  let actionMsg2;
 
   const metaidComponentRef = useRef<{
     getEstimatedData: () => null;
@@ -88,12 +89,12 @@ export default function WebsPage(props) {
     }
 
     setActionMsg(message);
+    actionMsg2 = message;
 
     if (actionType === ActionType.Authorize) {
-      console.log("message", message);
-
+      // console.log("message", message);
       setModalVisible(true);
-      if(message.icon){
+      if (message.icon) {
         setIcon(message.icon);
       }
       setHost(message.host);
@@ -104,16 +105,29 @@ export default function WebsPage(props) {
       setDescriptions(descriptions);
       setNeedEstimated(needEstimated);
     } else if (actionType === ActionType.Query) {
-      const { process } = actionDispatcher(actionName, ActionType.Query);
-      const data = await process(message.params, message.host);
-      console.log("data", data);
+      // console.log("query1111 :", actionName);
 
-      postMessage(
-        JSON.stringify({
-          data,
-          nonce: message.nonce,
-        })
-      );
+      const { process } = actionDispatcher(actionName, ActionType.Query);
+
+      const data = await process(message.params, message.host);
+
+      if (data !== undefined) {
+        // console.log("data11111111: ", data);
+        if(message&&message.nonce){
+          console.log("data11111111: ", message.nonce);
+          
+          postMessage(
+            JSON.stringify({
+              data,
+              nonce: message.nonce,
+            })
+          );
+        }
+       
+      } else {
+
+        console.log("query error", actionName);
+      }
     }
   };
 
@@ -130,37 +144,44 @@ export default function WebsPage(props) {
   };
 
   const confirmAction = async () => {
-    const [actionName, actionType] = actionMsg.action.split("-");
-    if (actionType === ActionType.Authorize && needEstimated) {
-      const data = metaidComponentRef.current.getEstimatedData();
-      const { nextComponent, estimate } = actionDispatcher(
-        actionName,
-        ActionType.Authorize
-      );
-      const params = await estimate(data);
-      setNeedEstimated(false);
-      setComponentInfo({ component: nextComponent, params });
-    } else {
-      const { process } = actionDispatcher(
-        actionName,
-        actionType as ActionType
-      );
-      // console.log("confirmAction params", componentInfo.params);
+    try {
+      const [actionName, actionType] = actionMsg.action.split("-");
+      if (actionType === ActionType.Authorize && needEstimated) {
+        const data = metaidComponentRef.current.getEstimatedData();
+        const { nextComponent, estimate } = actionDispatcher(
+          actionName,
+          ActionType.Authorize
+        );
+        const params = await estimate(data);
 
-      const data = await process(componentInfo.params, actionMsg.host);
-      console.log("confirmAction data", data);
-
-      postMessage(
-        JSON.stringify({
-          data,
-          nonce: actionMsg.nonce,
-        })
-      );
-      setModalVisible(false);
+        setNeedEstimated(false);
+        setComponentInfo({ component: nextComponent, params });
+      } else {
+        const { process } = actionDispatcher(
+          actionName,
+          actionType as ActionType
+        );
+        // console.log("confirmAction params", componentInfo.params);
+        const data = await process(componentInfo.params, actionMsg.host);
+        console.log("confirmAction data", data);
+        postMessage(
+          JSON.stringify({
+            data,
+            nonce: actionMsg.nonce,
+          })
+        );
+        setModalVisible(false);
+      }
+    } catch (e) {
+      // alert(e);
+      ToastView({ text: "Please input address", type: "error" });
+      // ToastView({text:e.toString(),type:'error'})
     }
   };
 
   const postMessage = async (message: unknown) => {
+    // console.log("postMessage", message);
+
     webViewRef.current.postMessage(message);
   };
 
@@ -168,121 +189,128 @@ export default function WebsPage(props) {
     <SafeAreaView style={{ flex: 1 }}>
       <Modal animationType="slide" visible={modalVisible}>
         {/* <View className="w-screen h-screen flex flex-col items-center px-4"> */}
-      <SafeAreaView style={{ flex: 1 ,margin:Platform.OS === "ios"?30:0 ,}}>
-      <View
-          style={{
-            flex: 1,
-            margin: 20,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+        <SafeAreaView
+          style={{ flex: 1, margin: Platform.OS === "ios" ? 30 : 0 }}
         >
-          {/* <Text className="text-blue-primary text-2xl tracking-wide py-6">
-            AUTHORIZE
-          </Text> */}
-
           <View
             style={{
-              alignItems: "center",
+              flex: 1,
+              margin: 20,
               justifyContent: "center",
-              marginTop: 20,
+              alignItems: "center",
             }}
           >
-            <MaskedView
-              style={{
-                flexDirection: "row",
-                height: 60,
-              }}
-              maskElement={
-                <Text
-                  style={{
-                    fontSize: 20,
-                    textAlign: "center",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  AUTHORIZE
-                </Text>
-              }
-            >
-              <LinearGradient
-                colors={["#6CE5F7", "#1F2CFF"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{ flex: 1 }}
-              />
-            </MaskedView>
-          </View>
-          {/* FIXME: color unwork */}
-          {/* <Text className="bg-gradient-to-r from-teal-primary to-blue-primary bg-clip-text text-transparent text-lg tracking-wide">
+            {/* <Text className="text-blue-primary text-2xl tracking-wide py-6">
             AUTHORIZE
           </Text> */}
-          {icon ? (
-            // <Image source={{ uri: icon }} className="w-24 h-24 rounded-lg" />
-            <Image source={{ uri: icon }} style={{ width: 80, height: 80 ,borderRadius:10}} />
-          ) : (
-            <CircleAvatarLetter
-              widthC={70}
-              heightC={70}
-              letterStr={host[0] || ""}
-            />
-            // <Text className="w-24 h-24 rounded-full bg-blue-primary flex items-center justify-center">
-            //   {host[0] || ""}
-            // </Text>
-          )}
 
-          <Text className="text-sm text-gray-500 py-6">
-            {`${host} would like to:`}
-          </Text>
-
-          <ScrollView className="overflow-y-auto rounded-lg bg-gray-50 text-sm w-full">
-            <View className="p-4 space-y-2">
-              {componentInfo
-                ? createElement(
-                    componentInfo.component,
-                    {
-                      params: componentInfo.params,
-                      ref: needEstimated ? metaidComponentRef : undefined,
-                    },
-                    <View className="space-y-2">
-                      <Text className="text-base">{actionName}</Text>
-                      {descriptions.map((description, index) => (
-                        <View
-                          key={index}
-                          className="flex flex-row gap-x-0.5 w-full"
-                        >
-                          <CheckBadgeIcon className="w-6 h-6 -mt-0.5" />
-                          <Text className="flex-1">{description}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  )
-                : null}
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: 20,
+              }}
+            >
+              <MaskedView
+                style={{
+                  flexDirection: "row",
+                  height: 60,
+                }}
+                maskElement={
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      textAlign: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    AUTHORIZE
+                  </Text>
+                }
+              >
+                <LinearGradient
+                  colors={["#6CE5F7", "#1F2CFF"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ flex: 1 }}
+                />
+              </MaskedView>
             </View>
-          </ScrollView>
+            {/* FIXME: color unwork */}
+            {/* <Text className="bg-gradient-to-r from-teal-primary to-blue-primary bg-clip-text text-transparent text-lg tracking-wide">
+            AUTHORIZE
+          </Text> */}
+            {icon ? (
+              // <Image source={{ uri: icon }} className="w-24 h-24 rounded-lg" />
+              <Image
+                source={{ uri: icon }}
+                style={{ width: 80, height: 80, borderRadius: 10 }}
+              />
+            ) : (
+              <CircleAvatarLetter
+                widthC={70}
+                heightC={70}
+                letterStr={host[0] || ""}
+              />
+              // <Text className="w-24 h-24 rounded-full bg-blue-primary flex items-center justify-center">
+              //   {host[0] || ""}
+              // </Text>
+            )}
 
-          <View className="flex flex-row items-center justify-center pt-6 pb-12 w-full gap-2">
-            <Pressable
-              onPress={cancelAction}
-              className="w-[120px] rounded-3xl bg-blue-light py-4"
-            >
-              <Text className="text-center text-sm text-blue-primary">
-                Cancel
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={confirmAction}
-              className="w-[120px] rounded-3xl bg-blue-primary py-4"
-            >
-              <Text className="text-center text-sm text-white">
-                {needEstimated ? "Next" : "Confirm"}
-              </Text>
-            </Pressable>
+            <Text className="text-sm text-gray-500 py-6">
+              {`${host} would like to:`}
+            </Text>
+
+            <ScrollView className="overflow-y-auto rounded-lg bg-gray-50 text-sm w-full">
+              <View className="p-4 space-y-2">
+                {componentInfo
+                  ? createElement(
+                      componentInfo.component,
+                      {
+                        params: componentInfo.params,
+                        ref: needEstimated ? metaidComponentRef : undefined,
+                      },
+                      <View className="space-y-2">
+                        <Text className="text-base">{actionName}</Text>
+                        {descriptions.map((description, index) => (
+                          <View
+                            key={index}
+                            className="flex flex-row gap-x-0.5 w-full"
+                          >
+                            <CheckBadgeIcon className="w-6 h-6 -mt-0.5" />
+                            <Text className="flex-1">{description}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )
+                  : null}
+              </View>
+            </ScrollView>
+
+            <View className="flex flex-row items-center justify-center pt-6 pb-12 w-full gap-2">
+              <Pressable
+                onPress={cancelAction}
+                className="w-[120px] rounded-3xl bg-blue-light py-4"
+              >
+                <Text className="text-center text-sm text-blue-primary">
+                  Cancel
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  confirmAction();
+                }}
+                className="w-[120px] rounded-3xl bg-blue-primary py-4"
+              >
+                <Text className="text-center text-sm text-white">
+                  {needEstimated ? "Next" : "Confirm"}
+                </Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
       </Modal>
 
       {/* className="flex flex-row items-center px-2.5 gap-x-2 h-14 py-2" */}

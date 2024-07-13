@@ -81,6 +81,12 @@ export async function caculateMvcAndBtcAssert(
   balance.spaceAssert = isMain ? spaceAssert.toFixed(2) : "0.0";
 
   const btcBalanceData = await fetchBtcBalance(btcAddress);
+  if (btcBalanceData.data==null) {
+    console.log("btcBalanceData",btcBalanceData.data);
+    
+    return balance;
+  }
+  
   const btcBalance = (balance.btcBalance =
     btcBalanceData.data.balance.toString());
   const btcAssert = toFloorNum(btcPrice * parseFloat(btcBalance), 2);

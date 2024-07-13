@@ -23,6 +23,7 @@ import { UpdateData } from "./type/Update";
 import { IcoinsData } from "./type/IcoinsData";
 import { RootMrc20Data } from "@/bean/BtcFtBean";
 import { MetaIDPinsData } from "./type/MetaIDPinsData";
+import { Mrc20RecordData } from "./type/Mrc20RecordData";
 
 export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
@@ -104,7 +105,7 @@ export async function broadcastSpace(
 
   const data = await post(
     network == "mainnet"
-      ? BASE_MVC_API_URL
+      ? BASE_MVC_API_URL+ "/tx/broadcast"
       : BASE_MVC_API_URL_TESTNET + "/tx/broadcast",
     { hex: hex }
   );
@@ -310,6 +311,16 @@ export async function fetchMetaIDPinsList(net:string,address:string): Promise<Me
     BASE_METALET_URL + "/wallet-api/v3/address/pins",
     false,
     {net,address,cursor:0,size:1000}
+  );
+  return data;
+}
+
+// 23. mrc20 record
+export async function fetchMrc20RecordList(net:string,address:string,tickId:string): Promise<Mrc20RecordData> {
+  const data: Mrc20RecordData = await get(
+    BASE_METALET_URL + "/wallet-api/v3/mrc20/address/activities",
+    false,
+    {net,address,tickId}
   );
   return data;
 }

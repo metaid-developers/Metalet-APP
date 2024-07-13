@@ -14,9 +14,14 @@ import {
   TitleBar,
 } from "../../constant/Widget";
 import { goBack, navigate } from "../../base/NavigationService";
-import { metaStyles, themeColor } from "../../constant/Constants";
+import {
+  grayNormalColor,
+  metaStyles,
+  themeColor,
+} from "../../constant/Constants";
 import { MvcActivityRecord } from "../../types/mvcrecord";
 import {
+  fetchMrc20RecordList,
   fetchMvcActivityComfird,
   fetchMvcFtPrice,
   fetchMvcFtRecord,
@@ -29,26 +34,35 @@ import { MvcFtRecordData } from "../../api/type/MvcFtData";
 import { getIconUri } from "@mvc-org/mvc-resources";
 import { formatToDecimal } from "../../utils/WalletUtils";
 import { caculateOneFtValue } from "../../utils/AssertUtils";
+import useNetworkStore from "@/stores/useNetworkStore";
+import { Mrc20Record } from "@/api/type/Mrc20RecordData";
 
 export default function Mrc20DetailPage({ route }) {
   const { mrc20Data } = route.params;
-  const [mvcActivityList, setMvcActivityList] = useState<MvcFtRecordData[]>([]);
+  const [mrc20RecordList, setMrc20RecordList] = useState<Mrc20Record[]>([]);
   const { mvcAddress, updateMvcAddress } = useData();
+  const { btcAddress, updateBtcAddress } = useData();
+
   const [noticeContent, setNoticeContent] = useState("Successful");
   const [isShowNotice, setIsShowNotice] = useState(false);
   const { metaletWallet, updateMetaletWallet } = useData();
 
   const [assertOneFt, setOneFtAssert] = useState("0.0");
+  const { netWork, updateNetWork } = useData();
+  const { network, switchNetwork } = useNetworkStore();
 
   useEffect(() => {
-    console.log(mrc20Data);
+    // console.log(mrc20Data);
     getActivityList();
   }, []);
 
   async function getActivityList() {
-    // const ftPriceData = await fetchMvcFtPrice();
-    // const assertFt = caculateOneFtValue([mvcFtData], ftPriceData);
-    // setOneFtAssert(assertFt);
+    const mrc20RecordData = await fetchMrc20RecordList(
+      network,
+      btcAddress,
+      mrc20Data.mrc20Id
+    );
+    console.log("mrc20RecordData ", JSON.stringify(mrc20RecordData));
 
     // let mvcActivityListData = await fetchMvcFtRecord(
     //   mvcAddress,
@@ -57,35 +71,32 @@ export default function Mrc20DetailPage({ route }) {
     // );
     // // console.log(mvcActivityListData);
 
-    // if (mvcActivityListData.length == 0) {
-    //   let record: MvcFtRecordData = {
-    //     flag: "1",
-    //     address: "1",
-    //     time: 1712334223000,
-    //     height: 1,
-    //     income: 1,
-    //     outcome: 1,
-    //     txid: "",
-    //     codeHash: "",
-    //     genesis: "",
-    //   };
-    //   setMvcActivityList([...mvcActivityListData, record]);
-    // } else {
-    //   setMvcActivityList([...mvcActivityListData]);
-    // }
+    const mvcActivityListData1 = mrc20RecordData.data.list;
+    const mvcActivityListData = mvcActivityListData1.filter((record) => {
+      return !(record.from === btcAddress && record.to === btcAddress);
+    });
 
-    let record: MvcFtRecordData = {
-      flag: "1",
-      address: "1",
-      time: 1712334223000,
-      height: 1,
-      income: 1,
-      outcome: 1,
-      txid: "",
-      codeHash: "",
-      genesis: "",
-    };
-    setMvcActivityList([record]);
+    console.log(mvcActivityListData);
+
+    if (mvcActivityListData != null && mvcActivityListData.length == 0) {
+      let record: Mrc20Record = {
+        txId: "1",
+        tickId: "",
+        tick: "",
+        tokenName: "",
+        decimals: "",
+        metaData: "",
+        from: "",
+        to: "",
+        amount: "",
+        txType: 1,
+        timestamp: 1,
+      };
+      setMrc20RecordList([...mrc20RecordList, record]);
+      // setMvcActivityList([...mvcActivityListData, record]);
+    } else {
+      setMrc20RecordList([...mvcActivityListData]);
+    }
   }
 
   function ShowNotice(notice) {
@@ -98,18 +109,25 @@ export default function Mrc20DetailPage({ route }) {
   }
 
   const ListItem = ({ index, item }) => {
-    let isIncome;
+    let isIncomeType;
     let recordMoney;
     let showAmount;
-    recordMoney = item.income - item.outcome;
+    // recordMoney = item.income - item.outcome;
     // showAmount = (recordMoney / 100000000).toFixed(8);
 
     // showAmount = formatToDecimal(recordMoney, parseFloat(mvcFtData.decimal));
 
-    if (recordMoney > 0) {
-      isIncome = true;
-    } else {
-      isIncome = false;
+    let textColor;
+    if (item.from === btcAddress && item.to === btcAddress) {
+      isIncomeType = "Transfer";
+      textColor = grayNormalColor;
+      return;
+    } else if (item.from === btcAddress) {
+      isIncomeType = "Send";
+      textColor = "red";
+    } else if (item.to === btcAddress) {
+      isIncomeType = "Receive";
+      textColor = "green";
     }
 
     // let ImageUrl = getIconUri({
@@ -120,7 +138,7 @@ export default function Mrc20DetailPage({ route }) {
 
     return (
       <View>
-        {item.address != "1" ? (
+        {item.txId != "1" ? (
           <View
             style={{
               width: "100%",
@@ -132,21 +150,25 @@ export default function Mrc20DetailPage({ route }) {
               paddingHorizontal: 20,
             }}
           >
-            {isIncome ? (
+            {isIncomeType === "Receive" && (
               <View>
                 <Image
                   source={require("../../../image/record_type_in.png")}
                   style={{ width: 35, height: 35 }}
                 />
               </View>
-            ) : (
-              <Image
-                source={require("../../../image/record_type_out.png")}
-                style={{
-                  width: 35,
-                  height: 35,
-                }}
-              />
+            )}
+
+            {isIncomeType === "Send" && (
+              <View>
+                <Image
+                  source={require("../../../image/record_type_out.png")}
+                  style={{
+                    width: 35,
+                    height: 35,
+                  }}
+                />
+              </View>
             )}
 
             <View style={{ flex: 1 }}>
@@ -154,19 +176,23 @@ export default function Mrc20DetailPage({ route }) {
                 <Text
                   style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
                 >
-                  {isIncome ? "Receive" : "Send"}
+                  {isIncomeType}
                 </Text>
                 <View style={{ flex: 1 }} />
                 <Text
                   style={{
                     fontSize: 16,
-                    color: isIncome ? "green" : "red",
+                    color: textColor,
                     marginBottom: 10,
                     // textAlign: "right",
                   }}
                 >
-                  {isIncome ? "+" + showAmount : showAmount}{" "}
-                  {mrc20Data.tick.toString().toUpperCase()}
+                  {isIncomeType === "Receive"
+                    ? "+" + item.amount.toString()
+                    : isIncomeType === "Send"
+                      ? "-" + item.amount.toString()
+                      : item.amount.toString()}
+                  {" " + mrc20Data.tick.toString().toUpperCase()}
                 </Text>
               </View>
 
@@ -180,12 +206,12 @@ export default function Mrc20DetailPage({ route }) {
               >
                 <TouchableWithoutFeedback
                   onPress={() => {
-                    ShowNotice(item.txid);
+                    ShowNotice(item.txId);
                   }}
                 >
                   <View style={{ flexDirection: "row" }}>
                     <Text style={metaStyles.grayTextSmall66}>
-                      {formatTime(item.time)}
+                      {formatTime(item.timestamp)}
                     </Text>
                     <View style={{ flex: 1 }} />
                     <Text
@@ -196,7 +222,7 @@ export default function Mrc20DetailPage({ route }) {
                         { textAlign: "right", width: 100 },
                       ]}
                     >
-                      {item.txid}
+                      {item.txId}
                     </Text>
 
                     <Image
@@ -241,8 +267,47 @@ export default function Mrc20DetailPage({ route }) {
     // if (!ImageUrl) {
     //   ImageUrl = "1";
     // }
-    let ImageUrl = "1";
+    const metaData = mrc20Data.metaData;
+    const showBalance =
+      parseFloat(mrc20Data.unsafeBalance) + parseFloat(mrc20Data.balance);
+    let mrc20Img = "";
+    if (
+      metaData &&
+      metaData != null &&
+      metaData != undefined &&
+      metaData != "" &&
+      metaData != "undefined"
+    ) {
+      // console.log("metaData", metaData);
 
+      const metaDataObject = JSON.parse(metaData);
+
+      const startIndex = metaData.indexOf("metafile://") + "metafile://".length;
+      const endIndex = metaData.indexOf('"', startIndex);
+      const extractedString = metaData.substring(startIndex, endIndex);
+
+      // if (netWork === "mainnet") {
+      //   mrc20Img = "https://man.metaid.io/content/" + extractedString;
+      // } else {
+      //   mrc20Img = "https://man-test.metaid.io/content/" + extractedString;
+      // }
+
+      if (netWork === "mainnet") {
+        if (metaDataObject.icon.startsWith("http")) {
+          mrc20Img = metaDataObject.icon;
+        } else {
+          mrc20Img = "https://man.metaid.io/content/" + extractedString;
+        }
+      } else {
+        if (metaDataObject.icon.startsWith("http")) {
+          mrc20Img = metaDataObject.icon;
+        } else {
+          mrc20Img = "https://man-test.metaid.io/content/" + extractedString;
+        }
+      }
+
+      // console.log("mrc20Img", mrc20Img);
+    }
     return (
       <View
         style={{
@@ -262,11 +327,27 @@ export default function Mrc20DetailPage({ route }) {
           />
         )} */}
 
-        <CircleAvatarLetter
+        {/* <CircleAvatarLetter
           letterStr={mrc20Data.tokenName.substring(0, 1)}
           widthC={70}
           heightC={70}
-        />
+        /> */}
+        {mrc20Img != null && mrc20Img != "" ? (
+          <CircleAvatar
+            imageUrl={mrc20Img}
+            event={() => {
+              // refreshData(item.name);
+            }}
+            widthC={65}
+            heightC={65}
+          />
+        ) : (
+          <CircleAvatarLetter
+            letterStr={mrc20Data.tokenName.substring(0, 1)}
+            widthC={70}
+            heightC={70}
+          />
+        )}
         <Text
           style={{
             color: "#333",
@@ -277,7 +358,7 @@ export default function Mrc20DetailPage({ route }) {
           }}
         >
           {/* {formatToDecimal(mrc20Data.balance, mrc20Data.decimals)}{" "} */}
-          {mrc20Data.balance} {mrc20Data.tick.toUpperCase()}
+          {showBalance} {mrc20Data.tick.toUpperCase()}
         </Text>
 
         <Text
@@ -387,35 +468,37 @@ export default function Mrc20DetailPage({ route }) {
           <Text style={{ color: "#666", fontSize: 16 }}>Token ID</Text>
           <View style={{ flex: 1 }} />
         </View>
-     <TouchableWithoutFeedback onPress={()=>{
-      ShowNotice(mrc20Data.mrc20Id)
-     }}>
-     <View
-          style={{
-            flexDirection: "row",
-            marginTop: 5,
-            alignItems: "center",
-            marginHorizontal: 20,
+        <TouchableWithoutFeedback
+          onPress={() => {
+            ShowNotice(mrc20Data.mrc20Id);
           }}
         >
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="middle"
+          <View
             style={{
-              color: "#999",
-              fontSize: 14,
-              width: "40%",
+              flexDirection: "row",
+              marginTop: 5,
+              alignItems: "center",
+              marginHorizontal: 20,
             }}
           >
-            {mrc20Data.mrc20Id}
-          </Text>
-          <Image
-            source={require("../../../image/meta_copy_icon.png")}
-            style={{ width: 18, height: 18, }}
-          />
-          <View style={{ flex: 1 }} />
-        </View>
-     </TouchableWithoutFeedback>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="middle"
+              style={{
+                color: "#999",
+                fontSize: 14,
+                width: "40%",
+              }}
+            >
+              {mrc20Data.mrc20Id}
+            </Text>
+            <Image
+              source={require("../../../image/meta_copy_icon.png")}
+              style={{ width: 18, height: 18 }}
+            />
+            <View style={{ flex: 1 }} />
+          </View>
+        </TouchableWithoutFeedback>
       </View>
     );
   };
@@ -482,7 +565,7 @@ export default function Mrc20DetailPage({ route }) {
         {/* 尾部 */}
 
         <FlatList
-          data={mvcActivityList}
+          data={mrc20RecordList}
           keyExtractor={(item, index) => index.toString()}
           showsVerticalScrollIndicator={false}
           renderItem={ListItem}

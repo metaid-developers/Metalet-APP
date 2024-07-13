@@ -5,6 +5,14 @@ import { getBtcNetwork, getNetwork } from "@/lib/network";
 import { Chain, ScriptType } from "@metalet/utxo-wallet-service";
 import { Psbt, payments, networks, Transaction } from "bitcoinjs-lib";
 
+if (!(Buffer.alloc(1).subarray(0, 1) instanceof Buffer)) {
+  Buffer.prototype.subarray = function (...args: [number?, number?]): Buffer {
+    const result = Uint8Array.prototype.subarray.apply(this, args)
+    Object.setPrototypeOf(result, Buffer.prototype)
+    return result as Buffer
+  }
+}
+
 const toXOnly = (pubKey: Buffer) =>
   pubKey.length === 32 ? pubKey : pubKey.slice(1, 33);
 

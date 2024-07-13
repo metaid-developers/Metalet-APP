@@ -15,10 +15,9 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "8",
+      "buildNumber": "20",
       "supportsTablet": true,
       "bundleIdentifier": "com.metalet.swallet",
-      "permissions": ["CAMERA", "PHOTO_LIBRARY_ADD_ONLY"],
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
         "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
@@ -35,20 +34,15 @@
       },
       "package": "com.metalet.swallet",
       "icon": "./assets/logo_metalet.png",
-      "versionCode": 8,
+      "versionCode": 20,
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "CAMERA_ROLL",
         "CAMERA",
         "RECORD_AUDIO"
-      ],
-      "keystore":{
-        "keystorePath":"/Users/simkeep/RN/Metalet/metalet.jks",
-        "keystorePassword": "123456",
-        "keyAlias": "key0",
-        "keyPassword": "123456"
-      }
+      ]
+      
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -10,5 +10,5 @@ export async function process(_: unknown, host: string) {
     connector.isConnected(currentAccountId, host)
   );
 
-  return connector.isConnected(currentAccountId, host);
+  return await connector.isConnected(currentAccountId, host);
 }

@@ -1784,10 +1784,10 @@
   resolved "https://registry.yarnpkg.com/@magiceden-oss/runestone-lib/-/runestone-lib-1.0.2.tgz#524394b49119d1acace0edc351f9cd5d7ed1ad73"
   integrity sha512-C4XoE7tHxxaWQNzovBIEndXGrTesotshnKQA8DXlnoVDvriD6G26ezUoj9AlEb2UAPbEijSga4Dtwd86Z0a1jg==
 
-"@metalet/utxo-wallet-sdk@0.5.5":
-  version "0.5.5"
-  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.5.5.tgz#412dde5f4b34e1859a8e722151dffbfcd372eed7"
-  integrity sha512-eBqzLOW0HK2U3tYFMBZzPVBewnYULkNB5kbS/68/DpYxwdq4B4sZqRtkSb7TKOTtlB9/y+42a4heuFQNvx71Ag==
+"@metalet/utxo-wallet-sdk@0.5.6", "@metalet/utxo-wallet-sdk@^0.5.6":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-sdk/-/utxo-wallet-sdk-0.5.6.tgz#9798089354d8ae9f618c0fa41670ba71c5fdc9c7"
+  integrity sha512-CbpiNQEgIKb7qeB4ceOD4Pu2ndK0hM9X3p7LgK2r+cbHFkyEGyx2FSDXExci/yRjMgv8mBQ5NRuHgZEC0e/hkw==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.1.1"
     "@magiceden-oss/runestone-lib" "^1.0.2"
@@ -1800,12 +1800,12 @@
     ecpair "^2.1.0"
     undici "^6.19.2"
 
-"@metalet/utxo-wallet-service@^0.3.11":
-  version "0.3.11"
-  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.11.tgz#2647ac0bd605a1017934e6fc6a582a12836af536"
-  integrity sha512-vEXyh6Uk9lJyhNx8V9ygs1cauliqeyVqDfUOPKyo5QpOkTTo5ag1h9vEeLn9NCWlSXq9SnfNxBRqjsceJTGduQ==
+"@metalet/utxo-wallet-service@^0.3.12":
+  version "0.3.12"
+  resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.12.tgz#03e1af211075b526b82c49701824ca7d1526ba08"
+  integrity sha512-ZIrPIuYJIOe3l207oTf6h7fUgkfP31A61anyIDQ5m3lzueZFLZW6UMGVsUkG34Xp8MeQMtFUQfSAT5rH00uUhw==
   dependencies:
-    "@metalet/utxo-wallet-sdk" "0.5.5"
+    "@metalet/utxo-wallet-sdk" "0.5.6"
     crypto-js "^4.2.0"
     decimal.js "^10.4.3"
 
@@ -1875,6 +1875,33 @@
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@okxweb3/crypto-lib/-/crypto-lib-1.0.2.tgz#9db3ba452baaab3dfb800ecb2edc483578fc74ca"
   integrity sha512-XZ8UiIlKnlTqkM2dO19qUWdQybB9W5dnUN7ZKGdFrfcQr2Oe6milncZ5Ar5ECICUzoOlibjKHjp18iMrM5crAg==
+  dependencies:
+    "@noble/ed25519" "^1.7.3"
+    "@noble/hashes" "1.0.0"
+    "@noble/secp256k1" "^1.7.1"
+    "@scure/base" "1.0.0"
+    asmcrypto.js "^2.3.2"
+    bigint-conversion "^2.3.0"
+    bigint-crypto-utils "^3.1.8"
+    bignumber.js "^9.0.1"
+    bn.js "4.12.0"
+    brorand "^1.1.0"
+    hash.js "^1.0.0"
+    hmac-drbg "^1.0.1"
+    inherits "^2.0.4"
+    long "^5.2.0"
+    minimalistic-assert "^1.0.1"
+    minimalistic-crypto-utils "^1.0.1"
+    protobufjs "^7.2.4"
+    randombytes "^2.1.0"
+    safe-buffer "^5.1.1"
+    typeforce "^1.11.5"
+    wif "^2.0.6"
+
+"@okxweb3/crypto-lib@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@okxweb3/crypto-lib/-/crypto-lib-1.0.4.tgz#4d043c537869105a3e838660a44cf4f23ad02677"
+  integrity sha512-LYP+IV0xRMWN2o5oh5gGioRwnTti8jwCv+lA7iYp6YD3sChN6R8xFtEVd9tU8rVzUWaifUxhDTHrvHBX8Fe71g==
   dependencies:
     "@noble/ed25519" "^1.7.3"
     "@noble/hashes" "1.0.0"
@@ -5432,11 +5459,6 @@ expo-modules-core@1.11.13:
   dependencies:
     invariant "^2.2.4"
 
-expo-permissions@^14.4.0:
-  version "14.4.0"
-  resolved "https://registry.yarnpkg.com/expo-permissions/-/expo-permissions-14.4.0.tgz#d7bb2f0026b87e1294ee551969c35306193f4ad3"
-  integrity sha512-oAcnJ7dlZhpBydK73cwomA2xofizayVUz+FW5REl7dMu7MYyeN/3aqhlpZ3mYddrxvG161bqu97MQr01UixUnw==
-
 expo-pwa@0.0.127:
   version "0.0.127"
   resolved "https://registry.yarnpkg.com/expo-pwa/-/expo-pwa-0.0.127.tgz#b8d2fd28efff408a24e0f2539bfb47e09f8e4ebe"
@@ -8633,13 +8655,22 @@ postcss-value-parser@^4.0.0, postcss-value-parser@^4.0.2, postcss-value-parser@^
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-postcss@^8.3.5, postcss@^8.4.12, postcss@^8.4.23, postcss@^8.4.33, postcss@^8.4.38, postcss@~8.4.32:
+postcss@^8.3.5, postcss@^8.4.12, postcss@^8.4.23, postcss@^8.4.33, postcss@^8.4.38:
   version "8.4.38"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.38.tgz#b387d533baf2054288e337066d81c6bee9db9e0e"
   integrity sha512-Wglpdk03BSfXkHoQa3b/oulrotAkwrlLDRSOb9D0bN86FdRyE9lppSp33aHNPgBa0JKCoB+drFLZkQoRRYae5A==
   dependencies:
     nanoid "^3.3.7"
     picocolors "^1.0.0"
+    source-map-js "^1.2.0"
+
+postcss@~8.4.32:
+  version "8.4.39"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.39.tgz#aa3c94998b61d3a9c259efa51db4b392e1bde0e3"
+  integrity sha512-0vzE+lAiG7hZl1/9I8yzKLx3aR9Xbof3fBHKunvMfOCYAtMhrsnccJY2iTURb9EZd5+pLuiNV9/c/GZJOHsgIw==
+  dependencies:
+    nanoid "^3.3.7"
+    picocolors "^1.0.1"
     source-map-js "^1.2.0"
 
 prettier@3.2.5:
@@ -10901,7 +10932,12 @@ ws@^7, ws@^7.5.1:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.9.tgz#54fa7db29f4c7cec68b1ddd3a89de099942bb591"
   integrity sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==
 
-ws@^8.12.1, ws@^8.13.0:
+ws@^8.12.1:
+  version "8.18.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.18.0.tgz#0d7505a6eafe2b0e712d232b42279f53bc289bbc"
+  integrity sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==
+
+ws@^8.13.0:
   version "8.17.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.17.0.tgz#d145d18eca2ed25aaf791a183903f7be5e295fea"
   integrity sha512-uJq6108EgZMAl20KagGkzCKfMEjxmKvZHG7Tlq0Z6nOky7YF7aq4mOx6xK8TJ/i1LeK4Qus7INktacctDgY8Ow==

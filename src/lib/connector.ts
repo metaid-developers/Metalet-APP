@@ -48,6 +48,10 @@ connector.isConnected = async function (accountId, host) {
   console.log("connections", JSON.stringify(connections));
 
   const accountConnections = connections[accountId] || {};
+  console.log("accountConnections----", JSON.stringify(accountConnections));
+  console.log("accountConnections[host] ", JSON.stringify(accountConnections[host]));
+  
+  
   return !!accountConnections[host];
 };
 

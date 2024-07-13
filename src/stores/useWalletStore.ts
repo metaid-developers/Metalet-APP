@@ -4,7 +4,6 @@ import {
   Chain,
   BtcWallet,
   MvcWallet,
-  BaseWallet,
 } from "@metalet/utxo-wallet-service";
 
 interface WalletState {

@@ -7,6 +7,7 @@ import {
   Modal,
   ScrollView,
   Linking,
+  ImageBackground,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -35,50 +36,108 @@ export default function MetaIDPinsDetails({ route }) {
           <View style={{ flex: 1, marginTop: 20 }}>
             {/* head */}
             <View style={{ padding: 15, alignItems: "center", marginTop: 20 }}>
-              <View
-                style={{
-                  backgroundColor: "#171AFF",
-                  borderRadius: 8,
-                  height: 150,
-                  width: 150,
-                  marginTop: 10,
-                  marginRight: 10,
-                  paddingHorizontal: 10,
-                  paddingVertical: 10,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {/* <Text style={{color:'#fff',fontSize:10}}>{JSON.stringify(item.nftShowContent)}</Text> */}
-                <Text style={{ color: "#fff", fontSize: 13, marginBottom: 20 }}>
-                  {nftDetail.contentSummary}
-                </Text>
-
+              {nftDetail.contentTypeDetect.includes("image") ? (
                 <View
                   style={{
+                    backgroundColor: "#fff",
+                    borderRadius: 8,
+                    height: 150,
+                    width: 150,
+                    marginTop: 10,
+                    marginRight: 10,
+                    paddingHorizontal: 10,
+                    paddingVertical: 10,
+                    alignItems: "center",
                     justifyContent: "center",
-                    flexDirection: "row",
-                    width: 50,
-                    backgroundColor: "#767EFF",
-                    borderRadius: 5,
-                    position: "absolute",
-                    bottom: 10,
-                    right: 10,
+                    borderColor: inputNormalBgColor,
+                    borderWidth: 1,
                   }}
                 >
-                  <Text
+                  <ImageBackground
+                    source={{ uri: nftDetail.content }} // 替换为你的图片路径
                     style={{
-                      color: "#fff",
-                      fontSize: 10,
-                      paddingHorizontal: 2,
-                      paddingVertical: 2,
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    {" "}
-                    546 sat{" "}
-                  </Text>
+                    <View style={{ flex: 1 }}></View>
+
+                    <View style={{ flexDirection: "row", marginBottom: 2 }}>
+                      <View style={{ flex: 1 }} />
+                      <View
+                        style={{
+                          justifyContent: "center",
+                          flexDirection: "row",
+                          width: 50,
+                          backgroundColor: "#767EFF",
+                          marginTop: 3,
+                          // backgroundColor: 'rgba(23, 26, 255, 0.1)',
+                          borderRadius: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#fff",
+                            fontSize: 10,
+                            paddingHorizontal: 2,
+                            paddingVertical: 2,
+                          }}
+                        >
+                          546 sat{" "}
+                        </Text>
+                      </View>
+                    </View>
+                  </ImageBackground>
                 </View>
-              </View>
+              ) : (
+                <View
+                  style={{
+                    backgroundColor: "#171AFF",
+                    borderRadius: 8,
+                    height: 150,
+                    width: 150,
+                    marginTop: 10,
+                    marginRight: 10,
+                    paddingHorizontal: 10,
+                    paddingVertical: 10,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {/* <Text style={{color:'#fff',fontSize:10}}>{JSON.stringify(item.nftShowContent)}</Text> */}
+                  <Text
+                    style={{ color: "#fff", fontSize: 13, marginBottom: 20 }}
+                  >
+                    {nftDetail.contentSummary}
+                  </Text>
+
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      flexDirection: "row",
+                      width: 50,
+                      backgroundColor: "#767EFF",
+                      borderRadius: 5,
+                      position: "absolute",
+                      bottom: 10,
+                      right: 10,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#fff",
+                        fontSize: 10,
+                        paddingHorizontal: 2,
+                        paddingVertical: 2,
+                      }}
+                    >
+                      {" "}
+                      546 sat{" "}
+                    </Text>
+                  </View>
+                </View>
+              )}
             </View>
 
             <Text
@@ -93,7 +152,10 @@ export default function MetaIDPinsDetails({ route }) {
             <View style={{ alignItems: "center", marginTop: 20 }}>
               <TouchableWithoutFeedback
                 onPress={() => {
-                  navigate("PinNftTransferPage", {type:"pin", nftDetail: nftDetail });
+                  navigate("PinNftTransferPage", {
+                    type: "pin",
+                    nftDetail: nftDetail,
+                  });
                 }}
               >
                 <View
