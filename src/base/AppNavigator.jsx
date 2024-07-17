@@ -7,7 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { setTopLevelNavigator } from "./NavigationService";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import { metaStyles } from "../constant/Constants";
+import { metaStyles, showPayCode } from "../constant/Constants";
 import EasyToast from "react-native-easy-toast";
 
 // import { ToastContainer } from 'react-native-toastify';
@@ -192,6 +192,8 @@ const StackNavigator = () => (
 
 const TabNavigator = () => {
   const { walletMode, updateWalletMode } = useData();
+  const { isShowPay, updateIsShowPay } = useData();
+
   // console.log("walletMode", walletMode);
 
   return (
@@ -257,7 +259,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
       {/* <Tab.Screen name="PlazaPage" component={PlazaPage} /> */}
-      {walletMode != wallet_mode_cold && (
+      {walletMode != wallet_mode_cold&&isShowPay==showPayCode && (
         <Tab.Screen name="DiscoverPage" component={DiscoverPage} />
       )}
       <Tab.Screen name="SettingsPage" component={SettingsPage} />

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { navigate } from "../base/NavigationService";
-import { metaStyles, themeColor } from "../constant/Constants";
+import { metaStyles, showPayCode, themeColor } from "../constant/Constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   CustomTabBar,
@@ -120,6 +120,7 @@ export default function HomePage({ navigation }) {
   const versionCode = Constants.expoConfig?.android.versionCode;
   const buildNumber = Constants.expoConfig?.ios.buildNumber;
   const platformNow = Platform.OS;
+  const { isShowPay, updateIsShowPay } = useData();
 
   // useEffect(() => {
   //   if (!walletManager) {
@@ -236,7 +237,7 @@ export default function HomePage({ navigation }) {
   async function checkUpgrade() {
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
-      //  console.log(JSON.stringify(check));
+      console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;
       setUpdateUrl(check.data.url);
       // setUpdateUrl(check.data.apkUrl);
@@ -281,7 +282,7 @@ export default function HomePage({ navigation }) {
     metaletWallet.currentBtcAssert = showbalance.btcAssert;
     metaletWallet.currentSpaceAssert = showbalance.spaceAssert;
 
-    console.log("metaletWallet 余额刷新 ",  metaletWallet.currentMvcBalance);
+    console.log("metaletWallet 余额刷新 ", metaletWallet.currentMvcBalance);
     updateSpaceBalance(showbalance.spaceBalance);
     updateSetBtcBalance(showbalance.btcBalance);
 
@@ -1080,7 +1081,7 @@ export default function HomePage({ navigation }) {
           <View
             style={[
               metaStyles.rowContainer,
-              { justifyContent: "space-between", marginTop: 10 },
+              { justifyContent:isShowPay==showPayCode?'space-between':'space-around', marginTop: 10 },
             ]}
           >
             <TouchableWithoutFeedback
@@ -1154,57 +1155,66 @@ export default function HomePage({ navigation }) {
             </View>
           </TouchableWithoutFeedback> */}
 
-            <TouchableWithoutFeedback
-              onPress={async () => {
-                // updateAccountIndex(1);
-                // AsyncStorageUtil.setItem("account_select", 0);
-                const isCold = await isColdWalletMode();
-                if (isCold) {
-                } else {
-                  navigate("WebsPage", {
-                    url: "https://app.orders.exchange/",
-                  });
-                }
+            {isShowPay == showPayCode && (
+              <TouchableWithoutFeedback
+                onPress={async () => {
+                  // updateAccountIndex(1);
+                  // AsyncStorageUtil.setItem("account_select", 0);
+                  const isCold = await isColdWalletMode();
+                  if (isCold) {
+                  } else {
+                    navigate("WebsPage", {
+                      url: "https://app.orders.exchange/",
+                    });
+                  }
 
-                // navigate("DiscoverPage");
-                // navigate("WebPageTest");
-              }}
-            >
-              <View style={{ marginTop: 20, alignItems: "center" }}>
-                <Image
-                  source={require("../../image/meta_home_swap_icon.png")}
-                  style={{ width: 40, height: 40 }}
-                />
-                <Text style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}>
-                  Swap
-                </Text>
-              </View>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback
-              onPress={async () => {
-                // navigate("DiscoverPage");
-                const isCold = await isColdWalletMode();
-                if (isCold) {
-                } else {
-                  navigate("WebsPage", {
-                    // url: "https://octopus.space/",
-                    url: "https://octopus.space/#/wrapping",
-                  });
-                }
-                // navigate("WebPageTest");
-                // navigate("WebPage");
-              }}
-            >
-              <View style={{ marginTop: 20, alignItems: "center" }}>
-                <Image
-                  source={require("../../image/meta_home_bridge_icon.png")}
-                  style={{ width: 40, height: 40 }}
-                />
-                <Text style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}>
-                  Bridge
-                </Text>
-              </View>
-            </TouchableWithoutFeedback>
+                  // navigate("DiscoverPage");
+                  // navigate("WebPageTest");
+                }}
+              >
+                <View style={{ marginTop: 20, alignItems: "center" }}>
+                  <Image
+                    source={require("../../image/meta_home_swap_icon.png")}
+                    style={{ width: 40, height: 40 }}
+                  />
+                  <Text
+                    style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
+                  >
+                    Swap
+                  </Text>
+                </View>
+              </TouchableWithoutFeedback>
+            )}
+
+            {isShowPay == showPayCode && (
+              <TouchableWithoutFeedback
+                onPress={async () => {
+                  // navigate("DiscoverPage");
+                  const isCold = await isColdWalletMode();
+                  if (isCold) {
+                  } else {
+                    navigate("WebsPage", {
+                      // url: "https://octopus.space/",
+                      url: "https://octopus.space/#/wrapping",
+                    });
+                  }
+                  // navigate("WebPageTest");
+                  // navigate("WebPage");
+                }}
+              >
+                <View style={{ marginTop: 20, alignItems: "center" }}>
+                  <Image
+                    source={require("../../image/meta_home_bridge_icon.png")}
+                    style={{ width: 40, height: 40 }}
+                  />
+                  <Text
+                    style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
+                  >
+                    Bridge
+                  </Text>
+                </View>
+              </TouchableWithoutFeedback>
+            )}
           </View>
 
           {/* <MyTabs /> */}

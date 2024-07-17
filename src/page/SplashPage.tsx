@@ -5,6 +5,7 @@ import {
   TextInput,
   ImageBackground,
   Dimensions,
+  Platform,
 } from "react-native";
 import React, { useEffect } from "react";
 import { metaStyles } from "../constant/Constants";
@@ -41,6 +42,8 @@ import {
 import { goBack, navigate, reSets } from "../base/NavigationService";
 import useNetworkStore from "@/stores/useNetworkStore";
 import { BTC_NETWORK } from "./SettingsPage";
+import { UpdateData } from "@/api/type/Update";
+import { fetchCheckUpgrade } from "@/api/metaletservice";
 
 export default function SplashPage(props) {
   const { myWallet, updateMyWallet } = useData();
@@ -48,9 +51,12 @@ export default function SplashPage(props) {
   const { metaletWallet, updateMetaletWallet } = useData();
   const { network, switchNetwork } = useNetworkStore();
   const { walletMode, updateWalletMode } = useData();
+  const { isShowPay, updateIsShowPay } = useData();
+  const platformNow = Platform.OS;
 
   useEffect(() => {
     try {
+      checkUpgrade()
       initDataBase();
     } catch (e) {
       console.log("initDataBase error", e);
@@ -74,8 +80,8 @@ export default function SplashPage(props) {
     if (walletBean && account) {
       updateMyWallet(walletBean);
       const isCold = await isColdWalletMode();
-      
-      if(!isCold){
+
+      if (!isCold) {
         const btcWallet = await getCurrentBtcWallet();
         const mvcWallet = await getCurrentMvcWallet();
         let metaletWallet = new MetaletWallet();
@@ -83,10 +89,10 @@ export default function SplashPage(props) {
         metaletWallet.currentMvcWallet = mvcWallet;
         updateMetaletWallet(metaletWallet);
         updateWalletMode(wallet_mode_hot);
-      }else{
+      } else {
         updateWalletMode(wallet_mode_cold);
       }
-     
+
       // props.navigation.navigate("Tabs");
       // reSets()
       // navigate("Tabs",{destory:true});
@@ -105,6 +111,21 @@ export default function SplashPage(props) {
         props.navigation.navigate("Tabs");
       }
     }, 200);
+  }
+
+  async function checkUpgrade() {
+    if (platformNow === "android") {
+      const check: UpdateData = await fetchCheckUpgrade("android");
+      console.log(JSON.stringify(check));
+      const showCode = check.data.android;
+      updateIsShowPay(showCode)
+    } else {
+      const check: UpdateData = await fetchCheckUpgrade("ios");
+      // console.log(JSON.stringify(check));
+      const codeVersion = check.data.ios;
+      const showCode = check.data.android;
+      updateIsShowPay(showCode)
+    }
   }
 
   return (

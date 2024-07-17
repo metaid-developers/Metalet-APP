@@ -14,6 +14,8 @@ export interface Update {
   mandatory_code: number;
   contents: Contents;
   apkUrl:string;
+  ios:number,
+  android:number,
 }
 
 interface Contents {

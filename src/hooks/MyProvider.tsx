@@ -37,6 +37,8 @@ type GlobalContext = {
   updateSpaceBalance;
   btcBalance;
   updateSetBtcBalance;
+  isShowPay,
+  updateIsShowPay
 };
 
 const UserContext = createContext<GlobalContext>(undefined);
@@ -136,6 +138,10 @@ export const UserProvider = ({ children }) => {
     setBtcBalance(newData);
   };
 
+  const [isShowPay, setIsShowPay] = useState(0);
+  const updateIsShowPay = (newData) => {
+    setIsShowPay(newData);
+  };
   // 将需要共享的数据和更新方法放在上下文的 value 中
   const contextValue = {
     userData,
@@ -168,6 +174,8 @@ export const UserProvider = ({ children }) => {
     updateSpaceBalance,
     btcBalance,
     updateSetBtcBalance,
+    isShowPay,
+    updateIsShowPay
   };
 
   return (

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Linking,
 } from "react-native";
 import React, { useState } from "react";
 import { metaStyles, themeColor } from "../constant/Constants";
@@ -18,6 +19,7 @@ import {
   getStorageWallets,
   isNoStorageWallet,
   isNoWalletPassword,
+  openBrowser,
 } from "../utils/WalletUtils";
 import { wordlist } from "@scure/bip39/wordlists/english";
 import * as bip39 from "@scure/bip39";
@@ -61,7 +63,6 @@ export default function WelcomeWalletPage(props) {
     metaletWallet.currentBtcWallet = btcWallet;
     metaletWallet.currentMvcWallet = mvcWallet;
     updateMetaletWallet(metaletWallet);
-    
 
     if (hasNoWallets) {
       await storage.set(wallets_key, [walletBean]);
@@ -79,7 +80,7 @@ export default function WelcomeWalletPage(props) {
   }
 
   return (
-    <SafeAreaView style={[styles.container,{backgroundColor:"#fff"}]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: "#fff" }]}>
       <LoadingModal
         isShow={isShowLoading}
         isCancel={true}
@@ -138,7 +139,14 @@ export default function WelcomeWalletPage(props) {
       <View style={[styles.row, { marginBottom: 40 }]}>
         {/* <Text style={metaStyles.blueText}>User Agreement</Text> */}
         <Text style={metaStyles.grayText99}> Metalet's </Text>
-        <Text style={metaStyles.blueText}>Terms of Service</Text>
+        <TouchableWithoutFeedback onPress={() => {
+          // Linking.openURL(
+          //   "https://metalet.space/terms-of-service"
+          // );
+          openBrowser( "https://metalet.space/terms-of-service");
+        }}>
+          <Text style={metaStyles.blueText}>Terms of Service</Text>
+        </TouchableWithoutFeedback>
       </View>
     </SafeAreaView>
   );
@@ -148,9 +156,9 @@ const styles = StyleSheet.create({
   container: {
     // margin: 20,
     // marginTop: 50,
-    paddingTop:50,
-    paddingHorizontal:20,
-    paddingBottom:20,
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     alignItems: "center",
     flexDirection: "column",
     flex: 1,

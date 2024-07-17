@@ -15,7 +15,7 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "20",
+      "buildNumber": "21",
       "supportsTablet": true,
       "bundleIdentifier": "com.metalet.swallet",
       "infoPlist": {
@@ -29,12 +29,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.metalet.swallet",
-      "icon": "./assets/logo_metalet.png",
-      "versionCode": 20,
+      "icon": "./assets/icon.png",
+      "versionCode": 21,
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
