@@ -98,6 +98,7 @@ export default function HomePage({ navigation }) {
   const [sameBtcAsMvcAddress, setSameBtcAsMvcAddress] = useState<string>();
 
   // const [mvcAddress, setMvcAddress] = useState<string>();
+  // test
 
   // 当前网络
   const { netWork, updateNetWork } = useData();
