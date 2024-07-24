@@ -6,7 +6,7 @@ import {
   StyleSheet,
   ListRenderItem,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   CircleAvatar,
   CircleAvatarLetter,
@@ -27,6 +27,7 @@ import {
 } from "@/utils/WalletUtils";
 import { Chain } from "@metalet/utxo-wallet-service";
 import { fetchMrc20List } from "@/api/metaletservice";
+import { useMRC20sInfiniteQuery } from "@/queries/mrc20";
 
 // now
 export default function BtcFtPage() {
@@ -53,6 +54,21 @@ export default function BtcFtPage() {
       refresh();
     }, [btcAddress])
   );
+
+  const { data: _mrc20Assets } = useMRC20sInfiniteQuery(btcAddress, 1000000, {
+    enabled: !!btcAddress,
+  });
+
+  const mrc20Assets = useMemo(
+    () => (_mrc20Assets ? _mrc20Assets.pages.flatMap((page) => page.list) : []),
+    [_mrc20Assets]
+  );
+
+  useEffect(() => {
+    if (mrc20Assets.length) {
+      console.log("Mrc20-----1 ",JSON.stringify(mrc20Assets));
+    }
+  }, [mrc20Assets]);
 
   async function refresh() {
     if (btcAddress) {
@@ -232,7 +248,6 @@ export default function BtcFtPage() {
             mrc20Img = "https://man-test.metaid.io/content/" + extractedString;
           }
         }
-
       }
 
       return (

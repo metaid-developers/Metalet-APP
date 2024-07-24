@@ -11,7 +11,7 @@ export interface UTXO {
   satoshis: number;
   confirmed: boolean;
   rawTx?: string;
-  inscriptions:
+  inscriptions?:
     | {
         id: string;
         num: number;
