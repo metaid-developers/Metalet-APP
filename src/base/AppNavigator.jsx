@@ -76,6 +76,12 @@ import MetaIDPinsPage from "@/page/nft/MetaIDPinsPage";
 import MetaIDPage from "@/page/nft/MetaIDPage";
 import MetaIDPinsDetails from "@/page/home/MetaIDPinsDetails";
 import PinNftTransferPage from "@/page/home/PinNftTransferPage";
+import ImportWalletNetWorkPage from "@/page/wallet/ImportWalletNetWorkPage";
+import ImportWalletFirstPage from "@/page/wallet/ImportWalletFirstPage";
+import ImportSelectMvcPathPage from "@/page/wallet/ImportWalletSelectAddressPage";
+import ImportWalletSelectAddressPage from "@/page/wallet/ImportWalletSelectAddressPage";
+import ImportWalletMvcPathNextPage from "@/page/wallet/ImportWalletMvcPathNextPage";
+import ImportWalletNetPage from "@/page/ImportWalletNetPage";
 
 ////////
 
@@ -187,6 +193,12 @@ const StackNavigator = () => (
     <Stack.Screen name="MetaIDPage" component={MetaIDPage} />
     <Stack.Screen name="MetaIDPinsDetails" component={MetaIDPinsDetails} />
     <Stack.Screen name="PinNftTransferPage" component={PinNftTransferPage} />
+    <Stack.Screen name="ImportWalletNetWorkPage" component={ImportWalletNetWorkPage} />
+    <Stack.Screen name="ImportWalletFirstPage" component={ImportWalletFirstPage} />
+    <Stack.Screen name="ImportWalletSelectAddressPage" component={ImportWalletSelectAddressPage} />
+    <Stack.Screen name="ImportWalletMvcPathNextPage" component={ImportWalletMvcPathNextPage} />
+    <Stack.Screen name="ImportWalletNetPage" component={ImportWalletNetPage} />
+
   </Stack.Navigator>
 );
 

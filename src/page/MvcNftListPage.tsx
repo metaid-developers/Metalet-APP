@@ -33,25 +33,7 @@ export default function MvcNftListPage({ props, route }) {
   }, []);
 
   async function getNftListData() {
-    let params = {
-      page: page,
-      pageSize: pageSize,
-      chain: "mvc",
-      codehash: myObject.codehash,
-      genesis: myObject.genesis,
-    };
-
-    let url =
-      BASE_METALET_URL +
-      "/aggregation/v2/app/show/nft/" +
-      mvcAddress +
-      "/details";
-
-    let data: RootMvcGenesisBeanObject = await get(url, false, params);
-    if (data.data.results.items != null) {
-      setGenesisNftList(data.data.results.items);
-    }
-
+  
     try {
       // const value=await AsyncStorage.getItem('@FlutterSharedPreferences:data');
       // console.log('读取的flutter数据信息',value);
@@ -62,6 +44,26 @@ export default function MvcNftListPage({ props, route }) {
       // // 解析 JSON 数据
       // const jsonData = JSON.parse(fileContent);
       // console.log("读取的数据信息", jsonData);
+
+      let params = {
+        page: page,
+        pageSize: pageSize,
+        chain: "mvc",
+        codehash: myObject.codehash,
+        genesis: myObject.genesis,
+      };
+  
+      let url =
+        BASE_METALET_URL +
+        "/aggregation/v2/app/show/nft/" +
+        mvcAddress +
+        "/details";
+  
+      let data: RootMvcGenesisBeanObject = await get(url, false, params);
+      if (data.data.results.items != null) {
+        setGenesisNftList(data.data.results.items);
+      }
+  
     } catch (e) {
       console.log("读取数据信息错误", e);
     }

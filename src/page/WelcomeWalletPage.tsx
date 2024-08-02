@@ -108,7 +108,8 @@ export default function WelcomeWalletPage(props) {
           if (noPassword) {
             navigate("SetPasswordPage", { type: "import" });
           } else {
-            navigate("ImportWalletPage", { destory: true });
+            // navigate("ImportWalletPage", { destory: true });
+            navigate("ImportWalletNetPage", { destory: true });
           }
         }}
         color="#F3F3FF"

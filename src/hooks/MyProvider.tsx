@@ -38,7 +38,11 @@ type GlobalContext = {
   btcBalance;
   updateSetBtcBalance;
   isShowPay,
-  updateIsShowPay
+  updateIsShowPay,
+  mvcPath,
+  updateMvcPath,
+  btcSameAsMvcAddress,
+  updateBtcSameAsMvcAddress
 };
 
 const UserContext = createContext<GlobalContext>(undefined);
@@ -142,6 +146,21 @@ export const UserProvider = ({ children }) => {
   const updateIsShowPay = (newData) => {
     setIsShowPay(newData);
   };
+
+
+   //import path
+   const [mvcPath, setMvcPath] = useState("10001");
+   const updateMvcPath = (newData) => {
+    setMvcPath(newData);
+  };
+
+  const [btcSameAsMvcAddress,setBtcSameAsMvcAddress] = useState();
+  const updateBtcSameAsMvcAddress = (newData) => {
+    setBtcSameAsMvcAddress(newData);
+  };
+
+  
+
   // 将需要共享的数据和更新方法放在上下文的 value 中
   const contextValue = {
     userData,
@@ -175,7 +194,11 @@ export const UserProvider = ({ children }) => {
     btcBalance,
     updateSetBtcBalance,
     isShowPay,
-    updateIsShowPay
+    updateIsShowPay,
+    mvcPath,
+    updateMvcPath,
+    btcSameAsMvcAddress,
+    updateBtcSameAsMvcAddress
   };
 
   return (

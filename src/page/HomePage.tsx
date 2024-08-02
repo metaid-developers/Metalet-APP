@@ -74,6 +74,8 @@ const storage = createStorage();
 // Home 开发
 const TabsTop = createMaterialTopTabNavigator();
 
+// version 3.0.2 code 23
+
 export default function HomePage({ navigation }) {
   const { metaletWallet, updateMetaletWallet } = useData();
   const { setCurrentWallet } = useWalletStore();
@@ -95,10 +97,10 @@ export default function HomePage({ navigation }) {
   const [taprootAddress, setTaprootAddress] = useState<string>();
   const [nestedSegwitAddress, setNestedSegwitAddress] = useState<string>();
   const [nativeSegwitAddress, setNativeSegwitAddress] = useState<string>();
-  const [sameBtcAsMvcAddress, setSameBtcAsMvcAddress] = useState<string>();
+  // const [sameBtcAsMvcAddress, setSameBtcAsMvcAddress] = useState<string>();
+  const {btcSameAsMvcAddress,updateBtcSameAsMvcAddress} = useData();
 
   // const [mvcAddress, setMvcAddress] = useState<string>();
-  // test
 
   // 当前网络
   const { netWork, updateNetWork } = useData();
@@ -176,6 +178,7 @@ export default function HomePage({ navigation }) {
     });
 
     checkUpgrade();
+    // AsyncStorageUtil.clear()
   }, []);
 
   useEffect(() => {
@@ -238,7 +241,7 @@ export default function HomePage({ navigation }) {
   async function checkUpgrade() {
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
-      console.log(JSON.stringify(check));
+      // console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;
       setUpdateUrl(check.data.url);
       // setUpdateUrl(check.data.apkUrl);
@@ -283,7 +286,7 @@ export default function HomePage({ navigation }) {
     metaletWallet.currentBtcAssert = showbalance.btcAssert;
     metaletWallet.currentSpaceAssert = showbalance.spaceAssert;
 
-    console.log("metaletWallet 余额刷新 ", metaletWallet.currentMvcBalance);
+    // console.log("metaletWallet 余额刷新 ", metaletWallet.currentMvcBalance);
     updateSpaceBalance(showbalance.spaceBalance);
     updateSetBtcBalance(showbalance.btcBalance);
 
@@ -342,7 +345,7 @@ export default function HomePage({ navigation }) {
       const btcLegacyWallet = await getBtcWallet(AddressType.Legacy);
       setLegacyAddress(btcLegacyWallet.getAddress());
       const btcSameAsLegacyWallet = await getBtcWallet(AddressType.SameAsMvc);
-      setSameBtcAsMvcAddress(btcSameAsLegacyWallet.getAddress());
+      updateBtcSameAsMvcAddress(btcSameAsLegacyWallet.getAddress());
       const mvcWallet = await getCurrentMvcWallet();
       const currentBtcWallet = await getCurrentBtcWallet();
 
@@ -863,13 +866,13 @@ export default function HomePage({ navigation }) {
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {sameBtcAsMvcAddress}
+                    {btcSameAsMvcAddress}
                   </Text>
                 </View>
 
                 <TouchableWithoutFeedback
                   onPress={() => {
-                    ShowNotice(sameBtcAsMvcAddress);
+                    ShowNotice(btcSameAsMvcAddress);
                   }}
                 >
                   <Image

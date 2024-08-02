@@ -66,7 +66,7 @@ export default function BtcFtPage() {
 
   useEffect(() => {
     if (mrc20Assets.length) {
-      console.log("Mrc20-----1 ",JSON.stringify(mrc20Assets));
+      // console.log("Mrc20-----1 ", JSON.stringify(mrc20Assets));
     }
   }, [mrc20Assets]);
 
@@ -113,6 +113,7 @@ export default function BtcFtPage() {
     };
 
     let dataBrc20: RootBtcFtObject = await get(BTC_FT_URL, false, params);
+    // console.log("dataBrc20", JSON.stringify(dataBrc20));
 
     if (dataBrc20 && dataBrc20.data) {
       if (dataBrc20.data.list != null && dataBrc20.data.list.length > 0) {
@@ -145,9 +146,6 @@ export default function BtcFtPage() {
   };
 
   const ListItem: React.FC<{ index: number; item }> = ({ index, item }) => {
-    const showBalance =
-      parseFloat(item.unsafeBalance) + parseFloat(item.balance);
-
     if (item.type === "brc20") {
       return (
         <TouchableWithoutFeedback
@@ -215,8 +213,24 @@ export default function BtcFtPage() {
         </TouchableWithoutFeedback>
       );
     } else {
-      let mrc20Img;
+      let showBalance = 0;
+      // const showBalance =
+      //   parseFloat(item.unsafeBalance) + parseFloat(item.balance);
 
+      if (parseFloat(item.balance) > 0) {
+        showBalance = parseFloat(item.unsafeBalance) + parseFloat(item.balance);
+      } else {
+        showBalance = parseFloat(item.unsafeBalance);
+      }
+
+      let showUnConfirmed = false;
+      if (parseFloat(item.unsafeBalance) > 0) {
+        // if (parseFloat(item.unsafeBalance) <= 0) {
+        showUnConfirmed = true;
+      } else {
+        showUnConfirmed = false;
+      }
+      let mrc20Img;
       const metaData = item.metaData;
 
       if (
@@ -224,7 +238,8 @@ export default function BtcFtPage() {
         metaData != null &&
         metaData != undefined &&
         metaData != "" &&
-        metaData != "undefined"
+        metaData != "undefined" &&
+        JSON.stringify(metaData).includes("icon")
       ) {
         // console.log("metaData", metaData);
 
@@ -242,7 +257,10 @@ export default function BtcFtPage() {
             mrc20Img = "https://man.metaid.io/content/" + extractedString;
           }
         } else {
-          if (metaDataObject.icon.startsWith("http")) {
+          if (
+            metaDataObject.icon != undefined &&
+            metaDataObject.icon.startsWith("http")
+          ) {
             mrc20Img = metaDataObject.icon;
           } else {
             mrc20Img = "https://man-test.metaid.io/content/" + extractedString;
@@ -259,55 +277,102 @@ export default function BtcFtPage() {
           }}
         >
           <View
-            style={[
-              styles.flatListStyle,
-              { paddingTop: 20, paddingBottom: 20 },
-            ]}
+            style={{
+              backgroundColor: "#F5F7F9",
+              borderRadius: 10,
+              marginTop: 10,
+            }}
           >
-            {mrc20Img != null ? (
-              <CircleAvatar
-                imageUrl={mrc20Img}
-                event={() => {
-                  // refreshData(item.name);
-                }}
-              />
-            ) : (
-              <CircleAvatarLetter letterStr={item.tokenName.substring(0, 1)} />
-            )}
+            <View
+              style={[
+                styles.flatListStyle,
+                { paddingTop: 20, paddingBottom: 20 },
+              ]}
+            >
+              {mrc20Img != null ? (
+                <CircleAvatar
+                  imageUrl={mrc20Img}
+                  event={() => {
+                    // refreshData(item.name);
+                  }}
+                />
+              ) : (
+                <CircleAvatarLetter
+                  letterStr={item.tokenName.substring(0, 1)}
+                />
+              )}
 
-            <View style={{ marginLeft: 10 }}>
-              <Text
-                style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
-              >
-                {item.tokenName.toUpperCase()}
-                {/* {item.tokenName} */}
-              </Text>
+              <View style={{ marginLeft: 10 }}>
+                <Text
+                  style={{
+                    fontSize: item.tokenName.length > 10 ? 10 : 16,
+                    color: "#000000",
+                    marginBottom: 10,
+                    width: 100,
+                  }}
+                >
+                  {item.tokenName.toUpperCase()}
+                  {/* {item.tokenName} */}
+                </Text>
 
-              <View
-                style={{
-                  backgroundColor: "rgba(214, 240, 255, 0.5)",
-                  borderRadius: 3,
-                  padding: 5,
-                  width: 50,
-                }}
-              >
-                <Text style={{ fontSize: 10, color: "#1472FF" }}>MRC20</Text>
+                <View
+                  style={{
+                    backgroundColor: "rgba(214, 240, 255, 0.5)",
+                    borderRadius: 3,
+                    padding: 5,
+                    width: 50,
+                  }}
+                >
+                  <Text style={{ fontSize: 10, color: "#1472FF" }}>MRC20</Text>
+                </View>
+              </View>
+
+              <View style={{ flex: 1 }} />
+
+              <View style={{ marginLeft: 10, marginRight: 10 }}>
+                <Text
+                  style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
+                >
+                  {/* balance */}
+                </Text>
+                <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
+                  {/* {item.balance!}{" "} */}
+                  {showBalance}
+                </Text>
               </View>
             </View>
 
-            <View style={{ flex: 1 }} />
-
-            <View style={{ marginLeft: 10, marginRight: 10 }}>
-              <Text
-                style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
+            {showUnConfirmed && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  backgroundColor: "#fff",
+                  borderRadius: 10,
+                  padding: 10,
+                  paddingHorizontal: 10,
+                  marginBottom: 10,
+                  marginHorizontal: 10,
+                  justifyContent: "space-between",
+                }}
               >
-                {/* balance */}
-              </Text>
-              <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
-                {/* {item.balance!}{" "} */}
-                {showBalance}
-              </Text>
-            </View>
+                <View style={{ alignItems: "center" }}>
+                  <Text style={[metaStyles.smallDefaultText, {}]}>0</Text>
+                  <Text style={[metaStyles.grayTextSmall66, { marginTop: 5 }]}>
+                    {" "}
+                    Confirmed
+                  </Text>
+                </View>
+                <View style={{ alignItems: "center" }}>
+                  <Text style={[metaStyles.smallDefaultText, {}]}>
+                    {item.unsafeAmount}
+                  </Text>
+                  <Text style={[metaStyles.grayTextSmall66, { marginTop: 5 }]}>
+                    {" "}
+                    Unconfirmed
+                  </Text>
+                </View>
+              </View>
+            )}
           </View>
         </TouchableWithoutFeedback>
       );
@@ -339,9 +404,9 @@ const styles = StyleSheet.create({
   flatListStyle: {
     width: "100%",
     height: "auto",
-    backgroundColor: "#F5F7F9",
+    // backgroundColor: "#F5F7F9",
     marginTop: 10,
-    borderRadius: 10,
+    // borderRadius: 10,
     flex: 1,
     flexDirection: "row",
     alignItems: "center",

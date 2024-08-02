@@ -75,6 +75,21 @@ export default function SendSelectAssertPage() {
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
                 SPACE
               </Text>
+
+              <View
+                style={{
+                  marginTop: 3,
+                  backgroundColor: "rgba(247, 147, 26, 0.2)",
+                  borderRadius: 10,
+                  alignItems: "center",
+                  paddingVertical: 2,
+                  paddingHorizontal:5
+                }}
+              >
+                <Text style={{ fontSize: 8, color: "#FF981C" }}>
+                  Bitcoin sidechain{" "}
+                </Text>
+              </View>
               {/* <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
                 sdfewfwsf
               </Text> */}

@@ -1,4 +1,9 @@
-import { AddressType, CoinType, Transaction, getAddressFromScript } from "@metalet/utxo-wallet-service";
+import {
+  AddressType,
+  CoinType,
+  Transaction,
+  getAddressFromScript,
+} from "@metalet/utxo-wallet-service";
 import { WalletBean } from "../bean/WalletBean";
 import {
   wallet_password_key,
@@ -35,13 +40,13 @@ export async function getCurrentMvcWallet(): Promise<MvcWallet> {
   const wallet = await getStorageCurrentWallet();
   const seed = await getCurrentWalletSeed();
   const network = await getWalletNetwork();
-  
+
   const mvcWallet = new MvcWallet({
     network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: wallet.mnemonic,
     addressIndex: wallet.isCurrentPathIndex,
-    // addressType: wallet.addressType, 
-    addressType:AddressType.LegacyMvc,
+    // addressType: wallet.addressType,
+    addressType: AddressType.LegacyMvc,
     coinType: wallet.mvcTypes,
     seed: seed,
   });
@@ -72,6 +77,8 @@ export async function getCurrentBtcWallet(): Promise<BtcWallet> {
 export async function getBtcWallet(
   uAddressType: AddressType
 ): Promise<BtcWallet> {
+  // console.log("getBtcWallet调用： "+uAddressType);
+
   const wallet = await getStorageCurrentWallet();
   const seed = await getCurrentWalletSeed();
   const network = await getWalletNetwork();
@@ -113,10 +120,11 @@ export async function getBtCreateWallet(
 
 export async function getMvcCreateWallet(
   walletBean: WalletBean,
-  seed
+  seed?
 ): Promise<BtcWallet> {
+  const network = await getWalletNetwork();
   const mvcWallet = new MvcWallet({
-    network: "mainnet",
+    network: network === "mainnet" ? "mainnet" : "testnet",
     mnemonic: walletBean.mnemonic,
     addressIndex: walletBean.isCurrentPathIndex,
     addressType: AddressType.LegacyMvc,
@@ -215,14 +223,23 @@ export async function sendBtcTransaction(
   return result;
 }
 
-
 //function
-// add safe utxo 
-export async function addMetaletSafeUtxo(rawTx: string,txID:string) {
-  const wallet:BtcWallet = await getCurrentBtcWallet();
-  const tx = Transaction.fromHex(rawTx)
-  if (tx.outs.length > 1 && getAddressFromScript(tx.outs[tx.outs.length - 1].script,wallet.getNetwork()) === wallet.getAddress()) {
-   console.log("change utxo", `${txID}:${tx.outs.length - 1}`,'btcAddress'+wallet.getAddress());
-    await addSafeUtxo(wallet.getAddress(), `${txID}:${tx.outs.length - 1}`)
+// add safe utxo
+export async function addMetaletSafeUtxo(rawTx: string, txID: string) {
+  const wallet: BtcWallet = await getCurrentBtcWallet();
+  const tx = Transaction.fromHex(rawTx);
+  if (
+    tx.outs.length > 1 &&
+    getAddressFromScript(
+      tx.outs[tx.outs.length - 1].script,
+      wallet.getNetwork()
+    ) === wallet.getAddress()
+  ) {
+    console.log(
+      "change utxo",
+      `${txID}:${tx.outs.length - 1}`,
+      "btcAddress" + wallet.getAddress()
+    );
+    await addSafeUtxo(wallet.getAddress(), `${txID}:${tx.outs.length - 1}`);
   }
- }
+}

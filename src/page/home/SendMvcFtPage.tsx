@@ -20,7 +20,7 @@ import {
   VerifyModal,
   styles,
 } from "../../constant/Widget";
-import { themeColor } from "../../constant/Constants";
+import { metaStyles, themeColor } from "../../constant/Constants";
 import { navigate } from "../../base/NavigationService";
 import { useData } from "../../hooks/MyProvider";
 import { Wallet, API_TARGET, API_NET, FtManager } from "meta-contract";
@@ -449,7 +449,7 @@ export default function SendMvcFtPage({ route }) {
                   textAlign: "center",
                 }}
               >
-                MetaContract 
+                MetaContract
               </Text>
             </View>
 
@@ -512,16 +512,32 @@ export default function SendMvcFtPage({ route }) {
        <Text style={{ marginTop: 20, color: "#666", fontSize: 14 ,width:'100%',textAlign:'right'}}> Balance: 0.003234 SPACE</Text>
        </View> */}
 
-            <Text
-              style={{
-                marginTop: 40,
-                color: "#333",
-                fontSize: 16,
-                width: "100%",
-              }}
-            >
-              Transfer Amount
-            </Text>
+            <View style={{ flexDirection: "row", marginTop: 40 }}>
+              <Text
+                style={{
+                  color: "#333",
+                  fontSize: 16,
+                }}
+              >
+                Transfer Amount
+              </Text>
+
+              <View style={{ flex: 1 }} />
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setInputAmount(
+                    formatToDecimal(mvcFtData.confirmed, mvcFtData.decimal)
+                  );
+                }}
+              >
+                <Text
+                  style={[metaStyles.smallDefaultText, { marginRight: 10 }]}
+                >
+                  Max
+                </Text>
+              </TouchableWithoutFeedback>
+            </View>
 
             <View
               style={{
@@ -542,6 +558,7 @@ export default function SendMvcFtPage({ route }) {
                   " " +
                   mvcFtData.symbol.toUpperCase()
                 }
+                value={inputAmount}
                 onChangeText={(text) => {
                   setInputAmount(text);
                   if (text.length > 0 && inputAddress.length > 0) {
@@ -570,8 +587,8 @@ export default function SendMvcFtPage({ route }) {
             <RoundSimButton
               title={"Next"}
               event={async () => {
-                const isCold=await isColdWalletMode();
-                if(!isCold){
+                const isCold = await isColdWalletMode();
+                if (!isCold) {
                   sendSpace();
                 }
               }}

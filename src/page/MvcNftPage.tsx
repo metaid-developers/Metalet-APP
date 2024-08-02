@@ -21,7 +21,6 @@ import { getShowImageUrl } from "../utils/MetaFunUiils";
 import { useFocusEffect } from "@react-navigation/native";
 import { useData } from "../hooks/MyProvider";
 import { eventBus, refreshMvcFtEvent } from "../utils/EventBus";
-import { fetchMvcNftBalance } from "../api/metaletservice";
 import { getCurrentMvcWallet } from "../wallet/wallet";
 import { getStorageCurrentWallet, isColdWalletMode } from "@/utils/WalletUtils";
 import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
@@ -69,25 +68,34 @@ export default function MvcNftPage(props) {
     //  const nftList=await fetchMvcNftBalance(address);
     //  console.log("nftList",nftList);
 
-    let params = {
-      page: 1,
-      pageSize: 300,
-      chain: "mvc",
-    };
-    let data: RootMvcNftObject = await get(
-      BASE_METALET_URL + "/aggregation/v2/app/show/nft/" + address + "/summary",
-      false,
-      params
-    );
-    if (data.data.results.items !==undefined&&data.data.results.items != null) {
-      // setNftList(data.data.results.items);
-      // console.log('有数据刷新');
-      setNftList([...data.data.results.items]);
-      // setBtcFtList([...data.data.list]);
-    } else {
-      // console.log('无有数据刷新');
-      setNftList([]);
+    try{
+      let params = {
+        page: 1,
+        pageSize: 300,
+        chain: "mvc",
+      };
+      let data: RootMvcNftObject = await get(
+        BASE_METALET_URL + "/aggregation/v2/app/show/nft/" + address + "/summary",
+        false,
+        params
+      );
+  
+      // console.log("data 获取的NFT 数据： ", JSON.stringify(data));
+      
+  
+      if (data.data.results.items !==undefined&&data.data.results.items != null) {
+        // setNftList(data.data.results.items);
+        // console.log('有数据刷新');
+        setNftList([...data.data.results.items]);
+        // setBtcFtList([...data.data.list]);
+      } else {
+        // console.log('无有数据刷新');
+        setNftList([]);
+      }
+    }catch(e){
+      console.log("getMvcNft error ",e)
     }
+   
   }
 
   const ListItem = ({ index, item }) => {

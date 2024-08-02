@@ -26,6 +26,7 @@ import {
 import {
   grayNormalColor,
   inputNormalBgColor,
+  metaStyles,
   themeColor,
 } from "../../constant/Constants";
 import { FeedBean, FeedBtcObject } from "../../types/btcfeed";
@@ -191,7 +192,7 @@ export default function SendMrc20Page({ route }) {
       const { commitTx, revealTx } = btcWallet.signTx(SignType.MRC20_TRANSFER, {
         utxos,
         flag: network === "mainnet" ? "metaid" : "testid",
-        amount:inputAmount,
+        amount: inputAmount,
         // metaIdPinUtxos,
         commitFeeRate: parseInt(feed),
         revealFeeRate: parseInt(feed),
@@ -267,7 +268,8 @@ export default function SendMrc20Page({ route }) {
 
     // broadcast
     const result = await broadcastBtc(rawTx);
-    const { code, message, processingTime, data } = await broadcastBtc(revealTx);
+    const { code, message, processingTime, data } =
+      await broadcastBtc(revealTx);
     if (data) {
       setIsShowLoading(false);
       updateNeedRefreshHome(getRandomID());
@@ -280,7 +282,7 @@ export default function SendMrc20Page({ route }) {
           address: inputAddress,
         },
       });
-      addMetaletSafeUtxo(rawTx,data);
+      addMetaletSafeUtxo(rawTx, data);
     }
     // setTimeout(() => {
     //   setIsShowLoading(false);
@@ -909,6 +911,10 @@ export default function SendMrc20Page({ route }) {
                 onChangeText={(text) => {
                   console.log(123);
 
+                  if (parseFloat(text) > mrc20Data.balance) {
+                    ToastView({ text: "Insufficient balance", type: "error" });
+                    return;
+                  }
                   if (Platform.OS === "android") {
                     const decimalRegex = /^(\d+(\.\d*)?)?$/;
                     if (decimalRegex.test(text)) {
@@ -939,6 +945,18 @@ export default function SendMrc20Page({ route }) {
               {/* <Text style={{ marginRight: 10, fontSize: 14, color: "#333" }}>
                 BTC
               </Text> */}
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setInputAmount(mrc20Data.balance);
+                }}
+              >
+                <Text
+                  style={[metaStyles.smallDefaultText, { marginRight: 10 }]}
+                >
+                  Max
+                </Text>
+              </TouchableWithoutFeedback>
             </View>
           </View>
 
@@ -954,6 +972,21 @@ export default function SendMrc20Page({ route }) {
               </Text>
               <Text style={{ color: "#999", fontSize: 14 }}>
                 {mrc20Data.balance} {mrc20Data.tick}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: 10,
+              }}
+            >
+              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                Pending
+              </Text>
+              <Text style={{ color: "#999", fontSize: 14 }}>
+                {mrc20Data.unsafeBalance} {mrc20Data.tick}
               </Text>
             </View>
 

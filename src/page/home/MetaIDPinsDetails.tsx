@@ -152,10 +152,12 @@ export default function MetaIDPinsDetails({ route }) {
             <View style={{ alignItems: "center", marginTop: 20 }}>
               <TouchableWithoutFeedback
                 onPress={() => {
-                  navigate("PinNftTransferPage", {
-                    type: "pin",
-                    nftDetail: nftDetail,
-                  });
+                  if(nftDetail.status==0){
+                    navigate("PinNftTransferPage", {
+                      type: "pin",
+                      nftDetail: nftDetail,
+                    });
+                  }
                 }}
               >
                 <View
@@ -177,7 +179,7 @@ export default function MetaIDPinsDetails({ route }) {
                       fontSize: 16,
                     }}
                   >
-                    Transfer
+                    {nftDetail.status==0?"Transfer":"Pending"}
                   </Text>
                 </View>
               </TouchableWithoutFeedback>

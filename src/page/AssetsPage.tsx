@@ -247,6 +247,22 @@ export default function AssetsPage() {
               {/* <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
                 sdfewfwsf
               </Text> */}
+                 <View style={{ marginLeft: 0 }}>
+              <View
+                style={{
+                  marginTop: 3,
+                  backgroundColor: "rgba(247, 147, 26, 0.2)",
+                  borderRadius: 10,
+                  alignItems: "center",
+                  paddingVertical: 2,
+                  paddingHorizontal:5
+                }}
+              >
+                <Text style={{ fontSize: 8, color: "#FF981C" }}>
+                  Bitcoin sidechain{" "}
+                </Text>
+              </View>
+            </View>
             </View>
 
             <View style={{ flex: 1 }} />

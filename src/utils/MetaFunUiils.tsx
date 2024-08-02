@@ -35,8 +35,10 @@ export const checkImage = async (uri) => {
 
 
 
-export const formatTime= (timestamp)=>{
+export const formatTime= (timestamp:number)=>{
   // const timestamp = 1623369476000; // 你的时间戳
+  console.log("timestamp",timestamp);
+  
   const date = new Date(timestamp);
   
   const year = date.getFullYear(); // 获取年份

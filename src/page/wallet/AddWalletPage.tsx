@@ -124,7 +124,8 @@ export default function AddWalletPage() {
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={() => {
-              navigate("ImportWalletPage");
+              // navigate("ImportWalletPage");
+              navigate("ImportWalletNetPage");
             }}
           >
             <View

@@ -18,8 +18,9 @@ import {
   Pressable,
   ScrollView,
   TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
-import { CircleAvatarLetter, ToastView } from "@/constant/Widget";
+import { CircleAvatarLetter, LoadingModal, ToastView } from "@/constant/Widget";
 import { LinearGradient } from "expo-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { inputNormalBgColor, litterWhittleBgColor } from "@/constant/Constants";
@@ -56,6 +57,8 @@ export default function WebsPage(props) {
     getEstimatedData: () => null;
   } | null>(null);
 
+  const [isShowLoading, setIsShowLoading] = useState(false);
+
   useEffect(() => {
     if (!props.route.params?.url) {
       navigate("DiscoverPage");
@@ -72,7 +75,7 @@ export default function WebsPage(props) {
   const handlerMessage = async (
     message: Message & { type: string; data: unknown }
   ) => {
-    // console.log("handlerMessage", message);
+    console.log("handlerMessage", message);
 
     if (message.type === "Console") {
       console.info(`[Console] ${JSON.stringify(message.data)}`);
@@ -105,28 +108,30 @@ export default function WebsPage(props) {
       setDescriptions(descriptions);
       setNeedEstimated(needEstimated);
     } else if (actionType === ActionType.Query) {
-      // console.log("query1111 :", actionName);
+      console.log("query1111 :", actionName);
 
-      const { process } = actionDispatcher(actionName, ActionType.Query);
+      try {
+        const { process } = actionDispatcher(actionName, ActionType.Query);
 
-      const data = await process(message.params, message.host);
+        const data = await process(message.params, message.host);
 
-      if (data !== undefined) {
-        // console.log("data11111111: ", data);
-        if(message&&message.nonce){
-          console.log("data11111111: ", message.nonce);
-          
-          postMessage(
-            JSON.stringify({
-              data,
-              nonce: message.nonce,
-            })
-          );
+        if (data !== undefined) {
+          if (message && message.nonce) {
+            console.log("data11111111: ", message.nonce);
+
+            postMessage(
+              JSON.stringify({
+                data,
+                nonce: message.nonce,
+              })
+            );
+          }
+        } else {
+          console.log("query error", actionName);
         }
-       
-      } else {
-
-        console.log("query error", actionName);
+      } catch (e) {
+        console.log("query2222 :", e);
+        console.log("error actionName : " + actionName);
       }
     }
   };
@@ -146,16 +151,22 @@ export default function WebsPage(props) {
   const confirmAction = async () => {
     try {
       const [actionName, actionType] = actionMsg.action.split("-");
+      console.log("actionName ", actionName);
+
       if (actionType === ActionType.Authorize && needEstimated) {
         const data = metaidComponentRef.current.getEstimatedData();
         const { nextComponent, estimate } = actionDispatcher(
           actionName,
           ActionType.Authorize
         );
+        console.log(" 设置参数完成：", data);
+
         const params = await estimate(data);
 
         setNeedEstimated(false);
         setComponentInfo({ component: nextComponent, params });
+        console.log("params 设置参数完成：", params);
+        setIsShowLoading(false);
       } else {
         const { process } = actionDispatcher(
           actionName,
@@ -164,6 +175,7 @@ export default function WebsPage(props) {
         // console.log("confirmAction params", componentInfo.params);
         const data = await process(componentInfo.params, actionMsg.host);
         console.log("confirmAction data", data);
+        setIsShowLoading(false);
         postMessage(
           JSON.stringify({
             data,
@@ -173,9 +185,10 @@ export default function WebsPage(props) {
         setModalVisible(false);
       }
     } catch (e) {
+      setIsShowLoading(false);
       // alert(e);
-      ToastView({ text: "Please input address", type: "error" });
-      // ToastView({text:e.toString(),type:'error'})
+      // ToastView({ text: "Please input address", type: "error" });
+      ToastView({ text: e.toString(), type: "error", time: 5000 });
     }
   };
 
@@ -187,6 +200,13 @@ export default function WebsPage(props) {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <LoadingModal
+        isShow={isShowLoading}
+        isCancel={true}
+        event={() => {
+          setIsShowLoading(false);
+        }}
+      />
       <Modal animationType="slide" visible={modalVisible}>
         {/* <View className="w-screen h-screen flex flex-col items-center px-4"> */}
         <SafeAreaView
@@ -300,6 +320,7 @@ export default function WebsPage(props) {
               </Pressable>
               <Pressable
                 onPress={() => {
+                  setIsShowLoading(true);
                   confirmAction();
                 }}
                 className="w-[120px] rounded-3xl bg-blue-primary py-4"
@@ -324,6 +345,17 @@ export default function WebsPage(props) {
       >
         {/* className="bg-[#E5EAEE] px-[18px] h-full leading-10 grow rounded-[60px]" */}
         {/* <Text  style={{backgroundColor:'#E5EAEE',flex:1,padding:10,borderRadius:10, overflow: 'hidden',}}> */}
+
+        <TouchableWithoutFeedback
+          onPress={() => {
+            if (webViewRef.current) webViewRef.current.goBack();
+          }}
+        >
+          <Image
+            source={require("../../image/meta_back_icon.png")}
+            style={{ width: 22, height: 22 }}
+          />
+        </TouchableWithoutFeedback>
         <Text
           style={{
             backgroundColor: litterWhittleBgColor,
@@ -332,13 +364,28 @@ export default function WebsPage(props) {
             borderRadius: 10,
             overflow: "hidden",
           }}
+          numberOfLines={1}
         >
           {uri}
         </Text>
+
+        <TouchableOpacity
+          onPress={() => {
+            if (webViewRef.current) webViewRef.current.reload();
+          }}
+          className="border border-[#E7E7E7] rounded-full w-8 h-8 flex items-center justify-center"
+          style={{ marginLeft: 5 }}
+        >
+          <Image
+            source={require("../../image/icon_refresh.png")}
+            style={{ width: 16, height: 16 }}
+          />
+        </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => goBack()}
-          className="border border-[#E7E7E7] rounded-full w-10 h-10 flex items-center justify-center"
-          style={{ marginLeft: 10 }}
+          className="border border-[#E7E7E7] rounded-full w-8 h-8 flex items-center justify-center"
+          style={{ marginLeft: 5 }}
         >
           <CloseIcon className="text-black-primary w-2.5 h-2.5" />
         </TouchableOpacity>

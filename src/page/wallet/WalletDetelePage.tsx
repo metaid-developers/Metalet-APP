@@ -36,14 +36,24 @@ export default function WalletDetelePage({ route }) {
         wallets[0].accountsOptions[0].isSelect = true;
         await setCurrentWalletID(wallets[0].id);
         await setCurrentAccountID(wallets[0].accountsOptions[0].id);
+        await storage.set(wallets_key, wallets).then(() => {
+          setTimeout(() => {
+            setIsDelete(false);
+            // navigate("WalletsPage");
+            navigate("SplashPage");
+          }, 1000);
+        });
+        setIsDelete(true);
+      }else{
+        await storage.set(wallets_key, wallets).then(() => {
+          setTimeout(() => {
+            setIsDelete(false);
+            navigate("WelcomeWalletPage");
+          }, 1000);
+        });
+        setIsDelete(true);
       }
-      setIsDelete(true);
-      await storage.set(wallets_key, wallets).then(() => {
-        setTimeout(() => {
-          setIsDelete(false);
-          navigate("WalletsPage");
-        }, 1000);
-      });
+    
     });
   }
 

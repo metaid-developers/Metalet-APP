@@ -1,4 +1,9 @@
-import { AddressType, BtcWallet, Chain, CoinType } from "@metalet/utxo-wallet-service";
+import {
+  AddressType,
+  BtcWallet,
+  Chain,
+  CoinType,
+} from "@metalet/utxo-wallet-service";
 import { AccountsOptions, WalletBean } from "../bean/WalletBean";
 import { useData } from "../hooks/MyProvider";
 import {
@@ -67,9 +72,22 @@ export async function getStorageCurrentWallet(): Promise<WalletBean> {
   }
 }
 
-// export async function setCurrentWallet(walletBean:WalletBean) {
-//   await AsyncStorageUtil.setItem(CurrentWalletIDKey,walletBean);
-//   }
+export async function setCurrentStorageWallet(
+  walletBean: WalletBean,
+  mvcPath: number
+) {
+  const wallets = await getWalletBeans();
+  const wallet = wallets.find((itemWallet) => {
+    console.log(itemWallet.mnemonic);
+    if (itemWallet.id == walletBean.id) {
+      return itemWallet;
+    }
+  });
+  wallet.mvcTypes = mvcPath;
+  await AsyncStorageUtil.updateItem(wallets_key, wallets);
+
+  // await AsyncStorageUtil.setItem(CurrentWalletIDKey, walletBean.id);
+}
 
 //   export async function setCurrentAccount(account:AccountsOptions) {
 //      await AsyncStorageUtil.setItem(CurrentAccountIDKey,account);
@@ -231,4 +249,3 @@ export async function openBrowser(link: string) {
     }
   }
 }
-

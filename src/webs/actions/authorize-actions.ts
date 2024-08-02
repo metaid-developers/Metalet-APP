@@ -182,11 +182,11 @@ export default {
     descriptions: [],
     estimate: Inscribe.estimate,
     process: Inscribe.process,
-    needEstimated: true,
+    needEstimated: false,
     component: lazy(() => import("../components/InscribeMetaPin/Info")),
-    nextComponent: lazy(
-      () => import("../components/InscribeMetaPin/Estimator")
-    ),
+    // nextComponent: lazy(
+    //   () => import("../components/InscribeMetaPin/Estimator")
+    // ),
   },
   MRC20Deploy: {
     name: "MRC20Deploy",

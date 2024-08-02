@@ -4,18 +4,20 @@ import {
   Image,
   TouchableWithoutFeedback,
   Modal,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import { useData } from "../hooks/MyProvider";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   CloseView,
+  Line,
   LoadingModal,
   QRScanner,
   TitleBar,
   VerifyModal,
 } from "@/constant/Widget";
-import { metaStyles } from "@/constant/Constants";
+import { metaStyles, themeColor } from "@/constant/Constants";
 import Constants from "expo-constants";
 import { navigate } from "@/base/NavigationService";
 import useNetworkStore from "@/stores/useNetworkStore";
@@ -34,6 +36,7 @@ export default function SettingsPage(props: any) {
   const { needInitWallet, updateNeedInitWallet } = useData();
   const { walletMode, updateWalletMode } = useData();
   const [isScan, setIsScan] = useState(false);
+  const [isDisclaimer, setIsDisclaimer] = useState(false);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -138,6 +141,71 @@ export default function SettingsPage(props: any) {
                   />
                 )}
               </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={isDisclaimer} transparent={true}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: 10,
+              paddingHorizontal: 30,
+              paddingTop: 25,
+              marginHorizontal: 20,
+              paddingBottom: 15,
+              height: "80%",
+            }}
+          >
+            <Text style={[metaStyles.defaultText18, { textAlign: "center" }]}>
+              Disclaimer
+            </Text>
+
+            <Line />
+
+            <ScrollView>
+              <Text style={[metaStyles.defaultText, { marginTop: 15 }]}>
+                Use of this wallet is at your own risk and discretion. The
+                wallet is not liable for any losses incurred as a result of
+                using the wallet. {'\n'}{'\n'}
+                The wallet does not guarantee the continuity
+                and stability of its functions and services, and may be
+                interrupted or terminated due to force majeure, hacker attacks,
+                technical failures, policy changes, or other factors.  {'\n'}{'\n'}
+                Users should comply with local laws and regulations, and the wallet is
+                not responsible for any consequences resulting from users'
+                violation of laws and regulations.  {'\n'}{'\n'}
+                Users should properly safeguard their private keys and mnemonic phrases, and bear any
+                losses incurred due to the loss or theft of private keys or
+                mnemonic phrases.
+              </Text>
+            </ScrollView>
+
+            {/* <RoundSimButton textColor="#fff" title={"OK"} event={()=>{
+            setIsShowBackUp(false)
+           }}/> */}
+
+            <TouchableWithoutFeedback
+              onPress={async () => {
+                setIsDisclaimer(false);
+              }}
+            >
+              <Text
+                style={[
+                  metaStyles.largeDefaultLittleText,
+                  { textAlign: "center", color: themeColor },
+                ]}
+              >
+                OK
+              </Text>
             </TouchableWithoutFeedback>
           </View>
         </View>
@@ -370,6 +438,37 @@ export default function SettingsPage(props: any) {
                 <Text style={metaStyles.defaultText}>
                   {Constants.expoConfig?.version}
                 </Text>
+                <Image
+                  source={require("../../image/list_icon_ins.png")}
+                  style={{ width: 20, height: 20, marginLeft: 5 }}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setIsDisclaimer(true);
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginTop: 30,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {/* <Image
+                  source={require("../../image/settings_about_icon.png")}
+                  style={{ width: 45, height: 45 }}
+                /> */}
+                <Text
+                  style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}
+                >
+                  Disclaimer
+                </Text>
+                <View style={{ flex: 1 }} />
+
                 <Image
                   source={require("../../image/list_icon_ins.png")}
                   style={{ width: 20, height: 20, marginLeft: 5 }}

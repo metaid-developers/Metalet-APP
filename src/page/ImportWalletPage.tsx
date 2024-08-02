@@ -48,7 +48,6 @@ import {
 } from "../utils/WalletUtils";
 
 const storage = createStorage();
-
 export default function ImportWalletPage(props) {
   const toastRef = useEasyToast("center");
   const [mnemonic, setMneMonic] = useState("");

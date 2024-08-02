@@ -75,55 +75,45 @@ export const wallet_password_key = "wallet_password";
 export const CurrentWalletIDKey = "CurrentWalletID_key";
 export const CurrentAccountIDKey = "CurrentAccountID_key";
 
-
 export const net_wallet_network_key = "net_network_key";
 
 export const wallet_mode_key = "wallet_mode_key";
 export const wallet_mode_cold = "cold";
 export const wallet_mode_hot = "hot";
 
-
-
-
 //创建数据
-export const AsyncStorageUtil={
+export const AsyncStorageUtil = {
   //set
-  async setItem(key,value){
-    try{
-      return await AsyncStorage.setItem(key,JSON.stringify(value))
-    }catch(e){
-    }
+  async setItem(key, value) {
+    try {
+      return await AsyncStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {}
   },
-  
 
-   async getItem(key) {
+  async getItem(key) {
     try {
       const value = await AsyncStorage.getItem(key);
-      const result=value != null ? JSON.parse(value) : null;
-      return result
+      const result = value != null ? JSON.parse(value) : null;
+      return result;
     } catch (error) {
-      console.log("key",key);
-      
-      console.error('Error retrieving data:', error);
+      console.log("key", key);
+
+      console.error("Error retrieving data:", error);
       return null;
     }
   },
 
-
   //remove
-  async removeItem(key){
-    try{
-      return await AsyncStorage.removeItem(key)
-    }catch(e){
-    }
+  async removeItem(key) {
+    try {
+      return await AsyncStorage.removeItem(key);
+    } catch (e) {}
   },
 
-  
- async updateItem(key,newValue){
-    try{
-      return  await AsyncStorage.setItem(key,JSON.stringify(newValue))
-    }catch(e){
-    }
+  async updateItem(key, newValue) {
+    try {
+      return await AsyncStorage.setItem(key, JSON.stringify(newValue));
+    } catch (e) {}
   },
 
   updateItem2: async (key, newValue) => {
@@ -136,16 +126,15 @@ export const AsyncStorageUtil={
       // 更新值
       await AsyncStorage.setItem(key, JSON.stringify(mergedValue));
     } catch (error) {
-      console.error('Error updating data:', error);
+      console.error("Error updating data:", error);
     }
   },
 
-  async clear(){
+  async clear() {
     try {
       await AsyncStorage.clear();
     } catch (error) {
-      console.error('Error clearing data:', error);
+      console.error("Error clearing data:", error);
     }
-  }
-
-}
+  },
+};

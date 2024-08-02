@@ -4,22 +4,22 @@ export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
 export const BASE_METALET_URL = "https://www.metalet.space";
 
-
-
-
 // 具体
 //btc ft
-export const BTC_FT_URL=BASE_METALET_URL+"/wallet-api/v3/brc20/tokens"
+export const BTC_FT_URL = BASE_METALET_URL + "/wallet-api/v3/brc20/tokens";
 //btc nft
-export const BTC_NFT_URL=BASE_METALET_URL+"/wallet-api/v3/address/inscriptions"
-
+export const BTC_NFT_URL =
+  BASE_METALET_URL + "/wallet-api/v3/address/inscriptions";
 
 //资产价格
-export const BALANCE_PRICE_URL=BASE_METALET_URL+"/wallet-api/v3/coin/price"
-
+export const BALANCE_PRICE_URL = BASE_METALET_URL + "/wallet-api/v3/coin/price";
 
 //get
-export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => {
+export const get = async (
+  url: string,
+  isFullUrl: boolean = true,
+  params?: {}
+) => {
   // 将参数拼接到URL中
   let queryString;
   if (params !== undefined) {
@@ -44,13 +44,14 @@ export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => 
     });
     if (!response.ok) {
       console.log("fullUrl请求出错的接口 ： ", fullUrl);
+      return null;
       // throw new Error(response.statusText);
     }
-
+    // console.log(response);
     return await response.json();
   } catch (error) {
     console.log("Get Rqeuest Error:", fullUrl);
-    
+
     console.error("Get Rqeuest Error:", error);
     // throw error;
   }
@@ -58,7 +59,7 @@ export const get = async (url: string, isFullUrl: boolean=true, params?: {}) => 
 
 export const post = async (url, data = {}) => {
   // console.log("data "+JSON.stringify(data));
-  
+
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -71,6 +72,7 @@ export const post = async (url, data = {}) => {
     });
     if (!response.ok) {
       console.log("fullUrl请求出错的接口 ： ", url);
+      return null;
       // throw new Error(response.statusText);
     }
     // console.log("response", response.url);

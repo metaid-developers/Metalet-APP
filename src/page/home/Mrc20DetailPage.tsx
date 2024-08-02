@@ -181,10 +181,11 @@ export default function Mrc20DetailPage({ route }) {
                 <View style={{ flex: 1 }} />
                 <Text
                   style={{
-                    fontSize: 16,
+                    fontSize: mrc20Data.tick.length > 10 ? 10 : 16,
                     color: textColor,
                     marginBottom: 10,
-                    // textAlign: "right",
+                    textAlign: "right",
+                    width:100
                   }}
                 >
                   {isIncomeType === "Receive"
@@ -211,7 +212,8 @@ export default function Mrc20DetailPage({ route }) {
                 >
                   <View style={{ flexDirection: "row" }}>
                     <Text style={metaStyles.grayTextSmall66}>
-                      {formatTime(item.timestamp)}
+                      {formatTime(item.timestamp * 1000)}
+                      {/* {formatTime(parseFloat(item.timestamp))} */}
                     </Text>
                     <View style={{ flex: 1 }} />
                     <Text
@@ -268,15 +270,28 @@ export default function Mrc20DetailPage({ route }) {
     //   ImageUrl = "1";
     // }
     const metaData = mrc20Data.metaData;
-    const showBalance =
-      parseFloat(mrc20Data.unsafeBalance) + parseFloat(mrc20Data.balance);
+    // const showBalance =
+    //   parseFloat(mrc20Data.unsafeBalance) + parseFloat(mrc20Data.balance);
+
+    let showBalance = 0;
+    // const showBalance =
+    //   parseFloat(item.unsafeBalance) + parseFloat(item.balance);
+
+    if (parseFloat(mrc20Data.balance) > 0) {
+      showBalance =
+        parseFloat(mrc20Data.unsafeBalance) + parseFloat(mrc20Data.balance);
+    } else {
+      showBalance = parseFloat(mrc20Data.unsafeBalance);
+    }
+
     let mrc20Img = "";
     if (
       metaData &&
       metaData != null &&
       metaData != undefined &&
       metaData != "" &&
-      metaData != "undefined"
+      metaData != "undefined" &&
+      JSON.stringify(metaData).includes("icon")
     ) {
       // console.log("metaData", metaData);
 
@@ -314,6 +329,7 @@ export default function Mrc20DetailPage({ route }) {
           marginTop: 40,
           alignItems: "center",
           marginBottom: 20,
+          marginHorizontal: 10,
         }}
       >
         {/* {mvcFtData.imageError ? (
@@ -353,12 +369,14 @@ export default function Mrc20DetailPage({ route }) {
             color: "#333",
             textAlign: "center",
             marginTop: 20,
-            fontSize: 25,
+            fontSize: mrc20Data.tick.length > 10 ? 20 : 25,
             fontWeight: "bold",
+            lineHeight: 30,
           }}
         >
           {/* {formatToDecimal(mrc20Data.balance, mrc20Data.decimals)}{" "} */}
-          {showBalance} {mrc20Data.tick.toUpperCase()}
+          {showBalance} {mrc20Data.tick.length > 10 ? "\n" : ""}
+          {mrc20Data.tick.toUpperCase()}
         </Text>
 
         <Text

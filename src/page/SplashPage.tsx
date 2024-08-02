@@ -116,7 +116,7 @@ export default function SplashPage(props) {
   async function checkUpgrade() {
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
-      console.log(JSON.stringify(check));
+      // console.log(JSON.stringify(check));
       const showCode = check.data.android;
       updateIsShowPay(showCode)
     } else {

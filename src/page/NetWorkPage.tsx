@@ -1,15 +1,9 @@
-import {
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  Image,
-} from "react-native";
+import { View, Text, TouchableWithoutFeedback, Image } from "react-native";
 import React from "react";
 import { GradientAvatar, TitleBar } from "../constant/Widget";
 import { metaStyles } from "../constant/Constants";
 import { useData } from "../hooks/MyProvider";
 import {
-  
   network_all,
   network_btc,
   network_key,
@@ -132,7 +126,21 @@ export default function NetWorkPage() {
             />
             <View style={{ marginLeft: 10 }}>
               <Text style={metaStyles.defaultText}> Microvisionchain</Text>
-              {/* <Text style={{ marginTop: 10 }}>{}</Text> */}
+              <View
+                style={{
+                  marginTop: 3,
+                  backgroundColor: "rgba(247, 147, 26, 0.2)",
+                  borderRadius: 10,
+                  width: 90,
+                  alignItems: "center",
+                  paddingVertical: 2,
+                  marginLeft: 5,
+                }}
+              >
+                <Text style={{ fontSize: 8, color: "#FF981C" }}>
+                  Bitcoin sidechain{" "}
+                </Text>
+              </View>
             </View>
 
             <View style={{ flex: 1 }} />

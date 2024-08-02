@@ -846,6 +846,7 @@ export const QRScanner = ({ handleScan }) => {
 
   return (
     <View style={{ flex: 1 }}>
+      <TitleBar/>
       {showCamera && hasPermission && (
         // <Camera
         //   style={{ flex: 1 }}

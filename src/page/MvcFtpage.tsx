@@ -15,7 +15,6 @@ import {
   NoMoreDataView,
 } from "../constant/Widget";
 import { metaStyles } from "../constant/Constants";
-import { BASE_METALET_URL, get } from "../utils/Api";
 import { useData } from "../hooks/MyProvider";
 import { MvcFtBeans, RootObject } from "../bean/DataBean";
 import { List } from "react-native-paper";
@@ -83,6 +82,7 @@ export default function MvcFtPage() {
 
     const ftdata = await fetchMvcFtBalance(address);
     const ftPriceData = await fetchMvcFtPrice();
+    
 
     let list = [];
     for (let i = 0; i < ftdata.length; i++) {
