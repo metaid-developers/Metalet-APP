@@ -40,7 +40,7 @@ export default function CongratulationsPage({ route, props }) {
           {type}
         </Text>
         <Text style={[metaStyles.defaultText, { marginTop: 20 }]}>
-          Metalet currently supports the Bitcoin network and MicrovisionChain.
+          Metalet currently supports the Bitcoin network and MicrovisionChain(Bitcoin sidechain).
         </Text>
 
         <View style={{ flex: 1 }} />

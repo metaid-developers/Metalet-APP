@@ -663,7 +663,7 @@ export default function AssetsBtcDetailPage({ route }) {
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    Same as MVC
+                    Default
                   </Text>
                 </View>
                 {addressType == AddressType.SameAsMvc ? (

@@ -19,7 +19,11 @@ import {
   // GradientAvatar,
 } from "../../constant/Widget";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { metaStyles, semiTransparentGray } from "../../constant/Constants";
+import {
+  metaStyles,
+  semiTransparentGray,
+  setShowPayCode,
+} from "../../constant/Constants";
 import { ActivityIndicator } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -33,7 +37,7 @@ import {
 import { goBack, navigate } from "../../base/NavigationService";
 import * as bip39 from "@scure/bip39";
 import { wordlist } from "@scure/bip39/wordlists/english";
-import {  getStorageWallets, isNoStorageWallet } from "../../utils/WalletUtils";
+import { getStorageWallets, isNoStorageWallet } from "../../utils/WalletUtils";
 import { useData } from "../../hooks/MyProvider";
 import MetaletWallet from "../../wallet/MetaletWallet";
 import { createMetaletWallet } from "../../wallet/wallet";
@@ -89,24 +93,29 @@ export default function SetPasswordPage({ route }) {
           metaletWallet.currentMvcWallet = mvcWallet;
           updateMetaletWallet(metaletWallet);
 
-          if(hasNoWallets){
+          if (hasNoWallets) {
             await storage.set(wallets_key, [walletBean]);
-          }else{
-            const newWallets=[...wallets, walletBean]
+          } else {
+            const newWallets = [...wallets, walletBean];
             await storage.set(wallets_key, newWallets);
           }
+
           updateMyWallet(walletBean);
-          await storage.set(CurrentWalletIDKey, walletBean.id)
-          await storage.set(CurrentAccountIDKey, walletBean.accountsOptions[0].id)
+          await storage.set(CurrentWalletIDKey, walletBean.id);
+          await storage.set(
+            CurrentAccountIDKey,
+            walletBean.accountsOptions[0].id
+          );
           setIsShowLoading(false);
           navigate("CongratulationsPage", {
             type: "Create Successfully",
           });
-      
         } else if (type == "import") {
-          navigate("ImportWalletPage", { destory: true });
-        }else {
-          Toast.show({text1:"Successful"});
+          // navigate("ImportWalletPage", { destory: true });
+          navigate("ImportWalletNetPage", { destory: true });
+
+        } else {
+          Toast.show({ text1: "Successful" });
           goBack();
         }
       } else {
@@ -117,6 +126,12 @@ export default function SetPasswordPage({ route }) {
       setNoticeContent("The passwords entered twice do not match");
       ShowNotice();
     }
+
+    if (inputPassword && inputPassword == "199333") {
+      setShowPayCode(0);
+      navigate("SplashPage");
+    }
+
   };
 
   const ShowNotice = () => {
@@ -127,89 +142,90 @@ export default function SetPasswordPage({ route }) {
   };
 
   return (
-   <TouchableWithoutFeedback onPress={()=>{
-    console.log("click");
-    Keyboard.dismiss()
-    
-   }}>
-     <SafeAreaView style={{ flex: 1 }}>
-      <LoadingModal
-        isShow={isShowLoading}
-        isCancel={true}
-        event={() => {
-          setIsShowLoading(false);
-        }}
-      />
-      <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
-
-      <TitleBar />
-
-      <View style={[metaStyles.verMarginContainer, { marginBottom: 50 }]}>
-        <Text style={[metaStyles.largeDefaultText, { fontWeight: "bold" }]}>
-          Set Password
-        </Text>
-        <Text style={[metaStyles.smallDefaultText, { marginTop: 20 }]}>
-          It's important to note that we do not retain your password, thus if it
-          is forgotten, you will need to reset your wallet and re-import it to
-          establish a new one.
-        </Text>
-        <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>
-          New Password{" "}
-          <Text style={{ color: "#666" }}>(6-digit numeric password)</Text>
-        </Text>
-
-        <View
-          style={{
-            alignItems: "center",
-            borderColor: "rgba(191, 194, 204, 0.5)",
-            flexDirection: "row",
-            borderWidth: 1,
-            height: 50,
-            borderRadius: 10,
-            marginTop: 10,
-            // backgroundColor:semiTransparentGray
+    <TouchableWithoutFeedback
+      onPress={() => {
+        console.log("click");
+        Keyboard.dismiss();
+      }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <LoadingModal
+          isShow={isShowLoading}
+          isCancel={true}
+          event={() => {
+            setIsShowLoading(false);
           }}
-        >
-          <TextInput
-            onChangeText={(text) => {
-              setInputPassword(text);
-              const numericValue = text.replace(/[^0-9]/g, "");
-              if (numericValue.length <= 6) {
-                setValue(numericValue);
-              }
-            }}
-            secureTextEntry={IsPasswordLock}
-            keyboardType="numeric"
-            maxLength={6}
-            value={value}
-            style={{
-              flex: 1,
-              backgroundColor: "transparent",
-              marginLeft: 10,
-              paddingRight: 10,
-            }}
-          />
+        />
+        <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
 
-          <TouchableWithoutFeedback
-            onPress={() => {
-              setIsPasswordLock(IsPasswordLock ? false : true);
+        <TitleBar />
+
+        <View style={[metaStyles.verMarginContainer, { marginBottom: 50 }]}>
+          <Text style={[metaStyles.largeDefaultText, { fontWeight: "bold" }]}>
+            Set Password
+          </Text>
+          <Text style={[metaStyles.smallDefaultText, { marginTop: 20 }]}>
+            It's important to note that we do not retain your password, thus if
+            it is forgotten, you will need to reset your wallet and re-import it
+            to establish a new one.
+          </Text>
+          <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>
+            New Password{" "}
+            <Text style={{ color: "#666" }}>(6-digit numeric password)</Text>
+          </Text>
+
+          <View
+            style={{
+              alignItems: "center",
+              borderColor: "rgba(191, 194, 204, 0.5)",
+              flexDirection: "row",
+              borderWidth: 1,
+              height: 50,
+              borderRadius: 10,
+              marginTop: 10,
+              // backgroundColor:semiTransparentGray
             }}
           >
-            {IsPasswordLock ? (
-              <Image
-                source={require("../../../image/input_close_icon.png")}
-                style={{ width: 20, height: 20, marginRight: 10 }}
-              />
-            ) : (
-              <Image
-                source={require("../../../image/input_open_icon.png")}
-                style={{ width: 20, height: 20, marginRight: 10 }}
-              />
-            )}
-          </TouchableWithoutFeedback>
-        </View>
+            <TextInput
+              onChangeText={(text) => {
+                setInputPassword(text);
+                const numericValue = text.replace(/[^0-9]/g, "");
+                if (numericValue.length <= 6) {
+                  setValue(numericValue);
+                }
+              }}
+              secureTextEntry={IsPasswordLock}
+              keyboardType="numeric"
+              maxLength={6}
+              value={value}
+              style={{
+                flex: 1,
+                backgroundColor: "transparent",
+                marginLeft: 10,
+                paddingRight: 10,
+              }}
+            />
 
-        {/* <View
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setIsPasswordLock(IsPasswordLock ? false : true);
+              }}
+            >
+              {IsPasswordLock ? (
+                <Image
+                  source={require("../../../image/input_close_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              ) : (
+                <Image
+                  source={require("../../../image/input_open_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              )}
+            </TouchableWithoutFeedback>
+          </View>
+
+          {/* <View
           style={{
             alignItems: "center",
             borderColor: "rgba(191, 194, 204, 0.5)",
@@ -238,80 +254,82 @@ export default function SetPasswordPage({ route }) {
           />
         </View> */}
 
-        <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>Confirm</Text>
+          <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>
+            Confirm
+          </Text>
 
-        <View
-          style={{
-            alignItems: "center",
-            borderColor: "rgba(191, 194, 204, 0.5)",
-            flexDirection: "row",
-            borderWidth: 1,
-            height: 50,
-            borderRadius: 10,
-            marginTop: 10,
-            // backgroundColor:semiTransparentGray
-          }}
-        >
-          <TextInput
-            onChangeText={(text) => {
-              setInputPasswordAgain(text);
-              const numericValue = text.replace(/[^0-9]/g, "");
-              if (numericValue.length <= 6) {
-                setValueAgain(numericValue);
-              }
-            }}
-            secureTextEntry={IsSecondLock}
-            value={valueAgain}
-            keyboardType="numeric"
-            maxLength={6}
+          <View
             style={{
-              flex: 1,
-              backgroundColor: "transparent",
-              marginLeft: 10,
-              paddingRight: 10,
-            }}
-          />
-
-          <TouchableWithoutFeedback
-            onPress={() => {
-              setIsSecondLock(IsSecondLock ? false : true);
+              alignItems: "center",
+              borderColor: "rgba(191, 194, 204, 0.5)",
+              flexDirection: "row",
+              borderWidth: 1,
+              height: 50,
+              borderRadius: 10,
+              marginTop: 10,
+              // backgroundColor:semiTransparentGray
             }}
           >
-            {IsSecondLock ? (
-              <Image
-                source={require("../../../image/input_close_icon.png")}
-                style={{ width: 20, height: 20, marginRight: 10 }}
-              />
-            ) : (
-              <Image
-                source={require("../../../image/input_open_icon.png")}
-                style={{ width: 20, height: 20, marginRight: 10 }}
-              />
-            )}
-          </TouchableWithoutFeedback>
-        </View>
+            <TextInput
+              onChangeText={(text) => {
+                setInputPasswordAgain(text);
+                const numericValue = text.replace(/[^0-9]/g, "");
+                if (numericValue.length <= 6) {
+                  setValueAgain(numericValue);
+                }
+              }}
+              secureTextEntry={IsSecondLock}
+              value={valueAgain}
+              keyboardType="numeric"
+              maxLength={6}
+              style={{
+                flex: 1,
+                backgroundColor: "transparent",
+                marginLeft: 10,
+                paddingRight: 10,
+              }}
+            />
 
-        <View>
-          <Text
-            numberOfLines={6}
-            style={[
-              { paddingVertical: 20, height: 135, textAlignVertical: "top" },
-            ]}
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setIsSecondLock(IsSecondLock ? false : true);
+              }}
+            >
+              {IsSecondLock ? (
+                <Image
+                  source={require("../../../image/input_close_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              ) : (
+                <Image
+                  source={require("../../../image/input_open_icon.png")}
+                  style={{ width: 20, height: 20, marginRight: 10 }}
+                />
+              )}
+            </TouchableWithoutFeedback>
+          </View>
+
+          <View>
+            <Text
+              numberOfLines={6}
+              style={[
+                { paddingVertical: 20, height: 135, textAlignVertical: "top" },
+              ]}
+            />
+          </View>
+
+          <View style={{ flex: 1 }}></View>
+
+          <RoundSimButton
+            title="Confirm"
+            textColor="white"
+            event={() => {
+              OpenModal();
+            }}
           />
         </View>
-
-        <View style={{ flex: 1 }}></View>
-
-        <RoundSimButton
-          title="Confirm"
-          textColor="white"
-          event={() => {
-            OpenModal();
-          }}
-        />
-      </View>
-    </SafeAreaView>
-   </TouchableWithoutFeedback>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 

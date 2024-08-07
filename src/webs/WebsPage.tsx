@@ -193,7 +193,7 @@ export default function WebsPage(props) {
   };
 
   const postMessage = async (message: unknown) => {
-    // console.log("postMessage", message);
+    console.log("postMessage", message);
 
     webViewRef.current.postMessage(message);
   };

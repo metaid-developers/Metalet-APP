@@ -29,13 +29,13 @@ export default ({
         <Text className="text-gray-primary">Fee Rate</Text>
         <Text>{feeRate} sat/vB</Text>
       </View>
-      <View className="flex flex-row items-center justify-between">
+      {/* <View className="flex flex-row items-center justify-between">
         <Text className="text-gray-primary">CommitTx</Text>
         <TouchableOpacity onPress={() => copyToClipboard(commitTx.rawTx)}>
           <CopyIcon className="w-5 h-5 text-gray-primary" />
         </TouchableOpacity>
-      </View>
-      {revealTxs.map((revealTx, i) => (
+      </View> */}
+      {/* {revealTxs.map((revealTx, i) => (
         <View
           key={revealTx.txId}
           className="flex flex-row items-center justify-between"
@@ -45,7 +45,7 @@ export default ({
             <CopyIcon className="w-5 h-5 text-gray-primary" />
           </TouchableOpacity>
         </View>
-      ))}
+      ))} */}
     </View>
   );
 };

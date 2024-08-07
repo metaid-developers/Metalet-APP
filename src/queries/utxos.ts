@@ -102,7 +102,9 @@ export const fetchUtxos = async (
   if (chain === Chain.MVC) {
     return (await fetchMVCUtxos(address)) || [];
   } else {
-    return (await getBtcUtxos(address)) || [];
+    const needRawTx = true;
+    return (await getBtcUtxos(address, needRawTx)) || [];
+    // return (await getBtcUtxos(address)) || [];
   }
 };
 
@@ -170,7 +172,7 @@ export async function getBtcUtxos(
     if (!useUnconfirmed) {
       utxos = utxos.filter((utxo) => utxo.confirmed)
     } else {
-      utxos = await getSafeUtxos(address, utxos)
+      // utxos = await getSafeUtxos(address, utxos)
     }
   if (needRawTx) {
     for (let utxo of utxos) {

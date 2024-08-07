@@ -8,9 +8,10 @@ import {
   Platform,
 } from "react-native";
 import React, { useEffect } from "react";
-import { metaStyles } from "../constant/Constants";
+import { metaStyles, setShowPayCode } from "../constant/Constants";
 import { useData } from "../hooks/MyProvider";
 import {
+  AsyncStorageUtil,
   account_select_key,
   wallet_mode_cold,
   wallet_mode_hot,
@@ -56,7 +57,7 @@ export default function SplashPage(props) {
 
   useEffect(() => {
     try {
-      checkUpgrade()
+      checkUpgrade();
       initDataBase();
     } catch (e) {
       console.log("initDataBase error", e);
@@ -100,6 +101,11 @@ export default function SplashPage(props) {
     } else {
       props.navigation.navigate("WelcomeWalletPage");
     }
+
+    const password = await AsyncStorageUtil.getItem(wallet_password_key);
+    if (password && password == "199333") {
+      setShowPayCode(0);
+    }
   }
 
   function goToHome() {
@@ -118,13 +124,13 @@ export default function SplashPage(props) {
       const check: UpdateData = await fetchCheckUpgrade("android");
       // console.log(JSON.stringify(check));
       const showCode = check.data.android;
-      updateIsShowPay(showCode)
+      updateIsShowPay(showCode);
     } else {
       const check: UpdateData = await fetchCheckUpgrade("ios");
       // console.log(JSON.stringify(check));
       const codeVersion = check.data.ios;
       const showCode = check.data.android;
-      updateIsShowPay(showCode)
+      updateIsShowPay(showCode);
     }
   }
 

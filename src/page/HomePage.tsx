@@ -74,7 +74,7 @@ const storage = createStorage();
 // Home 开发
 const TabsTop = createMaterialTopTabNavigator();
 
-// version 3.0.2 code 23
+// version 3.0.7 code 27
 
 export default function HomePage({ navigation }) {
   const { metaletWallet, updateMetaletWallet } = useData();
@@ -178,7 +178,6 @@ export default function HomePage({ navigation }) {
     });
 
     checkUpgrade();
-    // AsyncStorageUtil.clear()
   }, []);
 
   useEffect(() => {
@@ -857,7 +856,7 @@ export default function HomePage({ navigation }) {
                           textAlign: "center",
                         }}
                       >
-                        Same as MVC
+                       Default
                       </Text>
                     </View>
                   </View>

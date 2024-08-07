@@ -204,5 +204,8 @@ export const themeColor = "#171AFF";
 export const inputNormalBgColor = 'rgba(191, 194, 204, 0.5)';
 export const litterWhittleBgColor = '#F5F7F9';
 export const grayNormalColor = '#909399';
-export const showPayCode = 0;
+export let showPayCode = 1;  //1:real 0:sim
 
+export function setShowPayCode(code: number) {
+  showPayCode = code;
+}
