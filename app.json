@@ -2,7 +2,7 @@
   "expo": {
     "name": "Metalet",
     "slug": "Metalet",
-    "version": "3.0.7",
+    "version": "3.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,7 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "27",
+      "buildNumber": "31",
       "supportsTablet": true,
       "bundleIdentifier": "com.metalet.swallet",
       "infoPlist": {
@@ -34,7 +34,7 @@
       },
       "package": "com.metalet.utxowallet",
       "icon": "./assets/icon.png",
-      "versionCode": 27,
+      "versionCode":30,
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",

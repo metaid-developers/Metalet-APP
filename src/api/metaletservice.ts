@@ -105,7 +105,7 @@ export async function broadcastSpace(
 
   const data = await post(
     network == "mainnet"
-      ? BASE_MVC_API_URL+ "/tx/broadcast"
+      ? BASE_MVC_API_URL + "/tx/broadcast"
       : BASE_MVC_API_URL_TESTNET + "/tx/broadcast",
     { hex: hex }
   );
@@ -114,8 +114,11 @@ export async function broadcastSpace(
 
 // 8.MVC ft data
 export async function fetchMvcFtBalance(address: string): Promise<MvcFtData[]> {
+  const network = await getWalletNetwork();
+  const url =
+    network == "testnet" ? BASE_MVC_API_URL_TESTNET : BASE_MVC_API_URL;
   const data = await get(
-    BASE_MVC_API_URL + "/contract/ft/address/" + address + "/balance",
+    url + "/contract/ft/address/" + address + "/balance",
     true
   );
   return data;
@@ -123,8 +126,11 @@ export async function fetchMvcFtBalance(address: string): Promise<MvcFtData[]> {
 
 // 9. MVC nft data
 export async function fetchMvcNftBalance(address: string): Promise<MvcNftData> {
+  const network = await getWalletNetwork();
+  const url =
+    network == "testnet" ? BASE_MVC_API_URL_TESTNET : BASE_MVC_API_URL;
   const data = await get(
-    BASE_METALET_URL + "/wallet-api/v3/address/contract/nft/utxo",
+    url + "/wallet-api/v3/address/contract/nft/utxo",
     false,
     { net: "livenet", address: address }
   );
@@ -138,13 +144,17 @@ export async function broadcastBtc(hex: string): Promise<{
   processingTime: number;
   data: string;
 }> {
-  const network = await getWalletNetwork(Chain.BTC);
+  // const network = await getWalletNetwork(Chain.BTC);
+  const network = await getWalletNetwork();
+  console.log("network", network);
+
   const data = await post(BASE_METALET_URL + "/wallet-api/v3/tx/broadcast", {
     chain: "btc",
     net: network,
     rawTx: hex,
   });
   return data;
+  // return { code: 1,message: "string", processingTime: 1,data: "string"};
 }
 
 // 11.mvc ft price
@@ -293,34 +303,42 @@ export async function fetchIcons(): Promise<IcoinsData> {
   return data;
 }
 
-
 //21.mrc20
-export async function fetchMrc20List(net:string,address:string): Promise<RootMrc20Data> {
+export async function fetchMrc20List(
+  net: string,
+  address: string
+): Promise<RootMrc20Data> {
   const data: RootMrc20Data = await get(
     BASE_METALET_URL + "/wallet-api/v3/mrc20/address/balance-list",
     false,
-    {net,address}
+    { net, address, cursor: 0, size: 100000 }
   );
   return data;
 }
 
-
 // 22. pins
-export async function fetchMetaIDPinsList(net:string,address:string): Promise<MetaIDPinsData> {
+export async function fetchMetaIDPinsList(
+  net: string,
+  address: string
+): Promise<MetaIDPinsData> {
   const data: MetaIDPinsData = await get(
     BASE_METALET_URL + "/wallet-api/v3/address/pins",
     false,
-    {net,address,cursor:0,size:1000}
+    { net, address, cursor: 0, size: 1000 }
   );
   return data;
 }
 
 // 23. mrc20 record
-export async function fetchMrc20RecordList(net:string,address:string,tickId:string): Promise<Mrc20RecordData> {
+export async function fetchMrc20RecordList(
+  net: string,
+  address: string,
+  tickId: string
+): Promise<Mrc20RecordData> {
   const data: Mrc20RecordData = await get(
     BASE_METALET_URL + "/wallet-api/v3/mrc20/address/activities",
     false,
-    {net,address,tickId}
+    { net, address, tickId }
   );
   return data;
 }

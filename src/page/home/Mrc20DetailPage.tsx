@@ -36,6 +36,7 @@ import { formatToDecimal } from "../../utils/WalletUtils";
 import { caculateOneFtValue } from "../../utils/AssertUtils";
 import useNetworkStore from "@/stores/useNetworkStore";
 import { Mrc20Record } from "@/api/type/Mrc20RecordData";
+import { removeTrailingZeros2 } from "@/utils/StringUtils";
 
 export default function Mrc20DetailPage({ route }) {
   const { mrc20Data } = route.params;
@@ -48,8 +49,11 @@ export default function Mrc20DetailPage({ route }) {
   const { metaletWallet, updateMetaletWallet } = useData();
 
   const [assertOneFt, setOneFtAssert] = useState("0.0");
-  const { netWork, updateNetWork } = useData();
+  // const { netWork, updateNetWork } = useData();
   const { network, switchNetwork } = useNetworkStore();
+  // console.log("mrc20Data", mrc20Data);
+  
+
 
   useEffect(() => {
     // console.log(mrc20Data);
@@ -62,7 +66,7 @@ export default function Mrc20DetailPage({ route }) {
       btcAddress,
       mrc20Data.mrc20Id
     );
-    console.log("mrc20RecordData ", JSON.stringify(mrc20RecordData));
+    // console.log("mrc20RecordData ", JSON.stringify(mrc20RecordData));
 
     // let mvcActivityListData = await fetchMvcFtRecord(
     //   mvcAddress,
@@ -71,12 +75,16 @@ export default function Mrc20DetailPage({ route }) {
     // );
     // // console.log(mvcActivityListData);
 
+    // const mvcActivityListData = mrc20RecordData.data.list;
     const mvcActivityListData1 = mrc20RecordData.data.list;
     const mvcActivityListData = mvcActivityListData1.filter((record) => {
+      if(record.txType==2){
+        return true;
+      }
       return !(record.from === btcAddress && record.to === btcAddress);
     });
 
-    console.log(mvcActivityListData);
+    // console.log(mvcActivityListData);
 
     if (mvcActivityListData != null && mvcActivityListData.length == 0) {
       let record: Mrc20Record = {
@@ -119,10 +127,11 @@ export default function Mrc20DetailPage({ route }) {
 
     let textColor;
     if (item.from === btcAddress && item.to === btcAddress) {
-      isIncomeType = "Transfer";
-      textColor = grayNormalColor;
-      return;
-    } else if (item.from === btcAddress) {
+      isIncomeType = "Mint";
+      // textColor = grayNormalColor;
+      textColor  = "green";
+      // return;
+    } else if (item.from === btcAddress&&item.to != btcAddress) {
       isIncomeType = "Send";
       textColor = "red";
     } else if (item.to === btcAddress) {
@@ -136,6 +145,8 @@ export default function Mrc20DetailPage({ route }) {
     //   genesis: mvcFtData.genesis,
     // });
 
+    console.log("isIncomeType",isIncomeType);
+    
     return (
       <View>
         {item.txId != "1" ? (
@@ -151,6 +162,14 @@ export default function Mrc20DetailPage({ route }) {
             }}
           >
             {isIncomeType === "Receive" && (
+              <View>
+                <Image
+                  source={require("../../../image/record_type_in.png")}
+                  style={{ width: 35, height: 35 }}
+                />
+              </View>
+            )}
+                {isIncomeType === "Mint" && (
               <View>
                 <Image
                   source={require("../../../image/record_type_in.png")}
@@ -185,15 +204,15 @@ export default function Mrc20DetailPage({ route }) {
                     color: textColor,
                     marginBottom: 10,
                     textAlign: "right",
-                    width:100
+                    width:200
                   }}
                 >
-                  {isIncomeType === "Receive"
+                  {isIncomeType === "Receive"|| isIncomeType === "Mint"
                     ? "+" + item.amount.toString()
                     : isIncomeType === "Send"
                       ? "-" + item.amount.toString()
                       : item.amount.toString()}
-                  {" " + mrc20Data.tick.toString().toUpperCase()}
+                  {/* {" " + mrc20Data.tick.toString().toUpperCase()} */}
                 </Text>
               </View>
 
@@ -201,7 +220,6 @@ export default function Mrc20DetailPage({ route }) {
                 style={{
                   flex: 1,
                   marginLeft: 10,
-
                   alignItems: "flex-end",
                 }}
               >
@@ -273,15 +291,15 @@ export default function Mrc20DetailPage({ route }) {
     // const showBalance =
     //   parseFloat(mrc20Data.unsafeBalance) + parseFloat(mrc20Data.balance);
 
-    let showBalance = 0;
+    let showBalance = "0";
     // const showBalance =
     //   parseFloat(item.unsafeBalance) + parseFloat(item.balance);
 
     if (parseFloat(mrc20Data.balance) > 0) {
-      showBalance =
-        parseFloat(mrc20Data.unsafeBalance) + parseFloat(mrc20Data.balance);
+      showBalance =removeTrailingZeros2( parseFloat(mrc20Data.unsafeBalance) + parseFloat(mrc20Data.balance),mrc20Data.decimals)
+       
     } else {
-      showBalance = parseFloat(mrc20Data.unsafeBalance);
+      showBalance = removeTrailingZeros2(parseFloat(mrc20Data.unsafeBalance),mrc20Data.decimals);
     }
 
     let mrc20Img = "";
@@ -307,7 +325,7 @@ export default function Mrc20DetailPage({ route }) {
       //   mrc20Img = "https://man-test.metaid.io/content/" + extractedString;
       // }
 
-      if (netWork === "mainnet") {
+      if (network === "mainnet") {
         if (metaDataObject.icon.startsWith("http")) {
           mrc20Img = metaDataObject.icon;
         } else {
@@ -321,8 +339,25 @@ export default function Mrc20DetailPage({ route }) {
         }
       }
 
+
       // console.log("mrc20Img", mrc20Img);
     }
+
+    
+
+    if (mrc20Data.tag ) {
+      if (mrc20Data.tag.trim()=="id-coins") {
+        
+        if (mrc20Data.deployUserInfo.avatar&& mrc20Data.deployUserInfo.avatar.trim() != "") {
+          mrc20Img = mrc20Data.deployUserInfo.avatar;
+        } else {
+          mrc20Img = "";
+        }
+      }
+    }
+    // console.log(mrc20Img);
+    
+
     return (
       <View
         style={{

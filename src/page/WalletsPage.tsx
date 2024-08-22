@@ -7,6 +7,7 @@ import {
   Modal,
   ActivityIndicator,
   TextInput,
+  Keyboard,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -175,7 +176,6 @@ export default function WalletsPage() {
     getWalletData();
     navigate("Tabs");
     updateNeedInitWallet(getRandomID());
- 
 
     eventBus.publish(refreshHomeLoadingEvent, { data: "" });
 
@@ -402,380 +402,394 @@ export default function WalletsPage() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          marginLeft: 20,
-          marginTop: 5,
-          height: 44,
-          alignItems: "center",
-        }}
-      >
-        <TouchableWithoutFeedback
-          onPress={() => {
-            goBack();
+    <TouchableWithoutFeedback
+      onPress={() => {
+        console.log("wallets");
+        Keyboard.dismiss();
+      }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            marginLeft: 20,
+            marginTop: 5,
+            height: 44,
+            alignItems: "center",
           }}
         >
-          <Image
-            source={require("../../image/meta_back_icon.png")}
-            style={{ width: 22, height: 22 }}
-          />
-        </TouchableWithoutFeedback>
-        <View style={{ flexDirection: "row", flex: 1 }}></View>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setIsEdit(isEdit != true ? true : false);
-          }}
-        >
-          <Text
-            style={[
-              {
-                textAlign: "center",
-                marginRight: 20,
-                fontSize: 16,
-                color: "#333",
-              },
-            ]}
-          >
-            Edit
-          </Text>
-        </TouchableWithoutFeedback>
-      </View>
-      <View style={metaStyles.verMarginContainer}>
-        <Text style={{ textAlign: "center", color: "#666666", fontSize: 16 }}>
-          Total Assests
-        </Text>
-
-        <Text
-          style={[
-            metaStyles.bigLargeDefaultText,
-            { marginTop: 10, textAlign: "center" },
-          ]}
-        >
-          ${metaletWallet.currentSumAssert}
-        </Text>
-
-        <FlatList
-          style={{ marginTop: 20 }}
-          keyExtractor={(item, index) => index.toString()}
-          data={walletList}
-          renderItem={ListItem}
-        />
-
-        <TouchableWithoutFeedback
-          onPress={() => {
-            userAddWallet();
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              height: 48,
-              width: "100%",
-              borderRadius: 23,
-              alignItems: "center",
-              justifyContent: "center",
+          <TouchableWithoutFeedback
+            onPress={() => {
+              goBack();
             }}
           >
-            <View
+            <Image
+              source={require("../../image/meta_back_icon.png")}
+              style={{ width: 22, height: 22 }}
+            />
+          </TouchableWithoutFeedback>
+          <View style={{ flexDirection: "row", flex: 1 }}></View>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setIsEdit(isEdit != true ? true : false);
+            }}
+          >
+            <Text
               style={[
                 {
-                  flexDirection: "row",
-                  height: 48,
-                  width: 200,
-                  backgroundColor: "#171AFF",
-                  borderRadius: 23,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 20,
-                  marginStart: 20,
+                  textAlign: "center",
                   marginRight: 20,
+                  fontSize: 16,
+                  color: "#333",
                 },
               ]}
             >
-              <Text
+              Edit
+            </Text>
+          </TouchableWithoutFeedback>
+        </View>
+        <View style={metaStyles.verMarginContainer}>
+          <Text style={{ textAlign: "center", color: "#666666", fontSize: 16 }}>
+            Total Assests
+          </Text>
+
+          <Text
+            style={[
+              metaStyles.bigLargeDefaultText,
+              { marginTop: 10, textAlign: "center" },
+            ]}
+          >
+            ${metaletWallet.currentSumAssert}
+          </Text>
+
+          <FlatList
+            style={{ marginTop: 20 }}
+            keyExtractor={(item, index) => index.toString()}
+            data={walletList}
+            renderItem={ListItem}
+          />
+
+          <TouchableWithoutFeedback
+            onPress={() => {
+              userAddWallet();
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                height: 48,
+                width: "100%",
+                borderRadius: 23,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <View
                 style={[
-                  { textAlign: "center" },
-                  { color: "#fff" },
-                  { fontSize: 16 },
+                  {
+                    flexDirection: "row",
+                    height: 48,
+                    width: 200,
+                    backgroundColor: "#171AFF",
+                    borderRadius: 23,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 20,
+                    marginStart: 20,
+                    marginRight: 20,
+                  },
                 ]}
               >
-                Add Wallet
-              </Text>
+                <Text
+                  style={[
+                    { textAlign: "center" },
+                    { color: "#fff" },
+                    { fontSize: 16 },
+                  ]}
+                >
+                  Add Wallet
+                </Text>
+              </View>
             </View>
-          </View>
-        </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback>
 
-        {/* 修改钱包 */}
-        <Modal transparent={true} visible={isShowEditWallet}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "flex-end",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: "#fff",
-                padding: 20,
-                borderTopRightRadius: 10,
-                borderTopLeftRadius: 10,
-                paddingBottom: 40,
+          {/* 修改钱包 */}
+
+          <Modal transparent={true} visible={isShowEditWallet}>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                Keyboard.dismiss();
               }}
             >
-              <View style={{ flexDirection: "row" }}>
-                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                  Edit Name
-                </Text>
-                <View style={{ flex: 1 }} />
-
-                <TouchableWithoutFeedback
-                  onPress={() => {
-                    setIsShowEditWallet(false);
-                  }}
-                >
-                  <Image
-                    source={require("../../image/metalet_close_big_icon.png")}
-                    style={{ width: 15, height: 15 }}
-                  />
-                </TouchableWithoutFeedback>
-              </View>
-
-              <Text style={{ marginTop: 20, color: "#666", fontSize: 14 }}>
-                Wallet Name
-              </Text>
-
               <View
                 style={{
-                  alignItems: "center",
-                  borderColor: "#171AFF",
-                  flexDirection: "row",
-                  borderWidth: 1,
-                  height: 50,
-                  borderRadius: 30,
-                  marginTop: 20,
-                }}
-              >
-                <TextInput
-                  multiline={true}
-                  placeholder={editWalletName}
-                  autoCapitalize={"none"}
-                  onChangeText={(text) => {
-                    setChangeWalletName(text);
-                    if (text.length > 0) {
-                      setIsCanReName(true);
-                    } else {
-                      setIsCanReName(false);
-                    }
-                  }}
-                  style={{
-                    width: "100%",
-                    backgroundColor: "transparent",
-                    marginLeft: 10,
-                    paddingRight: 20,
-                  }}
-                />
-              </View>
-
-              <TouchableWithoutFeedback
-                onPress={async () => {
-                  changeWallet.name = changeWalletName;
-                  setWalletList([...walletList]);
-                  await storage.set(wallets_key, walletList);
-                  setIsShowEditWallet(false);
-                  setIsShowNotice(true);
-                  setTimeout(() => {
-                    setIsShowNotice(false);
-                  }, 800);
+                  flex: 1,
+                  justifyContent: "flex-end",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
                 }}
               >
                 <View
                   style={{
-                    marginTop: 20,
-                    marginBottom: 20,
-                    height: 20,
-                    width: "100%",
-                    alignItems: "center",
+                    backgroundColor: "#fff",
+                    padding: 20,
+                    borderTopRightRadius: 10,
+                    borderTopLeftRadius: 10,
+                    paddingBottom: 40,
                   }}
                 >
-                  <View
-                    style={[
-                      {
-                        flexDirection: "row",
-                        height: 48,
-                        width: 200,
-                        backgroundColor: isCanReName
-                          ? "rgba(23, 26, 255, 1)"
-                          : "rgba(23, 26, 255, 0.5)",
-                        borderRadius: 30,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginBottom: 20,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        { textAlign: "center" },
-                        { color: "#fff" },
-                        { fontSize: 16 },
-                      ]}
-                    >
-                      Confirm
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                      Edit Name
                     </Text>
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </View>
-        </Modal>
+                    <View style={{ flex: 1 }} />
 
-        {/* 修改account */}
-        <Modal transparent={true} visible={isShowEditAccount}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "flex-end",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            }}
-          >
+                    <TouchableWithoutFeedback
+                      onPress={() => {
+                        setIsShowEditWallet(false);
+                      }}
+                    >
+                      <Image
+                        source={require("../../image/metalet_close_big_icon.png")}
+                        style={{ width: 15, height: 15 }}
+                      />
+                    </TouchableWithoutFeedback>
+                  </View>
+
+                  <Text style={{ marginTop: 20, color: "#666", fontSize: 14 }}>
+                    Wallet Name
+                  </Text>
+
+                  <View
+                    style={{
+                      alignItems: "center",
+                      borderColor: "#171AFF",
+                      flexDirection: "row",
+                      borderWidth: 1,
+                      height: 50,
+                      borderRadius: 30,
+                      marginTop: 20,
+                    }}
+                  >
+                    <TextInput
+                      multiline={true}
+                      placeholder={editWalletName}
+                      autoCapitalize={"none"}
+                      onChangeText={(text) => {
+                        setChangeWalletName(text);
+                        if (text.length > 0) {
+                          setIsCanReName(true);
+                        } else {
+                          setIsCanReName(false);
+                        }
+                      }}
+                      style={{
+                        width: "100%",
+                        backgroundColor: "transparent",
+                        marginLeft: 10,
+                        paddingRight: 20,
+                      }}
+                    />
+                  </View>
+
+                  <TouchableWithoutFeedback
+                    onPress={async () => {
+                      changeWallet.name = changeWalletName;
+                      setWalletList([...walletList]);
+                      await storage.set(wallets_key, walletList);
+                      setIsShowEditWallet(false);
+                      setIsShowNotice(true);
+                      setTimeout(() => {
+                        setIsShowNotice(false);
+                      }, 800);
+                    }}
+                  >
+                    <View
+                      style={{
+                        marginTop: 20,
+                        marginBottom: 20,
+                        height: 20,
+                        width: "100%",
+                        alignItems: "center",
+                      }}
+                    >
+                      <View
+                        style={[
+                          {
+                            flexDirection: "row",
+                            height: 48,
+                            width: 200,
+                            backgroundColor: isCanReName
+                              ? "rgba(23, 26, 255, 1)"
+                              : "rgba(23, 26, 255, 0.5)",
+                            borderRadius: 30,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            marginBottom: 20,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            { textAlign: "center" },
+                            { color: "#fff" },
+                            { fontSize: 16 },
+                          ]}
+                        >
+                          Confirm
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableWithoutFeedback>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+
+          {/* 修改account */}
+          <Modal transparent={true} visible={isShowEditAccount}>
             <View
               style={{
-                backgroundColor: "#fff",
-                padding: 20,
-                borderTopRightRadius: 10,
-                borderTopLeftRadius: 10,
-                paddingBottom: 40,
+                flex: 1,
+                justifyContent: "flex-end",
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
               }}
             >
-              <View style={{ flexDirection: "row" }}>
-                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                  Edit Name
-                </Text>
-                <View style={{ flex: 1 }} />
-
-                <TouchableWithoutFeedback
-                  onPress={() => {
-                    setIsShowEditAccount(false);
-                  }}
-                >
-                  <Image
-                    source={require("../../image/metalet_close_big_icon.png")}
-                    style={{ width: 15, height: 15 }}
-                  />
-                </TouchableWithoutFeedback>
-              </View>
-
-              <Text style={{ marginTop: 20, color: "#666", fontSize: 14 }}>
-                Account Name
-              </Text>
-
               <View
                 style={{
-                  alignItems: "center",
-                  borderColor: "#171AFF",
-                  flexDirection: "row",
-                  borderWidth: 1,
-                  height: 50,
-                  borderRadius: 30,
-                  marginTop: 20,
+                  backgroundColor: "#fff",
+                  padding: 20,
+                  borderTopRightRadius: 10,
+                  borderTopLeftRadius: 10,
+                  paddingBottom: 40,
                 }}
               >
-                <TextInput
-                  multiline={true}
-                  // placeholder={changeAccountName}
-                  // autoCapitalize={"none"}
-                  onChangeText={(text) => {
-                    setChangeAccountName(text);
-                    if (text.length > 0) {
-                      setIsCanReAccountName(true);
-                    } else {
-                      setIsCanReAccountName(false);
-                    }
-                  }}
-                  style={{
-                    width: "100%",
-                    backgroundColor: "transparent",
-                    marginLeft: 10,
-                    paddingRight: 20,
-                  }}
-                />
-              </View>
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                    Edit Name
+                  </Text>
+                  <View style={{ flex: 1 }} />
 
-              <TouchableWithoutFeedback
-                onPress={async () => {
-                  await getStorageWallets().then(
-                    // await AsyncStorageUtil.getItem(wallets_key).then(
-                    async (wallets) => {
-                      const nowWallet = wallets[parentIndex];
-                      nowWallet.accountsOptions[accountIndex].name =
-                        changeAccountName;
-                      setWalletList([...wallets]);
+                  <TouchableWithoutFeedback
+                    onPress={() => {
                       setIsShowEditAccount(false);
-                      setIsEdit(false);
-                      await storage.set(wallets_key, wallets);
-                    }
-                  );
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/metalet_close_big_icon.png")}
+                      style={{ width: 15, height: 15 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
 
-                  setIsShowNotice(true);
-                  setTimeout(() => {
-                    setIsShowNotice(false);
-                  }, 800);
-                  // changeWallet.name = changeWalletName;
-                  // setWalletList([...walletList]);
-                  // await storage.set(wallets_key, walletList);
-                  // setIsShowEditWallet(false);
-                }}
-              >
+                <Text style={{ marginTop: 20, color: "#666", fontSize: 14 }}>
+                  Account Name
+                </Text>
+
                 <View
                   style={{
-                    marginTop: 20,
-                    marginBottom: 20,
-                    height: 20,
-                    width: "100%",
                     alignItems: "center",
+                    borderColor: "#171AFF",
+                    flexDirection: "row",
+                    borderWidth: 1,
+                    height: 50,
+                    borderRadius: 30,
+                    marginTop: 20,
+                  }}
+                >
+                  <TextInput
+                    multiline={true}
+                    // placeholder={changeAccountName}
+                    // autoCapitalize={"none"}
+                    onChangeText={(text) => {
+                      setChangeAccountName(text);
+                      if (text.length > 0) {
+                        setIsCanReAccountName(true);
+                      } else {
+                        setIsCanReAccountName(false);
+                      }
+                    }}
+                    style={{
+                      width: "100%",
+                      backgroundColor: "transparent",
+                      marginLeft: 10,
+                      paddingRight: 20,
+                    }}
+                  />
+                </View>
+
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    await getStorageWallets().then(
+                      // await AsyncStorageUtil.getItem(wallets_key).then(
+                      async (wallets) => {
+                        const nowWallet = wallets[parentIndex];
+                        nowWallet.accountsOptions[accountIndex].name =
+                          changeAccountName;
+                        setWalletList([...wallets]);
+                        setIsShowEditAccount(false);
+                        setIsEdit(false);
+                        await storage.set(wallets_key, wallets);
+                      }
+                    );
+
+                    setIsShowNotice(true);
+                    setTimeout(() => {
+                      setIsShowNotice(false);
+                    }, 800);
+                    // changeWallet.name = changeWalletName;
+                    // setWalletList([...walletList]);
+                    // await storage.set(wallets_key, walletList);
+                    // setIsShowEditWallet(false);
                   }}
                 >
                   <View
-                    style={[
-                      {
-                        flexDirection: "row",
-                        height: 48,
-                        width: 200,
-                        backgroundColor: isCanReAccountName
-                          ? "rgba(23, 26, 255, 1)"
-                          : "rgba(23, 26, 255, 0.5)",
-                        borderRadius: 30,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginBottom: 20,
-                      },
-                    ]}
+                    style={{
+                      marginTop: 20,
+                      marginBottom: 20,
+                      height: 20,
+                      width: "100%",
+                      alignItems: "center",
+                    }}
                   >
-                    <Text
+                    <View
                       style={[
-                        { textAlign: "center" },
-                        { color: "#fff" },
-                        { fontSize: 16 },
+                        {
+                          flexDirection: "row",
+                          height: 48,
+                          width: 200,
+                          backgroundColor: isCanReAccountName
+                            ? "rgba(23, 26, 255, 1)"
+                            : "rgba(23, 26, 255, 0.5)",
+                          borderRadius: 30,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: 20,
+                        },
                       ]}
                     >
-                      Confirm
-                    </Text>
+                      <Text
+                        style={[
+                          { textAlign: "center" },
+                          { color: "#fff" },
+                          { fontSize: 16 },
+                        ]}
+                      >
+                        Confirm
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableWithoutFeedback>
+                </TouchableWithoutFeedback>
+              </View>
             </View>
+          </Modal>
+
+          <LoadingNoticeModal title="Successful" isShow={isShowNotice} />
+
+          <View>
+            {/* <RoundSimButton title={"Add Wallet"}  textColor="#fff" event={()=>{}}  roundStytle={{marginLeft:20,marginRight:40,marginTop:20}}/> */}
           </View>
-        </Modal>
-
-        <LoadingNoticeModal title="Successful" isShow={isShowNotice} />
-
-        <View>
-          {/* <RoundSimButton title={"Add Wallet"}  textColor="#fff" event={()=>{}}  roundStytle={{marginLeft:20,marginRight:40,marginTop:20}}/> */}
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }

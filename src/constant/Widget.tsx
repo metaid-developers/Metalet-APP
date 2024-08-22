@@ -560,6 +560,7 @@ export const CircleAvatarLetter = ({
   widthC = 50,
   heightC = 50,
 }) => {
+  
   return (
     <View
       style={{

@@ -12,6 +12,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
+  CircleAvatar,
   CircleAvatarLetter,
   LoadingModal,
   LoadingNoticeModal,
@@ -56,6 +57,7 @@ import {
 } from "../../utils/WalletUtils";
 import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
 import { getNetwork } from "@/lib/network";
+import useNetworkStore from "@/stores/useNetworkStore";
 
 export default function SendMrc20Page({ route }) {
   const { mrc20Data } = route.params;
@@ -135,6 +137,9 @@ export default function SendMrc20Page({ route }) {
 
   const [aboutFee, setAboutFee] = useState(3000);
   const { walletMode, updateWalletMode } = useData();
+  // const { netWork, updateNetWork } = useData();
+  const { network, switchNetwork } = useNetworkStore();
+
 
   useEffect(() => {
     getFeed();
@@ -191,7 +196,7 @@ export default function SendMrc20Page({ route }) {
 
       const { commitTx, revealTx } = btcWallet.signTx(SignType.MRC20_TRANSFER, {
         utxos,
-        flag: network === "mainnet" ? "metaid" : "testid",
+        flag: "metaid",
         amount: inputAmount,
         // metaIdPinUtxos,
         commitFeeRate: parseInt(feed),
@@ -284,6 +289,7 @@ export default function SendMrc20Page({ route }) {
       });
       addMetaletSafeUtxo(rawTx, data);
     }
+
     // setTimeout(() => {
     //   setIsShowLoading(false);
     //   // navigate("HomePage");
@@ -291,55 +297,602 @@ export default function SendMrc20Page({ route }) {
     // }, 2000);
   };
 
+  const metaData = mrc20Data.metaData;
+  let mrc20Img = "";
+  if (
+    metaData &&
+    metaData != null &&
+    metaData != undefined &&
+    metaData != "" &&
+    metaData != "undefined" &&
+    JSON.stringify(metaData).includes("icon")
+  ) {
+    const metaDataObject = JSON.parse(metaData);
+
+    const startIndex = metaData.indexOf("metafile://") + "metafile://".length;
+    const endIndex = metaData.indexOf('"', startIndex);
+    const extractedString = metaData.substring(startIndex, endIndex);
+
+    if (network === "mainnet") {
+      if (metaDataObject.icon.startsWith("http")) {
+        mrc20Img = metaDataObject.icon;
+      } else {
+        mrc20Img = "https://man.metaid.io/content/" + extractedString;
+      }
+    } else {
+      if (metaDataObject.icon.startsWith("http")) {
+        mrc20Img = metaDataObject.icon;
+      } else {
+        mrc20Img = "https://man-test.metaid.io/content/" + extractedString;
+      }
+    }
+  }
+
+  if (mrc20Data.tag) {
+    if (mrc20Data.tag.trim() == "id-coins") {
+      if (
+        mrc20Data.deployUserInfo.avatar &&
+        mrc20Data.deployUserInfo.avatar.trim() != ""
+      ) {
+        mrc20Img = mrc20Data.deployUserInfo.avatar;
+      } else {
+        mrc20Img = "";
+      }
+    }
+  }
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <LoadingModal
-        isShow={isShowLoading}
-        isCancel={true}
-        event={() => {
-          setIsShowLoading(false);
-        }}
-      />
-
-      <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
-
-      {/* pay comfirm */}
-      <Modal visible={confirmDailogState} transparent={true}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <LoadingModal
+          isShow={isShowLoading}
+          isCancel={true}
+          event={() => {
+            setIsShowLoading(false);
           }}
-        >
+        />
+
+        <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
+
+        {/* pay comfirm */}
+        <Modal visible={confirmDailogState} transparent={true}>
           <View
             style={{
-              backgroundColor: "#fff",
-              borderRadius: 10,
-              paddingHorizontal: 30,
-              paddingTop: 30,
-              marginHorizontal: 20,
+              flex: 1,
+              justifyContent: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
             }}
           >
-            {/* <Text style={{ textAlign: "center", fontSize: 16 }}>
+            <View
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: 10,
+                paddingHorizontal: 30,
+                paddingTop: 30,
+                marginHorizontal: 20,
+              }}
+            >
+              {/* <Text style={{ textAlign: "center", fontSize: 16 }}>
               Confirm Transaction
             </Text> */}
 
-            {/* 头部 */}
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {/* <Image
+              {/* 头部 */}
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {/* <Image
                 source={require("../../../image/receive_btc_icon.png")}
                 style={{ width: 50, height: 50 }}
               /> */}
 
-              <CircleAvatarLetter
-                letterStr={mrc20Data.tokenName.substring(0, 1)}
-              />
+                <CircleAvatarLetter
+                  letterStr={mrc20Data.tokenName.substring(0, 1)}
+                />
+                <Text
+                  style={{
+                    color: "#333",
+                    textAlign: "center",
+                    lineHeight: 20,
+                    marginTop: 20,
+                    fontSize: 18,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {inputAmount} {mrc20Data.tick}
+                </Text>
+              </View>
+
+              <View>
+                <Text
+                  style={{
+                    marginTop: 15,
+                    color: grayNormalColor,
+                    fontSize: 14,
+                  }}
+                >
+                  From
+                </Text>
+                <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
+                  {/* {metaletWallet.currentBtcWallet.getAddress()} */}
+                  {btcAddress}
+                </Text>
+              </View>
+
+              <View>
+                <Text
+                  style={{
+                    marginTop: 10,
+                    color: grayNormalColor,
+                    fontSize: 14,
+                  }}
+                >
+                  To
+                </Text>
+                <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
+                  {inputAddress}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginTop: 10,
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                  Amount
+                </Text>
+                <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
+                  {/* {parseFloat(inputAmount).toFixed(8)} */}
+                  {inputAmount}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginTop: 10,
+                  justifyContent: "space-between",
+                  marginBottom: 10,
+                }}
+              >
+                <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                  Fees(Estimated)
+                </Text>
+                <Text style={{ color: "#333", fontSize: 14 }}>{fee} BTC</Text>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginTop: 20,
+                  justifyContent: "space-between",
+                }}
+              >
+                <RoundSimButtonFlee
+                  title={"Cancel"}
+                  style={{
+                    borderRadius: 10,
+                    height: 40,
+                    width: "45%",
+                    borderWidth: 1,
+                    borderColor: themeColor,
+                  }}
+                  color="#fff"
+                  textColor="#171AFF"
+                  event={() => {
+                    setConfirmDailogState(false);
+                  }}
+                />
+
+                <RoundSimButtonFlee
+                  title={"Confirm"}
+                  style={{ borderRadius: 10, height: 40, width: "45%" }}
+                  textColor="#fff"
+                  event={() => {
+                    setConfirmDailogState(false);
+                    setIsShowVerify(true);
+                    // OpenModal();
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        {/* feed */}
+        <Modal transparent={true} visible={isShowFeed}>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: Platform.OS === "ios" ? "center" : "flex-end",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "#fff",
+                padding: 20,
+                borderTopRightRadius: 10,
+                borderTopLeftRadius: 10,
+                paddingBottom: 40,
+                borderBottomLeftRadius: Platform.OS === "ios" ? 10 : 0,
+                borderBottomRightRadius: Platform.OS === "ios" ? 10 : 0,
+                marginHorizontal: Platform.OS === "ios" ? 10 : 0,
+              }}
+            >
+              <View style={{ flexDirection: "row" }}>
+                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                  Select Fee Rate
+                </Text>
+
+                <View style={{ flex: 1 }} />
+
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setIsShowFeed(false);
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/metalet_close_big_icon.png")}
+                    style={{ width: 15, height: 15 }}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginTop: 20,
+                }}
+              >
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setFeedModeType(feedModeSlow);
+                    if (textInputRef.current) {
+                      textInputRef.current.blur();
+                    }
+                    setFeedReady(userSlowFeed.feeRate.toString());
+                  }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      borderColor:
+                        feedModeType == feedModeSlow
+                          ? themeColor
+                          : inputNormalBgColor,
+                      borderWidth: 0.8,
+                      borderRadius: 5,
+                      height: 100,
+                    }}
+                  >
+                    {feedModeType == feedModeSlow && (
+                      <Image
+                        source={require("../../../image/fee_icon_tag.png")}
+                        style={{
+                          width: 13,
+                          height: 13,
+                          position: "absolute",
+                          right: 0,
+                        }}
+                      />
+                    )}
+
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#333" }}>
+                        {userSlowFeed.title}
+                      </Text>
+                      <Text style={{ marginTop: 3, color: "#000" }}>
+                        {userSlowFeed.feeRate} sat/vB
+                      </Text>
+                      <Text
+                        style={{ color: "#666", fontSize: 10, marginTop: 3 }}
+                      >
+                        {userSlowFeed.desc}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setFeedModeType(feedModeAvg);
+                    if (textInputRef.current) {
+                      textInputRef.current.blur();
+                    }
+                    setFeedReady(userAvgFeed.feeRate.toString());
+                  }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      borderColor:
+                        feedModeType == feedModeAvg
+                          ? themeColor
+                          : inputNormalBgColor,
+                      borderWidth: 0.8,
+                      borderRadius: 5,
+                      height: 100,
+                      marginLeft: 10,
+                    }}
+                  >
+                    {feedModeType == feedModeAvg && (
+                      <Image
+                        source={require("../../../image/fee_icon_tag.png")}
+                        style={{
+                          width: 13,
+                          height: 13,
+                          position: "absolute",
+                          right: 0,
+                        }}
+                      />
+                    )}
+
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#333" }}>{userAvgFeed.title}</Text>
+                      <Text style={{ marginTop: 3, color: "#000" }}>
+                        {userAvgFeed.feeRate} sat/vB
+                      </Text>
+                      <Text
+                        style={{ color: "#666", fontSize: 10, marginTop: 3 }}
+                      >
+                        {userAvgFeed.desc}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setFeedModeType(feedModeFast);
+                    if (textInputRef.current) {
+                      textInputRef.current.blur();
+                    }
+                    setFeedReady(userFastFeed.feeRate.toString());
+                  }}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      borderColor:
+                        feedModeType == feedModeFast
+                          ? themeColor
+                          : inputNormalBgColor,
+                      borderWidth: 0.8,
+                      borderRadius: 5,
+                      height: 100,
+                      marginLeft: 10,
+                    }}
+                  >
+                    {feedModeType == feedModeFast && (
+                      <Image
+                        source={require("../../../image/fee_icon_tag.png")}
+                        style={{
+                          width: 13,
+                          height: 13,
+                          position: "absolute",
+                          right: 0,
+                        }}
+                      />
+                    )}
+
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text style={{ color: "#333" }}>
+                        {userFastFeed.title}
+                      </Text>
+                      <Text style={{ marginTop: 3, color: "#000" }}>
+                        {userFastFeed.feeRate} sat/vB
+                      </Text>
+                      <Text
+                        style={{ color: "#666", fontSize: 10, marginTop: 3 }}
+                      >
+                        {userFastFeed.desc}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setFeedModeType(feedModeCustom);
+                }}
+              >
+                <View
+                  style={{
+                    borderColor:
+                      feedModeType == feedModeCustom
+                        ? themeColor
+                        : inputNormalBgColor,
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    marginTop: 20,
+                    height: "auto",
+                  }}
+                >
+                  {feedModeType == feedModeCustom && (
+                    <Image
+                      source={require("../../../image/fee_icon_tag.png")}
+                      style={{
+                        width: 13,
+                        height: 13,
+                        position: "absolute",
+                        right: 0,
+                      }}
+                    />
+                  )}
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      padding: 10,
+                    }}
+                  >
+                    <Text>Custom Fee Rate</Text>
+
+                    <TextInput
+                      placeholder="sat/vB"
+                      ref={textInputRef}
+                      keyboardType={
+                        Platform.OS === "ios" ? undefined : "numeric"
+                      }
+                      onChangeText={(text) => {
+                        if (feedModeType == feedModeCustom) {
+                          const numericInput = text.replace(/[^0-9]/g, "");
+                          setFeedReady(numericInput);
+                          // if (Platform.OS === "ios") {
+                          //   Keyboard.dismiss();
+                          // }
+                        }
+                      }}
+                      value={feedReady}
+                      style={{
+                        width: "100%",
+                        backgroundColor: "transparent",
+                      }}
+                      onFocus={() => {
+                        setFeedModeType(feedModeCustom);
+                      }}
+                    />
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+
+              <TouchableWithoutFeedback
+                onPress={async () => {
+                  setFeed(feedReady);
+                  setIsShowFeed(false);
+                }}
+              >
+                <View
+                  style={{
+                    marginTop: 20,
+                    marginBottom: 20,
+                    height: 20,
+                    width: "100%",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={[
+                      {
+                        flexDirection: "row",
+                        height: 48,
+                        width: "70%",
+                        backgroundColor: themeColor,
+                        borderRadius: 30,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: 20,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        { textAlign: "center" },
+                        { color: "#fff" },
+                        { fontSize: 16 },
+                      ]}
+                    >
+                      Confirm
+                    </Text>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </View>
+        </Modal>
+
+        {/* pay verify modal */}
+        <VerifyModal
+          isShow={isShowVerify}
+          eventCancel={() => {
+            setIsShowVerify(false);
+          }}
+          event={() => {
+            setIsShowVerify(false);
+
+            console.log("确认");
+
+            if (walletMode === wallet_mode_cold) {
+              sendColdBtcConfirm();
+            } else {
+              OpenModal();
+            }
+          }}
+        />
+
+        {isScan ? (
+          <QRScanner
+            handleScan={(data) => {
+              setInputAddress("");
+              setInputAddress(data);
+              setIsScan(false);
+            }}
+          />
+        ) : (
+          <View style={{ flex: 1 }}>
+            <TitleBar title="Send MRC20" />
+
+            <View
+              style={{
+                justifyContent: "center",
+                // backgroundColor: "#fff",
+                margin: 20,
+                // borderRadius: 10,
+                alignItems: "center",
+                padding: 20,
+              }}
+            >
+              {/* <Image
+              source={require("../../../image/receive_btc_icon.png")}
+              style={{ width: 70, height: 70 }}
+            /> */}
+
+              {/* <CircleAvatarLetter
+              letterStr={mrc20Data.tokenName.substring(0, 1)}
+              widthC={70}
+              heightC={70}
+            /> */}
+
+              {mrc20Img != null && mrc20Img != "" ? (
+                <CircleAvatar
+                  imageUrl={mrc20Img}
+                  event={() => {
+                    // refreshData(item.name);
+                  }}
+                  widthC={65}
+                  heightC={65}
+                />
+              ) : (
+                <CircleAvatarLetter
+                  letterStr={mrc20Data.tokenName.substring(0, 1)}
+                  widthC={70}
+                  heightC={70}
+                />
+              )}
               <Text
                 style={{
                   color: "#333",
@@ -350,535 +903,71 @@ export default function SendMrc20Page({ route }) {
                   fontWeight: "bold",
                 }}
               >
-                {inputAmount} {mrc20Data.tick}
+                {mrc20Data.tokenName}
               </Text>
-            </View>
 
-            <View>
-              <Text
-                style={{ marginTop: 15, color: grayNormalColor, fontSize: 14 }}
-              >
-                From
-              </Text>
-              <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                {/* {metaletWallet.currentBtcWallet.getAddress()} */}
-                {btcAddress}
-              </Text>
-            </View>
-
-            <View>
-              <Text
-                style={{ marginTop: 10, color: grayNormalColor, fontSize: 14 }}
-              >
-                To
-              </Text>
-              <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                {inputAddress}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 10,
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                Amount
-              </Text>
-              <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                {parseFloat(inputAmount)}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 10,
-                justifyContent: "space-between",
-                marginBottom: 10,
-              }}
-            >
-              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                Fees(Estimated)
-              </Text>
-              <Text style={{ color: "#333", fontSize: 14 }}>{fee} BTC</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                marginTop: 20,
-                justifyContent: "space-between",
-              }}
-            >
-              <RoundSimButtonFlee
-                title={"Cancel"}
+              <View
                 style={{
+                  borderColor: isInputAddressFcous
+                    ? themeColor
+                    : "rgba(191, 194, 204, 0.5)",
+                  flexDirection: "row",
+                  borderWidth: 1,
+                  height: 50,
                   borderRadius: 10,
-                  height: 40,
-                  width: "45%",
-                  borderWidth: 1,
-                  borderColor: themeColor,
-                }}
-                color="#fff"
-                textColor="#171AFF"
-                event={() => {
-                  setConfirmDailogState(false);
-                }}
-              />
-
-              <RoundSimButtonFlee
-                title={"Confirm"}
-                style={{ borderRadius: 10, height: 40, width: "45%" }}
-                textColor="#fff"
-                event={() => {
-                  setConfirmDailogState(false);
-                  setIsShowVerify(true);
-                  // OpenModal();
-                }}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      {/* feed */}
-      <Modal transparent={true} visible={isShowFeed}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: Platform.OS === "ios" ? "center" : "flex-end",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "#fff",
-              padding: 20,
-              borderTopRightRadius: 10,
-              borderTopLeftRadius: 10,
-              paddingBottom: 40,
-              borderBottomLeftRadius: Platform.OS === "ios" ? 10 : 0,
-              borderBottomRightRadius: Platform.OS === "ios" ? 10 : 0,
-              marginHorizontal: Platform.OS === "ios" ? 10 : 0,
-            }}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                Select Fee Rate
-              </Text>
-
-              <View style={{ flex: 1 }} />
-
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setIsShowFeed(false);
-                }}
-              >
-                <Image
-                  source={require("../../../image/metalet_close_big_icon.png")}
-                  style={{ width: 15, height: 15 }}
-                />
-              </TouchableWithoutFeedback>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginTop: 20,
-              }}
-            >
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setFeedModeType(feedModeSlow);
-                  if (textInputRef.current) {
-                    textInputRef.current.blur();
-                  }
-                  setFeedReady(userSlowFeed.feeRate.toString());
-                }}
-              >
-                <View
-                  style={{
-                    flex: 1,
-                    borderColor:
-                      feedModeType == feedModeSlow
-                        ? themeColor
-                        : inputNormalBgColor,
-                    borderWidth: 0.8,
-                    borderRadius: 5,
-                    height: 100,
-                  }}
-                >
-                  {feedModeType == feedModeSlow && (
-                    <Image
-                      source={require("../../../image/fee_icon_tag.png")}
-                      style={{
-                        width: 13,
-                        height: 13,
-                        position: "absolute",
-                        right: 0,
-                      }}
-                    />
-                  )}
-
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text style={{ color: "#333" }}>{userSlowFeed.title}</Text>
-                    <Text style={{ marginTop: 3, color: "#000" }}>
-                      {userSlowFeed.feeRate} sat/vB
-                    </Text>
-                    <Text style={{ color: "#666", fontSize: 10, marginTop: 3 }}>
-                      {userSlowFeed.desc}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setFeedModeType(feedModeAvg);
-                  if (textInputRef.current) {
-                    textInputRef.current.blur();
-                  }
-                  setFeedReady(userAvgFeed.feeRate.toString());
-                }}
-              >
-                <View
-                  style={{
-                    flex: 1,
-                    borderColor:
-                      feedModeType == feedModeAvg
-                        ? themeColor
-                        : inputNormalBgColor,
-                    borderWidth: 0.8,
-                    borderRadius: 5,
-                    height: 100,
-                    marginLeft: 10,
-                  }}
-                >
-                  {feedModeType == feedModeAvg && (
-                    <Image
-                      source={require("../../../image/fee_icon_tag.png")}
-                      style={{
-                        width: 13,
-                        height: 13,
-                        position: "absolute",
-                        right: 0,
-                      }}
-                    />
-                  )}
-
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text style={{ color: "#333" }}>{userAvgFeed.title}</Text>
-                    <Text style={{ marginTop: 3, color: "#000" }}>
-                      {userAvgFeed.feeRate} sat/vB
-                    </Text>
-                    <Text style={{ color: "#666", fontSize: 10, marginTop: 3 }}>
-                      {userAvgFeed.desc}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setFeedModeType(feedModeFast);
-                  if (textInputRef.current) {
-                    textInputRef.current.blur();
-                  }
-                  setFeedReady(userFastFeed.feeRate.toString());
-                }}
-              >
-                <View
-                  style={{
-                    flex: 1,
-                    borderColor:
-                      feedModeType == feedModeFast
-                        ? themeColor
-                        : inputNormalBgColor,
-                    borderWidth: 0.8,
-                    borderRadius: 5,
-                    height: 100,
-                    marginLeft: 10,
-                  }}
-                >
-                  {feedModeType == feedModeFast && (
-                    <Image
-                      source={require("../../../image/fee_icon_tag.png")}
-                      style={{
-                        width: 13,
-                        height: 13,
-                        position: "absolute",
-                        right: 0,
-                      }}
-                    />
-                  )}
-
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text style={{ color: "#333" }}>{userFastFeed.title}</Text>
-                    <Text style={{ marginTop: 3, color: "#000" }}>
-                      {userFastFeed.feeRate} sat/vB
-                    </Text>
-                    <Text style={{ color: "#666", fontSize: 10, marginTop: 3 }}>
-                      {userFastFeed.desc}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-
-            <TouchableWithoutFeedback
-              onPress={() => {
-                setFeedModeType(feedModeCustom);
-              }}
-            >
-              <View
-                style={{
-                  borderColor:
-                    feedModeType == feedModeCustom
-                      ? themeColor
-                      : inputNormalBgColor,
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  marginTop: 20,
-                  height: "auto",
-                }}
-              >
-                {feedModeType == feedModeCustom && (
-                  <Image
-                    source={require("../../../image/fee_icon_tag.png")}
-                    style={{
-                      width: 13,
-                      height: 13,
-                      position: "absolute",
-                      right: 0,
-                    }}
-                  />
-                )}
-                <View
-                  style={{
-                    justifyContent: "center",
-                    padding: 10,
-                  }}
-                >
-                  <Text>Custom Fee Rate</Text>
-
-                  <TextInput
-                    placeholder="sat/vB"
-                    ref={textInputRef}
-                    keyboardType={Platform.OS === "ios" ? undefined : "numeric"}
-                    onChangeText={(text) => {
-                      if (feedModeType == feedModeCustom) {
-                        const numericInput = text.replace(/[^0-9]/g, "");
-                        setFeedReady(numericInput);
-                        // if (Platform.OS === "ios") {
-                        //   Keyboard.dismiss();
-                        // }
-                      }
-                    }}
-                    value={feedReady}
-                    style={{
-                      width: "100%",
-                      backgroundColor: "transparent",
-                    }}
-                    onFocus={() => {
-                      setFeedModeType(feedModeCustom);
-                    }}
-                  />
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-
-            <TouchableWithoutFeedback
-              onPress={async () => {
-                setFeed(feedReady);
-                setIsShowFeed(false);
-              }}
-            >
-              <View
-                style={{
-                  marginTop: 20,
-                  marginBottom: 20,
-                  height: 20,
-                  width: "100%",
+                  marginTop: 50,
                   alignItems: "center",
                 }}
               >
-                <View
-                  style={[
-                    {
-                      flexDirection: "row",
-                      height: 48,
-                      width: "70%",
-                      backgroundColor: themeColor,
-                      borderRadius: 30,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginBottom: 20,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      { textAlign: "center" },
-                      { color: "#fff" },
-                      { fontSize: 16 },
-                    ]}
-                  >
-                    Confirm
-                  </Text>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </View>
-      </Modal>
-
-      {/* pay verify modal */}
-      <VerifyModal
-        isShow={isShowVerify}
-        eventCancel={() => {
-          setIsShowVerify(false);
-        }}
-        event={() => {
-          setIsShowVerify(false);
-
-          if (walletMode === wallet_mode_cold) {
-            sendColdBtcConfirm();
-          } else {
-            OpenModal();
-          }
-        }}
-      />
-
-      {isScan ? (
-        <QRScanner
-          handleScan={(data) => {
-            setInputAddress("");
-            setInputAddress(data);
-            setIsScan(false);
-          }}
-        />
-      ) : (
-        <View style={{ flex: 1 }}>
-          <TitleBar title="Send MRC20" />
-
-          <View
-            style={{
-              justifyContent: "center",
-              // backgroundColor: "#fff",
-              margin: 20,
-              // borderRadius: 10,
-              alignItems: "center",
-              padding: 20,
-            }}
-          >
-            {/* <Image
-              source={require("../../../image/receive_btc_icon.png")}
-              style={{ width: 70, height: 70 }}
-            /> */}
-
-            <CircleAvatarLetter
-              letterStr={mrc20Data.tokenName.substring(0, 1)}
-              widthC={70}
-              heightC={70}
-            />
-
-            <Text
-              style={{
-                color: "#333",
-                textAlign: "center",
-                lineHeight: 20,
-                marginTop: 20,
-                fontSize: 18,
-                fontWeight: "bold",
-              }}
-            >
-              {mrc20Data.tokenName}
-            </Text>
-
-            <View
-              style={{
-                borderColor: isInputAddressFcous
-                  ? themeColor
-                  : "rgba(191, 194, 204, 0.5)",
-                flexDirection: "row",
-                borderWidth: 1,
-                height: 50,
-                borderRadius: 10,
-                marginTop: 50,
-                alignItems: "center",
-              }}
-            >
-              <TextInput
-                placeholder="Recipient's address"
-                value={inputAddress}
-                onChangeText={(text) => {
-                  setInputAddress(text);
-                  if (text.length > 0 && inputAmount.length > 0) {
-                    setNextBtnColor("rgba(23, 26, 255, 1)");
-                  } else {
-                    setNextBtnColor("rgba(23, 26, 255, 0.5)");
-                  }
-                }}
-                onFocus={() => {
-                  // setIsInputAddressFcous(true);
-                  // setIsInputAmountFcous(false);
-                }}
-                style={{
-                  width: "100%",
-                  backgroundColor: "transparent",
-                  marginLeft: 10,
-                  flex: 1,
-                  // textAlignVertical: "left",
-                  paddingRight: 10,
-                }}
-              />
-
-              {/* <View style={{ position: "absolute", right: 0 ,bottom: 10,}}> */}
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  if (isScan == false) {
-                    console.log("scan");
-                    setIsScan(true);
-                  }
-                }}
-              >
-                <Image
-                  source={require("../../../image/send_scan_icon.png")}
-                  style={{ width: 20, height: 20, marginRight: 10 }}
+                <TextInput
+                  placeholder="Recipient's address"
+                  value={inputAddress}
+                  onChangeText={(text) => {
+                    setInputAddress(text.trim());
+                    if (text.length > 0 && inputAmount.length > 0) {
+                      setNextBtnColor("rgba(23, 26, 255, 1)");
+                    } else {
+                      setNextBtnColor("rgba(23, 26, 255, 0.5)");
+                    }
+                  }}
+                  onFocus={() => {
+                    // setIsInputAddressFcous(true);
+                    // setIsInputAmountFcous(false);
+                  }}
+                  style={{
+                    width: "100%",
+                    backgroundColor: "transparent",
+                    marginLeft: 10,
+                    flex: 1,
+                    // textAlignVertical: "left",
+                    paddingRight: 10,
+                  }}
                 />
-              </TouchableWithoutFeedback>
-              {/* </View> */}
-            </View>
 
-            {/* 
+                {/* <View style={{ position: "absolute", right: 0 ,bottom: 10,}}> */}
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    if (isScan == false) {
+                      console.log("scan");
+                      setIsScan(true);
+                    }
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/send_scan_icon.png")}
+                    style={{ width: 20, height: 20, marginRight: 10 }}
+                  />
+                </TouchableWithoutFeedback>
+                {/* </View> */}
+              </View>
+
+              {/* 
        <View style={{flexDirection: "row", marginTop: 20,}}>
        <Text style={{ marginTop: 20, color: "#666", fontSize: 14 ,width:'100%',textAlign:'right'}}> Balance: 0.003234 SPACE</Text>
        </View> */}
 
-            {/* 这个暂时不显示 */}
-            {/* <Text
+              {/* 这个暂时不显示 */}
+              {/* <Text
               style={{
                 marginTop: 40,
                 color: "#999",
@@ -891,174 +980,189 @@ export default function SendMrc20Page({ route }) {
               Max:0.003234 BTC
             </Text> */}
 
-            <View
-              style={{
-                alignItems: "center",
-                borderColor: isInputAmountFcous
-                  ? themeColor
-                  : "rgba(191, 194, 204, 0.5)",
-                flexDirection: "row",
-                borderWidth: 1,
-                height: 50,
-                borderRadius: 10,
-                marginTop: 40,
-              }}
-            >
-              <TextInput
-                placeholder="Amount"
-                keyboardType={Platform.OS == "android" ? "numeric" : undefined}
-                value={inputAmount}
-                onChangeText={(text) => {
-                  console.log(123);
-
-                  if (parseFloat(text) > mrc20Data.balance) {
-                    ToastView({ text: "Insufficient balance", type: "error" });
-                    return;
-                  }
-                  if (Platform.OS === "android") {
-                    const decimalRegex = /^(\d+(\.\d*)?)?$/;
-                    if (decimalRegex.test(text)) {
-                      setInputAmount(text);
-                    }
-                  } else {
-                    setInputAmount(text);
-                  }
-
-                  if (text.length > 0 && inputAddress.length > 0) {
-                    setNextBtnColor("rgba(23, 26, 255, 1)");
-                  } else {
-                    setNextBtnColor("rgba(23, 26, 255, 0.5)");
-                  }
-                }}
-                onFocus={() => {
-                  // setIsInputAddressFcous(false);
-                  // setIsInputAmountFcous(true);
-                }}
+              <View
                 style={{
-                  flex: 1,
-                  backgroundColor: "transparent",
-                  marginLeft: 10,
-                  paddingRight: 10,
+                  alignItems: "center",
+                  borderColor: isInputAmountFcous
+                    ? themeColor
+                    : "rgba(191, 194, 204, 0.5)",
+                  flexDirection: "row",
+                  borderWidth: 1,
+                  height: 50,
+                  borderRadius: 10,
+                  marginTop: 40,
                 }}
-              />
+              >
+                <TextInput
+                  placeholder="Amount"
+                  keyboardType={
+                    Platform.OS == "android" ? "numeric" : undefined
+                  }
+                  value={inputAmount}
+                  onChangeText={(text) => {
+                    // const decimalPattern = /^\d*\.?\d{0,8}$/;
+                    const decimalPattern = new RegExp(
+                      `^\\d*\\.?\\d{0,${mrc20Data.decimals}}$`
+                    );
 
-              {/* <Text style={{ marginRight: 10, fontSize: 14, color: "#333" }}>
+                    if (parseFloat(text) > mrc20Data.balance) {
+                      ToastView({
+                        text: "Insufficient balance",
+                        type: "error",
+                      });
+                      return;
+                    }
+                    if (Platform.OS === "android") {
+                      const decimalRegex = /^(\d+(\.\d*)?)?$/;
+                      if (
+                        decimalRegex.test(text) &&
+                        decimalPattern.test(text)
+                      ) {
+                        setInputAmount(text);
+                      }
+                    } else {
+                      if (decimalPattern.test(text)) {
+                        setInputAmount(text);
+                      }
+                      // setInputAmount(text);
+                    }
+
+                    if (text.length > 0 && inputAddress.length > 0) {
+                      setNextBtnColor("rgba(23, 26, 255, 1)");
+                    } else {
+                      setNextBtnColor("rgba(23, 26, 255, 0.5)");
+                    }
+                  }}
+                  onFocus={() => {
+                    // setIsInputAddressFcous(false);
+                    // setIsInputAmountFcous(true);
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: "transparent",
+                    marginLeft: 10,
+                    paddingRight: 10,
+                  }}
+                />
+
+                {/* <Text style={{ marginRight: 10, fontSize: 14, color: "#333" }}>
                 BTC
               </Text> */}
 
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setInputAmount(mrc20Data.balance);
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setInputAmount(mrc20Data.balance);
+                  }}
+                >
+                  <Text
+                    style={[metaStyles.smallDefaultText, { marginRight: 10 }]}
+                  >
+                    Max
+                  </Text>
+                </TouchableWithoutFeedback>
+              </View>
+            </View>
+
+            <View style={{ marginHorizontal: 20, paddingHorizontal: 25 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                 }}
               >
-                <Text
-                  style={[metaStyles.smallDefaultText, { marginRight: 10 }]}
-                >
-                  Max
+                <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                  Balance
                 </Text>
-              </TouchableWithoutFeedback>
-            </View>
-          </View>
+                <Text style={{ color: "#999", fontSize: 14 }}>
+                  {mrc20Data.balance} {mrc20Data.tick}
+                </Text>
+              </View>
 
-          <View style={{ marginHorizontal: 20, paddingHorizontal: 25 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                Balance
-              </Text>
-              <Text style={{ color: "#999", fontSize: 14 }}>
-                {mrc20Data.balance} {mrc20Data.tick}
-              </Text>
-            </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginTop: 10,
+                }}
+              >
+                <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                  Pending
+                </Text>
+                <Text style={{ color: "#999", fontSize: 14 }}>
+                  {mrc20Data.unsafeBalance} {mrc20Data.tick}
+                </Text>
+              </View>
 
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginTop: 10,
-              }}
-            >
-              <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                Pending
-              </Text>
-              <Text style={{ color: "#999", fontSize: 14 }}>
-                {mrc20Data.unsafeBalance} {mrc20Data.tick}
-              </Text>
-            </View>
-
-            {/* <View style={{ flexDirection: "row" ,justifyContent: "space-between" ,marginTop: 10}}>
+              {/* <View style={{ flexDirection: "row" ,justifyContent: "space-between" ,marginTop: 10}}>
               <Text style={{ color: "#999" ,fontSize: 14}}>Pending</Text>
               <Text style={{ color: "#999" ,fontSize: 14}}>0.00000546 TBC</Text>
             </View> */}
 
-            <TouchableWithoutFeedback
-              onPress={() => {
-                setIsShowFeed(true);
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginTop: 15,
-                  alignItems: "center",
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setIsShowFeed(true);
                 }}
               >
-                <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Fee Rate
-                </Text>
-                <View style={{ flex: 1 }} />
-                <Text style={{ color: "#999", fontSize: 14 }}>
-                  {feed} sat/vB
-                </Text>
-                <Image
-                  source={require("../../../image/list_icon_ins.png")}
-                  style={{ width: 18, height: 18 }}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 15,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: grayNormalColor, fontSize: 14 }}>
+                    Fee Rate
+                  </Text>
+                  <View style={{ flex: 1 }} />
+                  <Text style={{ color: "#999", fontSize: 14 }}>
+                    {feed} sat/vB
+                  </Text>
+                  <Image
+                    source={require("../../../image/list_icon_ins.png")}
+                    style={{ width: 18, height: 18 }}
+                  />
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
 
-          {/* <View style={{ flex: 1 }} /> */}
-          <View
-            style={{
-              marginHorizontal: 20,
-              paddingHorizontal: 25,
-              marginTop: 90,
-            }}
-          >
-            <RoundSimButton
-              title={"Next"}
-              event={() => {
-                if (!inputAddress) {
-                  ToastView({ text: "Please input address", type: "error" });
-                  return;
-                }
-
-                if (!inputAmount) {
-                  ToastView({ text: "Please input amount", type: "error" });
-                  return;
-                }
-
-                if (walletMode === wallet_mode_cold) {
-                  // sendColdBtc();
-                } else {
-                  sendBtc();
-                }
-                // sendBtc();
-                // navigate('SendBtcConfirmPage')
-                // setConfirmDailogState(true);
+            {/* <View style={{ flex: 1 }} /> */}
+            <View
+              style={{
+                marginHorizontal: 20,
+                paddingHorizontal: 25,
+                marginTop: 90,
               }}
-              roundStytle={{}}
-              textColor="#fff"
-              color={nextBtnColor}
-            />
+            >
+              <RoundSimButton
+                title={"Next"}
+                event={() => {
+                  if (!inputAddress) {
+                    ToastView({ text: "Please input address", type: "error" });
+                    return;
+                  }
+
+                  if (!inputAmount) {
+                    ToastView({ text: "Please input amount", type: "error" });
+                    return;
+                  }
+
+                  if (walletMode === wallet_mode_cold) {
+                    // sendColdBtc();
+                  } else {
+                    sendBtc();
+                  }
+                  // sendBtc();
+                  // navigate('SendBtcConfirmPage')
+                  // setConfirmDailogState(true);
+                }}
+                roundStytle={{}}
+                textColor="#fff"
+                color={nextBtnColor}
+              />
+            </View>
           </View>
-        </View>
-      )}
-    </SafeAreaView>
+        )}
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }

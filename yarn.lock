@@ -1800,7 +1800,7 @@
     ecpair "^2.1.0"
     undici "^6.19.2"
 
-"@metalet/utxo-wallet-service@^0.3.12":
+"@metalet/utxo-wallet-service@0.3.12":
   version "0.3.12"
   resolved "https://registry.yarnpkg.com/@metalet/utxo-wallet-service/-/utxo-wallet-service-0.3.12.tgz#03e1af211075b526b82c49701824ca7d1526ba08"
   integrity sha512-ZIrPIuYJIOe3l207oTf6h7fUgkfP31A61anyIDQ5m3lzueZFLZW6UMGVsUkG34Xp8MeQMtFUQfSAT5rH00uUhw==

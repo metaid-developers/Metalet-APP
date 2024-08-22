@@ -75,6 +75,7 @@ const actions = {
   previewTransaction: { action: "PreviewTransaction", type: "query" },
   transfer: { action: "Transfer", type: "authorize" },
   signMessage: { action: "SignMessage", type: "authorize" },
+  pay: { action: "Pay", type: "authorize" }
 };
 
 const metalet = { btc: {}, token: {} };

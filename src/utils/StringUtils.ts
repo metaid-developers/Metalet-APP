@@ -8,3 +8,12 @@ export function removeTrailingZeros(numberString){
 }
 
 
+
+
+export function removeTrailingZeros2(numberString,decimals:number){
+  let balance=parseFloat(numberString);
+  const formattedNum = balance.toFixed(decimals); 
+  const showBalance = formattedNum.replace(/\.?0+$/, ''); 
+  return showBalance;
+}
+

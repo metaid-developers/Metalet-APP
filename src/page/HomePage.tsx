@@ -74,7 +74,7 @@ const storage = createStorage();
 // Home 开发
 const TabsTop = createMaterialTopTabNavigator();
 
-// version 3.0.7 code 27
+// version 3.0.9 code 29
 
 export default function HomePage({ navigation }) {
   const { metaletWallet, updateMetaletWallet } = useData();
@@ -98,7 +98,7 @@ export default function HomePage({ navigation }) {
   const [nestedSegwitAddress, setNestedSegwitAddress] = useState<string>();
   const [nativeSegwitAddress, setNativeSegwitAddress] = useState<string>();
   // const [sameBtcAsMvcAddress, setSameBtcAsMvcAddress] = useState<string>();
-  const {btcSameAsMvcAddress,updateBtcSameAsMvcAddress} = useData();
+  const { btcSameAsMvcAddress, updateBtcSameAsMvcAddress } = useData();
 
   // const [mvcAddress, setMvcAddress] = useState<string>();
 
@@ -167,6 +167,7 @@ export default function HomePage({ navigation }) {
     setIsShowLoading(true);
     initCurrentWallet().then(() => {
       setIsShowLoading(false);
+      checkUpgrade();
     });
 
     eventBus.subscribe(refreshHomeLoadingEvent, (message) => {
@@ -177,7 +178,19 @@ export default function HomePage({ navigation }) {
       });
     });
 
-    checkUpgrade();
+    console.log("isShow", isShowPay);
+    console.log("shwo", showPayCode);
+
+    // 立即调用一次获取数据
+    // fetchData();
+    // 设置轮询，每隔5秒获取一次数据
+    const intervalId = setInterval( ()=>{
+      getShowBalance();
+    }, 15000);
+
+    // 清除定时器，防止内存泄漏
+    return () => clearInterval(intervalId);
+   
   }, []);
 
   useEffect(() => {
@@ -242,8 +255,8 @@ export default function HomePage({ navigation }) {
       const check: UpdateData = await fetchCheckUpgrade("android");
       // console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;
-      setUpdateUrl(check.data.url);
-      // setUpdateUrl(check.data.apkUrl);
+      // setUpdateUrl(check.data.url);
+      setUpdateUrl(check.data.apkUrl);
       if (codeVersion > versionCode) {
         setUpdate(true);
       }
@@ -252,6 +265,9 @@ export default function HomePage({ navigation }) {
       // console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;
       setUpdateUrl(check.data.url);
+      console.log("codeVersion", codeVersion);
+      console.log("buildNumber", buildNumber);
+
       if (codeVersion > parseFloat(buildNumber)) {
         setUpdate(true);
       }
@@ -406,6 +422,100 @@ export default function HomePage({ navigation }) {
           alignItems: "center",
         }}
       > */}
+
+      {/* upgrade  */}
+      <Modal visible={hasUpdate} transparent={true}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: 10,
+              paddingHorizontal: 30,
+              marginHorizontal: 25,
+              paddingTop: 20,
+              paddingBottom: 10,
+            }}
+          >
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {/* <Image
+                source={require("../../image/receive_mvc_icon.png")}
+                style={{ width: 50, height: 50 }}
+              /> */}
+
+              <Text
+                style={{
+                  color: "#333",
+                  textAlign: "center",
+                  lineHeight: 20,
+                  marginTop: 20,
+                  fontSize: 18,
+                  fontWeight: "bold",
+                }}
+              >
+                New version
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 10,
+              }}
+            >
+              <Text style={{ color: "#333", fontSize: 14 }}>
+                New version available. Would you like to download the update
+                now?
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 40,
+                justifyContent: "space-between",
+              }}
+            >
+              <RoundSimButtonFlee
+                title={"Cancel"}
+                style={{
+                  borderRadius: 10,
+                  height: 40,
+                  width: "45%",
+                  borderWidth: 1,
+                  borderColor: themeColor,
+                }}
+                color="#fff"
+                textColor="#171AFF"
+                event={() => {
+                  setUpdate(false);
+                }}
+              />
+
+              <RoundSimButtonFlee
+                title={"Confirm"}
+                style={{ borderRadius: 10, height: 40, width: "45%" }}
+                textColor="#fff"
+                event={() => {
+                  setUpdate(false);
+                  openBrowser(updateUrl);
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <View
         style={{
           flex: 1,
@@ -422,99 +532,6 @@ export default function HomePage({ navigation }) {
           }}
         />
         <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
-
-        {/* upgrade  */}
-        <Modal visible={hasUpdate} transparent={true}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: 10,
-                paddingHorizontal: 30,
-                marginHorizontal: 25,
-                paddingTop: 20,
-                paddingBottom: 10,
-              }}
-            >
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {/* <Image
-                source={require("../../image/receive_mvc_icon.png")}
-                style={{ width: 50, height: 50 }}
-              /> */}
-
-                <Text
-                  style={{
-                    color: "#333",
-                    textAlign: "center",
-                    lineHeight: 20,
-                    marginTop: 20,
-                    fontSize: 18,
-                    fontWeight: "bold",
-                  }}
-                >
-                  New version
-                </Text>
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginTop: 10,
-                }}
-              >
-                <Text style={{ color: "#333", fontSize: 14 }}>
-                  New version available. Would you like to download the update
-                  now?
-                </Text>
-              </View>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginTop: 40,
-                  justifyContent: "space-between",
-                }}
-              >
-                <RoundSimButtonFlee
-                  title={"Cancel"}
-                  style={{
-                    borderRadius: 10,
-                    height: 40,
-                    width: "45%",
-                    borderWidth: 1,
-                    borderColor: themeColor,
-                  }}
-                  color="#fff"
-                  textColor="#171AFF"
-                  event={() => {
-                    setUpdate(false);
-                  }}
-                />
-
-                <RoundSimButtonFlee
-                  title={"Confirm"}
-                  style={{ borderRadius: 10, height: 40, width: "45%" }}
-                  textColor="#fff"
-                  event={() => {
-                    setUpdate(false);
-                    openBrowser(updateUrl);
-                  }}
-                />
-              </View>
-            </View>
-          </View>
-        </Modal>
 
         {/* 底部地址 */}
         <Modal transparent={true} visible={isShowCopy}>
@@ -856,7 +873,7 @@ export default function HomePage({ navigation }) {
                           textAlign: "center",
                         }}
                       >
-                       Default
+                        Default
                       </Text>
                     </View>
                   </View>
@@ -1084,7 +1101,11 @@ export default function HomePage({ navigation }) {
           <View
             style={[
               metaStyles.rowContainer,
-              { justifyContent:isShowPay==showPayCode?'space-between':'space-around', marginTop: 10 },
+              {
+                justifyContent:
+                  isShowPay == showPayCode ? "space-between" : "space-around",
+                marginTop: 10,
+              },
             ]}
           >
             <TouchableWithoutFeedback

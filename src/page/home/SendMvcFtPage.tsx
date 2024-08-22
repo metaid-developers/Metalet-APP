@@ -560,7 +560,18 @@ export default function SendMvcFtPage({ route }) {
                 }
                 value={inputAmount}
                 onChangeText={(text) => {
-                  setInputAmount(text);
+
+                  // const decimalPattern = new RegExp(
+                  //   `^\\d*\\.?\\d{0,${mvcFtData.decimals}}$`
+                  // );
+
+                  const decimalPattern = new RegExp(
+                    `^\\d*\\.?\\d{0,8}$`
+                  );
+                  if (decimalPattern.test(text)) {
+                    setInputAmount(text);
+                  }
+                  // setInputAmount(text);
                   if (text.length > 0 && inputAddress.length > 0) {
                     setNextBtnColor("rgba(23, 26, 255, 1)");
                   } else {

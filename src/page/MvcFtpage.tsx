@@ -171,11 +171,33 @@ export default function MvcFtPage() {
             <Text style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}>
               {item.symbol.toUpperCase()}
             </Text>
-            <Text style={metaStyles.grayTextSmall66}>{item.name}</Text>
+            {/* <Text style={metaStyles.grayTextSmall66}>{item.name}</Text> */}
+         
+            <View
+              style={{
+                flexDirection: "row",
+                backgroundColor: "rgba(23, 26, 255, 0.1)",
+                padding: 5,
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 4,
+                width: 70,
+              }}
+            >
+              <Text
+                style={{
+                  color: "#171AFF",
+                  fontSize: 8,
+                  textAlign: "center",
+                }}
+              >
+                MetaContract
+              </Text>
+            </View>
           </View>
 
-          <View style={{ flex: 1 }} />
-          <View style={{ marginLeft: 10, marginRight: 10 }}>
+          {/* <View style={{ flex: 1 }} /> */}
+          <View style={{ marginLeft: 10, marginRight: 10,flex:1 }}>
             <Text
               numberOfLines={2}
               ellipsizeMode="tail"

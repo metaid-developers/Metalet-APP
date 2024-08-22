@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { RoundSimButton, TitleBar } from "@/constant/Widget";
+import { RoundSimButton, TitleBar, ToastView } from "@/constant/Widget";
 import { FeedBean } from "@/types/btcfeed";
 import {
   inputNormalBgColor,
@@ -20,6 +20,8 @@ import {
 } from "@/constant/Constants";
 import { formatTime } from "@/utils/MetaFunUiils";
 import { navigate } from "@/base/NavigationService";
+import Toast from "react-native-toast-message";
+import * as Clipboard from "expo-clipboard";
 
 export default function MetaIDPinsDetails({ route }) {
   const { nftDetail } = route.params;
@@ -152,7 +154,7 @@ export default function MetaIDPinsDetails({ route }) {
             <View style={{ alignItems: "center", marginTop: 20 }}>
               <TouchableWithoutFeedback
                 onPress={() => {
-                  if(nftDetail.status==0){
+                  if (nftDetail.status == 0) {
                     navigate("PinNftTransferPage", {
                       type: "pin",
                       nftDetail: nftDetail,
@@ -179,7 +181,7 @@ export default function MetaIDPinsDetails({ route }) {
                       fontSize: 16,
                     }}
                   >
-                    {nftDetail.status==0?"Transfer":"Pending"}
+                    {nftDetail.status == 0 ? "Transfer" : "Pending"}
                   </Text>
                 </View>
               </TouchableWithoutFeedback>
@@ -280,6 +282,18 @@ export default function MetaIDPinsDetails({ route }) {
                 >
                   {nftDetail.id}
                 </Text>
+
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    Clipboard.setString(nftDetail.id);
+                    ToastView({ text: "Copy Successful" });
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/meta_copy_icon.png")}
+                    style={{ width: 15, height: 15, marginLeft: 5 }}
+                  />
+                </TouchableWithoutFeedback>
               </View>
 
               <View
@@ -304,6 +318,17 @@ export default function MetaIDPinsDetails({ route }) {
                 >
                   {nftDetail.address}
                 </Text>
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    Clipboard.setString(nftDetail.address);
+                    ToastView({ text: "Copy Successful" });
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/meta_copy_icon.png")}
+                    style={{ width: 15, height: 15, marginLeft: 5 }}
+                  />
+                </TouchableWithoutFeedback>
               </View>
 
               <View

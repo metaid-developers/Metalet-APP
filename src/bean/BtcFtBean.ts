@@ -44,5 +44,10 @@ export interface Mrc20Data {
   decimals: string;
   metaData: string;
   type: string;
+  deployUserInfo:DeployUserInfo;
 }
 
+export interface DeployUserInfo {
+  name: string;
+  avatar: string;
+}

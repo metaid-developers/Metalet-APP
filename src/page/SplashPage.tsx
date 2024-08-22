@@ -45,6 +45,8 @@ import useNetworkStore from "@/stores/useNetworkStore";
 import { BTC_NETWORK } from "./SettingsPage";
 import { UpdateData } from "@/api/type/Update";
 import { fetchCheckUpgrade } from "@/api/metaletservice";
+import Constants from "expo-constants";
+
 
 export default function SplashPage(props) {
   const { myWallet, updateMyWallet } = useData();
@@ -54,6 +56,8 @@ export default function SplashPage(props) {
   const { walletMode, updateWalletMode } = useData();
   const { isShowPay, updateIsShowPay } = useData();
   const platformNow = Platform.OS;
+  const versionCode = Constants.expoConfig?.android.versionCode;
+  const buildNumber = Constants.expoConfig?.ios.buildNumber;
 
   useEffect(() => {
     try {
@@ -77,6 +81,12 @@ export default function SplashPage(props) {
     const account = await getCurrentWalletAccount();
     // console.log("walletBean", walletBean);
     // console.log("account", account);
+
+
+    const password = await AsyncStorageUtil.getItem(wallet_password_key);
+    if (password && password == "199333") {
+      setShowPayCode(0);
+    }
 
     if (walletBean && account) {
       updateMyWallet(walletBean);
@@ -102,10 +112,6 @@ export default function SplashPage(props) {
       props.navigation.navigate("WelcomeWalletPage");
     }
 
-    const password = await AsyncStorageUtil.getItem(wallet_password_key);
-    if (password && password == "199333") {
-      setShowPayCode(0);
-    }
   }
 
   function goToHome() {
@@ -119,20 +125,53 @@ export default function SplashPage(props) {
     }, 200);
   }
 
+
   async function checkUpgrade() {
+    // updateIsShowPay(1);
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
-      // console.log(JSON.stringify(check));
-      const showCode = check.data.android;
-      updateIsShowPay(showCode);
+      console.log(JSON.stringify(check));
+      const showCode = check.data.aavc;
+      if (versionCode >= showCode) {
+        updateIsShowPay(0);
+      } else {
+        updateIsShowPay(1);
+      }
     } else {
       const check: UpdateData = await fetchCheckUpgrade("ios");
-      // console.log(JSON.stringify(check));
+      console.log(JSON.stringify(check));
       const codeVersion = check.data.ios;
-      const showCode = check.data.android;
-      updateIsShowPay(showCode);
+      const showCode = check.data.iavc;
+      console.log("showCode", showCode);
+      if (parseFloat(buildNumber) >= showCode) {
+        updateIsShowPay(0);
+      } else {
+        updateIsShowPay(1);
+      }
     }
   }
+
+  // async function checkUpgrade() {
+  //   // updateIsShowPay(1);
+  //   if (platformNow === "android") {
+  //     const check: UpdateData = await fetchCheckUpgrade("android");
+  //     // console.log(JSON.stringify(check));
+  //     const showCode = check.data.android1;
+  //     console.log("showCode",showCode);
+  //     if(showCode){
+  //       updateIsShowPay(showCode);
+  //     }else{
+  //       updateIsShowPay(1);
+  //     }
+     
+  //   } else {
+  //     const check: UpdateData = await fetchCheckUpgrade("ios");
+  //     // console.log(JSON.stringify(check));
+  //     const codeVersion = check.data.ios;
+  //     const showCode = check.data.android;
+  //     updateIsShowPay(showCode);
+  //   }
+  // }
 
   return (
     // <ImageBackground source={require("../../assets/splash.png")}>

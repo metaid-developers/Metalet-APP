@@ -22,7 +22,7 @@ import { navigate } from "../base/NavigationService";
 import { useData } from "../hooks/MyProvider";
 import { API_NET, API_TARGET, NftManager } from "meta-contract";
 import { MvcGenesisItemBean } from "@/bean/MvcGenesisBean";
-import { goToWebScan, isColdWalletMode } from "@/utils/WalletUtils";
+import { getWalletNetwork, goToWebScan, isColdWalletMode } from "@/utils/WalletUtils";
 
 export default function TransferMvcNftPage({ route }) {
   const { myObject } = route.params;
@@ -46,9 +46,12 @@ export default function TransferMvcNftPage({ route }) {
   const [transactionID, settransactionID] = useState("");
   const sendNft = async () => {
     setIsShowLoading(true);
+    const network = await getWalletNetwork();
+    
     const privateKey: string = metaletWallet.currentMvcWallet.getPrivateKey();
     const nftManager = new NftManager({
-      network: API_NET.MAIN,
+      // network: API_NET.MAIN,
+      network:network === "mainnet" ? API_NET.MAIN : API_NET.TEST,
       apiTarget: API_TARGET.MVC,
       purse: privateKey,
     });

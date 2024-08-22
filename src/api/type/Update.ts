@@ -15,7 +15,10 @@ export interface Update {
   contents: Contents;
   apkUrl:string;
   ios:number,
+  iavc:number,
+  aavc:number,
   android:number,
+  android1:number,
 }
 
 interface Contents {
