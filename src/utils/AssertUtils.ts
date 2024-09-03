@@ -1,8 +1,10 @@
-import { BtcFtBean } from "@/bean/BtcFtBean";
+import { BtcFtBean, Mrc20Data } from "@/bean/BtcFtBean";
 import {
   fetchAssetsPrice,
   fetchBtcBalance,
   fetchIcons,
+  fetchMrc20List,
+  fetchMrc20Price,
   fetchMvcFtBalance,
   fetchMvcFtPrice,
   fetchSpaceBalance,
@@ -58,6 +60,33 @@ export function caculateOneBtcFtValue(
   return total.toFixed(2);
 }
 
+export function caculateOneBtcFtMrc20Value(
+  tokens: Mrc20Data[],
+  ftPriceData: MvcFtPriceData,
+  btcPrice: number
+) {
+  let total = 0;
+  // const ftPriceData = await fetchMvcFtPrice();
+  const mvcPrices = ftPriceData.data.priceInfo;
+
+  
+
+  for (let i = 0; i < tokens.length; i++) {
+    const tokenSymbol = tokens[i].tick.toLocaleUpperCase();
+    const quantity = parseFloat(tokens[i].balance);
+    const checkID = tokens[i].mrc20Id + "/" + tokenSymbol;
+    // console.log("mvcPrices",mvcPrices);
+    if (checkID in mvcPrices) {
+      const price = mvcPrices[checkID];
+      const assert = price * quantity;
+      total += price * quantity*btcPrice;
+    }
+  }
+
+
+  return total.toFixed(2);
+}
+
 //balance
 export async function caculateMvcAndBtcAssert(
   mvcAddrss,
@@ -81,12 +110,12 @@ export async function caculateMvcAndBtcAssert(
   balance.spaceAssert = isMain ? spaceAssert.toFixed(2) : "0.0";
 
   const btcBalanceData = await fetchBtcBalance(btcAddress);
-  if (btcBalanceData.data==null) {
-    console.log("btcBalanceData",btcBalanceData.data);
-    
+  if (btcBalanceData.data == null) {
+    console.log("btcBalanceData", btcBalanceData.data);
+
     return balance;
   }
-  
+
   const btcBalance = (balance.btcBalance =
     btcBalanceData.data.balance.toString());
   const btcAssert = toFloorNum(btcPrice * parseFloat(btcBalance), 2);
@@ -99,6 +128,18 @@ export async function caculateMvcAndBtcAssert(
     const assertFt = caculateOneFtValue(ftdata, ftPriceData);
     assertSum = toFloorNum(parseFloat(assertFt) + assertSum, 2);
   }
+
+  //mrc20 list
+  const ftPriceMrc20Data = await fetchMrc20Price();
+  const simData = await fetchMrc20List(network, btcAddress);
+  if (simData) {
+    
+    const assertFt = caculateOneBtcFtMrc20Value(simData.data.list, ftPriceMrc20Data,btcPrice);
+    assertSum = toFloorNum(parseFloat(assertFt) + assertSum, 2);
+  }
+
+
+
 
   balance.sumAssert = assertSum.toFixed(2);
   // console.log("assert" + JSON.stringify(balance));
@@ -171,7 +212,11 @@ export function getBtcBrc20Icon(ftName: string) {
   return iconPic;
 }
 
-export  function getOneIcons(tag:string,ticker:string,iconsData: IcoinsData) {
+export function getOneIcons(
+  tag: string,
+  ticker: string,
+  iconsData: IcoinsData
+) {
   let icon;
   // const iconsData: IcoinsData = await fetchIcons();
   // console.log(iconsData);

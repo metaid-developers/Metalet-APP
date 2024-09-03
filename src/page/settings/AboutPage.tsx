@@ -1,14 +1,24 @@
-import { View, Text, Image, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableWithoutFeedback,
+  Platform,
+} from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TitleBar } from "@/constant/Widget";
+import { TitleBar, ToastView } from "@/constant/Widget";
 import { metaStyles, themeColor } from "@/constant/Constants";
 import Constants from "expo-constants";
 import { openBrowser } from "@/utils/WalletUtils";
 
 export default function AboutPage() {
+  const versionCode = Constants.expoConfig?.android.versionCode;
+  const buildNumber = Constants.expoConfig?.ios.buildNumber;
+  const platformNow = Platform.OS;
+
   return (
-    <SafeAreaView style={{ flex: 1,backgroundColor:'#fff' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <View style={{ flex: 1 }}>
         <TitleBar />
         <View style={{ padding: 20, flex: 1 }}>
@@ -23,30 +33,42 @@ export default function AboutPage() {
             </Text>
           </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              marginTop: 50,
-              alignItems: "center",
-              justifyContent: "center",
+          <TouchableWithoutFeedback
+            onPress={() => {
+              if (platformNow == "ios") {
+                ToastView({ text: buildNumber.toString(), type: "info" });
+              }else{
+                ToastView({ text: versionCode.toString(), type: "info" });
+              }
             }}
           >
-            {/* <Image
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 50,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* <Image
                 source={require("../../../image/settings_about_icon.png")}
                 style={{ width: 45, height: 45 }}
               /> */}
-            <Text style={{ marginLeft: 10, color: "#333", fontSize: 16 }}>
-              Version
-            </Text>
-            <View style={{ flex: 1 }} />
-            <Text style={metaStyles.defaultText}>
-              {Constants.expoConfig?.version}
-            </Text>
-          </View>
+              <Text style={{ marginLeft: 10, color: "#333", fontSize: 16 }}>
+                Version
+              </Text>
+              <View style={{ flex: 1 }} />
+              <Text style={metaStyles.defaultText}>
+                {Constants.expoConfig?.version}
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
 
-          <TouchableWithoutFeedback onPress={() => {
+          <TouchableWithoutFeedback
+            onPress={() => {
               openBrowser("https://metalet.space/terms-of-service");
-          }}>
+            }}
+          >
             <View
               style={{
                 flexDirection: "row",
@@ -65,7 +87,6 @@ export default function AboutPage() {
                 style={{ width: 20, height: 20, marginLeft: 5 }}
               />
             </View>
-            
           </TouchableWithoutFeedback>
 
           <TouchableWithoutFeedback
@@ -82,7 +103,7 @@ export default function AboutPage() {
               }}
             >
               <Text style={{ marginLeft: 10, color: "#333", fontSize: 16 }}>
-              Privacy Policy
+                Privacy Policy
               </Text>
               <View style={{ flex: 1 }} />
 

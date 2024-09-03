@@ -325,7 +325,7 @@ export default function AssetsMvcFtDetailPage({ route }) {
             fontWeight: "bold",
           }}
         >
-          {formatToDecimal(mvcFtData.confirmed, mvcFtData.decimal)}{" "}
+          {formatToDecimal(mvcFtData.confirmed+ mvcFtData.unconfirmed, mvcFtData.decimal)}{" "}
           {mvcFtData.symbol.toUpperCase()}
         </Text>
 

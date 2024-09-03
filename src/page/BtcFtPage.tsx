@@ -28,11 +28,12 @@ import {
   isColdWalletMode,
 } from "@/utils/WalletUtils";
 import { Chain } from "@metalet/utxo-wallet-service";
-import { fetchMrc20List } from "@/api/metaletservice";
+import { fetchAssetsPrice, fetchMrc20List, fetchMrc20Price } from "@/api/metaletservice";
 import { useMRC20sInfiniteQuery } from "@/queries/mrc20";
 import { lightGreen100 } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import { removeTrailingZeros, removeTrailingZeros2 } from "@/utils/StringUtils";
 import useNetworkStore from "@/stores/useNetworkStore";
+import { caculateOneBtcFtMrc20Value } from "@/utils/AssertUtils";
 
 // now
 export default function BtcFtPage() {
@@ -79,7 +80,7 @@ export default function BtcFtPage() {
   }, [mrc20Assets]);
 
   async function refresh() {
-    setIsShowLoading(true)
+    setIsShowLoading(true);
     if (btcAddress) {
       getBtcFtData(btcAddress);
     } else {
@@ -101,14 +102,21 @@ export default function BtcFtPage() {
     const simData = await fetchMrc20List(network, address);
     setIsShowLoading(false);
 
+    //price
+    const ftPriceData = await fetchMrc20Price();
+    const assertPrice = await fetchAssetsPrice();
+    const btcPrice = assertPrice.data.priceInfo.btc;
 
-    console.log("simData", JSON.stringify(simData));
+
+    // console.log("simData", JSON.stringify(simData));
     if (simData && simData.data) {
       if (simData.data!.list != null && simData.data!.list.length > 0) {
         simData.data.list.forEach((item) => {
           if (item) {
             item.type = "mrc20";
             item.tokenName = item.tick;
+            const assertFt = caculateOneBtcFtMrc20Value([item], ftPriceData,btcPrice);
+            item.assetPrice = assertFt;
             list.push(item);
           }
         });
@@ -224,21 +232,23 @@ export default function BtcFtPage() {
         </TouchableWithoutFeedback>
       );
     } else {
-      let showBalance ="0";
+      let showBalance = "0";
       // const showBalance =
       //   parseFloat(item.unsafeBalance) + parseFloat(item.balance);
 
       if (parseFloat(item.balance) > 0) {
         // let balance=parseFloat(item.unsafeBalance) + parseFloat(item.balance);
-        // const formattedNum = balance.toFixed(item.decimals); 
-        // showBalance = formattedNum.replace(/\.?0+$/, ''); 
+        // const formattedNum = balance.toFixed(item.decimals);
+        // showBalance = formattedNum.replace(/\.?0+$/, '');
         // showBalance = parseFloat((parseFloat(item.unsafeBalance) + parseFloat(item.balance)).toFixed(item.decimals));
-       
-        showBalance=removeTrailingZeros2(parseFloat(item.unsafeBalance) + parseFloat(item.balance),item.decimals);
 
+        showBalance = removeTrailingZeros2(
+          parseFloat(item.unsafeBalance) + parseFloat(item.balance),
+          item.decimals
+        );
       } else {
         // showBalance = parseFloat(item.unsafeBalance).toFixed(item.decimals);
-        showBalance=removeTrailingZeros2(item.unsafeBalance,item.decimals);
+        showBalance = removeTrailingZeros2(item.unsafeBalance, item.decimals);
       }
 
       let showUnConfirmed = false;
@@ -268,8 +278,8 @@ export default function BtcFtPage() {
         const endIndex = metaData.indexOf('"', startIndex);
         const extractedString = metaData.substring(startIndex, endIndex);
 
-        console.log("netWork",network);
-        
+        // console.log("netWork",network);
+
         if (network === "mainnet") {
           if (metaDataObject.icon.startsWith("http")) {
             mrc20Img = metaDataObject.icon;
@@ -300,7 +310,7 @@ export default function BtcFtPage() {
           }
         }
       }
-      console.log(mrc20Img);
+      // console.log(mrc20Img);
 
       return (
         <TouchableWithoutFeedback
@@ -320,7 +330,7 @@ export default function BtcFtPage() {
             <View
               style={[
                 styles.flatListStyle,
-                { paddingTop: 20, paddingBottom: 20,},
+                { paddingTop: 20, paddingBottom: 20 },
               ]}
             >
               {mrc20Img != null &&
@@ -367,18 +377,20 @@ export default function BtcFtPage() {
 
               {/* <View style={{ flex: 1 }} /> */}
 
-              <View style={{ marginLeft: 10, flex:1 }}>
-               
+              <View style={{ marginLeft: 10, flex: 1 }}>
                 <Text
                   numberOfLines={2}
                   ellipsizeMode="tail"
-                  style={[
-                    metaStyles.defaultText,
-                    { textAlign: "right", },
-                  ]}
+                  style={[metaStyles.defaultText, { textAlign: "right" }]}
                 >
                   {/* {item.balance!}{" "} */}
                   {showBalance}
+                </Text>
+
+                <Text
+                  style={[metaStyles.grayTextSmall66, { textAlign: "right",marginTop:5 }]}
+                >
+                  ${item.assetPrice}
                 </Text>
               </View>
             </View>

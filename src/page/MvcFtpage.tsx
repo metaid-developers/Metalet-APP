@@ -83,6 +83,7 @@ export default function MvcFtPage() {
     const ftdata = await fetchMvcFtBalance(address);
     const ftPriceData = await fetchMvcFtPrice();
     
+    
 
     let list = [];
     for (let i = 0; i < ftdata.length; i++) {

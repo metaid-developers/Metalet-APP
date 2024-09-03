@@ -130,7 +130,7 @@ export default function SplashPage(props) {
     // updateIsShowPay(1);
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
-      console.log(JSON.stringify(check));
+      // console.log(JSON.stringify(check));
       const showCode = check.data.aavc;
       if (versionCode >= showCode) {
         updateIsShowPay(0);

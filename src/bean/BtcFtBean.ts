@@ -21,8 +21,6 @@ export interface BtcFtBean {
   type: string;
 }
 
-
-
 export interface RootMrc20Data {
   code: number;
   message: string;
@@ -44,7 +42,9 @@ export interface Mrc20Data {
   decimals: string;
   metaData: string;
   type: string;
-  deployUserInfo:DeployUserInfo;
+  deployUserInfo: DeployUserInfo;
+  //dev
+  assetPrice: string;
 }
 
 export interface DeployUserInfo {

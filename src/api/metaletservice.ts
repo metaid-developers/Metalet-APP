@@ -159,6 +159,7 @@ export async function broadcastBtc(hex: string): Promise<{
 
 // 11.mvc ft price
 export async function fetchMvcFtPrice(): Promise<MvcFtPriceData> {
+  
   const data = await get(
     BASE_METALET_URL + "/wallet-api/v3/coin/contract/ft/price",
     true
@@ -340,5 +341,17 @@ export async function fetchMrc20RecordList(
     false,
     { net, address, tickId }
   );
+  return data;
+}
+
+//24.mrc20 Price
+export async function fetchMrc20Price():Promise<MvcFtPriceData> {
+  const network = await getWalletNetwork(Chain.BTC);
+  const data: MvcFtPriceData = await get(
+    BASE_METALET_URL + "/wallet-api/v3/coin/mrc20/price",
+    false,
+    { net: network }
+  );
+
   return data;
 }

@@ -405,10 +405,13 @@ export default function WebsPage(props) {
           allowFileAccess={true}
           javaScriptEnabled={true}
           injectedJavaScript={injectedJavaScript}
+          domStorageEnabled={true}
           javaScriptCanOpenWindowsAutomatically={true}
           onMessage={(e) => {
             handlerMessage(JSON.parse(e.nativeEvent.data));
           }}
+          userAgent={Platform.OS ? "Metalet-iOS" : "Metalet-Android"}
+          androidHardwareAccelerationDisabled={true}
         />
       )}
     </SafeAreaView>

@@ -42,6 +42,7 @@ export const get = async (
       },
       // body:JSON.stringify(params)
     });
+    
     if (!response.ok) {
       console.log("fullUrl请求出错的接口 ： ", fullUrl);
       return null;

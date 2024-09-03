@@ -63,7 +63,7 @@ import { ShowBalance } from "../api/type/Balance";
 import useWalletStore from "@/stores/useWalletStore";
 import useWalletManager from "@/hooks/useWalletManager";
 import useNetworkStore from "@/stores/useNetworkStore";
-import { fetchCheckUpgrade } from "@/api/metaletservice";
+import { fetchCheckUpgrade, fetchMrc20Price } from "@/api/metaletservice";
 import { UpdateData } from "@/api/type/Update";
 import Constants from "expo-constants";
 import Toast from "react-native-toast-message";
@@ -180,16 +180,20 @@ export default function HomePage({ navigation }) {
 
     console.log("isShow", isShowPay);
     console.log("shwo", showPayCode);
-
+ 
+    
     // 立即调用一次获取数据
     // fetchData();
     // 设置轮询，每隔5秒获取一次数据
-    const intervalId = setInterval( ()=>{
-      getShowBalance();
-    }, 15000);
+    // const intervalId = setInterval( ()=>{
+    //   getShowBalance();
+    // }, 15000);
 
     // 清除定时器，防止内存泄漏
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
+
+
+    
    
   }, []);
 
@@ -251,10 +255,13 @@ export default function HomePage({ navigation }) {
   }
 
   async function checkUpgrade() {
+   
+
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
       // console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;
+      
       // setUpdateUrl(check.data.url);
       setUpdateUrl(check.data.apkUrl);
       if (codeVersion > versionCode) {
@@ -310,7 +317,6 @@ export default function HomePage({ navigation }) {
   };
   //初始化所有钱包
   async function initCurrentWallet() {
-    console.log("initCurrentWallet");
 
     const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
     if (mode && wallet_mode_cold === mode) {

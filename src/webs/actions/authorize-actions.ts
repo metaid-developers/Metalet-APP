@@ -13,6 +13,7 @@ import * as SwitchNetwork from "./lib/authorize/switch-network";
 import * as SignTransaction from "./lib/authorize/sign-transaction";
 import * as SignTransactions from "./lib/authorize/sign-transactions";
 
+
 // // BTC
 import * as Inscribe from "./lib/authorize/btc/inscribe";
 import * as ConnectBTC from "./lib/authorize/btc/connect";

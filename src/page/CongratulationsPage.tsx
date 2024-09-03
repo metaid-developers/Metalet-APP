@@ -5,27 +5,30 @@ import { RoundSimButton, TitleBar } from "../constant/Widget";
 import { metaStyles } from "../constant/Constants";
 import { navigate } from "../base/NavigationService";
 import { useData } from "@/hooks/MyProvider";
-import { getRandomID, getStorageCurrentWallet, getWalletBeans } from "@/utils/WalletUtils";
+import {
+  getRandomID,
+  getStorageCurrentWallet,
+  getWalletBeans,
+} from "@/utils/WalletUtils";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function CongratulationsPage({ route, props }) {
   const { type } = route.params;
+  const { needInitWallet, updateNeedInitWallet } = useData();
 
   useEffect(() => {
     // test();
+    updateNeedInitWallet(getRandomID());
   }, []);
 
   async function test() {
     // await const wallets=getWalletBeans();
-    const wallets=await getWalletBeans();
-    console.log("wallets: ",JSON.stringify(wallets));
+    const wallets = await getWalletBeans();
+    console.log("wallets: ", JSON.stringify(wallets));
 
-    const wallet=await getStorageCurrentWallet();
-    console.log("wallet: ",wallet);
-    
-    
+    const wallet = await getStorageCurrentWallet();
+    console.log("wallet: ", wallet);
   }
-
 
   return (
     <SafeAreaView style={metaStyles.parentContainer}>
@@ -40,7 +43,8 @@ export default function CongratulationsPage({ route, props }) {
           {type}
         </Text>
         <Text style={[metaStyles.defaultText, { marginTop: 20 }]}>
-          Metalet currently supports the Bitcoin network and MicrovisionChain(Bitcoin sidechain).
+          Metalet currently supports the Bitcoin network and
+          MicrovisionChain(Bitcoin sidechain).
         </Text>
 
         <View style={{ flex: 1 }} />

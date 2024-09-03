@@ -29,7 +29,6 @@ import {
   fetchBtcFtPrice,
   fetchIcons,
   fetchMvcActivityComfird,
-  fetchMvcFtPrice,
   fetchMvcFtRecord,
   fetchOneBrc20,
 } from "../../api/metaletservice";

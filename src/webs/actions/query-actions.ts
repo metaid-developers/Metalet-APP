@@ -20,7 +20,7 @@ import * as GetBTCPublicKey from "./lib/query/btc/get-public-key";
 import * as BTCVerifyMessage from "./lib/query/btc/verify-message";
 import * as GetBTCAddressType from "./lib/query/btc/get-address-type";
 import * as AddSafeUtxo from "./lib/query/btc/add-safe-utxo";
-
+import * as SaveBase64Image from "./lib/query/save-picture"
 
 export default {
   // Listen,
@@ -34,6 +34,7 @@ export default {
   GetTokenBalance,
   VerifySignature,
   PreviewTransaction,
+  SaveBase64Image,
 
   // BTC
   PushPsbt,
