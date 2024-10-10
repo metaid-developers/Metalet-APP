@@ -29,7 +29,7 @@ import { getCurrentMvcWallet } from "../wallet/wallet";
 import {
   formatToDecimal,
   getStorageCurrentWallet,
-  isColdWalletMode,
+  isObserverWalletMode,
 } from "../utils/WalletUtils";
 import { caculateOneFtValue } from "../utils/AssertUtils";
 import { navigate } from "../base/NavigationService";
@@ -67,7 +67,7 @@ export default function MvcFtPage() {
       // getMvcFtData(mvcAddress);
     // } else {
       // if (walletMode == wallet_mode_cold) {
-      const isCold = await isColdWalletMode();
+      const isCold = await isObserverWalletMode();
       if (isCold) {
         const wallet = await getStorageCurrentWallet();
         getMvcFtData(wallet.coldAddress);

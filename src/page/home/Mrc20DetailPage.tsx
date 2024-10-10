@@ -22,7 +22,6 @@ import {
 import { MvcActivityRecord } from "../../types/mvcrecord";
 import {
   fetchMrc20RecordList,
-  fetchMvcActivityComfird,
   fetchMvcFtPrice,
   fetchMvcFtRecord,
 } from "../../api/metaletservice";
@@ -37,6 +36,8 @@ import { caculateOneFtValue } from "../../utils/AssertUtils";
 import useNetworkStore from "@/stores/useNetworkStore";
 import { Mrc20Record } from "@/api/type/Mrc20RecordData";
 import { removeTrailingZeros2 } from "@/utils/StringUtils";
+import { useTranslation } from "react-i18next";
+import { wallet_mode_observer } from "@/utils/AsyncStorageUtil";
 
 export default function Mrc20DetailPage({ route }) {
   const { mrc20Data } = route.params;
@@ -47,13 +48,13 @@ export default function Mrc20DetailPage({ route }) {
   const [noticeContent, setNoticeContent] = useState("Successful");
   const [isShowNotice, setIsShowNotice] = useState(false);
   const { metaletWallet, updateMetaletWallet } = useData();
+  const { t } = useTranslation();
 
   const [assertOneFt, setOneFtAssert] = useState("0.0");
   // const { netWork, updateNetWork } = useData();
   const { network, switchNetwork } = useNetworkStore();
   // console.log("mrc20Data", mrc20Data);
-  
-
+  const { walletMode, updateWalletMode } = useData();
 
   useEffect(() => {
     // console.log(mrc20Data);
@@ -78,7 +79,7 @@ export default function Mrc20DetailPage({ route }) {
     // const mvcActivityListData = mrc20RecordData.data.list;
     const mvcActivityListData1 = mrc20RecordData.data.list;
     const mvcActivityListData = mvcActivityListData1.filter((record) => {
-      if(record.txType==2){
+      if (record.txType == 2) {
         return true;
       }
       return !(record.from === btcAddress && record.to === btcAddress);
@@ -129,9 +130,9 @@ export default function Mrc20DetailPage({ route }) {
     if (item.from === btcAddress && item.to === btcAddress) {
       isIncomeType = "Mint";
       // textColor = grayNormalColor;
-      textColor  = "green";
+      textColor = "green";
       // return;
-    } else if (item.from === btcAddress&&item.to != btcAddress) {
+    } else if (item.from === btcAddress && item.to != btcAddress) {
       isIncomeType = "Send";
       textColor = "red";
     } else if (item.to === btcAddress) {
@@ -145,8 +146,8 @@ export default function Mrc20DetailPage({ route }) {
     //   genesis: mvcFtData.genesis,
     // });
 
-    console.log("isIncomeType",isIncomeType);
-    
+    console.log("isIncomeType", isIncomeType);
+
     return (
       <View>
         {item.txId != "1" ? (
@@ -169,7 +170,7 @@ export default function Mrc20DetailPage({ route }) {
                 />
               </View>
             )}
-                {isIncomeType === "Mint" && (
+            {isIncomeType === "Mint" && (
               <View>
                 <Image
                   source={require("../../../image/record_type_in.png")}
@@ -195,7 +196,7 @@ export default function Mrc20DetailPage({ route }) {
                 <Text
                   style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
                 >
-                  {isIncomeType}
+                  {isIncomeType == "Send" ? t("h_send") : t("h_receive")}
                 </Text>
                 <View style={{ flex: 1 }} />
                 <Text
@@ -204,10 +205,10 @@ export default function Mrc20DetailPage({ route }) {
                     color: textColor,
                     marginBottom: 10,
                     textAlign: "right",
-                    width:200
+                    width: 200,
                   }}
                 >
-                  {isIncomeType === "Receive"|| isIncomeType === "Mint"
+                  {isIncomeType === "Receive" || isIncomeType === "Mint"
                     ? "+" + item.amount.toString()
                     : isIncomeType === "Send"
                       ? "-" + item.amount.toString()
@@ -296,10 +297,15 @@ export default function Mrc20DetailPage({ route }) {
     //   parseFloat(item.unsafeBalance) + parseFloat(item.balance);
 
     if (parseFloat(mrc20Data.balance) > 0) {
-      showBalance =removeTrailingZeros2( parseFloat(mrc20Data.unsafeBalance) + parseFloat(mrc20Data.balance),mrc20Data.decimals)
-       
+      showBalance = removeTrailingZeros2(
+        parseFloat(mrc20Data.unsafeBalance) + parseFloat(mrc20Data.balance),
+        mrc20Data.decimals
+      );
     } else {
-      showBalance = removeTrailingZeros2(parseFloat(mrc20Data.unsafeBalance),mrc20Data.decimals);
+      showBalance = removeTrailingZeros2(
+        parseFloat(mrc20Data.unsafeBalance),
+        mrc20Data.decimals
+      );
     }
 
     let mrc20Img = "";
@@ -339,16 +345,15 @@ export default function Mrc20DetailPage({ route }) {
         }
       }
 
-
       // console.log("mrc20Img", mrc20Img);
     }
 
-    
-
-    if (mrc20Data.tag ) {
-      if (mrc20Data.tag.trim()=="id-coins") {
-        
-        if (mrc20Data.deployUserInfo.avatar&& mrc20Data.deployUserInfo.avatar.trim() != "") {
+    if (mrc20Data.tag) {
+      if (mrc20Data.tag.trim() == "id-coins") {
+        if (
+          mrc20Data.deployUserInfo.avatar &&
+          mrc20Data.deployUserInfo.avatar.trim() != ""
+        ) {
           mrc20Img = mrc20Data.deployUserInfo.avatar;
         } else {
           mrc20Img = "";
@@ -356,7 +361,6 @@ export default function Mrc20DetailPage({ route }) {
       }
     }
     // console.log(mrc20Img);
-    
 
     return (
       <View
@@ -433,43 +437,45 @@ export default function Mrc20DetailPage({ route }) {
             alignItems: "center",
           }}
         >
-          <TouchableWithoutFeedback
-            onPress={() => {
-              navigate("SendMrc20Page", {
-                mrc20Data: mrc20Data,
-              });
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                backgroundColor: "#F3F3FF",
-                borderRadius: 30,
-                paddingVertical: 20,
-                paddingHorizontal: 30,
-                alignItems: "center",
-                justifyContent: "center",
-                width: "40%",
+          {walletMode != wallet_mode_observer && (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                navigate("SendMrc20Page", {
+                  mrc20Data: mrc20Data,
+                });
               }}
             >
-              <Image
-                source={require("../../../image/assert_send_icon.png")}
-                style={{ width: 15, height: 15 }}
-              />
-
-              <Text
+              <View
                 style={{
-                  color: themeColor,
-                  textAlign: "center",
-                  marginLeft: 10,
-                  lineHeight: 20,
-                  fontSize: 18,
+                  flexDirection: "row",
+                  backgroundColor: "#F3F3FF",
+                  borderRadius: 30,
+                  paddingVertical: 20,
+                  paddingHorizontal: 30,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "40%",
                 }}
               >
-                Send
-              </Text>
-            </View>
-          </TouchableWithoutFeedback>
+                <Image
+                  source={require("../../../image/assert_send_icon.png")}
+                  style={{ width: 15, height: 15 }}
+                />
+
+                <Text
+                  style={{
+                    color: themeColor,
+                    textAlign: "center",
+                    marginLeft: 10,
+                    lineHeight: 20,
+                    fontSize: 18,
+                  }}
+                >
+                  {t("h_send")}
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          )}
 
           <TouchableWithoutFeedback
             onPress={() => {
@@ -503,7 +509,7 @@ export default function Mrc20DetailPage({ route }) {
                   fontSize: 18,
                 }}
               >
-                Receive
+                {t("h_receive")}
               </Text>
             </View>
           </TouchableWithoutFeedback>

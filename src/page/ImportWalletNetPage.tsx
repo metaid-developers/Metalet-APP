@@ -45,9 +45,11 @@ import {
   getWalletNetwork,
   isNoStorageWallet,
 } from "../utils/WalletUtils";
+import { useTranslation } from "react-i18next";
+import { navigate } from "@/base/NavigationService";
 
 const storage = createStorage();
-export default function ImportWalletNetPage(props) {
+export default function ImportWalletNetPage({ route }) {
   const toastRef = useEasyToast("center");
   const [mnemonic, setMneMonic] = useState("");
   const { walletManager, updateWalletManager } = useData();
@@ -61,6 +63,10 @@ export default function ImportWalletNetPage(props) {
 
   //import
   const { mvcPath, updateMvcPath } = useData();
+  const { type } = route.params;
+
+
+  const { t } = useTranslation();
 
   // const showToast = useCallback(() => {
   //   toastRef.current?.show('Hello World!', 2000, () => console.log('Toast dismissed'));
@@ -77,6 +83,8 @@ export default function ImportWalletNetPage(props) {
       return;
     }
 
+    console.log("import wallet mode",type);
+    
     setObj({ ...obj, isShow: true });
 
     //wallet
@@ -103,7 +111,7 @@ export default function ImportWalletNetPage(props) {
       walletName = "Wallet " + (wallets.length + 1);
     }
 
-    console.log("初始创建的路径是： "+mvcPath);
+    console.log("初始创建的路径是： " + mvcPath);
     const network = await getWalletNetwork();
 
     let walletBean: WalletBean = {
@@ -116,6 +124,7 @@ export default function ImportWalletNetPage(props) {
       isBackUp: false,
       isCurrentPathIndex: 0,
       seed: "",
+      isColdWalletMode:type,
       accountsOptions: [
         {
           id: accountID,
@@ -179,7 +188,9 @@ export default function ImportWalletNetPage(props) {
     setObj({ ...obj, isShow: false });
     // props.navigation.navigate('HomePage')
 
-    props.navigation.navigate("ImportWalletNetWorkPage");
+    navigate("ImportWalletNetWorkPage")
+
+    // props.navigation.navigate("ImportWalletNetWorkPage");
 
     //TODO  gogo
     // props.navigation.navigate("CongratulationsPage", {
@@ -350,19 +361,18 @@ export default function ImportWalletNetPage(props) {
           />
 
           <Text style={[metaStyles.largeDefaultText, { fontWeight: "bold" }]}>
-            Enter your mnemonic phrase
+            {t("m_import_web_title")}
           </Text>
           <Text style={[metaStyles.smallDefaultText, { marginTop: 20 }]}>
-            Separate mnemonic words with spaces. Supports the import of
-            12-digit, 18-digit, and 24-digit mnemonic phrases from any wallet.
+            {t("m_import_web_notice")}
           </Text>
           <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>
-            Please Enter
+           {t("m_import_please_enter")}
           </Text>
 
           <View>
             <TextInput
-              placeholder="Enter your mnemonic phrase"
+              placeholder=  {t("m_import_web_title")}
               multiline={true}
               numberOfLines={6}
               style={[
@@ -417,13 +427,11 @@ export default function ImportWalletNetPage(props) {
                   marginLeft: 5,
                 }}
               >
-                Warning!{" "}
+               {t("m_import_warning_title")}
               </Text>
             </View>
             <Text style={{ color: "#FA5151", marginTop: 5 }}>
-              Metalet will not record your mnemonic words and private keys.
-              Users manage their own permissions and your assets are under your
-              control.
+            {t("m_import_warning_notice")}
             </Text>
           </View>
 
@@ -431,7 +439,7 @@ export default function ImportWalletNetPage(props) {
 
           {/* <GradientAvatar/> */}
           <RoundSimButton
-            title="Confirm"
+            title={t("c_confirm")}
             textColor="white"
             event={() => {
               // console.log("hello");

@@ -5,12 +5,11 @@ import { RoundSimButton, TitleBar } from "../../constant/Widget";
 import { navigate } from "../../base/NavigationService";
 import { goToWebScan } from "@/utils/WalletUtils";
 import { metaStyles } from "@/constant/Constants";
+import { useTranslation } from "react-i18next";
 
-export default function SendSpaceSuccessPage({route}) {
-
-  const {result} = route.params;
-
-
+export default function SendSpaceSuccessPage({ route }) {
+  const { result } = route.params;
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -41,7 +40,7 @@ export default function SendSpaceSuccessPage({route}) {
               fontWeight: "bold",
             }}
           >
-            Sent Successfully
+            {t("c_send_success")}
           </Text>
 
           <View
@@ -53,7 +52,7 @@ export default function SendSpaceSuccessPage({route}) {
               width: "100%",
             }}
           >
-            <Text style={{ color: "#666", fontSize: 14 }}> Send Amount</Text>
+            <Text style={{ color: "#666", fontSize: 14 }}> {t("c_send_amount")}</Text>
 
             <View
               style={{
@@ -67,7 +66,7 @@ export default function SendSpaceSuccessPage({route}) {
                 style={{ width: 36, height: 36 }}
               />
               <Text style={{ color: "#000", fontSize: 16, marginLeft: 10 }}>
-              {result.amount} SPACE
+                {result.amount} SPACE
               </Text>
             </View>
 
@@ -80,7 +79,7 @@ export default function SendSpaceSuccessPage({route}) {
             />
 
             <Text style={{ color: "#666", fontSize: 14 }}>
-              Receiving Address
+              {t("c_receiving_address")}
             </Text>
             <View
               style={{
@@ -123,7 +122,7 @@ export default function SendSpaceSuccessPage({route}) {
             }}
           >
             <Text style={metaStyles.smallDefaultText}>
-              View on Block Explorer
+            {t("c_view_on_blockchain")}
             </Text>
             <Image
               source={require("../../../image/link_ins_icon.png")}
@@ -133,7 +132,7 @@ export default function SendSpaceSuccessPage({route}) {
         </TouchableWithoutFeedback>
         <View style={{ marginTop: 20, marginHorizontal: 40, marginBottom: 20 }}>
           <RoundSimButton
-            title={"Done"}
+            title={t("c_done")}
             textColor="#fff"
             event={() => {
               navigate("HomePage");

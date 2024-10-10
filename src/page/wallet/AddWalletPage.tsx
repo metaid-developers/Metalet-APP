@@ -5,16 +5,22 @@ import { metaStyles } from "../../constant/Constants";
 import { LoadingModal, TitleBar } from "../../constant/Widget";
 import { navigate } from "../../base/NavigationService";
 import { createMetaletWallet } from "@/wallet/wallet";
-import { getRandomID, getStorageWallets, isNoStorageWallet } from "@/utils/WalletUtils";
+import {
+  getRandomID,
+  getStorageWallets,
+  isNoStorageWallet,
+} from "@/utils/WalletUtils";
 import MetaletWallet from "@/wallet/MetaletWallet";
 import { useData } from "@/hooks/MyProvider";
 import {
   CurrentAccountIDKey,
   CurrentWalletIDKey,
   createStorage,
+  wallet_mode_hot,
   wallets_key,
 } from "@/utils/AsyncStorageUtil";
 import Toast from "react-native-toast-message";
+import { useTranslation } from "react-i18next";
 
 export default function AddWalletPage() {
   const [isShowLoading, setIsShowLoading] = useState(false);
@@ -23,11 +29,12 @@ export default function AddWalletPage() {
   const { mvcAddress, updateMvcAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
   const { needInitWallet, updateNeedInitWallet } = useData();
+  const { t } = useTranslation();
 
   async function createWallet() {
     setIsShowLoading(true);
     const { btcWallet, mvcWallet, walletBean } =
-      await createMetaletWallet(10001);
+      await createMetaletWallet(10001,wallet_mode_hot);
     const wallets = await getStorageWallets();
     const hasNoWallets = await isNoStorageWallet();
 
@@ -43,19 +50,18 @@ export default function AddWalletPage() {
     if (hasNoWallets) {
       await storage.set(wallets_key, [walletBean]);
     } else {
-      console.log('refresh');
+      console.log("refresh");
       const newWallets = [...wallets, walletBean];
       await storage.set(wallets_key, newWallets);
       updateNeedInitWallet(getRandomID());
     }
     updateMyWallet(walletBean);
-   
+
     await storage.set(CurrentWalletIDKey, walletBean.id);
     await storage.set(CurrentAccountIDKey, walletBean.accountsOptions[0].id);
     setIsShowLoading(false);
 
-
-    navigate("CongratulationsPage", {
+    navigate("CongratulationsColdPage", {
       type: "Successfully created",
     });
   }
@@ -82,7 +88,7 @@ export default function AddWalletPage() {
               marginLeft: 20,
             }}
           >
-            Add Wallet
+            {t("m_add_wallet")}
           </Text>
 
           <TouchableWithoutFeedback
@@ -108,10 +114,10 @@ export default function AddWalletPage() {
                 <Text
                   style={{ fontSize: 16, color: "#333", fontWeight: "bold" }}
                 >
-                  Create wallet
+                  {t("m_create_wallet")}
                 </Text>
                 <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
-                  create a new menmonic wallet
+                  {t("m_create_wallet_notice")}
                 </Text>
               </View>
 
@@ -125,7 +131,7 @@ export default function AddWalletPage() {
           <TouchableWithoutFeedback
             onPress={() => {
               // navigate("ImportWalletPage");
-              navigate("ImportWalletNetPage");
+              navigate("ImportWalletNetPage", { type: wallet_mode_hot });
             }}
           >
             <View
@@ -146,10 +152,10 @@ export default function AddWalletPage() {
                 <Text
                   style={{ fontSize: 16, color: "#333", fontWeight: "bold" }}
                 >
-                  Import wallet
+                  {t("m_import_wallet")}
                 </Text>
                 <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
-                  import using menmonic phrase
+                  {t("m_import_wallet_notice")}
                 </Text>
               </View>
 

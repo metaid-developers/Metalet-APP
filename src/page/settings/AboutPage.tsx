@@ -11,11 +11,13 @@ import { TitleBar, ToastView } from "@/constant/Widget";
 import { metaStyles, themeColor } from "@/constant/Constants";
 import Constants from "expo-constants";
 import { openBrowser } from "@/utils/WalletUtils";
+import { useTranslation } from "react-i18next";
 
 export default function AboutPage() {
   const versionCode = Constants.expoConfig?.android.versionCode;
   const buildNumber = Constants.expoConfig?.ios.buildNumber;
   const platformNow = Platform.OS;
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -37,7 +39,7 @@ export default function AboutPage() {
             onPress={() => {
               if (platformNow == "ios") {
                 ToastView({ text: buildNumber.toString(), type: "info" });
-              }else{
+              } else {
                 ToastView({ text: versionCode.toString(), type: "info" });
               }
             }}
@@ -55,7 +57,7 @@ export default function AboutPage() {
                 style={{ width: 45, height: 45 }}
               /> */}
               <Text style={{ marginLeft: 10, color: "#333", fontSize: 16 }}>
-                Version
+                {t("s_version")}
               </Text>
               <View style={{ flex: 1 }} />
               <Text style={metaStyles.defaultText}>
@@ -78,7 +80,7 @@ export default function AboutPage() {
               }}
             >
               <Text style={{ marginLeft: 10, color: "#333", fontSize: 16 }}>
-                Terms of Service
+              {t("s_terms_of_service")}
               </Text>
               <View style={{ flex: 1 }} />
 
@@ -103,7 +105,7 @@ export default function AboutPage() {
               }}
             >
               <Text style={{ marginLeft: 10, color: "#333", fontSize: 16 }}>
-                Privacy Policy
+              {t("s_privacy_policy")}
               </Text>
               <View style={{ flex: 1 }} />
 
@@ -129,7 +131,7 @@ export default function AboutPage() {
                 color: themeColor,
               }}
             >
-              Go to the official website to learn move.
+             {t("s_official")}
             </Text>
           </TouchableWithoutFeedback>
         </View>

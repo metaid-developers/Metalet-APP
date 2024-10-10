@@ -16,7 +16,7 @@ import {
   PreInscribeData,
 } from "./type/Inscribe";
 import { MvcFtData, MvcFtRecordData } from "./type/MvcFtData";
-import { MvcNftData } from "./type/MvcNftData";
+import { MvcNftData, MvcNftDetail, MvcNftListObject } from "./type/MvcNftData";
 import { MvcFtPriceData } from "./type/Price";
 import { getWalletNetwork } from "@/utils/WalletUtils";
 import { UpdateData } from "./type/Update";
@@ -24,10 +24,15 @@ import { IcoinsData } from "./type/IcoinsData";
 import { RootMrc20Data } from "@/bean/BtcFtBean";
 import { MetaIDPinsData } from "./type/MetaIDPinsData";
 import { Mrc20RecordData } from "./type/Mrc20RecordData";
+import { t } from "i18next";
+import { TxIdData } from "./type/TxId";
+import { MvcActivityRecord } from "@/types/mvcrecord";
+import { RootDataObject, RootDataObject2 } from "./type/RootDataObject";
 
-export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
+// export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
 export const BASE_METALET_URL = "https://www.metalet.space";
+export const BASE_METALET_V4_URL = "/wallet-api/v4/mvc";
 
 //资产价格
 export const BALANCE_PRICE_URL = BASE_METALET_URL + "/wallet-api/v3/coin/price";
@@ -43,11 +48,19 @@ export async function fetchMvcActivityComfird(
   address: string,
   isConfirm: boolean
 ) {
-  const data = await get(
-    BASE_MVC_API_URL + "/address/" + address + "/tx",
+  // const data = await get(
+  //   BASE_MVC_API_URL + "/address/" + address + "/tx",
+  //   false,
+  //   { confirm: isConfirm }
+  // );
+  // return data;
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject2 = await get(
+    BASE_METALET_URL + BASE_METALET_V4_URL + "/address/tx-list",
     false,
-    { confirm: isConfirm }
+    { net: network, address: address }
   );
+  const data = result.data.list as MvcActivityRecord[];
   return data;
 }
 
@@ -103,38 +116,70 @@ export async function broadcastSpace(
 ): Promise<{ txid: string; message: string }> {
   const network = await getWalletNetwork();
 
-  const data = await post(
-    network == "mainnet"
-      ? BASE_MVC_API_URL + "/tx/broadcast"
-      : BASE_MVC_API_URL_TESTNET + "/tx/broadcast",
-    { hex: hex }
+  // const data = await post(
+  //   network == "mainnet"
+  //     ? BASE_MVC_API_URL + "/tx/broadcast"
+  //     : BASE_MVC_API_URL_TESTNET + "/tx/broadcast",
+  //   { hex: hex }
+  // );
+
+  const result: RootDataObject = await post(
+    BASE_METALET_URL + "/wallet-api/v4/mvc/tx/broadcast",
+    { net: network == "mainnet" ? "livenet" : "testnet", rawTx: hex }
   );
+  // console.log("result",result);
+  let data = { txid: (result.data as TxIdData).TxId, message: result.message };
   return data;
 }
 
 // 8.MVC ft data
 export async function fetchMvcFtBalance(address: string): Promise<MvcFtData[]> {
-  const network = await getWalletNetwork();
-  const url =
-    network == "testnet" ? BASE_MVC_API_URL_TESTNET : BASE_MVC_API_URL;
-  const data = await get(
-    url + "/contract/ft/address/" + address + "/balance",
-    true
+  // const network = await getWalletNetwork();
+  // const url =
+  //   network == "testnet" ? BASE_MVC_API_URL_TESTNET : BASE_MVC_API_URL;
+  // const data = await get(
+  //   url + "/contract/ft/address/" + address + "/balance",
+  //   true
+  // );
+  // return data;
+
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject2 = await get(
+    BASE_METALET_URL +
+      BASE_METALET_V4_URL +
+      "/address/contract/ft/balance-list",
+    false,
+    { net: network, address: address }
   );
+  const data = result.data.list as MvcFtData[];
   return data;
 }
 
 // 9. MVC nft data
-export async function fetchMvcNftBalance(address: string): Promise<MvcNftData> {
-  const network = await getWalletNetwork();
-  const url =
-    network == "testnet" ? BASE_MVC_API_URL_TESTNET : BASE_MVC_API_URL;
-  const data = await get(
-    url + "/wallet-api/v3/address/contract/nft/utxo",
+export async function fetchMvcNftBalance(
+  address: string
+): Promise<MvcNftListObject[]> {
+  // const network = await getWalletNetwork(Chain.BTC);
+  // const url =
+  //   network == "testnet" ? BASE_MVC_API_URL_TESTNET : BASE_MVC_API_URL;
+  // const data = await get(
+  //   url + "/wallet-api/v3/address/contract/nft/utxo",
+  //   false,
+  //   { net: "livenet", address: address }
+  // );
+  // return data;
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject2 = await get(
+    BASE_METALET_URL +
+      BASE_METALET_V4_URL +
+      "/address/contract/nft/summary-list",
     false,
-    { net: "livenet", address: address }
+    { net: network, address: address, detailCount: 3 }
   );
+  const data = result.data.list as MvcNftListObject[];
   return data;
+
+  // MvcNftListObject
 }
 
 // 10.btc broadcast
@@ -159,7 +204,6 @@ export async function broadcastBtc(hex: string): Promise<{
 
 // 11.mvc ft price
 export async function fetchMvcFtPrice(): Promise<MvcFtPriceData> {
-  
   const data = await get(
     BASE_METALET_URL + "/wallet-api/v3/coin/contract/ft/price",
     true
@@ -167,17 +211,25 @@ export async function fetchMvcFtPrice(): Promise<MvcFtPriceData> {
   return data;
 }
 
+
 // balance
 //12.space balance
 export async function fetchSpaceBalance(
   address: string
 ): Promise<SpaceBalance> {
   const network = await getWalletNetwork();
-  const dataMvcBalance: SpaceBalance = await get(
-    network == "mainnet"
-      ? BASE_MVC_API_URL + "/address/" + address + "/balance"
-      : BASE_MVC_API_URL_TESTNET + "/address/" + address + "/balance"
+  // const dataMvcBalance: SpaceBalance = await get(
+  //   network == "mainnet"
+  //     ? BASE_MVC_API_URL + "/address/" + address + "/balance"
+  //     : BASE_MVC_API_URL_TESTNET + "/address/" + address + "/balance"
+  // );
+  const data: RootDataObject = await get(
+    BASE_METALET_URL + BASE_METALET_V4_URL + "/address/balance-info",
+    false,
+    { net: network, address: address }
   );
+  const dataMvcBalance: SpaceBalance = data.data as SpaceBalance;
+
   return dataMvcBalance;
 }
 
@@ -187,17 +239,26 @@ export async function fetchMvcFtRecord(
   genesis: string,
   codeHash: string
 ): Promise<MvcFtRecordData[]> {
-  const dataMvcBalance: MvcFtRecordData[] = await get(
-    BASE_MVC_API_URL +
-      "/contract/ft/address/" +
-      address +
-      "/" +
-      codeHash +
-      "/" +
-      genesis +
-      "/tx"
+  // const dataMvcBalance: MvcFtRecordData[] = await get(
+  //   BASE_MVC_API_URL +
+  //     "/contract/ft/address/" +
+  //     address +
+  //     "/" +
+  //     codeHash +
+  //     "/" +
+  //     genesis +
+  //     "/tx"
+  // );
+  // return dataMvcBalance;
+
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject2 = await get(
+    BASE_METALET_URL + BASE_METALET_V4_URL + "/address/contract/ft/tx-list",
+    false,
+    { net: network, address: address, codeHash: codeHash, genesis: genesis }
   );
-  return dataMvcBalance;
+  const data = result.data.list as MvcFtRecordData[];
+  return data;
 }
 
 // 14. ft btc price
@@ -345,7 +406,7 @@ export async function fetchMrc20RecordList(
 }
 
 //24.mrc20 Price
-export async function fetchMrc20Price():Promise<MvcFtPriceData> {
+export async function fetchMrc20Price(): Promise<MvcFtPriceData> {
   const network = await getWalletNetwork(Chain.BTC);
   const data: MvcFtPriceData = await get(
     BASE_METALET_URL + "/wallet-api/v3/coin/mrc20/price",
@@ -354,4 +415,33 @@ export async function fetchMrc20Price():Promise<MvcFtPriceData> {
   );
 
   return data;
+}
+
+// 24.mvc nft Ser List
+// 9. MVC nft data
+export async function fetchMvcNftSerList(
+  address: string,
+  codeHash: string,
+  genesis: string
+): Promise<MvcNftDetail[]> {
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject2 = await get(
+    BASE_METALET_URL + BASE_METALET_V4_URL + "/address/contract/nft/utxo-list",
+    false,
+    { net: network, address: address, codehash: codeHash, genesis: genesis }
+  );
+  const data = result.data.list as MvcNftDetail[];
+  return data;
+}
+
+
+
+
+
+
+
+export async function checkHasNetWork(){
+  const check: UpdateData = await fetchCheckUpgrade("android");
+  console.log(JSON.stringify(check));
+  return false;  
 }

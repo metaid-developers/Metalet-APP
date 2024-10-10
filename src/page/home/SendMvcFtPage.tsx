@@ -30,10 +30,11 @@ import {
   formatToDecimal,
   getRandomID,
   getWalletNetwork,
-  isColdWalletMode,
+  isObserverWalletMode,
 } from "../../utils/WalletUtils";
 import { getIconUri } from "@mvc-org/mvc-resources";
 import { removeTrailingZeros } from "@/utils/StringUtils";
+import { useTranslation } from "react-i18next";
 
 export default function SendMvcFtPage({ route }) {
   const [nextBtnColor, setNextBtnColor] = useState("rgba(23, 26, 255, 0.5)");
@@ -53,6 +54,7 @@ export default function SendMvcFtPage({ route }) {
 
   // verfiy
   const [isShowVerify, setIsShowVerify] = useState(false);
+  const [txid, setTxid] = useState("");
 
   const { metaletWallet, updateMetaletWallet } = useData();
 
@@ -61,6 +63,7 @@ export default function SendMvcFtPage({ route }) {
   const [total, settotal] = useState("");
   const [rawTx, setrawTx] = useState("");
   const { needRefreshHome, updateNeedRefreshHome } = useData();
+  const { t } = useTranslation();
 
   const { mvcFtData } = route.params;
   let ImageUrl = getIconUri({
@@ -112,7 +115,10 @@ export default function SendMvcFtPage({ route }) {
     const ftManager = new FtManager({
       network: network === "mainnet" ? API_NET.MAIN : API_NET.TEST,
       purse: privateKey,
+      apiTarget: API_TARGET.CYBER3,
+      // apiTarget: API_TARGET.MVC,
     });
+
     // const largestUtxo = await ftManager.api
     //   .getUnspents(metaletWallet.currentMvcWallet.getAddress())
     //   .then((utxos) => {
@@ -156,7 +162,22 @@ export default function SendMvcFtPage({ route }) {
       setIsShowLoading(false);
       // console.log("result ： " + JSON.stringify(transferRes));
       setrawTx(transferRes.txHex);
-      setConfirmDailogState(true);
+      // setTxid(transferRes.txid);
+
+      if (transferRes.txid != null) {
+        updateNeedRefreshHome(getRandomID());
+
+        navigate("SendSuccessPage", {
+          result: {
+            chain: "mvc",
+            symbol: mvcFtData.symbol.toUpperCase(),
+            txid: transferRes.txid,
+            amount: inputAmount,
+            address: inputAddress,
+          },
+        });
+      }
+      // setConfirmDailogState(true);
     }
     // if (sentRes) {
     //   const fee = Transaction.fromHex(sentRes.txHex).virtualSize();
@@ -255,7 +276,7 @@ export default function SendMvcFtPage({ route }) {
 
             <View>
               <Text style={{ marginTop: 15, color: "#666", fontSize: 14 }}>
-                From
+                {t("c_from")}
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                 {metaletWallet.currentMvcWallet.getAddress()}
@@ -264,7 +285,7 @@ export default function SendMvcFtPage({ route }) {
 
             <View>
               <Text style={{ marginTop: 10, color: "#666", fontSize: 14 }}>
-                To
+                {t("c_to")}
               </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                 {inputAddress}
@@ -278,7 +299,10 @@ export default function SendMvcFtPage({ route }) {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: "#666", fontSize: 14 }}>Amount</Text>
+              <Text style={{ color: "#666", fontSize: 14 }}>
+                {" "}
+                {t("c_amount")}
+              </Text>
               <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                 {inputAmount} {mvcFtData.symbol.toUpperCase()}
               </Text>
@@ -316,7 +340,7 @@ export default function SendMvcFtPage({ route }) {
               }}
             >
               <RoundSimButtonFlee
-                title={"Cancel"}
+                title={t("c_cancel")}
                 style={{
                   borderRadius: 10,
                   height: 40,
@@ -332,7 +356,7 @@ export default function SendMvcFtPage({ route }) {
               />
 
               <RoundSimButtonFlee
-                title={"Confirm"}
+                title={t("c_confirm")}
                 style={{ borderRadius: 10, height: 40, width: "45%" }}
                 textColor="#fff"
                 event={() => {
@@ -354,20 +378,24 @@ export default function SendMvcFtPage({ route }) {
         }}
         event={async () => {
           setIsShowVerify(false);
-          const { txid, message } = await broadcastSpace(rawTx);
-          if (txid != null) {
-            updateNeedRefreshHome(getRandomID());
+          // const { txid, message } = await broadcastSpace(rawTx);
 
-            navigate("SendSuccessPage", {
-              result: {
-                chain: "mvc",
-                symbol: mvcFtData.symbol.toUpperCase(),
-                txid: txid,
-                amount: inputAmount,
-                address: inputAddress,
-              },
-            });
-          }
+          sendSpace();
+
+          //old
+          // if (txid != null) {
+          //   updateNeedRefreshHome(getRandomID());
+
+          //   navigate("SendSuccessPage", {
+          //     result: {
+          //       chain: "mvc",
+          //       symbol: mvcFtData.symbol.toUpperCase(),
+          //       txid: txid,
+          //       amount: inputAmount,
+          //       address: inputAddress,
+          //     },
+          //   });
+          // }
 
           // navigate("SendSuccessPage", {
           //   result: {
@@ -391,7 +419,7 @@ export default function SendMvcFtPage({ route }) {
         />
       ) : (
         <View style={{ flex: 1 }}>
-          <TitleBar title="Send" />
+          <TitleBar title={t("h_send")} />
 
           <View
             style={{
@@ -467,7 +495,7 @@ export default function SendMvcFtPage({ route }) {
               }}
             >
               <TextInput
-                placeholder="Recipient's address"
+                placeholder={t("c_receive_address")}
                 // value={inputAddress}
                 onChangeText={(text) => {
                   setInputAddress(text);
@@ -519,7 +547,7 @@ export default function SendMvcFtPage({ route }) {
                   fontSize: 16,
                 }}
               >
-                Transfer Amount
+                {t("c_amount")}
               </Text>
 
               <View style={{ flex: 1 }} />
@@ -534,7 +562,7 @@ export default function SendMvcFtPage({ route }) {
                 <Text
                   style={[metaStyles.smallDefaultText, { marginRight: 10 }]}
                 >
-                  Max
+                  {t("c_max")}
                 </Text>
               </TouchableWithoutFeedback>
             </View>
@@ -560,14 +588,11 @@ export default function SendMvcFtPage({ route }) {
                 }
                 value={inputAmount}
                 onChangeText={(text) => {
-
                   // const decimalPattern = new RegExp(
                   //   `^\\d*\\.?\\d{0,${mvcFtData.decimals}}$`
                   // );
 
-                  const decimalPattern = new RegExp(
-                    `^\\d*\\.?\\d{0,8}$`
-                  );
+                  const decimalPattern = new RegExp(`^\\d*\\.?\\d{0,8}$`);
                   if (decimalPattern.test(text)) {
                     setInputAmount(text);
                   }
@@ -596,11 +621,12 @@ export default function SendMvcFtPage({ route }) {
             </View>
 
             <RoundSimButton
-              title={"Next"}
+              title={t("c_next")}
               event={async () => {
-                const isCold = await isColdWalletMode();
+                const isCold = await isObserverWalletMode();
                 if (!isCold) {
-                  sendSpace();
+                  // sendSpace();
+                  setConfirmDailogState(true);
                 }
               }}
               roundStytle={{ marginTop: 50 }}

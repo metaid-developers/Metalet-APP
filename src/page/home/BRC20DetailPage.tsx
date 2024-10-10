@@ -28,7 +28,6 @@ import {
   fetchBrc20Record,
   fetchBtcFtPrice,
   fetchIcons,
-  fetchMvcActivityComfird,
   fetchMvcFtRecord,
   fetchOneBrc20,
 } from "../../api/metaletservice";
@@ -57,6 +56,7 @@ import {
 } from "@/api/type/BtcFtOneRecordData";
 import { Chain } from "@metalet/utxo-wallet-service";
 import { IcoinsData } from "@/api/type/IcoinsData";
+import { useTranslation } from "react-i18next";
 
 export default function BRC20DetailPage({ route }) {
   const [mvcActivityList, setMvcActivityList] = useState<InscriptionsList[]>(
@@ -80,6 +80,7 @@ export default function BRC20DetailPage({ route }) {
   const [tokenPingList, setTokenPingList] = useState([]);
   const [isSelectTransfer, setIsSelectTransfer] = useState(true);
   const [brc20Icons, setBrc20Icons] = useState<IcoinsData>();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // console.log("brc20: " + JSON.stringify(brc20));
@@ -525,7 +526,7 @@ export default function BRC20DetailPage({ route }) {
                   fontSize: 18,
                 }}
               >
-                Send
+                {t("h_send")}
               </Text>
             </View>
           </TouchableWithoutFeedback>
@@ -562,7 +563,7 @@ export default function BRC20DetailPage({ route }) {
                   fontSize: 18,
                 }}
               >
-                Receive
+                   {t("h_receive")}
               </Text>
             </View>
           </TouchableWithoutFeedback>

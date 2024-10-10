@@ -11,11 +11,14 @@ import {
   getWalletBeans,
 } from "@/utils/WalletUtils";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { useTranslation } from "react-i18next";
 
 export default function CongratulationsPage({ route, props }) {
   const { type } = route.params;
   const { needInitWallet, updateNeedInitWallet } = useData();
+  const { needRefreshApp, updateNeedRefreshApp } = useData();
 
+  const {t}=useTranslation();
   useEffect(() => {
     // test();
     updateNeedInitWallet(getRandomID());
@@ -43,17 +46,19 @@ export default function CongratulationsPage({ route, props }) {
           {type}
         </Text>
         <Text style={[metaStyles.defaultText, { marginTop: 20 }]}>
-          Metalet currently supports the Bitcoin network and
-          MicrovisionChain(Bitcoin sidechain).
+        {t("w_success_notice")}
         </Text>
 
         <View style={{ flex: 1 }} />
 
         <RoundSimButton
-          title="Start Metalet"
+          title={t("w_start_metalet")}
           textColor="#fff"
           event={() => {
-            navigate("Tabs");
+            // navigate("Tabs");
+            // navigate("SplashPage")
+            updateNeedRefreshApp(getRandomID());
+            navigate("SplashPage");
           }}
         />
       </View>

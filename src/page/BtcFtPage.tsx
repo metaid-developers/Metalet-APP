@@ -25,15 +25,21 @@ import { navigate } from "@/base/NavigationService";
 import {
   getStorageCurrentWallet,
   getWalletNetwork,
-  isColdWalletMode,
+  isObserverWalletMode,
 } from "@/utils/WalletUtils";
 import { Chain } from "@metalet/utxo-wallet-service";
-import { fetchAssetsPrice, fetchMrc20List, fetchMrc20Price } from "@/api/metaletservice";
+import {
+  fetchAssetsPrice,
+  fetchMrc20List,
+  fetchMrc20Price,
+} from "@/api/metaletservice";
 import { useMRC20sInfiniteQuery } from "@/queries/mrc20";
 import { lightGreen100 } from "react-native-paper/lib/typescript/styles/themes/v2/colors";
 import { removeTrailingZeros, removeTrailingZeros2 } from "@/utils/StringUtils";
 import useNetworkStore from "@/stores/useNetworkStore";
 import { caculateOneBtcFtMrc20Value } from "@/utils/AssertUtils";
+import { use } from "i18next";
+import { useTranslation } from "react-i18next";
 
 // now
 export default function BtcFtPage() {
@@ -47,6 +53,7 @@ export default function BtcFtPage() {
   const { network, switchNetwork } = useNetworkStore();
 
   const [isShowLoading, setIsShowLoading] = useState(false);
+  const { t } = useTranslation();
 
   // const isFocused = useIsFocused(); // 使用useIsFocused钩子
   useEffect(() => {
@@ -80,11 +87,11 @@ export default function BtcFtPage() {
   }, [mrc20Assets]);
 
   async function refresh() {
-    setIsShowLoading(true);
+    // setIsShowLoading(true);
     if (btcAddress) {
       getBtcFtData(btcAddress);
     } else {
-      const isCold = await isColdWalletMode();
+      const isCold = await isObserverWalletMode();
       if (isCold) {
         const wallet = await getStorageCurrentWallet();
         getBtcFtData(wallet.coldAddress);
@@ -107,7 +114,6 @@ export default function BtcFtPage() {
     const assertPrice = await fetchAssetsPrice();
     const btcPrice = assertPrice.data.priceInfo.btc;
 
-
     // console.log("simData", JSON.stringify(simData));
     if (simData && simData.data) {
       if (simData.data!.list != null && simData.data!.list.length > 0) {
@@ -115,7 +121,11 @@ export default function BtcFtPage() {
           if (item) {
             item.type = "mrc20";
             item.tokenName = item.tick;
-            const assertFt = caculateOneBtcFtMrc20Value([item], ftPriceData,btcPrice);
+            const assertFt = caculateOneBtcFtMrc20Value(
+              [item],
+              ftPriceData,
+              btcPrice
+            );
             item.assetPrice = assertFt;
             list.push(item);
           }
@@ -214,7 +224,7 @@ export default function BtcFtPage() {
               <Text
                 style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
               >
-                Transferable:{" "}
+                {t("b_transferable")}:
               </Text>
               <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
                 {item.transferableBalance!}{" "}
@@ -222,7 +232,7 @@ export default function BtcFtPage() {
               <Text
                 style={[metaStyles.grayTextSmall66, { textAlign: "right" }]}
               >
-                Available:{" "}
+                {t("b_available")}:
               </Text>
               <Text style={[metaStyles.defaultText, { textAlign: "right" }]}>
                 {item.availableBalance!}{" "}
@@ -388,7 +398,10 @@ export default function BtcFtPage() {
                 </Text>
 
                 <Text
-                  style={[metaStyles.grayTextSmall66, { textAlign: "right",marginTop:5 }]}
+                  style={[
+                    metaStyles.grayTextSmall66,
+                    { textAlign: "right", marginTop: 5 },
+                  ]}
                 >
                   ${item.assetPrice}
                 </Text>

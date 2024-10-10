@@ -3,9 +3,12 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TitleBar, VerifyModal } from "@/constant/Widget";
 import { navigate } from "@/base/NavigationService";
+import { use } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function SecurityPage() {
   const [isShowVerify, setIsShowVerify] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -21,11 +24,11 @@ export default function SecurityPage() {
       />
 
       <View style={{ flex: 1 }}>
-        <TitleBar title="SecurityPage" />
+        <TitleBar title="" />
         <View>
           <TouchableWithoutFeedback
             onPress={async () => {
-             setIsShowVerify(true);
+              setIsShowVerify(true);
             }}
           >
             <View
@@ -38,7 +41,7 @@ export default function SecurityPage() {
               }}
             >
               <Text style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}>
-                Change Password
+               {t("s_change_password")}
               </Text>
               <View style={{ flex: 1 }} />
 

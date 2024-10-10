@@ -22,20 +22,27 @@ import {
   createStorage,
   wallet_mode_cold,
   wallet_mode_key,
+  wallet_mode_observer,
   wallets_key,
 } from "@/utils/AsyncStorageUtil";
+import { useTranslation } from "react-i18next";
 
 export default function ColdWalletPage() {
   const { width } = Dimensions.get("window");
   const [isScan, setIsScan] = useState(false);
   const { metaletWallet, updateMetaletWallet } = useData();
   const { needInitWallet, updateNeedInitWallet } = useData();
+  const { walletMode, updateWalletMode } = useData();
+
+  const { t } = useTranslation();
 
   let qrData = "1";
-  let publicKey = metaletWallet.currentBtcWallet.getAddress();
+  // let publicKey = metaletWallet.currentBtcWallet.getAddress();currentMvcWallet
+  let publicKey = metaletWallet.currentBtcWallet.getPublicKey().toString("hex");
   const qrDataReady: MetaletColdRr = {
     name: ActionType.CONNECT,
     publicKey: publicKey,
+    address:metaletWallet.currentBtcWallet.getAddress()
   };
 
   qrData = JSON.stringify(qrDataReady);
@@ -68,9 +75,9 @@ export default function ColdWalletPage() {
           isCurrentPathIndex: 0,
           seed: "",
           //dev
-          isColdWalletMode: true,
+          isColdWalletMode: wallet_mode_observer,
           coldPublicKey: result.publicKey,
-          coldAddress: result.publicKey,
+          coldAddress: result.address,
           accountsOptions: [
             {
               id: accountID,
@@ -92,6 +99,9 @@ export default function ColdWalletPage() {
         await storage.set(wallets_key, newWallets);
         updateNeedInitWallet(getRandomID());
         navigate("SplashPage");
+        
+        console.log("walletBean", walletBean);
+        
       }
     } catch (error) {
       console.error("Error parseScan data:", error);
@@ -160,7 +170,8 @@ export default function ColdWalletPage() {
             ></Text>
           </View>
           <View style={{ padding: 20 }}>
-            <View
+            
+            {/* <View
               style={{
                 justifyContent: "center",
                 backgroundColor: "#fff",
@@ -173,7 +184,7 @@ export default function ColdWalletPage() {
               <View style={{ marginTop: 40 }}>
                 <MyQrCode qrData={qrData} size={width - 130} />
               </View>
-            </View>
+            </View> */}
           </View>
 
           <View style={{ margin: 20 }}>
@@ -181,12 +192,12 @@ export default function ColdWalletPage() {
               style={{
                 color: "#333",
                 lineHeight: 20,
-                marginTop: 40,
                 fontSize: 18,
                 fontWeight: "bold",
               }}
             >
-              Cold Wallet Guide:
+              {/* {t("s_cold_wallet")} */}
+              {t("s_cold_use_guide")}
             </Text>
 
             <Text
@@ -197,11 +208,12 @@ export default function ColdWalletPage() {
                 fontSize: 14,
               }}
             >
-              1.Create/Restore Wallet on an Offline Phone. {"\n"}
+              {t("s_cold_wallet_notice")}
+              {/* 1.Create/Restore Wallet on an Offline Phone. {"\n"}
               2.Scan the offline phone's QR code with an online phone to create
               a watch-only wallet. {"\n"}
               3.Try Sending and Receiving Transactions Using the Watch-Only
-              Wallet.
+              Wallet. */}
             </Text>
           </View>
         </View>

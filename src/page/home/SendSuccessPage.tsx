@@ -12,10 +12,12 @@ import { metaStyles } from "@/constant/Constants";
 import { goToWebScan } from "@/utils/WalletUtils";
 import { network_btc } from "@/utils/AsyncStorageUtil";
 import { getBtcBrc20Icon } from "@/utils/AssertUtils";
+import { useTranslation } from "react-i18next";
 
 export default function SendSuccessPage({ route }) {
   const { result } = route.params;
   const [isErrorIcon, setisErrorIcon] = useState(false);
+  const { t } = useTranslation();
 
   let ImageUrl = getBtcBrc20Icon(result.symbol);
   if (!ImageUrl) {
@@ -51,7 +53,7 @@ export default function SendSuccessPage({ route }) {
               fontWeight: "bold",
             }}
           >
-            Sent Successfully
+            {t("c_send_success")}
           </Text>
 
           <View
@@ -109,7 +111,7 @@ export default function SendSuccessPage({ route }) {
             />
 
             <Text style={{ color: "#666", fontSize: 14 }}>
-              Receiving Address
+            {t("c_receiving_address")}
             </Text>
             <View
               style={{
@@ -153,7 +155,7 @@ export default function SendSuccessPage({ route }) {
             }}
           >
             <Text style={metaStyles.smallDefaultText}>
-              View on Block Explorer
+            {t("c_view_on_blockchain")}
             </Text>
             <Image
               source={require("../../../image/link_ins_icon.png")}
@@ -164,7 +166,7 @@ export default function SendSuccessPage({ route }) {
 
         <View style={{ marginTop: 20, marginHorizontal: 40, marginBottom: 20 }}>
           <RoundSimButton
-            title={"Done"}
+           title={t("c_done")}
             textColor="#fff"
             event={() => {
               navigate("HomePage");

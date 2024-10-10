@@ -1,8 +1,19 @@
-interface RootDataObject {
+export interface RootDataObject {
   code: number;
   message: string;
   processingTime: number;
   data: Object;
+}
+
+export interface RootDataObject2 {
+  code: number;
+  message: string;
+  processingTime: number;
+  data: MvcApiResponse;
+}
+
+interface MvcApiResponse {
+      list: Object;
 }
 
 // interface Data {

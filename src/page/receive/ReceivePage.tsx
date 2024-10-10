@@ -11,6 +11,7 @@ import { LoadingNoticeModal, MyQrCode, TitleBar } from "../../constant/Widget";
 import * as Clipboard from "expo-clipboard";
 import { useData } from "../../hooks/MyProvider";
 import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
+import { useTranslation } from "react-i18next";
 
 export default function ReceivePage({ route }) {
   const { width } = Dimensions.get("window");
@@ -21,6 +22,7 @@ export default function ReceivePage({ route }) {
   const { myCoinType } = route.params;
   const { btcAddress, updateBtcAddress } = useData();
   const { mvcAddress, updateMvcAddress } = useData();
+  const { t } = useTranslation();
 
   function ShowNotice(notice) {
     Clipboard.setString(notice);
@@ -31,10 +33,7 @@ export default function ReceivePage({ route }) {
     }, 800);
   }
 
-
- let isCold=walletMode===wallet_mode_cold;
- 
-
+  let isCold = walletMode === wallet_mode_cold;
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -80,7 +79,7 @@ export default function ReceivePage({ route }) {
                 fontSize: 14,
               }}
             >
-              Only supports receiving Bitcoin network assets.
+             {t("o_receive_btc_notice")}
             </Text>
 
             <View style={{ marginTop: 40 }}>
@@ -90,7 +89,6 @@ export default function ReceivePage({ route }) {
 
             <TouchableWithoutFeedback
               onPress={() => {
-                
                 // ShowNotice(metaletWallet.currentBtcWallet.getAddress());
                 ShowNotice(btcAddress);
                 // updateBtcAddress(btcAddress);
@@ -176,7 +174,7 @@ export default function ReceivePage({ route }) {
                 fontSize: 14,
               }}
             >
-              Only supports receiving assets from the Microvisionchain network.
+              {t("o_receive_mvc_notice")}
             </Text>
 
             <View style={{ marginTop: 40 }}>
@@ -204,7 +202,8 @@ export default function ReceivePage({ route }) {
                 }}
               >
                 <Text numberOfLines={1} ellipsizeMode="middle">
-                  {metaletWallet.currentMvcWallet.getAddress()}
+                  {/* {metaletWallet.currentMvcWallet.getAddress()} */}
+                  {mvcAddress}
                 </Text>
 
                 <View style={{ flex: 1 }} />

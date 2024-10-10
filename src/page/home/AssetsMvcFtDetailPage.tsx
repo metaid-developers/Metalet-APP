@@ -16,11 +16,7 @@ import {
 import { goBack, navigate } from "../../base/NavigationService";
 import { metaStyles, themeColor } from "../../constant/Constants";
 import { MvcActivityRecord } from "../../types/mvcrecord";
-import {
-  fetchMvcActivityComfird,
-  fetchMvcFtPrice,
-  fetchMvcFtRecord,
-} from "../../api/metaletservice";
+import { fetchMvcFtPrice, fetchMvcFtRecord } from "../../api/metaletservice";
 import { useData } from "../../hooks/MyProvider";
 import * as Clipboard from "expo-clipboard";
 import { formatTime } from "../../utils/MetaFunUiils";
@@ -29,6 +25,8 @@ import { MvcFtRecordData } from "../../api/type/MvcFtData";
 import { getIconUri } from "@mvc-org/mvc-resources";
 import { formatToDecimal } from "../../utils/WalletUtils";
 import { caculateOneFtValue } from "../../utils/AssertUtils";
+import { useTranslation } from "react-i18next";
+import { wallet_mode_observer } from "@/utils/AsyncStorageUtil";
 
 export default function AssetsMvcFtDetailPage({ route }) {
   const { mvcFtData } = route.params;
@@ -39,6 +37,9 @@ export default function AssetsMvcFtDetailPage({ route }) {
   const { metaletWallet, updateMetaletWallet } = useData();
 
   const [assertOneFt, setOneFtAssert] = useState("0.0");
+  const { t } = useTranslation();
+
+  const { walletMode, updateWalletMode } = useData();
 
   useEffect(() => {
     console.log(mvcFtData);
@@ -240,7 +241,8 @@ export default function AssetsMvcFtDetailPage({ route }) {
                 >
                   <View style={{ flexDirection: "row" }}>
                     <Text style={metaStyles.grayTextSmall66}>
-                      {formatTime(item.time)}
+                      {/* {formatTime(item.time)} */}
+                      {formatTime(item.time * 1000)}
                     </Text>
                     <View style={{ flex: 1 }} />
                     <Text
@@ -279,7 +281,7 @@ export default function AssetsMvcFtDetailPage({ route }) {
             />
 
             <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
-              No activities
+              {t("o_nodata")}
             </Text>
           </View>
         )}
@@ -325,7 +327,10 @@ export default function AssetsMvcFtDetailPage({ route }) {
             fontWeight: "bold",
           }}
         >
-          {formatToDecimal(mvcFtData.confirmed+ mvcFtData.unconfirmed, mvcFtData.decimal)}{" "}
+          {formatToDecimal(
+            mvcFtData.confirmed + mvcFtData.unconfirmed,
+            mvcFtData.decimal
+          )}{" "}
           {mvcFtData.symbol.toUpperCase()}
         </Text>
 
@@ -348,43 +353,45 @@ export default function AssetsMvcFtDetailPage({ route }) {
             alignItems: "center",
           }}
         >
-          <TouchableWithoutFeedback
-            onPress={() => {
-              navigate("SendMvcFtPage", {
-                mvcFtData: mvcFtData,
-              });
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                backgroundColor: "#F3F3FF",
-                borderRadius: 30,
-                paddingVertical: 20,
-                paddingHorizontal: 30,
-                alignItems: "center",
-                justifyContent: "center",
-                width: "40%",
+          {walletMode != wallet_mode_observer && (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                navigate("SendMvcFtPage", {
+                  mvcFtData: mvcFtData,
+                });
               }}
             >
-              <Image
-                source={require("../../../image/assert_send_icon.png")}
-                style={{ width: 15, height: 15 }}
-              />
-
-              <Text
+              <View
                 style={{
-                  color: themeColor,
-                  textAlign: "center",
-                  marginLeft: 10,
-                  lineHeight: 20,
-                  fontSize: 18,
+                  flexDirection: "row",
+                  backgroundColor: "#F3F3FF",
+                  borderRadius: 30,
+                  paddingVertical: 20,
+                  paddingHorizontal: 30,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "40%",
                 }}
               >
-                Send
-              </Text>
-            </View>
-          </TouchableWithoutFeedback>
+                <Image
+                  source={require("../../../image/assert_send_icon.png")}
+                  style={{ width: 15, height: 15 }}
+                />
+
+                <Text
+                  style={{
+                    color: themeColor,
+                    textAlign: "center",
+                    marginLeft: 10,
+                    lineHeight: 20,
+                    fontSize: 18,
+                  }}
+                >
+                  {t("h_send")}
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          )}
 
           <TouchableWithoutFeedback
             onPress={() => {
@@ -418,7 +425,7 @@ export default function AssetsMvcFtDetailPage({ route }) {
                   fontSize: 18,
                 }}
               >
-                Receive
+                {t("h_receive")}
               </Text>
             </View>
           </TouchableWithoutFeedback>

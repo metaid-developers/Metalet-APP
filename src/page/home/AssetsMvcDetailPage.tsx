@@ -10,6 +10,7 @@ import {
   LoadingNoticeModal,
   NoMoreDataView,
   TitleBar,
+  ToastView,
 } from "../../constant/Widget";
 import { goBack, navigate } from "../../base/NavigationService";
 import { metaStyles, themeColor } from "../../constant/Constants";
@@ -19,6 +20,8 @@ import { useData } from "../../hooks/MyProvider";
 import * as Clipboard from "expo-clipboard";
 import { formatTime } from "../../utils/MetaFunUiils";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
+import { wallet_mode_observer } from "@/utils/AsyncStorageUtil";
 
 export default function AssetsMvcDetailPage({ route }) {
   const { myCoinType } = route.params;
@@ -29,6 +32,8 @@ export default function AssetsMvcDetailPage({ route }) {
   const [noticeContent, setNoticeContent] = useState("Successful");
   const [isShowNotice, setIsShowNotice] = useState(false);
   const { metaletWallet, updateMetaletWallet } = useData();
+  const { t }=useTranslation();
+  const { walletMode, updateWalletMode } = useData();
 
   useEffect(() => {
     getActivityList();
@@ -108,10 +113,11 @@ export default function AssetsMvcDetailPage({ route }) {
               <Text
                 style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
               >
-                {isIncome ? "Receive" : "Send"}
+                {isIncome ? t("h_receive") : t("h_send")}
               </Text>
               <Text style={metaStyles.grayTextSmall66}>
-                {formatTime(item.time)}
+                {/* {formatTime(item.time)} */}
+                {formatTime(item.time * 1000)}
               </Text>
             </View>
 
@@ -171,7 +177,7 @@ export default function AssetsMvcDetailPage({ route }) {
             />
 
             <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
-              No activities
+              {t("o_nodata")}
             </Text>
           </View>
         )}
@@ -228,6 +234,10 @@ export default function AssetsMvcDetailPage({ route }) {
         
         <TouchableWithoutFeedback
         onPress={()=>{
+          if(walletMode==wallet_mode_observer){
+            ToastView({ text: "come soon", type: "info" });
+            return;
+          }
           navigate("SendSpacePage");
         }}
         >
@@ -257,7 +267,7 @@ export default function AssetsMvcDetailPage({ route }) {
                 fontSize: 18,
               }}
             >
-              Send
+              {t("h_send")}
             </Text>
           </View>
         </TouchableWithoutFeedback>
@@ -292,7 +302,7 @@ export default function AssetsMvcDetailPage({ route }) {
                   fontSize: 18,
                 }}
               >
-                Receive
+                  {t("h_receive")}
               </Text>
             </View>
           </TouchableWithoutFeedback>

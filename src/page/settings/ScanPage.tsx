@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { QRScanner, TitleBar } from "@/constant/Widget";
 import { ActionType, MetaletColdRr } from "@/bean/MetaletColdRr";
 import { AddressType } from "@metalet/utxo-wallet-service";
-import { getRandomID, getStorageWallets, isColdWalletMode } from "@/utils/WalletUtils";
+import { getRandomID, getStorageWallets, isObserverWalletMode,  } from "@/utils/WalletUtils";
 import { WalletBean } from "@/bean/WalletBean";
 import { getRandomColorList } from "@/utils/MetaFunUiils";
 import {
@@ -14,6 +14,7 @@ import {
   createStorage,
   wallet_mode_cold,
   wallet_mode_key,
+  wallet_mode_observer,
   wallets_key,
 } from "@/utils/AsyncStorageUtil";
 import { useData } from "@/hooks/MyProvider";
@@ -42,7 +43,7 @@ export default function ScanPage() {
   async function SendBtcUnSign(result: MetaletColdRr) {
     // to sign
     console.log(result);
-    const isCold = await isColdWalletMode();
+    const isCold = await isObserverWalletMode();
     if (!isCold) {
         
     }
@@ -76,7 +77,7 @@ export default function ScanPage() {
       isCurrentPathIndex: 0,
       seed: "",
       //dev
-      isColdWalletMode: true,
+      isColdWalletMode: wallet_mode_observer,
       coldPublicKey: result.publicKey,
       coldAddress: result.publicKey,
       accountsOptions: [

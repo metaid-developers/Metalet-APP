@@ -19,10 +19,13 @@ import { TitleBar } from "../constant/Widget";
 import { getShowImageUrl } from "../utils/MetaFunUiils";
 import { navigate } from "../base/NavigationService";
 import { useData } from "@/hooks/MyProvider";
+import { MvcNftDetail } from "@/api/type/MvcNftData";
+import { fetchMvcNftSerList } from "@/api/metaletservice";
 
 export default function MvcNftListPage({ props, route }) {
   const { myObject } = route.params;
-  let [genesisNftList, setGenesisNftList] = useState<MvcGenesisItemBean[]>([]);
+  // let [genesisNftList, setGenesisNftList] = useState<MvcGenesisItemBean[]>([]);
+  let [genesisNftList, setGenesisNftList] = useState<MvcNftDetail[]>([]);
   const { mvcAddress, updateMvcAddress } = useData();
 
   let page = 1;
@@ -45,23 +48,30 @@ export default function MvcNftListPage({ props, route }) {
       // const jsonData = JSON.parse(fileContent);
       // console.log("读取的数据信息", jsonData);
 
-      let params = {
-        page: page,
-        pageSize: pageSize,
-        chain: "mvc",
-        codehash: myObject.codehash,
-        genesis: myObject.genesis,
-      };
+      // let params = {
+      //   page: page,
+      //   pageSize: pageSize,
+      //   chain: "mvc",
+      //   codehash: myObject.codehash,
+      //   genesis: myObject.genesis,
+      // };
   
-      let url =
-        BASE_METALET_URL +
-        "/aggregation/v2/app/show/nft/" +
-        mvcAddress +
-        "/details";
+      // let url =
+      //   BASE_METALET_URL +
+      //   "/aggregation/v2/app/show/nft/" +
+      //   mvcAddress +
+      //   "/details";
   
-      let data: RootMvcGenesisBeanObject = await get(url, false, params);
-      if (data.data.results.items != null) {
-        setGenesisNftList(data.data.results.items);
+      // let data: RootMvcGenesisBeanObject = await get(url, false, params);
+
+
+      const data=await fetchMvcNftSerList(mvcAddress,myObject.codehash,myObject.genesis);
+      // console.log("data",data);
+      
+
+      // if (data.data.results.items != null) {
+      if (data!= null) {
+        setGenesisNftList(data);
       }
   
     } catch (e) {
@@ -70,7 +80,8 @@ export default function MvcNftListPage({ props, route }) {
   }
 
   const DetailItmeList = ({ index, item }) => {
-    let imageUrl = getShowImageUrl(item.nftIcon!);
+    // let imageUrl = getShowImageUrl(item.nftIcon!);
+    let imageUrl = getShowImageUrl(item.icon!);
     // console.log("imageUrl",imageUrl)
     return (
       <TouchableWithoutFeedback
@@ -88,7 +99,8 @@ export default function MvcNftListPage({ props, route }) {
               fontSize: 12,
             }}
           >
-            #{item.nftTokenIndex}
+            {/* #{item.nftTokenIndex} */}
+            #{item.tokenIndex}
           </Text>
           <Text
             style={{
@@ -98,7 +110,7 @@ export default function MvcNftListPage({ props, route }) {
               fontSize: 13,
             }}
           >
-            {item.nftName!}
+            {item.name!}
           </Text>
         </View>
       </TouchableWithoutFeedback>

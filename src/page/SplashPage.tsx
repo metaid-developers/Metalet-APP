@@ -15,6 +15,7 @@ import {
   account_select_key,
   wallet_mode_cold,
   wallet_mode_hot,
+  wallet_mode_observer,
   wallet_password_key,
   wallets_key,
 } from "../utils/AsyncStorageUtil";
@@ -36,8 +37,8 @@ import {
   getCurrentWalletAccount,
   getStorageCurrentWallet,
   getWalletBeans,
+  getWalletMode,
   getWalletNetwork,
-  isColdWalletMode,
   setWalletNetwork,
 } from "../utils/WalletUtils";
 import { goBack, navigate, reSets } from "../base/NavigationService";
@@ -46,7 +47,6 @@ import { BTC_NETWORK } from "./SettingsPage";
 import { UpdateData } from "@/api/type/Update";
 import { fetchCheckUpgrade } from "@/api/metaletservice";
 import Constants from "expo-constants";
-
 
 export default function SplashPage(props) {
   const { myWallet, updateMyWallet } = useData();
@@ -59,14 +59,37 @@ export default function SplashPage(props) {
   const versionCode = Constants.expoConfig?.android.versionCode;
   const buildNumber = Constants.expoConfig?.ios.buildNumber;
 
+  const { needRefreshApp, updateNeedRefreshApp } = useData();
+  let needRefresh = true;
+
   useEffect(() => {
     try {
+      needRefresh = true;
+      console.log("initDataBase", "自主刷新"+needRefreshApp);
       checkUpgrade();
       initDataBase();
+      needRefresh = false;
     } catch (e) {
       console.log("initDataBase error", e);
     }
   }, []);
+
+  useEffect(() => {
+    try {
+      if (needRefreshApp == "123") {
+        return;
+      }
+      setTimeout(() => {
+        if (needRefresh) {
+          checkUpgrade();
+          initDataBase();
+          console.log("needRefreshApp111", needRefreshApp);
+        }
+      }, 1000);
+    } catch (e) {
+      console.log("initDataBase error", e);
+    }
+  }, [needRefreshApp]);
 
   async function initDataBase() {
     const network = await getWalletNetwork();
@@ -82,7 +105,6 @@ export default function SplashPage(props) {
     // console.log("walletBean", walletBean);
     // console.log("account", account);
 
-
     const password = await AsyncStorageUtil.getItem(wallet_password_key);
     if (password && password == "199333") {
       setShowPayCode(0);
@@ -90,9 +112,34 @@ export default function SplashPage(props) {
 
     if (walletBean && account) {
       updateMyWallet(walletBean);
-      const isCold = await isColdWalletMode();
+      console.log("walletBean", walletBean);
 
-      if (!isCold) {
+      const isCold = await getWalletMode();
+      // const isColdTest = await getWalletModeTest();
+      // console.log("isColdTest", isColdTest);
+      
+      // if (isCold == wallet_mode_hot||isCold==undefined||isCold==null||isCold=="") {
+      //   const btcWallet = await getCurrentBtcWallet();
+      //   const mvcWallet = await getCurrentMvcWallet();
+      //   let metaletWallet = new MetaletWallet();
+      //   metaletWallet.currentBtcWallet = btcWallet;
+      //   metaletWallet.currentMvcWallet = mvcWallet;
+      //   updateMetaletWallet(metaletWallet);
+      //   updateWalletMode(wallet_mode_hot);
+      // } else
+      
+      
+      if (isCold == wallet_mode_cold) {
+        const btcWallet = await getCurrentBtcWallet();
+        const mvcWallet = await getCurrentMvcWallet();
+        let metaletWallet = new MetaletWallet();
+        metaletWallet.currentBtcWallet = btcWallet;
+        metaletWallet.currentMvcWallet = mvcWallet;
+        updateMetaletWallet(metaletWallet);
+        updateWalletMode(wallet_mode_cold);
+      } else if (isCold == wallet_mode_observer) {
+        updateWalletMode(wallet_mode_observer);
+      }else{
         const btcWallet = await getCurrentBtcWallet();
         const mvcWallet = await getCurrentMvcWallet();
         let metaletWallet = new MetaletWallet();
@@ -100,18 +147,16 @@ export default function SplashPage(props) {
         metaletWallet.currentMvcWallet = mvcWallet;
         updateMetaletWallet(metaletWallet);
         updateWalletMode(wallet_mode_hot);
-      } else {
-        updateWalletMode(wallet_mode_cold);
       }
 
       // props.navigation.navigate("Tabs");
       // reSets()
       // navigate("Tabs",{destory:true});
+      // console.log("initDataBase 重置页面", "initDataBase");
       reSets("Tabs");
     } else {
       props.navigation.navigate("WelcomeWalletPage");
     }
-
   }
 
   function goToHome() {
@@ -125,12 +170,11 @@ export default function SplashPage(props) {
     }, 200);
   }
 
-
   async function checkUpgrade() {
     // updateIsShowPay(1);
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
-      // console.log(JSON.stringify(check));
+      console.log(JSON.stringify(check));
       const showCode = check.data.aavc;
       if (versionCode >= showCode) {
         updateIsShowPay(0);
@@ -163,7 +207,7 @@ export default function SplashPage(props) {
   //     }else{
   //       updateIsShowPay(1);
   //     }
-     
+
   //   } else {
   //     const check: UpdateData = await fetchCheckUpgrade("ios");
   //     // console.log(JSON.stringify(check));

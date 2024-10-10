@@ -22,6 +22,7 @@ import { PreInscribe, PreInscribeData } from "@/api/type/Inscribe";
 import { navigate } from "@/base/NavigationService";
 import { getWalletNetwork } from "@/utils/WalletUtils";
 import { Chain } from "@metalet/utxo-wallet-service";
+import { useTranslation } from "react-i18next";
 
 export default function InscribeFirstPage({ route }) {
   const { brc20 } = route.params;
@@ -40,6 +41,7 @@ export default function InscribeFirstPage({ route }) {
   const textInputRef = useRef(null);
   const [feed, setFeed] = useState("10");
   const [feedReady, setFeedReady] = useState("10");
+  const { t } = useTranslation();
 
   const [userSlowFeed, setSlowFeed] = useState<FeedBean>({
     title: "",
@@ -396,7 +398,8 @@ export default function InscribeFirstPage({ route }) {
         </Modal>
 
         <View style={{ flex: 1 }}>
-          <TitleBar title={"Inscribe Transfer"} />
+          {/* <TitleBar title={"Inscribe Transfer"} /> */}
+          <TitleBar title={t("b_inscribe_transfer")} />
 
           <View style={{ padding: 20 }}>
             <View
@@ -448,7 +451,7 @@ export default function InscribeFirstPage({ route }) {
             <Line top={20} />
 
             <Text style={{ textAlign: "right", marginTop: 20, color: "#999" }}>
-              Avaiabe {brc20.availableBalanceSafe} {brc20.ticker}
+              {t("b_available")} {brc20.availableBalanceSafe} {brc20.ticker}
             </Text>
 
             <View
@@ -463,7 +466,7 @@ export default function InscribeFirstPage({ route }) {
               }}
             >
               <TextInput
-                placeholder="Transfer Amount"
+                placeholder={t("c_amount")}
                 inputMode="numeric"
                 onChangeText={(text) => {
                   setInputAmount(text);
@@ -489,7 +492,9 @@ export default function InscribeFirstPage({ route }) {
                   alignItems: "center",
                 }}
               >
-                <Text style={{ color: "#333", fontSize: 14 }}>Fee Rate</Text>
+                <Text style={{ color: "#333", fontSize: 14 }}>
+                  {t("c_fee_rate")}
+                </Text>
                 <View style={{ flex: 1 }} />
                 <Text style={{ color: "#999", fontSize: 14 }}>
                   {feed} sat/vB
@@ -502,7 +507,7 @@ export default function InscribeFirstPage({ route }) {
             </TouchableWithoutFeedback>
 
             <RoundSimButton
-              title={"Next"}
+              title={t("c_next")}
               color={themeColor}
               textColor={"#fff"}
               roundStytle={{ marginTop: 100 }}

@@ -14,12 +14,14 @@ import { getCurrentAccountID, getWalletBeans } from "@/utils/WalletUtils";
 import { navigate } from "@/base/NavigationService";
 import { metaStyles, themeColor } from "@/constant/Constants";
 import { AsyncStorageUtil, wallets_key } from "@/utils/AsyncStorageUtil";
+import { useTranslation } from "react-i18next";
 
 export default function BackupPage() {
   let [walletList, setWalletList] = useState<WalletBean[]>([]);
   const [isShowBackUp, setIsShowBackUp] = useState(false);
   const [walletBackUp, setWalletBackUp] = useState("");
   const [mvcPath, setMvcPath] = useState("");
+  const { t } = useTranslation();
 
   useEffect(() => {
     getWalletData();
@@ -28,7 +30,9 @@ export default function BackupPage() {
   async function getWalletData() {
     const currentAccountID = await getCurrentAccountID();
     const wallets = await getWalletBeans();
-    setWalletList(wallets);
+    // setWalletList(wallets);
+    const filterWallets=wallets.filter(item=>item.mnemonic!="1");
+    setWalletList(filterWallets);
   }
 
   const ListItem = ({ index, item }) => {
@@ -36,7 +40,7 @@ export default function BackupPage() {
       <TouchableWithoutFeedback
         onPress={async () => {
           setWalletBackUp(item.mnemonic);
-          setMvcPath(item.mvcTypes.toString())
+          setMvcPath(item.mvcTypes.toString());
           setIsShowBackUp(true);
           const wallets = await getWalletBeans();
           const wallet = wallets.find((itemWallet) => {
@@ -101,7 +105,7 @@ export default function BackupPage() {
             }}
           >
             <Text style={[metaStyles.defaultText18, { textAlign: "center" }]}>
-              Backup Wallet{" "}
+             {t("s_backup_wallet_title")}
             </Text>
 
             <Line />
@@ -109,16 +113,11 @@ export default function BackupPage() {
             <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
               Mnemonic Phrase
             </Text>
-            <Text
-              style={[
-                metaStyles.defaultText,
-                { marginTop: 20,  },
-              ]}
-            >
+            <Text style={[metaStyles.defaultText, { marginTop: 20 }]}>
               {walletBackUp}
             </Text>
 
-            <Text style={[metaStyles.grayTextdefault66, { marginTop: 20}]}>
+            <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
               MVC Derivation Path
             </Text>
             <Text
@@ -145,7 +144,7 @@ export default function BackupPage() {
                   { textAlign: "center", color: themeColor },
                 ]}
               >
-                OK
+                {t("s_ok")}
               </Text>
             </TouchableWithoutFeedback>
           </View>
@@ -153,7 +152,7 @@ export default function BackupPage() {
       </Modal>
 
       <View style={{ flex: 1 }}>
-        <TitleBar title="Backup" />
+        <TitleBar title={t("s_backup_wallet")} />
         <View style={{ padding: 20 }}>
           <FlatList
             // style={{ marginTop: 20 }}

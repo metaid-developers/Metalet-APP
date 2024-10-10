@@ -14,7 +14,12 @@ import {
 import { wallets_key, createStorage } from "../../utils/AsyncStorageUtil";
 import { navigate } from "../../base/NavigationService";
 import { eventBus, refreshHomeLoadingEvent } from "../../utils/EventBus";
-import { getStorageWallets, setCurrentAccountID, setCurrentWalletID } from "../../utils/WalletUtils";
+import {
+  getStorageWallets,
+  setCurrentAccountID,
+  setCurrentWalletID,
+} from "../../utils/WalletUtils";
+import { useTranslation } from "react-i18next";
 
 export default function WalletDetelePage({ route }) {
   const [isAgree, setIsAgree] = useState(false);
@@ -23,6 +28,7 @@ export default function WalletDetelePage({ route }) {
 
   const { postion } = route.params;
   const storage = createStorage();
+  const { t } = useTranslation();
 
   async function deleteWallet() {
     await getStorageWallets().then(async (wallets) => {
@@ -44,7 +50,7 @@ export default function WalletDetelePage({ route }) {
           }, 1000);
         });
         setIsDelete(true);
-      }else{
+      } else {
         await storage.set(wallets_key, wallets).then(() => {
           setTimeout(() => {
             setIsDelete(false);
@@ -53,7 +59,6 @@ export default function WalletDetelePage({ route }) {
         });
         setIsDelete(true);
       }
-    
     });
   }
 
@@ -97,7 +102,7 @@ export default function WalletDetelePage({ route }) {
                 marginTop: 20,
               }}
             >
-              Confirm To Delete Wallet
+             {t("delete_wallet_title")}
             </Text>
           </View>
 
@@ -110,11 +115,7 @@ export default function WalletDetelePage({ route }) {
               textAlign: "center",
             }}
           >
-            Confirming The Deletion Will Remove This Wallet From The
-            Application. You Can Re-Import It Using The Mnemonic Generated When
-            Backing Up The Wallet Without Affecting Your Assets. Please Be Sure
-            To Back Up Your Wallet Before Deleting It, Otherwise You Will
-            Permanently Lose This Wallet And Assets Therein
+            {t("delete_wallet_notice")}
           </Text>
         </View>
         <View style={{ flex: 1 }} />
@@ -158,7 +159,7 @@ export default function WalletDetelePage({ route }) {
               lineHeight: 22,
             }}
           >
-            I am aware of the obove risks
+            {t("delete_wallet_agree")}
           </Text>
         </View>
 
@@ -199,7 +200,7 @@ export default function WalletDetelePage({ route }) {
                   { fontSize: 16 },
                 ]}
               >
-                Confirm
+                {t("c_confirm")}
               </Text>
             </View>
           </View>

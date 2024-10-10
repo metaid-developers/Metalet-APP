@@ -21,7 +21,11 @@ import {
   metaStyles,
   themeColor,
 } from "@/constant/Constants";
-import { getWalletNetwork, parseToSat, parseToSpace } from "@/utils/WalletUtils";
+import {
+  getWalletNetwork,
+  parseToSat,
+  parseToSpace,
+} from "@/utils/WalletUtils";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import * as Clipboard from "expo-clipboard";
 import { navigate } from "@/base/NavigationService";
@@ -29,6 +33,7 @@ import { broadcastBtc, fetchBrc20InscribeCommit } from "@/api/metaletservice";
 import { useData } from "@/hooks/MyProvider";
 import { InscribeResultData } from "@/api/type/Inscribe";
 import { Chain } from "@metalet/utxo-wallet-service";
+import { useTranslation } from "react-i18next";
 
 const TabsTop = createMaterialTopTabNavigator();
 export default function InscribeTransferPage({ route }) {
@@ -40,6 +45,7 @@ export default function InscribeTransferPage({ route }) {
   const [confirmDialogState, setConfirmDialogState] = useState(false);
 
   const { btcAddress, updateBtcAddress } = useData();
+  const { t } = useTranslation();
 
   //   console.log("transRes", transRes);
 
@@ -71,7 +77,7 @@ export default function InscribeTransferPage({ route }) {
           console.log(orderID, orderID);
           console.log(btcAddress, btcAddress);
           console.log("raxtx", transRes.rawTx);
-          const network=await getWalletNetwork(Chain.BTC);
+          const network = await getWalletNetwork(Chain.BTC);
 
           const commitRes: InscribeResultData = await fetchBrc20InscribeCommit(
             0,
@@ -140,7 +146,8 @@ export default function InscribeTransferPage({ route }) {
       </Modal>
 
       <View style={{ flex: 1 }}>
-        <TitleBar title="Inscribe Transfer" />
+        {/* <TitleBar title="Inscribe Transfer" /> */}
+        <TitleBar title="" />
         <View style={{ padding: 20, flex: 1 }}>
           <View style={{ alignItems: "center", marginTop: 10 }}>
             <Text style={[metaStyles.bigLargeDefaultText, { fontSize: 25 }]}>
@@ -398,7 +405,7 @@ export default function InscribeTransferPage({ route }) {
           )}
 
           <RoundSimButton
-            title={"Confirm"}
+            title={t("c_confirm")}
             textColor="#fff"
             roundStytle={{
               position: "absolute",

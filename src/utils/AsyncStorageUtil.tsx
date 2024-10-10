@@ -80,6 +80,11 @@ export const net_wallet_network_key = "net_network_key";
 export const wallet_mode_key = "wallet_mode_key";
 export const wallet_mode_cold = "cold";
 export const wallet_mode_hot = "hot";
+export const wallet_mode_default = "DefaultMode";
+export const wallet_mode_observer = "observer";
+export const wallet_language_key = "wallet_language_key";
+export const wallet_language_en = "en";
+export const wallet_language_zh = "zh";
 
 //创建数据
 export const AsyncStorageUtil = {
@@ -94,6 +99,19 @@ export const AsyncStorageUtil = {
     try {
       const value = await AsyncStorage.getItem(key);
       const result = value != null ? JSON.parse(value) : null;
+      return result;
+    } catch (error) {
+      console.log("key", key);
+
+      console.error("Error retrieving data:", error);
+      return null;
+    }
+  },
+
+  async getItemDefault(key,defaultValue) {
+    try {
+      const value = await AsyncStorage.getItem(key);
+      const result = value != null ? JSON.parse(value) : defaultValue;
       return result;
     } catch (error) {
       console.log("key", key);

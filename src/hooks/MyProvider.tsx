@@ -42,7 +42,11 @@ type GlobalContext = {
   mvcPath,
   updateMvcPath,
   btcSameAsMvcAddress,
-  updateBtcSameAsMvcAddress
+  updateBtcSameAsMvcAddress,
+  walletLanguage,
+  updateWalletLanguage,
+  needRefreshApp,
+  updateNeedRefreshApp
 };
 
 const UserContext = createContext<GlobalContext>(undefined);
@@ -160,7 +164,16 @@ export const UserProvider = ({ children }) => {
   };
 
   
+  const [walletLanguage,setWalletLanguage] = useState("en");
+  const updateWalletLanguage = (newData) => {
+    setWalletLanguage(newData);
+  };
 
+
+  const [needRefreshApp, setNeedRefreshApp] = useState("123");
+  const updateNeedRefreshApp = (newData) => {
+    setNeedRefreshApp(newData);
+  };
   // 将需要共享的数据和更新方法放在上下文的 value 中
   const contextValue = {
     userData,
@@ -198,7 +211,12 @@ export const UserProvider = ({ children }) => {
     mvcPath,
     updateMvcPath,
     btcSameAsMvcAddress,
-    updateBtcSameAsMvcAddress
+    updateBtcSameAsMvcAddress,
+    walletLanguage,
+    updateWalletLanguage,
+    needRefreshApp,
+    updateNeedRefreshApp
+
   };
 
   return (

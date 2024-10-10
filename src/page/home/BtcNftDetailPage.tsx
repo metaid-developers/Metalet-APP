@@ -19,13 +19,17 @@ import {
 } from "@/constant/Constants";
 import { formatTime } from "@/utils/MetaFunUiils";
 import { navigate } from "@/base/NavigationService";
+import { useData } from "@/hooks/MyProvider";
+import { wallet_mode_observer } from "@/utils/AsyncStorageUtil";
 
 export default function BtcNftDetailPage({ route }) {
   const { nftDetail } = route.params;
-  console.log("nftDetail", nftDetail);
+  const { walletMode, updateWalletMode } = useData();
+
   const openLink = (link) => {
     Linking.openURL(link);
   };
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -90,7 +94,7 @@ export default function BtcNftDetailPage({ route }) {
               #{nftDetail.inscriptionNumber}
             </Text>
 
-            <View style={{ alignItems: "center", marginTop: 20 }}>
+            {walletMode != wallet_mode_observer && (  <View style={{ alignItems: "center", marginTop: 20 }}>
              <TouchableWithoutFeedback onPress={()=>{
                 navigate("BtcNftTransferPage",{type:"brc20",nftDetail:nftDetail})
              }}>
@@ -117,7 +121,9 @@ export default function BtcNftDetailPage({ route }) {
                 </Text>
               </View>
              </TouchableWithoutFeedback>
-            </View>
+            </View>)}
+          
+
             {/* transfer end */}
 
             <View

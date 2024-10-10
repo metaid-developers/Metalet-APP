@@ -1,7 +1,8 @@
 export interface MetaletColdRr {
     name:ActionType,
-    publicKey?:string,
+    publicKey:string,
     hex?:string,
+    address:string
 }
 
 

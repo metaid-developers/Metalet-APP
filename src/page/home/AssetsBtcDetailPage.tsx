@@ -12,6 +12,7 @@ import {
   LoadingNoticeModal,
   NoMoreDataView,
   TitleBar,
+  ToastView,
 } from "../../constant/Widget";
 import { goBack, navigate } from "../../base/NavigationService";
 import { metaStyles, themeColor } from "../../constant/Constants";
@@ -22,7 +23,6 @@ import {
 } from "../../types/mvcrecord";
 import {
   fetchBtcActivityRecord,
-  fetchMvcActivityComfird,
 } from "../../api/metaletservice";
 // import useNetworkManager from "@/hooks/useNetworkManager";
 import useNetworkStore from "@/stores/useNetworkStore";
@@ -30,12 +30,19 @@ import { useData } from "../../hooks/MyProvider";
 import * as Clipboard from "expo-clipboard";
 import { formatTime } from "../../utils/MetaFunUiils";
 import { AddressType, Chain } from "@metalet/utxo-wallet-service";
-import { wallet_mode_cold, wallet_mode_hot, walllet_address_type_key } from "../../utils/AsyncStorageUtil";
+import {
+  wallet_mode_cold,
+  wallet_mode_default,
+  wallet_mode_hot,
+  wallet_mode_observer,
+  walllet_address_type_key,
+} from "../../utils/AsyncStorageUtil";
 import {
   changeCurrentWalletAddressType,
   getStorageCurrentWallet,
 } from "../../utils/WalletUtils";
 import useWalletStore from "@/stores/useWalletStore";
+import { useTranslation } from "react-i18next";
 // import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-sdk";
 
 export default function AssetsBtcDetailPage({ route }) {
@@ -48,6 +55,7 @@ export default function AssetsBtcDetailPage({ route }) {
   const [isShowCopy, setIsShowCopy] = useState(false);
   const [addressType, setAddressType] = useState(AddressType.Legacy);
   const { setCurrentChainWallet } = useWalletStore();
+  const { t } = useTranslation();
 
   //当前btc 地址
   const { btcAddress, updateBtcAddress } = useData();
@@ -186,7 +194,7 @@ export default function AssetsBtcDetailPage({ route }) {
               <Text
                 style={{ fontSize: 16, color: "#000000", marginBottom: 10 }}
               >
-                {isIncome ? "Receive" : "Send"}
+                {isIncome ? t("h_receive") : t("h_send")}
               </Text>
               <Text style={metaStyles.grayTextSmall66}>
                 {formatTime(parseInt(item.transactionTime))}
@@ -250,7 +258,7 @@ export default function AssetsBtcDetailPage({ route }) {
             />
 
             <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
-              No activities
+             {t("o_nodata")}
             </Text>
           </View>
         )}
@@ -306,6 +314,10 @@ export default function AssetsBtcDetailPage({ route }) {
         >
           <TouchableWithoutFeedback
             onPress={() => {
+              if(walletMode==wallet_mode_observer){
+                ToastView({ text: "come soon", type: "info" });
+                return;
+              }
               navigate("SendBtcPage");
             }}
           >
@@ -335,7 +347,7 @@ export default function AssetsBtcDetailPage({ route }) {
                   fontSize: 18,
                 }}
               >
-                Send
+               {t("h_send")}
               </Text>
             </View>
           </TouchableWithoutFeedback>
@@ -372,7 +384,7 @@ export default function AssetsBtcDetailPage({ route }) {
                   fontSize: 18,
                 }}
               >
-                Receive
+                 {t("h_receive")}
               </Text>
             </View>
           </TouchableWithoutFeedback>
@@ -394,290 +406,292 @@ export default function AssetsBtcDetailPage({ route }) {
       <LoadingNoticeModal title={noticeContent} isShow={isShowNotice} />
 
       {/* 切换address */}
-     {walletMode != wallet_mode_cold && ( <Modal transparent={true} visible={isShowCopy}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-          }}
-        >
+      {(walletMode == wallet_mode_hot||walletMode == undefined)&& (
+        <Modal transparent={true} visible={isShowCopy}>
           <View
             style={{
-              backgroundColor: "#fff",
-              borderTopRightRadius: 10,
-              borderTopLeftRadius: 10,
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingTop: 20,
-              paddingBottom: 30,
+              flex: 1,
+              justifyContent: "flex-end",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
             }}
           >
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
+                backgroundColor: "#fff",
+                borderTopRightRadius: 10,
+                borderTopLeftRadius: 10,
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingTop: 20,
+                paddingBottom: 30,
               }}
             >
-              <Text
+              <View
                 style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                Set Default Address
-              </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    flex: 1,
+                  }}
+                >
+                 {t("o_select_default_address")}
+                </Text>
 
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setIsShowCopy(false);
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/metalet_close_big_icon.png")}
+                    style={{ width: 15, height: 15, padding: 5 }}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+
+              {/* btc Legacy */}
               <TouchableWithoutFeedback
                 onPress={() => {
-                  setIsShowCopy(false);
+                  changAddressType(AddressType.Legacy);
                 }}
               >
-                <Image
-                  source={require("../../../image/metalet_close_big_icon.png")}
-                  style={{ width: 15, height: 15, padding: 5 }}
-                />
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="middle"
+                        style={{ fontSize: 15, width: "70%" }}
+                      >
+                        {metaletWallet.btcLegacyWallet.getAddress()}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 13, color: "#999" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Legacy
+                    </Text>
+                  </View>
+
+                  {addressType == AddressType.Legacy ? (
+                    <Image
+                      source={require("../../../image/wallets_select_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  ) : null}
+                </View>
               </TouchableWithoutFeedback>
+
+              {/* btc nested segwit */}
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  changAddressType(AddressType.NestedSegwit);
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="middle"
+                        style={{ fontSize: 15, width: "70%" }}
+                      >
+                        {metaletWallet.btcNestedSegwitWallet.getAddress()}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 13, color: "#999" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Nested Segwit
+                    </Text>
+                  </View>
+
+                  {addressType == AddressType.NestedSegwit ? (
+                    <Image
+                      source={require("../../../image/wallets_select_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  ) : null}
+                </View>
+              </TouchableWithoutFeedback>
+
+              {/* native segwit */}
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  changAddressType(AddressType.NativeSegwit);
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="middle"
+                        style={{ fontSize: 15, width: "70%" }}
+                      >
+                        {metaletWallet.btcNativeSegwitWallet.getAddress()}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 13, color: "#999" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Native Segwit
+                    </Text>
+                  </View>
+
+                  {addressType == AddressType.NativeSegwit ? (
+                    <Image
+                      source={require("../../../image/wallets_select_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  ) : null}
+                </View>
+              </TouchableWithoutFeedback>
+
+              {/* taproot */}
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  changAddressType(AddressType.Taproot);
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="middle"
+                        style={{ fontSize: 15, width: "70%" }}
+                      >
+                        {metaletWallet.btcTaprootWallet.getAddress()}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 13, color: "#999" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Taproot
+                    </Text>
+                  </View>
+                  {addressType == AddressType.Taproot ? (
+                    <Image
+                      source={require("../../../image/wallets_select_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  ) : null}
+                </View>
+              </TouchableWithoutFeedback>
+              {/* Same as Mvc */}
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  changAddressType(AddressType.SameAsMvc);
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 20,
+                    marginHorizontal: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    source={require("../../../image/logo_btc.png")}
+                    style={{ width: 35, height: 35, marginLeft: 20 }}
+                  />
+
+                  <View style={{ marginLeft: 10, flex: 1 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="middle"
+                        style={{ fontSize: 15, width: "70%" }}
+                      >
+                        {metaletWallet.btcSameAsWallet.getAddress()}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{ marginTop: 5, fontSize: 13, color: "#999" }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      Default
+                    </Text>
+                  </View>
+                  {addressType == AddressType.SameAsMvc ? (
+                    <Image
+                      source={require("../../../image/wallets_select_icon.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  ) : null}
+                </View>
+              </TouchableWithoutFeedback>
+              {/* over */}
             </View>
-
-            {/* btc Legacy */}
-            <TouchableWithoutFeedback
-              onPress={() => {
-                changAddressType(AddressType.Legacy);
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginTop: 20,
-                  marginHorizontal: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={require("../../../image/logo_btc.png")}
-                  style={{ width: 35, height: 35, marginLeft: 20 }}
-                />
-
-                <View style={{ marginLeft: 10, flex: 1 }}>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      numberOfLines={1}
-                      ellipsizeMode="middle"
-                      style={{ fontSize: 15, width: "70%" }}
-                    >
-                      {metaletWallet.btcLegacyWallet.getAddress()}
-                    </Text>
-                  </View>
-                  <Text
-                    style={{ marginTop: 5, fontSize: 13, color: "#999" }}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    Legacy
-                  </Text>
-                </View>
-
-                {addressType == AddressType.Legacy ? (
-                  <Image
-                    source={require("../../../image/wallets_select_icon.png")}
-                    style={{ width: 20, height: 20, marginRight: 10 }}
-                  />
-                ) : null}
-              </View>
-            </TouchableWithoutFeedback>
-
-            {/* btc nested segwit */}
-            <TouchableWithoutFeedback
-              onPress={() => {
-                changAddressType(AddressType.NestedSegwit);
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginTop: 20,
-                  marginHorizontal: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={require("../../../image/logo_btc.png")}
-                  style={{ width: 35, height: 35, marginLeft: 20 }}
-                />
-
-                <View style={{ marginLeft: 10, flex: 1 }}>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      numberOfLines={1}
-                      ellipsizeMode="middle"
-                      style={{ fontSize: 15, width: "70%" }}
-                    >
-                      {metaletWallet.btcNestedSegwitWallet.getAddress()}
-                    </Text>
-                  </View>
-                  <Text
-                    style={{ marginTop: 5, fontSize: 13, color: "#999" }}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    Nested Segwit
-                  </Text>
-                </View>
-
-                {addressType == AddressType.NestedSegwit ? (
-                  <Image
-                    source={require("../../../image/wallets_select_icon.png")}
-                    style={{ width: 20, height: 20, marginRight: 10 }}
-                  />
-                ) : null}
-              </View>
-            </TouchableWithoutFeedback>
-
-            {/* native segwit */}
-            <TouchableWithoutFeedback
-              onPress={() => {
-                changAddressType(AddressType.NativeSegwit);
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginTop: 20,
-                  marginHorizontal: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={require("../../../image/logo_btc.png")}
-                  style={{ width: 35, height: 35, marginLeft: 20 }}
-                />
-
-                <View style={{ marginLeft: 10, flex: 1 }}>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      numberOfLines={1}
-                      ellipsizeMode="middle"
-                      style={{ fontSize: 15, width: "70%" }}
-                    >
-                      {metaletWallet.btcNativeSegwitWallet.getAddress()}
-                    </Text>
-                  </View>
-                  <Text
-                    style={{ marginTop: 5, fontSize: 13, color: "#999" }}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    Native Segwit
-                  </Text>
-                </View>
-
-                {addressType == AddressType.NativeSegwit ? (
-                  <Image
-                    source={require("../../../image/wallets_select_icon.png")}
-                    style={{ width: 20, height: 20, marginRight: 10 }}
-                  />
-                ) : null}
-              </View>
-            </TouchableWithoutFeedback>
-
-            {/* taproot */}
-            <TouchableWithoutFeedback
-              onPress={() => {
-                changAddressType(AddressType.Taproot);
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginTop: 20,
-                  marginHorizontal: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={require("../../../image/logo_btc.png")}
-                  style={{ width: 35, height: 35, marginLeft: 20 }}
-                />
-
-                <View style={{ marginLeft: 10, flex: 1 }}>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      numberOfLines={1}
-                      ellipsizeMode="middle"
-                      style={{ fontSize: 15, width: "70%" }}
-                    >
-                      {metaletWallet.btcTaprootWallet.getAddress()}
-                    </Text>
-                  </View>
-                  <Text
-                    style={{ marginTop: 5, fontSize: 13, color: "#999" }}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    Taproot
-                  </Text>
-                </View>
-                {addressType == AddressType.Taproot ? (
-                  <Image
-                    source={require("../../../image/wallets_select_icon.png")}
-                    style={{ width: 20, height: 20, marginRight: 10 }}
-                  />
-                ) : null}
-              </View>
-            </TouchableWithoutFeedback>
-            {/* Same as Mvc */}
-            <TouchableWithoutFeedback
-              onPress={() => {
-                changAddressType(AddressType.SameAsMvc);
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginTop: 20,
-                  marginHorizontal: 10,
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={require("../../../image/logo_btc.png")}
-                  style={{ width: 35, height: 35, marginLeft: 20 }}
-                />
-
-                <View style={{ marginLeft: 10, flex: 1 }}>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text
-                      numberOfLines={1}
-                      ellipsizeMode="middle"
-                      style={{ fontSize: 15, width: "70%" }}
-                    >
-                      {metaletWallet.btcSameAsWallet.getAddress()}
-                    </Text>
-                  </View>
-                  <Text
-                    style={{ marginTop: 5, fontSize: 13, color: "#999" }}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    Default
-                  </Text>
-                </View>
-                {addressType == AddressType.SameAsMvc ? (
-                  <Image
-                    source={require("../../../image/wallets_select_icon.png")}
-                    style={{ width: 20, height: 20, marginRight: 10 }}
-                  />
-                ) : null}
-              </View>
-            </TouchableWithoutFeedback>
-            {/* over */}
           </View>
-        </View>
-      </Modal>)}
+        </Modal>
+      )}
 
       <View style={{ flex: 1 }}>
         {/* 头部 */}
@@ -714,7 +728,7 @@ export default function AssetsBtcDetailPage({ route }) {
             ]}
           ></Text>
 
-          {walletMode != wallet_mode_cold && (
+          {(walletMode  == wallet_mode_hot||walletMode==undefined)&& (
             <TouchableWithoutFeedback
               onPress={() => {
                 setIsShowCopy(true);

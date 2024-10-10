@@ -33,6 +33,7 @@ import {
   wallets_key,
   walllet_address_type_key,
   createStorage,
+  wallet_mode_hot,
 } from "../../utils/AsyncStorageUtil";
 import { goBack, navigate } from "../../base/NavigationService";
 import * as bip39 from "@scure/bip39";
@@ -42,6 +43,7 @@ import { useData } from "../../hooks/MyProvider";
 import MetaletWallet from "../../wallet/MetaletWallet";
 import { createMetaletWallet } from "../../wallet/wallet";
 import Toast from "react-native-toast-message";
+import { useTranslation } from "react-i18next";
 
 const storage = createStorage();
 
@@ -66,6 +68,7 @@ export default function SetPasswordPage({ route }) {
   const { metaletWallet, updateMetaletWallet } = useData();
   const { mvcAddress, updateMvcAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
+  const { t } = useTranslation();
 
   useEffect(() => {
     console.log("mytype", type);
@@ -82,7 +85,7 @@ export default function SetPasswordPage({ route }) {
         if (type == "create") {
           setIsShowLoading(true);
           const { btcWallet, mvcWallet, walletBean } =
-            await createMetaletWallet(10001);
+            await createMetaletWallet(10001,wallet_mode_hot);
           const wallets = await getStorageWallets();
           const hasNoWallets = await isNoStorageWallet();
 
@@ -108,12 +111,12 @@ export default function SetPasswordPage({ route }) {
           );
           setIsShowLoading(false);
           navigate("CongratulationsPage", {
-            type: "Create Successfully",
+            type: t("w_create_success"),
           });
         } else if (type == "import") {
           // navigate("ImportWalletPage", { destory: true });
-          navigate("ImportWalletNetPage", { destory: true });
-
+          // navigate("ImportWalletNetPage", { destory: true });
+          navigate("ImportWalletNetPage", { type: wallet_mode_hot });
         } else {
           Toast.show({ text1: "Successful" });
           goBack();
@@ -131,7 +134,6 @@ export default function SetPasswordPage({ route }) {
       setShowPayCode(0);
       navigate("SplashPage");
     }
-
   };
 
   const ShowNotice = () => {
@@ -162,16 +164,14 @@ export default function SetPasswordPage({ route }) {
 
         <View style={[metaStyles.verMarginContainer, { marginBottom: 50 }]}>
           <Text style={[metaStyles.largeDefaultText, { fontWeight: "bold" }]}>
-            Set Password
+            {t("p_set_password")}
           </Text>
           <Text style={[metaStyles.smallDefaultText, { marginTop: 20 }]}>
-            It's important to note that we do not retain your password, thus if
-            it is forgotten, you will need to reset your wallet and re-import it
-            to establish a new one.
+           {t("p_set_password_notice")}
           </Text>
           <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>
-            New Password{" "}
-            <Text style={{ color: "#666" }}>(6-digit numeric password)</Text>
+           {t("p_set_new_password")}
+            <Text style={{ color: "#666" }}>{t("p_set_password_about")}</Text>
           </Text>
 
           <View
@@ -255,7 +255,7 @@ export default function SetPasswordPage({ route }) {
         </View> */}
 
           <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>
-            Confirm
+            {t("p_set_confirm_password")}
           </Text>
 
           <View
@@ -321,10 +321,14 @@ export default function SetPasswordPage({ route }) {
           <View style={{ flex: 1 }}></View>
 
           <RoundSimButton
-            title="Confirm"
+            title={t("c_confirm")}
             textColor="white"
             event={() => {
-              OpenModal();
+               if (type == "create_cold_wallet"){
+                navigate("AddColdWalletPage");
+              }else{
+                OpenModal();
+              }
             }}
           />
         </View>

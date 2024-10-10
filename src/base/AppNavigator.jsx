@@ -17,7 +17,6 @@ import EasyToast from "react-native-easy-toast";
 import HomePage from "../page/HomePage";
 import SettingsPage from "../page/SettingsPage";
 import WelcomeWalletPage from "../page/WelcomeWalletPage";
-import Index from "../page/Index";
 import SplashPage from "../page/SplashPage";
 import ImportWalletPage from "../page/ImportWalletPage";
 import CongratulationsPage from "../page/CongratulationsPage";
@@ -66,7 +65,11 @@ import SecurityPage from "@/page/settings/SecurityPage";
 import AboutPage from "@/page/settings/AboutPage";
 import ColdWalletPage from "@/page/settings/ColdWalletPage";
 import { useData } from "@/hooks/MyProvider";
-import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
+import {
+  wallet_mode_cold,
+  wallet_mode_hot,
+  wallet_mode_observer,
+} from "@/utils/AsyncStorageUtil";
 import SendColdBtcPrePage from "@/page/home/transfer/SendColdBtcPrePage";
 import ScanPage from "@/page/settings/ScanPage";
 import Mrc20DetailPage from "@/page/home/Mrc20DetailPage";
@@ -82,6 +85,11 @@ import ImportSelectMvcPathPage from "@/page/wallet/ImportWalletSelectAddressPage
 import ImportWalletSelectAddressPage from "@/page/wallet/ImportWalletSelectAddressPage";
 import ImportWalletMvcPathNextPage from "@/page/wallet/ImportWalletMvcPathNextPage";
 import ImportWalletNetPage from "@/page/ImportWalletNetPage";
+import HomeColdPage from "@/page/HomeColdPage";
+import AddColdWalletPage from "@/page/wallet/AddColdWalletPage";
+import ReceiveColdPage from "@/page/receive/ReceiveColdPage";
+import ColdAssetWalletPage from "@/page/settings/ColdAssetWalletPage";
+import CongratulationsColdPage from "@/page/CongratulationsColdPage";
 
 ////////
 
@@ -131,6 +139,7 @@ const StackNavigator = () => (
     <Stack.Screen name="TransferMvcNftPage" component={TransferMvcNftPage} />
     <Stack.Screen name="WalletsPage" component={WalletsPage} />
     <Stack.Screen name="AddWalletPage" component={AddWalletPage} />
+    <Stack.Screen name="AddColdWalletPage" component={AddColdWalletPage} />
     <Stack.Screen name="WalletDetailPage" component={WalletDetailPage} />
     <Stack.Screen name="WalletDetelePage" component={WalletDetelePage} />
     <Stack.Screen
@@ -188,17 +197,37 @@ const StackNavigator = () => (
     <Stack.Screen name="ScanPage" component={ScanPage} />
     <Stack.Screen name="Mrc20DetailPage" component={Mrc20DetailPage} />
     <Stack.Screen name="SendMrc20Page" component={SendMrc20Page} />
-    <Stack.Screen name="SendSuccessNormalPage" component={SendSuccessNormalPage} />
+    <Stack.Screen
+      name="SendSuccessNormalPage"
+      component={SendSuccessNormalPage}
+    />
     <Stack.Screen name="MetaIDPinsPage" component={MetaIDPinsPage} />
     <Stack.Screen name="MetaIDPage" component={MetaIDPage} />
     <Stack.Screen name="MetaIDPinsDetails" component={MetaIDPinsDetails} />
     <Stack.Screen name="PinNftTransferPage" component={PinNftTransferPage} />
-    <Stack.Screen name="ImportWalletNetWorkPage" component={ImportWalletNetWorkPage} />
-    <Stack.Screen name="ImportWalletFirstPage" component={ImportWalletFirstPage} />
-    <Stack.Screen name="ImportWalletSelectAddressPage" component={ImportWalletSelectAddressPage} />
-    <Stack.Screen name="ImportWalletMvcPathNextPage" component={ImportWalletMvcPathNextPage} />
+    <Stack.Screen
+      name="ImportWalletNetWorkPage"
+      component={ImportWalletNetWorkPage}
+    />
+    <Stack.Screen
+      name="ImportWalletFirstPage"
+      component={ImportWalletFirstPage}
+    />
+    <Stack.Screen
+      name="ImportWalletSelectAddressPage"
+      component={ImportWalletSelectAddressPage}
+    />
+    <Stack.Screen
+      name="ImportWalletMvcPathNextPage"
+      component={ImportWalletMvcPathNextPage}
+    />
     <Stack.Screen name="ImportWalletNetPage" component={ImportWalletNetPage} />
-
+    <Stack.Screen name="ReceiveColdPage" component={ReceiveColdPage} />
+    <Stack.Screen name="ColdAssetWalletPage" component={ColdAssetWalletPage} />
+    <Stack.Screen
+      name="CongratulationsColdPage"
+      component={CongratulationsColdPage}
+    />
   </Stack.Navigator>
 );
 
@@ -206,7 +235,7 @@ const TabNavigator = () => {
   const { walletMode, updateWalletMode } = useData();
   const { isShowPay, updateIsShowPay } = useData();
 
-  // console.log("walletMode", walletMode);
+  console.log("walletMode-----", walletMode);
 
   return (
     <Tab.Navigator
@@ -215,7 +244,7 @@ const TabNavigator = () => {
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let icon;
-          if (route.name === "HomePage") {
+          if (route.name === "HomePage" || route.name === "HomeColdPage") {
             icon = focused ? (
               <Image
                 source={require("../../image/me_index_select_tab.png")}
@@ -269,12 +298,24 @@ const TabNavigator = () => {
         },
       })}
     >
-      <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
+      {(walletMode == wallet_mode_hot ||walletMode == undefined )&& (
+        <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
+      )}
+
+      {walletMode == wallet_mode_observer && (
+        <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
+      )}
+
+      {walletMode == wallet_mode_cold && (
+        <Tab.Screen name="HomeColdPage" component={HomeColdPage} />
+      )}
+
       {/* <Tab.Screen name="PlazaPage" component={PlazaPage} /> */}
-      {walletMode != wallet_mode_cold&&isShowPay==showPayCode && (
+      {(walletMode == wallet_mode_hot||walletMode == undefined )&& isShowPay == showPayCode && (
         <Tab.Screen name="DiscoverPage" component={DiscoverPage} />
       )}
       <Tab.Screen name="SettingsPage" component={SettingsPage} />
+
     </Tab.Navigator>
   );
 };

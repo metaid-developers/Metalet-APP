@@ -22,7 +22,16 @@ import Constants from "expo-constants";
 import { navigate } from "@/base/NavigationService";
 import useNetworkStore from "@/stores/useNetworkStore";
 import { getRandomID, setWalletNetwork } from "@/utils/WalletUtils";
-import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
+import {
+  AsyncStorageUtil,
+  wallet_language_key,
+  wallet_mode_cold,
+  wallet_mode_hot,
+  wallet_mode_observer,
+} from "@/utils/AsyncStorageUtil";
+import { useTranslation } from "react-i18next";
+import i18n from "@/language/i18n";
+import { AddressType } from "@metalet/utxo-wallet-sdk";
 
 export const BTC_NETWORK = "mainnet";
 export const BTC_NETWORK_TEST = "testnet";
@@ -30,6 +39,7 @@ export const BTC_NETWORK_TEST = "testnet";
 export default function SettingsPage(props: any) {
   const [isShowVerify, setIsShowVerify] = useState(false);
   const [isShowNetwork, setShowNetwork] = useState(false);
+  const [isLanguage, setIsLanguage] = useState(false);
   const { network, switchNetwork } = useNetworkStore();
   const [isShowLoading, setIsShowLoading] = useState(false);
   // const { needRefreshHome, updateNeedRefreshHome } = useData();
@@ -37,6 +47,18 @@ export default function SettingsPage(props: any) {
   const { walletMode, updateWalletMode } = useData();
   const [isScan, setIsScan] = useState(false);
   const [isDisclaimer, setIsDisclaimer] = useState(false);
+  const { walletLanguage, updateWalletLanguage } = useData();
+  const { mvcAddress, updateMvcAddress } = useData();
+  const { btcAddress, updateBtcAddress } = useData();
+  const { metaletWallet, updateMetaletWallet } = useData();
+
+  const { t } = useTranslation();
+
+  // const currentAddressType = metaletWallet.currentBtcWallet!.getAddressType()!;
+  // console.log(
+  //   "addressType-----",
+  //   metaletWallet.currentBtcWallet!.getAddressType()!
+  // );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -66,7 +88,7 @@ export default function SettingsPage(props: any) {
           >
             <View style={{ flexDirection: "row" }}>
               <Text style={metaStyles.largeDefaultLittleText}>
-                Select network
+                {t("s_select_network")}
               </Text>
 
               <View style={{ flex: 1 }} />
@@ -146,6 +168,105 @@ export default function SettingsPage(props: any) {
         </View>
       </Modal>
 
+      <Modal visible={isLanguage} transparent={true}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: 10,
+              marginHorizontal: 30,
+              padding: 30,
+            }}
+          >
+            <View style={{ flexDirection: "row" }}>
+              <Text style={metaStyles.largeDefaultLittleText}>
+                {t("s_select_language")}
+              </Text>
+
+              <View style={{ flex: 1 }} />
+
+              <CloseView
+                event={() => {
+                  setIsLanguage(false);
+                }}
+              />
+            </View>
+
+            <TouchableWithoutFeedback
+              onPress={async () => {
+                AsyncStorageUtil.setItem(wallet_language_key, "en");
+                i18n.changeLanguage("en");
+                updateWalletLanguage("en");
+                setIsShowLoading(true);
+                setIsLanguage(false);
+                setTimeout(() => {
+                  setIsShowLoading(false);
+                  i18n.changeLanguage("en");
+                }, 1000);
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginTop: 30,
+                  alignItems: "center",
+                  height: 50,
+                }}
+              >
+                <Text style={{ color: "#333333", fontSize: 18 }}>English</Text>
+
+                <View style={{ flex: 1 }} />
+
+                {walletLanguage == "en" && (
+                  <Image
+                    source={require("../../image/wallets_select_icon.png")}
+                    style={{ padding: 8, width: 20, height: 20 }}
+                  />
+                )}
+              </View>
+            </TouchableWithoutFeedback>
+
+            <TouchableWithoutFeedback
+              onPress={async () => {
+                AsyncStorageUtil.setItem(wallet_language_key, "zh");
+                updateWalletLanguage("zh");
+                setIsLanguage(false);
+                setIsShowLoading(true);
+                setTimeout(() => {
+                  setIsShowLoading(false);
+                  i18n.changeLanguage("zh");
+                }, 1000);
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  height: 50,
+                }}
+              >
+                <Text style={{ color: "#333333", fontSize: 18 }}>中文简体</Text>
+
+                <View style={{ flex: 1 }} />
+
+                {walletLanguage == "zh" && (
+                  <Image
+                    source={require("../../image/wallets_select_icon.png")}
+                    style={{ padding: 8, width: 20, height: 20 }}
+                  />
+                )}
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </View>
+      </Modal>
+
       <Modal visible={isDisclaimer} transparent={true}>
         <View
           style={{
@@ -166,26 +287,30 @@ export default function SettingsPage(props: any) {
             }}
           >
             <Text style={[metaStyles.defaultText18, { textAlign: "center" }]}>
-              Disclaimer
+              {t("s_disclaimer")}
             </Text>
 
             <Line />
 
             <ScrollView>
               <Text style={[metaStyles.defaultText, { marginTop: 15 }]}>
-                Use of this wallet is at your own risk and discretion. The
+                {t("m_disclaimer")}
+                {/* Use of this wallet is at your own risk and discretion. The
                 wallet is not liable for any losses incurred as a result of
-                using the wallet. {'\n'}{'\n'}
-                The wallet does not guarantee the continuity
-                and stability of its functions and services, and may be
-                interrupted or terminated due to force majeure, hacker attacks,
-                technical failures, policy changes, or other factors.  {'\n'}{'\n'}
-                Users should comply with local laws and regulations, and the wallet is
-                not responsible for any consequences resulting from users'
-                violation of laws and regulations.  {'\n'}{'\n'}
-                Users should properly safeguard their private keys and mnemonic phrases, and bear any
-                losses incurred due to the loss or theft of private keys or
-                mnemonic phrases.
+                using the wallet. {"\n"}
+                {"\n"}
+                The wallet does not guarantee the continuity and stability of
+                its functions and services, and may be interrupted or terminated
+                due to force majeure, hacker attacks, technical failures, policy
+                changes, or other factors. {"\n"}
+                {"\n"}
+                Users should comply with local laws and regulations, and the
+                wallet is not responsible for any consequences resulting from
+                users' violation of laws and regulations. {"\n"}
+                {"\n"}
+                Users should properly safeguard their private keys and mnemonic
+                phrases, and bear any losses incurred due to the loss or theft
+                of private keys or mnemonic phrases. */}
               </Text>
             </ScrollView>
 
@@ -204,7 +329,7 @@ export default function SettingsPage(props: any) {
                   { textAlign: "center", color: themeColor },
                 ]}
               >
-                OK
+                {t("s_ok")}
               </Text>
             </TouchableWithoutFeedback>
           </View>
@@ -240,7 +365,7 @@ export default function SettingsPage(props: any) {
               }}
             >
               <Text style={[{ textAlign: "left" }, metaStyles.titleText]}>
-                Setting
+                {t("s_settings")}
               </Text>
 
               <View style={{ flex: 1 }} />
@@ -259,13 +384,46 @@ export default function SettingsPage(props: any) {
 
             <TouchableWithoutFeedback
               onPress={() => {
-                navigate("WalletsPage");
+                setIsLanguage(true);
               }}
             >
               <View
                 style={{
                   flexDirection: "row",
                   marginTop: 30,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Image
+                  source={require("../../image/set_icon_language.png")}
+                  style={{ width: 45, height: 45 }}
+                />
+                <Text
+                  style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}
+                >
+                  {t("s_language")}
+                </Text>
+                <View style={{ flex: 1 }} />
+                <Text style={metaStyles.defaultText}>
+                  {walletLanguage == "en" ? "English" : "中文简体"}
+                </Text>
+                <Image
+                  source={require("../../image/list_icon_ins.png")}
+                  style={{ width: 20, height: 20, marginLeft: 5 }}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+
+            <TouchableWithoutFeedback
+              onPress={() => {
+                navigate("WalletsPage");
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginTop: 20,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -277,7 +435,7 @@ export default function SettingsPage(props: any) {
                 <Text
                   style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}
                 >
-                  Management
+                  {t("s_manage_wallet")}
                 </Text>
                 <View style={{ flex: 1 }} />
                 <Image
@@ -286,8 +444,8 @@ export default function SettingsPage(props: any) {
                 />
               </View>
             </TouchableWithoutFeedback>
-
-            {/* {walletMode != wallet_mode_cold && (
+            {/* currentAddressType == AddressType.SameAsMvc &&  */}
+            {walletMode !=wallet_mode_observer&& (
               <TouchableWithoutFeedback
                 onPress={() => {
                   navigate("ColdWalletPage");
@@ -296,7 +454,7 @@ export default function SettingsPage(props: any) {
                 <View
                   style={{
                     flexDirection: "row",
-                    marginTop: 30,
+                    marginTop: 20,
                     alignItems: "center",
                     justifyContent: "center",
                   }}
@@ -308,7 +466,7 @@ export default function SettingsPage(props: any) {
                   <Text
                     style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}
                   >
-                    Cold Wallet
+                    {t("s_cold_wallet")}
                   </Text>
                   <View style={{ flex: 1 }} />
                   <Image
@@ -317,7 +475,7 @@ export default function SettingsPage(props: any) {
                   />
                 </View>
               </TouchableWithoutFeedback>
-            )} */}
+            )}
 
             <TouchableWithoutFeedback
               onPress={() => {
@@ -327,7 +485,7 @@ export default function SettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: "row",
-                  marginTop: 30,
+                  marginTop: 20,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -339,7 +497,7 @@ export default function SettingsPage(props: any) {
                 <Text
                   style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}
                 >
-                  Backup{" "}
+                  {t("s_backup_wallet")}
                 </Text>
                 <View style={{ flex: 1 }} />
                 <Image
@@ -357,7 +515,7 @@ export default function SettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: "row",
-                  marginTop: 30,
+                  marginTop: 20,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -369,7 +527,7 @@ export default function SettingsPage(props: any) {
                 <Text
                   style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}
                 >
-                  Wallet Security
+                  {t("s_security")}
                 </Text>
                 <View style={{ flex: 1 }} />
                 <Image
@@ -387,7 +545,7 @@ export default function SettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: "row",
-                  marginTop: 30,
+                  marginTop: 20,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -399,7 +557,7 @@ export default function SettingsPage(props: any) {
                 <Text
                   style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}
                 >
-                  Network
+                  {t("s_network")}
                 </Text>
                 <View style={{ flex: 1 }} />
                 <Text style={metaStyles.defaultText}>
@@ -420,7 +578,7 @@ export default function SettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: "row",
-                  marginTop: 30,
+                  marginTop: 20,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -432,7 +590,7 @@ export default function SettingsPage(props: any) {
                 <Text
                   style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}
                 >
-                  About Metalet
+                  {t("s_about")}
                 </Text>
                 <View style={{ flex: 1 }} />
                 <Text style={metaStyles.defaultText}>
@@ -453,7 +611,7 @@ export default function SettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: "row",
-                  marginTop: 30,
+                  marginTop: 20,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -465,7 +623,7 @@ export default function SettingsPage(props: any) {
                 <Text
                   style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}
                 >
-                  Disclaimer
+                  {t("s_disclaimer")}
                 </Text>
                 <View style={{ flex: 1 }} />
 

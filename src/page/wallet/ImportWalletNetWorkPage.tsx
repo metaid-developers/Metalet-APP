@@ -24,6 +24,7 @@ import {
 } from "@/utils/WalletUtils";
 import { getBtcWallet, getCurrentBtcWallet, getCurrentMvcWallet, getMvcCreateWallet } from "@/wallet/wallet";
 import { AddressType } from "@metalet/utxo-wallet-service";
+import { useTranslation } from "react-i18next";
 
 const storage = createStorage();
 
@@ -39,6 +40,7 @@ export default function ImportWalletNetWorkPage(props) {
   const { btcAddress, updateBtcAddress } = useData();
   const {btcSameAsMvcAddress,updateBtcSameAsMvcAddress} = useData();
 
+  const {t}=useTranslation();
 
   async function changeNetwork() {
     if (selectBtcNetWork == false && selectMvcNetWork == false) {
@@ -79,7 +81,7 @@ export default function ImportWalletNetWorkPage(props) {
     // await setCurrentStorageWallet(walletBean, parseInt(mvcPath));
 
     props.navigation.navigate("CongratulationsPage", {
-      type: "Imported Successfully",
+      type:t("w_import_success") ,
       type3: ":sldkfj",
     });
   }
@@ -94,7 +96,7 @@ export default function ImportWalletNetWorkPage(props) {
         }}
       />
       <View style={{ flex: 1 }}>
-        <TitleBar title="Please Select A Network" />
+        <TitleBar title={t("w_please_select_network")} />
 
         <View
           style={[
@@ -220,7 +222,7 @@ export default function ImportWalletNetWorkPage(props) {
         <View style={{ flex: 1 }} />
 
         <View style={{ marginHorizontal: 20, marginBottom: 40 }}>
-          <RoundSimButton title="Confirm" textColor="white" event={() => {
+          <RoundSimButton title={t("c_confirm")} textColor="white" event={() => {
             changeNetwork()
           }} />
         </View>

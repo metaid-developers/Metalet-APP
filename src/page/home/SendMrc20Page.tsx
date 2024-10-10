@@ -58,6 +58,7 @@ import {
 import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
 import { getNetwork } from "@/lib/network";
 import useNetworkStore from "@/stores/useNetworkStore";
+import { useTranslation } from "react-i18next";
 
 export default function SendMrc20Page({ route }) {
   const { mrc20Data } = route.params;
@@ -96,6 +97,8 @@ export default function SendMrc20Page({ route }) {
     feeRate: 10,
     desc: "",
   });
+
+  const { t } = useTranslation();
 
   //wallet
   const { metaletWallet, updateMetaletWallet } = useData();
@@ -139,7 +142,6 @@ export default function SendMrc20Page({ route }) {
   const { walletMode, updateWalletMode } = useData();
   // const { netWork, updateNetWork } = useData();
   const { network, switchNetwork } = useNetworkStore();
-
 
   useEffect(() => {
     getFeed();
@@ -412,7 +414,7 @@ export default function SendMrc20Page({ route }) {
                     fontSize: 14,
                   }}
                 >
-                  From
+                  {t("c_from")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {/* {metaletWallet.currentBtcWallet.getAddress()} */}
@@ -428,7 +430,7 @@ export default function SendMrc20Page({ route }) {
                     fontSize: 14,
                   }}
                 >
-                  To
+                  {t("c_from")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {inputAddress}
@@ -443,7 +445,7 @@ export default function SendMrc20Page({ route }) {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Amount
+                  {t("c_amount")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {/* {parseFloat(inputAmount).toFixed(8)} */}
@@ -460,7 +462,7 @@ export default function SendMrc20Page({ route }) {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Fees(Estimated)
+                  {t("c_fees")}
                 </Text>
                 <Text style={{ color: "#333", fontSize: 14 }}>{fee} BTC</Text>
               </View>
@@ -473,7 +475,7 @@ export default function SendMrc20Page({ route }) {
                 }}
               >
                 <RoundSimButtonFlee
-                  title={"Cancel"}
+                  title={t("c_cancel")}
                   style={{
                     borderRadius: 10,
                     height: 40,
@@ -489,7 +491,7 @@ export default function SendMrc20Page({ route }) {
                 />
 
                 <RoundSimButtonFlee
-                  title={"Confirm"}
+                  title={t("c_confirm")}
                   style={{ borderRadius: 10, height: 40, width: "45%" }}
                   textColor="#fff"
                   event={() => {
@@ -854,7 +856,8 @@ export default function SendMrc20Page({ route }) {
           />
         ) : (
           <View style={{ flex: 1 }}>
-            <TitleBar title="Send MRC20" />
+            {/* title="Send MRC20" */}
+            <TitleBar />
 
             <View
               style={{
@@ -920,7 +923,7 @@ export default function SendMrc20Page({ route }) {
                 }}
               >
                 <TextInput
-                  placeholder="Recipient's address"
+                  placeholder={t("c_receive_address")}
                   value={inputAddress}
                   onChangeText={(text) => {
                     setInputAddress(text.trim());
@@ -994,7 +997,7 @@ export default function SendMrc20Page({ route }) {
                 }}
               >
                 <TextInput
-                  placeholder="Amount"
+                 placeholder={t("c_amount")}
                   keyboardType={
                     Platform.OS == "android" ? "numeric" : undefined
                   }
@@ -1057,7 +1060,7 @@ export default function SendMrc20Page({ route }) {
                   <Text
                     style={[metaStyles.smallDefaultText, { marginRight: 10 }]}
                   >
-                    Max
+                    {t("c_max")}
                   </Text>
                 </TouchableWithoutFeedback>
               </View>
@@ -1071,7 +1074,7 @@ export default function SendMrc20Page({ route }) {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Balance
+                {t("c_balance")}
                 </Text>
                 <Text style={{ color: "#999", fontSize: 14 }}>
                   {mrc20Data.balance} {mrc20Data.tick}
@@ -1086,7 +1089,7 @@ export default function SendMrc20Page({ route }) {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Pending
+                {t("c_pending")}
                 </Text>
                 <Text style={{ color: "#999", fontSize: 14 }}>
                   {mrc20Data.unsafeBalance} {mrc20Data.tick}
@@ -1111,7 +1114,7 @@ export default function SendMrc20Page({ route }) {
                   }}
                 >
                   <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                    Fee Rate
+                  {t("c_fee_rate")}
                   </Text>
                   <View style={{ flex: 1 }} />
                   <Text style={{ color: "#999", fontSize: 14 }}>
@@ -1134,7 +1137,7 @@ export default function SendMrc20Page({ route }) {
               }}
             >
               <RoundSimButton
-                title={"Next"}
+                title={t("c_next")}
                 event={() => {
                   if (!inputAddress) {
                     ToastView({ text: "Please input address", type: "error" });

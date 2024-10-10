@@ -13,7 +13,7 @@ import {
   Alert,
 } from "react-native";
 import { metaStyles, themeColor } from "../constant/Constants";
-import { goBack } from "../base/NavigationService";
+import { goBack, navigate } from "../base/NavigationService";
 
 import React, { useRef, useEffect, useState } from "react";
 import EasyToast from "react-native-easy-toast";
@@ -29,6 +29,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // import { verifyPassword } from "../utils/WalletUtils";
 import { CameraView } from 'expo-camera/next';
 import Toast from "react-native-toast-message";
+import { useTranslation } from "react-i18next";
 
 const storage = createStorage();
 
@@ -596,6 +597,8 @@ export const VerifyModal = ({
   eventCancel = () => {},
 }) => {
   const [inputText, setInputText] = useState("");
+  const { t }=useTranslation();
+
 
   return (
     <Modal transparent={true} visible={isShow}>
@@ -619,7 +622,7 @@ export const VerifyModal = ({
         >
           <View style={{ flexDirection: "row" }}>
             <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-              Verify Password
+              {t("o_verify_password")}
             </Text>
             <View style={{ flex: 1 }} />
 
@@ -636,7 +639,7 @@ export const VerifyModal = ({
           </View>
 
           <Text style={{ marginTop: 20, color: "#666", fontSize: 14 }}>
-            Please enter your wallet password
+          {t("o_verify_password_notice")}
           </Text>
           {/* 
           <View
@@ -678,7 +681,10 @@ export const VerifyModal = ({
                   const passwordLocal = await storage.get(wallet_password_key);
                   // await AsyncStorageUtil.getItem(wallet_password_key);
                   // const isPassword = await verifyPassword(value);
-                  console.log("输入的密码：", value);
+                  console.log("输入的密码：", passwordLocal);
+                  if(passwordLocal == undefined){
+                    navigate("SetPasswordPage", { type: "change" });
+                  }
                   if (passwordLocal == value) {
                     event(inputText);
                   } else {

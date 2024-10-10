@@ -27,10 +27,10 @@ export async function process({
   const address = chianWallet.getAddress();
   const apiHost = await getApiHost();
 
-  const wallet = new Wallet(purse, network, FEEB, API_TARGET.MVC, apiHost);
+  const wallet = new Wallet(purse, network, FEEB, API_TARGET.CYBER3, apiHost);
   const ftManager = new FtManager({
     network,
-    apiTarget: API_TARGET.MVC,
+    apiTarget: API_TARGET.CYBER3,
     purse,
     feeb: FEEB,
     apiHost,

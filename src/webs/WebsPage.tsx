@@ -75,7 +75,7 @@ export default function WebsPage(props) {
   const handlerMessage = async (
     message: Message & { type: string; data: unknown }
   ) => {
-    console.log("handlerMessage", message);
+    // console.log("handlerMessage", message);
 
     if (message.type === "Console") {
       console.info(`[Console] ${JSON.stringify(message.data)}`);

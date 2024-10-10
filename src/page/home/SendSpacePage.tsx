@@ -24,9 +24,22 @@ import { grayNormalColor, themeColor } from "../../constant/Constants";
 import { navigate } from "../../base/NavigationService";
 import { useData } from "../../hooks/MyProvider";
 import { Wallet, API_TARGET, API_NET } from "meta-contract";
-import { Transaction } from "@metalet/utxo-wallet-service";
+import {
+  AddressType,
+  ScriptType,
+  Transaction,
+} from "@metalet/utxo-wallet-service";
 import { broadcastSpace } from "../../api/metaletservice";
-import { getRandomID, getWalletNetwork } from "../../utils/WalletUtils";
+import {
+  getRandomID,
+  getWalletNetwork,
+  parseToSat,
+} from "../../utils/WalletUtils";
+import { getCurrentBtcWallet } from "@/wallet/wallet";
+import { BtcHotWallet, SignType } from "@metalet/utxo-wallet-sdk";
+import { getBtcUtxos } from "@/queries/utxos";
+import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
+import { useTranslation } from "react-i18next";
 
 export default function SendSpacePage() {
   const [nextBtnColor, setNextBtnColor] = useState("rgba(23, 26, 255, 0.5)");
@@ -54,6 +67,8 @@ export default function SendSpacePage() {
   const [total, settotal] = useState("");
   const [rawTx, setrawTx] = useState("");
   const { needRefreshHome, updateNeedRefreshHome } = useData();
+  const { walletMode, updateWalletMode } = useData();
+  const { t } = useTranslation();
 
   const sendSpace = async () => {
     if (inputAddress == "" || inputAmount == "") {
@@ -71,7 +86,8 @@ export default function SendSpacePage() {
       priviteKey,
       network === "mainnet" ? API_NET.MAIN : API_NET.TEST,
       1,
-      API_TARGET.MVC
+      API_TARGET.CYBER3
+      // API_TARGET.MVC
     );
 
     //
@@ -112,6 +128,54 @@ export default function SendSpacePage() {
     //     console.log(err);
     //   });
   };
+
+  async function sendHotBtcTest(
+    address: string,
+    receiveAddress: string,
+    sendAmount: number,
+    feeRate: number
+  ) {
+    const btcWallet = await getCurrentBtcWallet();
+    console.log(btcWallet.getAddress());
+    console.log(btcWallet.getAddressType());
+    const publicKey = btcWallet.getPublicKey().toString("hex");
+    const hotWallet = new BtcHotWallet({
+      network: "testnet",
+      publicKey: publicKey,
+      addressType: AddressType.SameAsMvc,
+    });
+    console.log(hotWallet.getAddress());
+    const needRawTx = btcWallet.getScriptType() === ScriptType.P2PKH;
+    console.log("hotWallet address:" + hotWallet.getAddress());
+
+    const utxos = await getBtcUtxos(hotWallet.getAddress(), needRawTx);
+
+    const result = hotWallet.buildTx(SignType.SEND, {
+      utxos,
+      feeRate: feeRate,
+      outputs: [{ address: receiveAddress, satoshis: sendAmount }],
+    });
+
+    console.log(result);
+
+    // parseToSat
+    // const result= hotWallet.signTx(SignType.SEND,{
+    //   amount: sendAmount,
+    //   utxos,
+    //   feeRate: feeRate,
+    //   recipient:receiveAddress,
+    //   changeAddress:btcWallet.getAddress()
+    // });
+    // console.log(result);
+
+    // buildTx
+
+    // utxos: UTXO[];
+    // amount: number;
+    // feeRate: number;
+    // recipient: string;
+    // changeAddress?: string;
+  }
 
   return (
     <TouchableWithoutFeedback
@@ -185,10 +249,12 @@ export default function SendSpacePage() {
                     fontSize: 14,
                   }}
                 >
-                  From
+                 {t("c_from")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
-                  {metaletWallet.currentMvcWallet.getAddress()}
+                  {walletMode === wallet_mode_cold
+                    ? ""
+                    : metaletWallet.currentMvcWallet.getAddress()}
                 </Text>
               </View>
 
@@ -200,7 +266,7 @@ export default function SendSpacePage() {
                     fontSize: 14,
                   }}
                 >
-                  To
+                 {t("c_to")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {inputAddress}
@@ -215,7 +281,7 @@ export default function SendSpacePage() {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Amount
+                {t("c_amount")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {inputAmount} SPACE
@@ -230,7 +296,7 @@ export default function SendSpacePage() {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Fees(Estimated)
+                {t("c_fees")}
                 </Text>
                 <Text style={{ color: "#333", fontSize: 14 }}>{fee} SPACE</Text>
               </View>
@@ -243,7 +309,7 @@ export default function SendSpacePage() {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Total
+                {t("c_total")}
                 </Text>
                 <Text style={{ color: "#333", fontSize: 14 }}>
                   {total} SPACE
@@ -258,7 +324,7 @@ export default function SendSpacePage() {
                 }}
               >
                 <RoundSimButtonFlee
-                  title={"Cancel"}
+                  title={t("c_cancel")}
                   style={{
                     borderRadius: 10,
                     height: 40,
@@ -274,7 +340,7 @@ export default function SendSpacePage() {
                 />
 
                 <RoundSimButtonFlee
-                  title={"Confirm"}
+                  title={t("c_confirm")}
                   style={{ borderRadius: 10, height: 40, width: "45%" }}
                   textColor="#fff"
                   event={() => {
@@ -298,6 +364,10 @@ export default function SendSpacePage() {
             setIsShowVerify(false);
 
             const { txid, message } = await broadcastSpace(rawTx);
+            console.log(txid);
+            console.log(message);
+            
+            
             if (txid != null) {
               updateNeedRefreshHome(getRandomID());
 
@@ -323,7 +393,7 @@ export default function SendSpacePage() {
           />
         ) : (
           <View style={{ flex: 1 }}>
-            <TitleBar title="Send" />
+            <TitleBar title={t("h_send")} />
 
             <View
               style={{
@@ -367,7 +437,7 @@ export default function SendSpacePage() {
                 }}
               >
                 <TextInput
-                  placeholder="Recipient's address"
+                  placeholder={t("c_receive_address")}
                   value={inputAddress}
                   onChangeText={(text) => {
                     setInputAddress(text);
@@ -421,7 +491,7 @@ export default function SendSpacePage() {
                   width: "100%",
                 }}
               >
-                Transfer Amount
+               {t("c_amount")}
               </Text>
 
               <View
@@ -469,9 +539,10 @@ export default function SendSpacePage() {
               </View>
 
               <RoundSimButton
-                title={"Next"}
+                title={t("c_next")}
                 event={() => {
                   sendSpace();
+                  // sendHotBtcTest("","tb1qqac24ca3e5vdh8fxz0kqsdjjm4zexxq8usveps",10000, 10);
                 }}
                 roundStytle={{ marginTop: 50 }}
                 textColor="#fff"

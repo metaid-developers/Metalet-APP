@@ -2,7 +2,7 @@ import { getNetwork } from "@/lib/network";
 import { fetchBtcTxHex } from "./transaction";
 import { Chain } from "@metalet/utxo-wallet-service";
 import { getWalletNetwork } from "@/utils/WalletUtils";
-import { mvcApi, mempoolApi, metaletApiV3 } from "./request";
+import { mvcApi, mempoolApi, metaletApiV3, metaletApiV4 } from "./request";
 import { getSafeUtxos } from "@/lib/utxo";
 
 export interface UTXO {
@@ -81,9 +81,35 @@ export interface MetaIDPin {
 
 
 // TODO: fix network switch
-const fetchMVCUtxos = async (address: string): Promise<MvcUtxo[]> => {
-  return (await mvcApi<MvcUtxo[]>(`/address/${address}/utxo`)).get();
-};
+// const fetchMVCUtxos = async (address: string): Promise<MvcUtxo[]> => {
+//   return (await mvcApi<MvcUtxo[]>(`/address/${address}/utxo`)).get();
+// };
+
+const fetchMVCUtxos = async (address: string, useUnconfirmed = true): Promise<MvcUtxo[]> => {
+  const net = getNetwork()
+  let allUtxos: MvcUtxo[] = []
+  let flag
+  let hasMore = true
+
+  while (hasMore) {
+    const { list = [] } = await metaletApiV4<{ list: MvcUtxo[] }>('/mvc/address/utxo-list').get({
+      address,
+      net,
+      flag,
+    })
+    flag = list[list.length - 1]?.flag
+    let filteredList = list.filter((utxo) => utxo.value >= 600)
+    if (!useUnconfirmed) {
+      filteredList = filteredList.filter((utxo) => utxo.height > 0)
+    }
+
+    allUtxos = [...allUtxos, ...filteredList]
+    hasMore = list.length > 0
+  }
+
+  return allUtxos
+}
+
 
 export type Utxo = {
   addressType: number;

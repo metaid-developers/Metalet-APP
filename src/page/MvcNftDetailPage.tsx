@@ -5,11 +5,15 @@ import { RoundSimButton, TitleBar } from "../constant/Widget";
 import { formatTime, getShowImageUrl } from "../utils/MetaFunUiils";
 import { metaStyles } from "../constant/Constants";
 import { navigate } from "../base/NavigationService";
+import { useData } from "@/hooks/MyProvider";
+import { wallet_mode_observer } from "@/utils/AsyncStorageUtil";
 
 export default function MvcNftDetailPage({ route }) {
   const { myObject } = route.params;
+  const { walletMode, updateWalletMode } = useData();
 
-  let imgNftUrl = getShowImageUrl(myObject.nftIcon!);
+  // let imgNftUrl = getShowImageUrl(myObject.nftIcon!);
+  let imgNftUrl = getShowImageUrl(myObject.icon!);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -25,7 +29,8 @@ export default function MvcNftDetailPage({ route }) {
 
         <View>
           <Text style={{ fontSize: 20, fontWeight: "bold", marginTop: 20 }}>
-            {myObject.nftName}
+            {/* {myObject.nftName} */}
+            {myObject.name}
           </Text>
 
           <View style={{ flexDirection: "row", marginTop: 5 }}>
@@ -82,7 +87,7 @@ export default function MvcNftDetailPage({ route }) {
         <View
           style={{ height: 0.2, backgroundColor: "#666666", marginTop: 20 }}
         />
-        <View
+        {/* <View
           style={{
             marginTop: 20,
             flexDirection: "row",
@@ -93,7 +98,7 @@ export default function MvcNftDetailPage({ route }) {
           <Text style={{ color: "#333333", fontSize: 15 }}>
             {myObject.nftIssuer!}{" "}
           </Text>
-        </View>
+        </View> */}
         <View
           style={{
             marginTop: 20,
@@ -103,7 +108,8 @@ export default function MvcNftDetailPage({ route }) {
         >
           <Text style={{ color: "#666666", fontSize: 15 }}>Token Index: </Text>
           <Text style={{ color: "#333333", fontSize: 15 }}>
-            {myObject.nftTokenIndex!}{" "}
+            {/* {myObject.nftTokenIndex!}{" "} */}
+            {myObject.tokenIndex!}
           </Text>
         </View>
         <View
@@ -130,7 +136,8 @@ export default function MvcNftDetailPage({ route }) {
              
             }}
           >
-            {myObject.nftGenesis!}{" "}
+            {/* {myObject.nftGenesis!}{" "} */}
+            {myObject.genesis!}{" "}
           </Text>
          
         </View>
@@ -145,18 +152,20 @@ export default function MvcNftDetailPage({ route }) {
             Last Activity At:{" "}
           </Text>
           <Text style={{ color: "#333333", fontSize: 15 }}>
-            {formatTime(myObject.nftTimestamp!)}{" "}
+            {/* {formatTime(myObject.nftTimestamp!)}{" "} */}
+            {formatTime(myObject.issueTime!)}{" "}
           </Text>
         </View>
 
         <View style={{ flex: 1 }} />
-        <RoundSimButton
+        {walletMode != wallet_mode_observer && ( <RoundSimButton
           title="Transfers"
           event={() => {
             navigate("TransferMvcNftPage", { myObject: myObject });
           }}
           textColor="#fff"
-        />
+        />)}
+       
       </View>
     </SafeAreaView>
   );

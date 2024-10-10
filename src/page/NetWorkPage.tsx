@@ -13,11 +13,13 @@ import {
 import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 import { navigate } from "../base/NavigationService";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 
 const storage = createStorage();
 
 export default function NetWorkPage() {
   const { netWork, updateNetWork } = useData();
+  const { t } = useTranslation();
 
   async function changeNetwork(changeNetwork: string) {
     if (changeNetwork == network_mvc) {
@@ -40,7 +42,8 @@ export default function NetWorkPage() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
-        <TitleBar title="Select Network" />
+        {/* <TitleBar title="Select Network" /> */}
+        <TitleBar title={t("o_select_network")} />
 
         <TouchableWithoutFeedback
           onPress={() => {
@@ -60,7 +63,7 @@ export default function NetWorkPage() {
               style={{ width: 30, height: 30 }}
             />
             <View style={{ marginLeft: 10 }}>
-              <Text style={metaStyles.defaultText}> All Networks</Text>
+              <Text style={metaStyles.defaultText}> {t("o_all_networks")}</Text>
               {/* <Text style={{ marginTop: 10 }}>{}</Text> */}
             </View>
 

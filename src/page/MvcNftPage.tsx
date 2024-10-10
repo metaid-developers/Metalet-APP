@@ -22,10 +22,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useData } from "../hooks/MyProvider";
 import { eventBus, refreshMvcFtEvent } from "../utils/EventBus";
 import { getCurrentMvcWallet } from "../wallet/wallet";
-import { getStorageCurrentWallet, isColdWalletMode } from "@/utils/WalletUtils";
+import { getStorageCurrentWallet, isObserverWalletMode,  } from "@/utils/WalletUtils";
 import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
+import { MvcNftListObject } from "@/api/type/MvcNftData";
+import { fetchMvcNftBalance } from "@/api/metaletservice";
 export default function MvcNftPage(props) {
-  let [nftList, setNftList] = useState<MvcGenesisItem[]>([]);
+  // let [nftList, setNftList] = useState<MvcGenesisItem[]>([]);
+  let [nftList, setNftList] = useState<MvcNftListObject[]>([]);
   const { walletManager, updateWalletManager } = useData();
   const { accountIndex, updateAccountIndex } = useData();
   const { mvcAddress, updateMvcAddress } = useData();
@@ -41,17 +44,17 @@ export default function MvcNftPage(props) {
 
   async function refresh() {
     // if (mvcAddress) {
-      // getMvcNft(mvcAddress);
+    // getMvcNft(mvcAddress);
     // } else {
-      // if (walletMode == wallet_mode_cold) {
-      const isCold = await isColdWalletMode();
-      if (isCold) {
-        const wallet = await getStorageCurrentWallet();
-        getMvcNft(wallet.coldAddress);
-      } else {
-        const mvcWallet = await getCurrentMvcWallet();
-        getMvcNft(mvcWallet.getAddress());
-      }
+    // if (walletMode == wallet_mode_cold) {
+    const isCold = await isObserverWalletMode();
+    if (isCold) {
+      const wallet = await getStorageCurrentWallet();
+      getMvcNft(wallet.coldAddress);
+    } else {
+      const mvcWallet = await getCurrentMvcWallet();
+      getMvcNft(mvcWallet.getAddress());
+    }
     // }
   }
 
@@ -68,39 +71,41 @@ export default function MvcNftPage(props) {
     //  const nftList=await fetchMvcNftBalance(address);
     //  console.log("nftList",nftList);
 
-    try{
-      let params = {
-        page: 1,
-        pageSize: 300,
-        chain: "mvc",
-      };
-      let data: RootMvcNftObject = await get(
-        BASE_METALET_URL + "/aggregation/v2/app/show/nft/" + address + "/summary",
-        false,
-        params
-      );
-  
+    try {
+      //   let params = {
+      //     page: 1,
+      //     pageSize: 300,
+      //     chain: "mvc",
+      //   };
+      //   let data: RootMvcNftObject = await get(
+      //     BASE_METALET_URL + "/aggregation/v2/app/show/nft/" + address + "/summary",
+      //     false,
+      //     params
+      //   );
+
       // console.log("data 获取的NFT 数据： ", JSON.stringify(data));
-      
-  
-      if (data.data.results.items !==undefined&&data.data.results.items != null) {
+
+      const data: MvcNftListObject[] = await fetchMvcNftBalance(address);
+
+      // if (data.data.results.items !==undefined&&data.data.results.items != null) {
+      if (data !== undefined && data != null) {
         // setNftList(data.data.results.items);
         // console.log('有数据刷新');
-        setNftList([...data.data.results.items]);
+        setNftList(data);
         // setBtcFtList([...data.data.list]);
       } else {
         // console.log('无有数据刷新');
         setNftList([]);
       }
-    }catch(e){
-      console.log("getMvcNft error ",e)
+    } catch (e) {
+      console.log("getMvcNft error ", e);
     }
-   
   }
 
   const ListItem = ({ index, item }) => {
     const DetailItmeList = ({ index, item }) => {
-      let imageUrl = getShowImageUrl(item.nftIcon!);
+      // let imageUrl = getShowImageUrl(item.nftIcon!);
+      let imageUrl = getShowImageUrl(item.icon!);
       // console.log("imageUrl",imageUrl)
       return (
         <View style={styles.itemStyle}>
@@ -113,7 +118,7 @@ export default function MvcNftPage(props) {
               fontSize: 12,
             }}
           >
-            #{item.nftTokenIndex}
+            {/* #{item.nftTokenIndex} */}#{item.tokenIndex}
           </Text>
           <Text
             style={{
@@ -123,7 +128,8 @@ export default function MvcNftPage(props) {
               fontSize: 13,
             }}
           >
-            {item.nftName!}
+            {/* {item.nftName!} */}
+            {item.name!}
           </Text>
         </View>
       );
@@ -135,8 +141,10 @@ export default function MvcNftPage(props) {
           console.log(mvcAddress);
           props.navigation.navigate("MvcNftListPage", {
             myObject: {
-              codehash: item.nftCodehash,
-              genesis: item.nftGenesis,
+              // codehash: item.nftCodehash,
+              // genesis: item.nftGenesis,
+              codehash: item.codeHash,
+              genesis: item.genesis,
             },
           });
         }}
@@ -145,10 +153,12 @@ export default function MvcNftPage(props) {
           <View style={{ flexDirection: "row" }}>
             <View>
               <Text style={{ color: "#000000", fontSize: 14 }}>
-                {item.nftSeriesName!}
+                {/* {item.nftSeriesName!} */}
+                {item.seriesName!}
               </Text>
               <Text style={{ color: "#666666", fontSize: 12, marginTop: 5 }}>
-                Amount {item.nftMyCount.toString()}
+                {/* Amount {item.nftMyCount.toString()} */}
+                Amount {item.count}
               </Text>
             </View>
             <View style={{ flex: 1 }} />
@@ -159,7 +169,8 @@ export default function MvcNftPage(props) {
           </View>
 
           <FlatList
-            data={item.nftDetailItemList}
+            // data={item.nftDetailItemList}
+            data={item.nftList}
             keyExtractor={(item, index) => index.toString()}
             showsVerticalScrollIndicator={false}
             renderItem={DetailItmeList}

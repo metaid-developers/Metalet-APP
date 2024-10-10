@@ -27,7 +27,7 @@ import { navigate } from "@/base/NavigationService";
 import {
   getStorageCurrentWallet,
   getWalletNetwork,
-  isColdWalletMode,
+  isObserverWalletMode,
 } from "@/utils/WalletUtils";
 import { Chain } from "@metalet/utxo-wallet-service";
 import { MetaIDPinsData, Pins } from "@/api/type/MetaIDPinsData";
@@ -60,7 +60,7 @@ export default function MetaIDPinsPage() {
     if (btcAddress) {
       getBtcNftData(btcAddress);
     } else {
-      const isCold = await isColdWalletMode();
+      const isCold = await isObserverWalletMode();
       if (isCold) {
         const wallet = await getStorageCurrentWallet();
         getBtcNftData(wallet.coldAddress);

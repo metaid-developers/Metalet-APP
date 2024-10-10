@@ -1,6 +1,7 @@
 import {
   AddressType,
   CoinType,
+  SignType,
   Transaction,
   getAddressFromScript,
 } from "@metalet/utxo-wallet-service";
@@ -24,6 +25,7 @@ import { wordlist } from "@scure/bip39/wordlists/english";
 import { getRandomColorList } from "../utils/MetaFunUiils";
 import { getBtcUtxos } from "@/queries/utxos";
 import { addSafeUtxo } from "@/lib/utxo";
+import { BtcHotWallet } from "@metalet/utxo-wallet-sdk";
 
 // READY
 export const btc_network = "mainnet";
@@ -134,8 +136,15 @@ export async function getMvcCreateWallet(
   return mvcWallet;
 }
 
+
+export async function getMvcRootPath(): Promise<string> {
+  const mvcWallet = await getCurrentMvcWallet()
+  const mvcFullPath = mvcWallet.getPath()
+
+  return mvcFullPath.slice(0, mvcFullPath.length - 4)
+}
 ///////////////function//////////////////////////
-export async function createMetaletWallet(mvcPath): Promise<{
+export async function createMetaletWallet(mvcPath,walletMode:string): Promise<{
   btcWallet: BtcWallet;
   mvcWallet: MvcWallet;
   walletBean: WalletBean;
@@ -169,6 +178,7 @@ export async function createMetaletWallet(mvcPath): Promise<{
     isBackUp: false,
     isCurrentPathIndex: 0,
     seed: "",
+    isColdWalletMode:walletMode,
     accountsOptions: [
       {
         id: accountID,
@@ -211,15 +221,27 @@ export async function getCurrentWalletAddress(chain: string): Promise<string> {
 export async function sendBtcTransaction(
   address: string,
   receiveAddress: string,
-  sendAmount: string,
+  sendAmount: number,
   feeRate: number
 ) {
   const btcWallet = await getCurrentBtcWallet();
   const needRawTx = btcWallet.getScriptType() === ScriptType.P2PKH;
   const utxos = await getBtcUtxos(address, needRawTx);
 
-  const result = btcWallet.send(receiveAddress, sendAmount, feeRate, utxos);
+  // const result = btcWallet.send(receiveAddress, sendAmount, feeRate, utxos);
 
+  // const { fee, rawTx } = btcWallet!.signTx(SignType.SEND, {
+  //   utxos,
+  //   feeRate: feeRate,
+  //   outputs: [{ address: receiveAddress, satoshis: sendAmount as unknown as number }],
+  // });
+
+  const result = btcWallet!.signTx(SignType.SEND, {
+    utxos,
+    feeRate: feeRate,
+    outputs: [{ address: receiveAddress, satoshis: sendAmount}],
+  });
+  
   return result;
 }
 
@@ -242,4 +264,15 @@ export async function addMetaletSafeUtxo(rawTx: string, txID: string) {
     );
     await addSafeUtxo(wallet.getAddress(), `${txID}:${tx.outs.length - 1}`);
   }
+}
+
+
+export async function sendHotBtcTest(){
+  const btcWallet = await getCurrentBtcWallet();
+  console.log(btcWallet.getAddress());
+  console.log(btcWallet.getAddressType());
+  const publicKey=btcWallet.getPublicKey().toString("hex");
+  const hotWallet =new BtcHotWallet({network:"testnet",publicKey:publicKey,addressType:AddressType.SameAsMvc}) 
+  console.log(hotWallet.getAddress());
+  
 }

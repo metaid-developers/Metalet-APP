@@ -22,6 +22,7 @@ import { Brc20DetailData, TokenTransfer } from "@/api/type/Balance";
 import { fetchOneBrc20 } from "@/api/metaletservice";
 import { getWalletNetwork } from "@/utils/WalletUtils";
 import { Chain } from "@metalet/utxo-wallet-service";
+import { useTranslation } from "react-i18next";
 
 export default function TransferBrc20FirstPage({ route }) {
   const { brc20 } = route.params;
@@ -31,13 +32,14 @@ export default function TransferBrc20FirstPage({ route }) {
 
   const [showAllTransfer, setShowAllTransfer] = useState(false);
   const [showAllTag, setShowAllTag] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     initData();
   }, []);
 
   async function initData() {
-    const network=await getWalletNetwork(Chain.BTC);
+    const network = await getWalletNetwork(Chain.BTC);
     const brc20Balance: Brc20DetailData = await fetchOneBrc20(
       btcAddress,
       network,
@@ -95,9 +97,8 @@ export default function TransferBrc20FirstPage({ route }) {
     );
   };
 
-
-  function toTransfer(tokenTransfer){
-    navigate("TransferBrc20Page",{tokenTransfer:tokenTransfer})
+  function toTransfer(tokenTransfer) {
+    navigate("TransferBrc20Page", { tokenTransfer: tokenTransfer });
   }
 
   return (
@@ -238,7 +239,7 @@ export default function TransferBrc20FirstPage({ route }) {
                               }}
                             >
                               <Text style={{ color: "#fff" }}>
-                               # {item.inscriptionNumber}
+                                # {item.inscriptionNumber}
                               </Text>
                             </View>
                           )}
@@ -293,20 +294,20 @@ export default function TransferBrc20FirstPage({ route }) {
           </View>
         </View>
       </Modal>
-
+      {/* Transfer */}
       <View style={{ flex: 1 }}>
-        <TitleBar title={"Transfer"} />
+        <TitleBar title={""} />
         <View style={{ marginHorizontal: 20, marginTop: 30 }}>
-          <Text style={metaStyles.defaultText}>Transfer Amount</Text>
+          <Text style={metaStyles.defaultText}>{t("c_amount")}</Text>
           <View style={[metaStyles.lineBgRadius, { padding: 10 }]}>
             <Text style={metaStyles.defaultText}>
-              0 <Text> RDEX</Text>
+              0 <Text> {brc20.ticker.toUpperCase()}</Text>
             </Text>
 
             <Line top={20} />
 
             <Text style={{ marginTop: 20, color: "#666" }}>
-              Transfer Inscriptions
+              {t("b_transfer_inscriptions")}
             </Text>
 
             {true &&
@@ -408,7 +409,7 @@ export default function TransferBrc20FirstPage({ route }) {
                                   }}
                                 >
                                   <Text style={{ color: "#fff" }}>
-                                  # {item.inscriptionNumber}
+                                    # {item.inscriptionNumber}
                                   </Text>
                                 </View>
                               )}
@@ -453,15 +454,15 @@ export default function TransferBrc20FirstPage({ route }) {
           </View>
 
           <Text style={[metaStyles.defaultText, { marginTop: 20 }]}>
-            Inscribe Transfer
+            {t("b_inscribe_transfer")}
           </Text>
           <Text style={{ marginTop: 10, color: "#666", fontSize: 13 }}>
-            You have to inscribe a TRANSFER inscription first.
+            {t("b_inscribe_transfer_notice")}
           </Text>
 
           <RoundSimButton
             title={
-              "Available " +
+              t("b_available") +
               brc20.overallBalance +
               " " +
               brc20.ticker.toUpperCase()

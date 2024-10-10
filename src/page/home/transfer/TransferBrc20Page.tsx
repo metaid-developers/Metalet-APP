@@ -26,11 +26,12 @@ import { useData } from "@/hooks/MyProvider";
 import { inputNormalBgColor, themeColor } from "@/constant/Constants";
 import { getBtcBrc20Icon } from "@/utils/AssertUtils";
 import { navigate } from "@/base/NavigationService";
-import { ScriptType } from "@metalet/utxo-wallet-service";
+import { ScriptType, SignType } from "@metalet/utxo-wallet-service";
 import { getBtcUtxos, getInscriptionUtxo } from "@/queries/utxos";
 import { broadcastBtc, fetchBtcFeed } from "@/api/metaletservice";
 import { getRandomID, parseToSpace } from "@/utils/WalletUtils";
 import { addMetaletSafeUtxo } from "@/wallet/wallet";
+import { useTranslation } from "react-i18next";
 
 export default function TransferBrc20Page({ route }) {
   const [isShowFeed, setIsShowFeed] = useState(false);
@@ -78,6 +79,7 @@ export default function TransferBrc20Page({ route }) {
   const [fee, setfee] = useState("");
   const [total, settotal] = useState("");
   const [rawTx, setRawTx] = useState<string>();
+  const { t } = useTranslation();
 
   const { tokenTransfer } = route.params;
   let ImageUrl = getBtcBrc20Icon(tokenTransfer.ticker);
@@ -111,18 +113,29 @@ export default function TransferBrc20Page({ route }) {
         needRawTx
       );
       const utxos = await getBtcUtxos(btcAddress, needRawTx);
-      const { fee, rawTx, cost } = metaletWallet.currentBtcWallet.sendBRC20(
-        inputAddress,
-        [utxo],
-        parseFloat(feed),
-        utxos
+      // const { fee, rawTx, cost } = metaletWallet.currentBtcWallet.sendBRC20(
+      //   inputAddress,
+      //   [utxo],
+      //   parseFloat(feed),
+      //   utxos
+      // );
+
+      const { fee, rawTx: _rawTx } = metaletWallet.currentBtcWallet!.signTx(
+        SignType.Transfer,
+        {
+          recipient: inputAddress,
+          transferUTXOs: [utxo],
+          feeRate: parseFloat(feed)!,
+          utxos,
+        }
       );
 
-      if (rawTx) {
-        console.log("rawTx", rawTx);
+      if (_rawTx) {
+        console.log("rawTx", _rawTx);
         setfee(parseToSpace(fee.toString()));
-        settotal(parseToSpace(cost.toString()));
-        setRawTx(rawTx);
+        //TODO
+        // settotal(parseToSpace(cost.toString()));
+        setRawTx(_rawTx);
         setConfirmDailogState(true);
       }
     } catch (e) {
@@ -532,7 +545,7 @@ export default function TransferBrc20Page({ route }) {
 
               <View>
                 <Text style={{ marginTop: 15, color: "#666", fontSize: 14 }}>
-                  From
+                  {t("c_from")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {metaletWallet.currentBtcWallet.getAddress()}
@@ -541,7 +554,7 @@ export default function TransferBrc20Page({ route }) {
 
               <View>
                 <Text style={{ marginTop: 10, color: "#666", fontSize: 14 }}>
-                  To
+                {t("c_to")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {inputAddress}
@@ -555,7 +568,7 @@ export default function TransferBrc20Page({ route }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={{ color: "#666", fontSize: 14 }}>Amount</Text>
+                <Text style={{ color: "#666", fontSize: 14 }}>{t("c_amount")}</Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {tokenTransfer.amount} {tokenTransfer.ticker}
                 </Text>
@@ -569,7 +582,7 @@ export default function TransferBrc20Page({ route }) {
                 }}
               >
                 <Text style={{ color: "#666", fontSize: 14 }}>
-                  Fees(Estimated)
+                {t("c_fees")}
                 </Text>
                 <Text style={{ color: "#333", fontSize: 14 }}>{fee} BTC</Text>
               </View>
@@ -581,7 +594,7 @@ export default function TransferBrc20Page({ route }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={{ color: "#666", fontSize: 14 }}>Total</Text>
+                <Text style={{ color: "#666", fontSize: 14 }}>{t("c_total")}</Text>
                 <Text style={{ color: "#333", fontSize: 14 }}>{total} BTC</Text>
               </View>
 
@@ -593,7 +606,7 @@ export default function TransferBrc20Page({ route }) {
                 }}
               >
                 <RoundSimButtonFlee
-                  title={"Cancel"}
+                  title={t("c_cancel")}
                   style={{
                     borderRadius: 10,
                     height: 40,
@@ -609,7 +622,7 @@ export default function TransferBrc20Page({ route }) {
                 />
 
                 <RoundSimButtonFlee
-                  title={"Confirm"}
+                  title={t("c_confirm")}
                   style={{ borderRadius: 10, height: 40, width: "45%" }}
                   textColor="#fff"
                   event={() => {
@@ -740,7 +753,7 @@ export default function TransferBrc20Page({ route }) {
                 }}
               >
                 <TextInput
-                  placeholder="Receiver"
+                  placeholder={t("c_receive_address")}
                   value={inputAddress}
                   onChangeText={(text) => {
                     setInputAddress(text);
@@ -782,7 +795,7 @@ export default function TransferBrc20Page({ route }) {
               </View>
 
               <View style={{ width: "100%", marginTop: 20 }}>
-                <Text>Amount</Text>
+                <Text>{t("c_amount")}</Text>
               </View>
 
               <View
@@ -818,7 +831,7 @@ export default function TransferBrc20Page({ route }) {
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ color: "#666", fontSize: 14 }}>Fee Rate</Text>
+                  <Text style={{ color: "#666", fontSize: 14 }}>{t("c_fee_rate")}</Text>
                   <View style={{ flex: 1 }} />
                   <Text style={{ color: "#999", fontSize: 14 }}>
                     {feed} sat/vB
@@ -837,7 +850,7 @@ export default function TransferBrc20Page({ route }) {
                 }}
               >
                 <RoundSimButton
-                  title={"Next"}
+                  title={t("c_next")}
                   event={() => {
                     sendBRC20();
                   }}

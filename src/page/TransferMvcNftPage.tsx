@@ -22,12 +22,13 @@ import { navigate } from "../base/NavigationService";
 import { useData } from "../hooks/MyProvider";
 import { API_NET, API_TARGET, NftManager } from "meta-contract";
 import { MvcGenesisItemBean } from "@/bean/MvcGenesisBean";
-import { getWalletNetwork, goToWebScan, isColdWalletMode } from "@/utils/WalletUtils";
+import { getWalletNetwork, goToWebScan, isObserverWalletMode } from "@/utils/WalletUtils";
 
 export default function TransferMvcNftPage({ route }) {
   const { myObject } = route.params;
   // const mm:MvcGenesisItemBean;
-  let imgNftUrl = getShowImageUrl(myObject.nftIcon!);
+  // let imgNftUrl = getShowImageUrl(myObject.nftIcon!);
+  let imgNftUrl = getShowImageUrl(myObject.icon!);
   const { loadingModal, setLoadingDailog } = useData();
   const [confirmDailogState, setConfirmDailogState] = useState(false);
   const [inputAddress, setInputAddress] = useState("");
@@ -52,14 +53,17 @@ export default function TransferMvcNftPage({ route }) {
     const nftManager = new NftManager({
       // network: API_NET.MAIN,
       network:network === "mainnet" ? API_NET.MAIN : API_NET.TEST,
-      apiTarget: API_TARGET.MVC,
+      apiTarget: API_TARGET.CYBER3,
       purse: privateKey,
     });
     const transferRes = await nftManager
       .transfer({
-        codehash: myObject.nftCodehash,
-        genesis: myObject.nftGenesis,
-        tokenIndex: myObject.nftTokenIndex,
+        // codehash: myObject.nftCodehash,
+        // genesis: myObject.nftGenesis,
+        // tokenIndex: myObject.nftTokenIndex,
+        codehash: myObject.codeHash,
+        genesis: myObject.genesis,
+        tokenIndex: myObject.tokenIndex,
         senderWif: privateKey,
         receiverAddress: inputAddress,
       })
@@ -131,10 +135,12 @@ export default function TransferMvcNftPage({ route }) {
               />
               <View style={{}}>
                 <Text style={{ fontSize: 14, marginLeft: 10 }}>
-                  {myObject.nftName}
+                  {/* {myObject.nftName} */}
+                  {myObject.name}
                 </Text>
                 <Text style={{ fontSize: 14, marginLeft: 10, marginTop: 10 }}>
-                  # {myObject.nftTokenIndex}
+                  {/* # {myObject.nftTokenIndex} */}
+                  # {myObject.tokenIndex}
                 </Text>
               </View>
             </View>
@@ -320,7 +326,7 @@ export default function TransferMvcNftPage({ route }) {
         }}
         event={async () => {
           setIsShowVerify(false);
-          const isCold=await isColdWalletMode();
+          const isCold=await isObserverWalletMode();
           if(!isCold){
             sendNft();
           }

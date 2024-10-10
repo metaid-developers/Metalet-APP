@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   LoadingModal,
@@ -47,6 +47,8 @@ import { navigate } from "../../base/NavigationService";
 import { addMetaletSafeUtxo, getCurrentBtcWallet } from "../../wallet/wallet";
 import { getRandomID, parseToSat, parseToSpace } from "../../utils/WalletUtils";
 import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
+import { BtcHotWallet } from "@metalet/utxo-wallet-sdk";
+import { useTranslation } from "react-i18next";
 
 export default function SendBtcPage() {
   const [nextBtnColor, setNextBtnColor] = useState("rgba(23, 26, 255, 0.5)");
@@ -67,7 +69,7 @@ export default function SendBtcPage() {
   const textInputRef = useRef(null);
   const [feed, setFeed] = useState("10");
   const [feedReady, setFeedReady] = useState("10");
-
+  const { t } = useTranslation();
   const [userSlowFeed, setSlowFeed] = useState<FeedBean>({
     title: "",
     feeRate: 10,
@@ -160,27 +162,27 @@ export default function SendBtcPage() {
     console.log("当前钱包地址：" + btcWallet.getAddress());
 
     try {
-      const { rawTx, cost } = btcWallet.send(
-        inputAddress,
-        inputAmount,
-        parseInt(feed),
-        utxos
-      );
-      const amount = parseToSat(inputAmount);
-      const gas = parseInt(cost) - amount;
-      const fee = parseToSpace(gas.toString()).toString();
-      const total = parseToSpace(cost.toString()).toString();
-      settotal(total);
-      setfee(fee);
+      // const { rawTx, cost } = btcWallet.send(
+      //   inputAddress,
+      //   inputAmount,
+      //   parseInt(feed),
+      //   utxos
+      // );
+      // const amount = parseToSat(inputAmount);
+      // const gas = parseInt(cost) - amount;
+      // const fee = parseToSpace(gas.toString()).toString();
+      // const total = parseToSpace(cost.toString()).toString();
+      // settotal(total);
+      // setfee(fee);
 
-      console.log(rawTx);
-      console.log(cost);
+      // console.log(rawTx);
+      // console.log(cost);
 
-      setRawTx(rawTx);
+      // setRawTx(rawTx);
 
-      setConfirmDailogState(true);
+      // setConfirmDailogState(true);
 
-      console.log(parseFloat(inputAmount));
+      // console.log(parseFloat(inputAmount));
 
       // const { fee, rawTx } = btcWallet!.signTx(SignType.SEND, {
       //   recipient: inputAddress,
@@ -189,26 +191,33 @@ export default function SendBtcPage() {
       //   utxos,
       // });
 
-      // console.log('fee',fee);
-      
-      // console.log("rawTx:", rawTx);
+      const { fee, rawTx } = btcWallet!.signTx(SignType.SEND, {
+        utxos,
+        feeRate: parseInt(feed)!,
+        outputs: [{ address: inputAddress, satoshis: parseToSat(inputAmount) }],
+      });
 
-      // const amount = parseToSat(inputAmount);
-      // // const gas = parseInt(cost) - amount;
-      // const justfee = parseToSpace(fee.toString()).toString();
-      // console.log("change fee", parseToSpace(fee.toString()));
-      // console.log("change inputAmount",  parseFloat(inputAmount));
-      
-      // const total =parseFloat( parseToSpace(fee.toString())) + parseFloat(inputAmount);
-      // settotal(total.toString());
-      // setfee(justfee);
+      console.log("fee", fee);
 
-      // console.log(rawTx);
-      // console.log(total);
+      console.log("rawTx:", rawTx);
 
-      // setRawTx(rawTx);
+      const amount = parseToSat(inputAmount);
+      // const gas = parseInt(cost) - amount;
+      const justfee = parseToSpace(fee.toString()).toString();
+      console.log("change fee", parseToSpace(fee.toString()));
+      console.log("change inputAmount", parseFloat(inputAmount));
 
-      // setConfirmDailogState(true);
+      const total =
+        parseFloat(parseToSpace(fee.toString())) + parseFloat(inputAmount);
+      settotal(total.toString());
+      setfee(justfee);
+
+      console.log(rawTx);
+      console.log(total);
+
+      setRawTx(rawTx);
+
+      setConfirmDailogState(true);
     } catch (e) {
       console.log("send error", e);
       ToastView({ text: e.toString(), type: "error" });
@@ -339,7 +348,7 @@ export default function SendBtcPage() {
                     fontSize: 14,
                   }}
                 >
-                  From
+                  {t("c_from")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {/* {metaletWallet.currentBtcWallet.getAddress()} */}
@@ -355,7 +364,7 @@ export default function SendBtcPage() {
                     fontSize: 14,
                   }}
                 >
-                  To
+                  {t("c_to")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {inputAddress}
@@ -370,7 +379,7 @@ export default function SendBtcPage() {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Amount
+                  {t("c_amount")}
                 </Text>
                 <Text style={{ marginTop: 5, color: "#333", fontSize: 14 }}>
                   {parseFloat(inputAmount).toFixed(8)} BTC
@@ -385,7 +394,7 @@ export default function SendBtcPage() {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Fees(Estimated)
+                  {t("c_fees")}
                 </Text>
                 <Text style={{ color: "#333", fontSize: 14 }}>{fee1} BTC</Text>
               </View>
@@ -398,7 +407,7 @@ export default function SendBtcPage() {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Total
+                  {t("c_total")}
                 </Text>
                 <Text style={{ color: "#333", fontSize: 14 }}>{total} BTC</Text>
               </View>
@@ -411,7 +420,7 @@ export default function SendBtcPage() {
                 }}
               >
                 <RoundSimButtonFlee
-                  title={"Cancel"}
+                  title={t("c_cancel")}
                   style={{
                     borderRadius: 10,
                     height: 40,
@@ -427,7 +436,7 @@ export default function SendBtcPage() {
                 />
 
                 <RoundSimButtonFlee
-                  title={"Confirm"}
+                  title={t("c_confirm")}
                   style={{ borderRadius: 10, height: 40, width: "45%" }}
                   textColor="#fff"
                   event={() => {
@@ -771,7 +780,6 @@ export default function SendBtcPage() {
           }}
           event={() => {
             setIsShowVerify(false);
-
             if (walletMode === wallet_mode_cold) {
               sendColdBtcConfirm();
             } else {
@@ -790,7 +798,7 @@ export default function SendBtcPage() {
           />
         ) : (
           <View style={{ flex: 1 }}>
-            <TitleBar title="Send" />
+            <TitleBar title={t("h_send")} />
 
             <View
               style={{
@@ -834,7 +842,7 @@ export default function SendBtcPage() {
                 }}
               >
                 <TextInput
-                  placeholder="Recipient's address"
+                  placeholder={t("c_receive_address")}
                   value={inputAddress}
                   onChangeText={(text) => {
                     setInputAddress(text);
@@ -908,7 +916,7 @@ export default function SendBtcPage() {
                 }}
               >
                 <TextInput
-                  placeholder="Amount"
+                  placeholder={t("c_amount")}
                   keyboardType={
                     Platform.OS == "android" ? "numeric" : undefined
                   }
@@ -953,7 +961,7 @@ export default function SendBtcPage() {
               </View>
             </View>
 
-            <View style={{ marginHorizontal: 20, paddingHorizontal: 25 }}>
+            <View style={{ marginHorizontal: 20, paddingHorizontal: 15 }}>
               <View
                 style={{
                   flexDirection: "row",
@@ -961,7 +969,7 @@ export default function SendBtcPage() {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Balance
+                  {t("c_balance")}
                 </Text>
                 <Text style={{ color: "#999", fontSize: 14 }}>
                   {btcBalance.balance} BTC
@@ -981,7 +989,7 @@ export default function SendBtcPage() {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Pending
+                  {t("c_pending")}
                 </Text>
                 <Text style={{ color: "#999", fontSize: 14 }}>
                   {btcBalance.pinsBalance} BTC
@@ -995,7 +1003,7 @@ export default function SendBtcPage() {
                 }}
               >
                 <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                  Available
+                  {t("c_available")}
                 </Text>
                 <Text style={{ color: "#999", fontSize: 14 }}>
                   {btcBalance.safeBalance} BTC
@@ -1015,7 +1023,7 @@ export default function SendBtcPage() {
                   }}
                 >
                   <Text style={{ color: grayNormalColor, fontSize: 14 }}>
-                    Fee Rate
+                    {t("c_fee_rate")}
                   </Text>
                   <View style={{ flex: 1 }} />
                   <Text style={{ color: "#999", fontSize: 14 }}>
@@ -1038,7 +1046,7 @@ export default function SendBtcPage() {
               }}
             >
               <RoundSimButton
-                title={"Next"}
+                title={t("c_next")}
                 event={() => {
                   if (!inputAddress) {
                     ToastView({ text: "Please input address", type: "error" });

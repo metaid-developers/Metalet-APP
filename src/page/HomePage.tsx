@@ -10,7 +10,12 @@ import {
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { navigate } from "../base/NavigationService";
-import { metaStyles, showPayCode, themeColor } from "../constant/Constants";
+import {
+  grayNormalColor,
+  metaStyles,
+  showPayCode,
+  themeColor,
+} from "../constant/Constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   CustomTabBar,
@@ -18,6 +23,7 @@ import {
   LoadingModal,
   LoadingNoticeModal,
   RoundSimButtonFlee,
+  ToastView,
 } from "../constant/Widget";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
@@ -35,6 +41,8 @@ import {
   wallet_mode_key,
   wallet_mode_cold,
   wallet_mode_hot,
+  wallet_language_key,
+  wallet_mode_observer,
 } from "../utils/AsyncStorageUtil";
 import { AddressType, Chain } from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
@@ -50,12 +58,13 @@ import {
   getBtcWallet,
   getCurrentBtcWallet,
   getCurrentMvcWallet,
+  sendHotBtcTest,
 } from "../wallet/wallet";
 
 import {
   getCurrentWalletAccount,
   getStorageCurrentWallet,
-  isColdWalletMode,
+  getWalletMode,
   openBrowser,
 } from "../utils/WalletUtils";
 import { caculateMvcAndBtcAssert, getOneIcons } from "../utils/AssertUtils";
@@ -68,13 +77,16 @@ import { UpdateData } from "@/api/type/Update";
 import Constants from "expo-constants";
 import Toast from "react-native-toast-message";
 import MetaIDPage from "./nft/MetaIDPage";
+import { BtcHotWallet } from "@metalet/utxo-wallet-sdk";
+import i18n from "@/language/i18n";
+import { useTranslation } from "react-i18next";
 
 const storage = createStorage();
 
 // Home 开发
 const TabsTop = createMaterialTopTabNavigator();
 
-// version 3.0.9 code 29
+// 待发布 version 3.1.3 code 33
 
 export default function HomePage({ navigation }) {
   const { metaletWallet, updateMetaletWallet } = useData();
@@ -112,6 +124,7 @@ export default function HomePage({ navigation }) {
 
   const { needRefreshHome, updateNeedRefreshHome } = useData();
   const { needInitWallet, updateNeedInitWallet } = useData();
+  const { walletLanguage, updateWalletLanguage } = useData();
   const [userAvater, setuserAvater] = useState<string[]>([]);
   const [accountName, setaccountName] = useState("");
   const [walletName, setWalletName] = useState("");
@@ -124,44 +137,10 @@ export default function HomePage({ navigation }) {
   const buildNumber = Constants.expoConfig?.ios.buildNumber;
   const platformNow = Platform.OS;
   const { isShowPay, updateIsShowPay } = useData();
+  const { t } = useTranslation(); // 获取翻译函数
 
-  // useEffect(() => {
-  //   if (!walletManager) {
-  //     return;
-  //   }
-
-  //   const initWalletManager = async () => {
-  //     try {
-  //       const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
-  //       if (!mode || wallet_mode_cold != mode) {
-  //         // console.log("initWalletManager");
-  //         // const t1 = performance.now();
-  //         getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
-  //           // updateBtcAddress(btcWallet.getAddress());
-  //           console.log(btcWallet.getAddress());
-
-  //           // console.log("time1", performance.now() - t1);
-  //           // console.log("btc address", btcWallet.getAddress());
-  //         });
-  //         getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
-  //           // console.log("mvc walletManager ",mvcWallet.getAddress());
-  //           // console.log("mvc walletManager ",mvcWallet.getAddressIndex());
-  //           // console.log("mvc walletManager ",mvcWallet.getAddressType());
-  //           // console.log("mvc walletManager ",mvcWallet.getScriptType());
-  //           // console.log("mvc walletManager ",mvcWallet.getPath());
-  //           // console.log("mvc walletManager ",mvcWallet.getSeed().toString('hex'));
-  //           // updateMvcAddress(mvcWallet.getAddress());
-  //           // console.log("time2", performance.now() - t1);
-  //           // console.log("mvc address", mvcWallet.getAddress());
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-
-  //   initWalletManager();
-  // }, [walletManager]);
+  // "package": "com.metalet.utxowallet",
+  // "package": "com.utxo.wallet",
 
   useEffect(() => {
     setIsShowLoading(true);
@@ -178,10 +157,8 @@ export default function HomePage({ navigation }) {
       });
     });
 
-    console.log("isShow", isShowPay);
-    console.log("shwo", showPayCode);
- 
-    
+    changeLanguage();
+
     // 立即调用一次获取数据
     // fetchData();
     // 设置轮询，每隔5秒获取一次数据
@@ -191,10 +168,6 @@ export default function HomePage({ navigation }) {
 
     // 清除定时器，防止内存泄漏
     // return () => clearInterval(intervalId);
-
-
-    
-   
   }, []);
 
   useEffect(() => {
@@ -229,7 +202,8 @@ export default function HomePage({ navigation }) {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log("Home page is focused");
+      // console.log("Home page is focused");
+      console.log("walletMid==", walletMode);
 
       // Add event listener for back button press
       const backHandler = BackHandler.addEventListener(
@@ -255,13 +229,11 @@ export default function HomePage({ navigation }) {
   }
 
   async function checkUpgrade() {
-   
-
+    // AsyncStorageUtil.clear();
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
       // console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;
-      
       // setUpdateUrl(check.data.url);
       setUpdateUrl(check.data.apkUrl);
       if (codeVersion > versionCode) {
@@ -282,11 +254,10 @@ export default function HomePage({ navigation }) {
   }
 
   const getShowBalance = async () => {
-    const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
     let nowMvcAddress;
     let nowBtcAddress;
 
-    if (mode && wallet_mode_cold === mode) {
+    if (wallet_mode_observer === walletMode) {
       const swallet = await getStorageCurrentWallet();
       nowBtcAddress = swallet.coldAddress;
       nowMvcAddress = swallet.coldAddress;
@@ -317,21 +288,34 @@ export default function HomePage({ navigation }) {
   };
   //初始化所有钱包
   async function initCurrentWallet() {
-
-    const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
-    if (mode && wallet_mode_cold === mode) {
+    // const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
+    // const _wallet_mode = await getWalletMode();
+    if (wallet_mode_observer === walletMode) {
       const nowWallet = await getStorageCurrentWallet();
       const nowAccount = await getCurrentWalletAccount();
-      updateWalletMode(wallet_mode_cold);
+      // updateWalletMode(wallet_mode_cold);
       setWalletName(nowWallet.name);
       setaccountName(nowAccount.name);
       setuserAvater(nowAccount.defaultAvatarColor);
       updateMvcAddress(nowWallet.coldAddress);
       updateBtcAddress(nowWallet.coldAddress);
+
+      //init HotWallet
+      const publicKey = nowWallet.coldPublicKey;
+      const hotBtcWallet = new BtcHotWallet({
+        network: network,
+        publicKey: publicKey,
+        addressType: nowWallet.addressType,
+      });
+      console.log("进入观察者钱包模式------------");
+
+      console.log("HotWallet Address :" + hotBtcWallet.getAddress());
+      metaletWallet.currentBtcColdWallet = hotBtcWallet;
+      updateMetaletWallet(metaletWallet);
+
       getShowBalance();
     } else {
-      updateWalletMode(wallet_mode_hot);
-
+      // updateWalletMode(wallet_mode_hot);
       await storage.get(network_key).then(async (saveNet) => {
         if (saveNet == null) {
           // console.log("saveNet is null" + saveNet);
@@ -403,6 +387,16 @@ export default function HomePage({ navigation }) {
   //   }
   //   setIsShowLoading(false)
   // }, [walletManager]);
+
+  const changeLanguage = async () => {
+    // const newLanguage = i18n.language === 'en' ? 'zh' : 'en';
+    const newLanguage = await AsyncStorageUtil.getItemDefault(
+      wallet_language_key,
+      "en"
+    );
+    i18n.changeLanguage(newLanguage); // 切换语言
+    updateWalletLanguage(newLanguage);
+  };
 
   return (
     <SafeAreaView style={metaStyles.parentContainer}>
@@ -1013,6 +1007,33 @@ export default function HomePage({ navigation }) {
               </Text>
             </View>
           )}
+
+          {walletMode == wallet_mode_observer && (
+            <View
+              style={{
+                flexDirection: "row",
+                backgroundColor: "#F3F3FF",
+                borderRadius: 5,
+                paddingHorizontal: 5,
+                paddingVertical: 5,
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: grayNormalColor,
+                  textAlign: "center",
+                  marginLeft: 5,
+                  fontSize: 12,
+                }}
+              >
+                {t("s_cold_observer_wallet_mode")}
+              </Text>
+            </View>
+          )}
+
           {netWork == null ||
             (netWork == network_all && (
               <TouchableWithoutFeedback
@@ -1109,7 +1130,9 @@ export default function HomePage({ navigation }) {
               metaStyles.rowContainer,
               {
                 justifyContent:
-                  isShowPay == showPayCode ? "space-between" : "space-around",
+                  isShowPay != showPayCode || walletMode == wallet_mode_observer
+                    ? "space-around"
+                    : "space-between",
                 marginTop: 10,
               },
             ]}
@@ -1126,6 +1149,10 @@ export default function HomePage({ navigation }) {
                 //   visibilityTime: 2000,
                 // });
 
+                if (walletMode == wallet_mode_observer) {
+                  ToastView({ text: "come soon", type: "info" });
+                  return;
+                }
                 if (netWork == network_mvc) {
                   navigate("SendSpacePage");
                 } else if (netWork == network_btc) {
@@ -1141,13 +1168,15 @@ export default function HomePage({ navigation }) {
                   style={{ width: 40, height: 40 }}
                 />
                 <Text style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}>
-                  Send
+                  {t("h_send")}
+                  {/* {t('welcome')} */}
                 </Text>
               </View>
             </TouchableWithoutFeedback>
 
             <TouchableWithoutFeedback
               onPress={() => {
+                // changeLanguage()
                 if (netWork == network_mvc) {
                   navigate("ReceivePage", { myCoinType: "SPACE" });
                 } else if (netWork == network_btc) {
@@ -1163,7 +1192,7 @@ export default function HomePage({ navigation }) {
                   style={{ width: 40, height: 40 }}
                 />
                 <Text style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}>
-                  Receive
+                  {t("h_receive")}
                 </Text>
               </View>
             </TouchableWithoutFeedback>
@@ -1171,7 +1200,6 @@ export default function HomePage({ navigation }) {
           <TouchableWithoutFeedback
             onPress={() => {
               console.log("click");
-              AsyncStorageUtil.clear();
             }}
           >
             <View style={{ marginTop: 20 }}>
@@ -1185,66 +1213,62 @@ export default function HomePage({ navigation }) {
             </View>
           </TouchableWithoutFeedback> */}
 
-            {isShowPay == showPayCode && (
-              <TouchableWithoutFeedback
-                onPress={async () => {
-                  // updateAccountIndex(1);
-                  // AsyncStorageUtil.setItem("account_select", 0);
-                  const isCold = await isColdWalletMode();
-                  if (isCold) {
-                  } else {
+            {isShowPay == showPayCode &&
+              (walletMode == wallet_mode_hot || walletMode == undefined) && (
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    // updateAccountIndex(1);
+                    // AsyncStorageUtil.setItem("account_select", 0);
+
                     navigate("WebsPage", {
                       url: "https://app.orders.exchange/",
                     });
-                  }
 
-                  // navigate("DiscoverPage");
-                  // navigate("WebPageTest");
-                }}
-              >
-                <View style={{ marginTop: 20, alignItems: "center" }}>
-                  <Image
-                    source={require("../../image/meta_home_swap_icon.png")}
-                    style={{ width: 40, height: 40 }}
-                  />
-                  <Text
-                    style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
-                  >
-                    Swap
-                  </Text>
-                </View>
-              </TouchableWithoutFeedback>
-            )}
+                    // navigate("DiscoverPage");
+                    // navigate("WebPageTest");
+                  }}
+                >
+                  <View style={{ marginTop: 20, alignItems: "center" }}>
+                    <Image
+                      source={require("../../image/meta_home_swap_icon.png")}
+                      style={{ width: 40, height: 40 }}
+                    />
+                    <Text
+                      style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
+                    >
+                      {t("h_swap")}
+                    </Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              )}
 
-            {isShowPay == showPayCode && (
-              <TouchableWithoutFeedback
-                onPress={async () => {
-                  // navigate("DiscoverPage");
-                  const isCold = await isColdWalletMode();
-                  if (isCold) {
-                  } else {
+            {isShowPay == showPayCode &&
+              (walletMode == wallet_mode_hot || walletMode == undefined) && (
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    // navigate("DiscoverPage");
+
                     navigate("WebsPage", {
                       // url: "https://octopus.space/",
                       url: "https://octopus.space/#/wrapping",
                     });
-                  }
-                  // navigate("WebPageTest");
-                  // navigate("WebPage");
-                }}
-              >
-                <View style={{ marginTop: 20, alignItems: "center" }}>
-                  <Image
-                    source={require("../../image/meta_home_bridge_icon.png")}
-                    style={{ width: 40, height: 40 }}
-                  />
-                  <Text
-                    style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
-                  >
-                    Bridge
-                  </Text>
-                </View>
-              </TouchableWithoutFeedback>
-            )}
+                    // navigate("WebPageTest");
+                    // navigate("WebPage");
+                  }}
+                >
+                  <View style={{ marginTop: 20, alignItems: "center" }}>
+                    <Image
+                      source={require("../../image/meta_home_bridge_icon.png")}
+                      style={{ width: 40, height: 40 }}
+                    />
+                    <Text
+                      style={[{ marginTop: 10 }, metaStyles.smallDefaultText]}
+                    >
+                      {t("h_bridge")}
+                    </Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              )}
           </View>
 
           {/* <MyTabs /> */}
@@ -1396,3 +1420,41 @@ function MyTabs03() {
     </TabsTop.Navigator>
   );
 }
+
+// useEffect(() => {
+//   if (!walletManager) {
+//     return;
+//   }
+
+//   const initWalletManager = async () => {
+//     try {
+//       const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
+//       if (!mode || wallet_mode_cold != mode) {
+//         // console.log("initWalletManager");
+//         // const t1 = performance.now();
+//         getCurrentChainWallet(Chain.BTC).then((btcWallet) => {
+//           // updateBtcAddress(btcWallet.getAddress());
+//           console.log(btcWallet.getAddress());
+
+//           // console.log("time1", performance.now() - t1);
+//           // console.log("btc address", btcWallet.getAddress());
+//         });
+//         getCurrentChainWallet(Chain.MVC).then((mvcWallet) => {
+//           // console.log("mvc walletManager ",mvcWallet.getAddress());
+//           // console.log("mvc walletManager ",mvcWallet.getAddressIndex());
+//           // console.log("mvc walletManager ",mvcWallet.getAddressType());
+//           // console.log("mvc walletManager ",mvcWallet.getScriptType());
+//           // console.log("mvc walletManager ",mvcWallet.getPath());
+//           // console.log("mvc walletManager ",mvcWallet.getSeed().toString('hex'));
+//           // updateMvcAddress(mvcWallet.getAddress());
+//           // console.log("time2", performance.now() - t1);
+//           // console.log("mvc address", mvcWallet.getAddress());
+//         });
+//       }
+//     } catch (error) {
+//       console.error("Error fetching data:", error);
+//     }
+//   };
+
+//   initWalletManager();
+// }, [walletManager]);

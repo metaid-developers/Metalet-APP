@@ -12,6 +12,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
+  CloseView,
   GradientAvatar,
   LoadingModal,
   LoadingNoticeModal,
@@ -40,6 +41,7 @@ import {
   getStorageWallets,
   setWalletMode,
 } from "../utils/WalletUtils";
+import { useTranslation } from "react-i18next";
 
 export default function WalletsPage() {
   let [walletList, setWalletList] = useState<WalletBean[]>([]);
@@ -67,6 +69,8 @@ export default function WalletsPage() {
   const { needInitWallet, updateNeedInitWallet } = useData();
   const { metaletWallet, updateMetaletWallet } = useData();
   const { walletMode, updateWalletMode } = useData();
+  const { t } = useTranslation();
+  const [isShowAddWallet, setShowAddWallet] = useState(false);
 
   // let changeWallet:WalletBean;
 
@@ -162,13 +166,14 @@ export default function WalletsPage() {
     setcurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
     await setCurrentAccountID(nowWallet.accountsOptions[accountIndex].id);
     await setCurrentWalletID(nowWallet.id);
-    if (nowWallet.isColdWalletMode) {
-      updateWalletMode(wallet_mode_cold);
-      await setWalletMode(wallet_mode_cold);
-    } else {
-      updateWalletMode(wallet_mode_hot);
-      await setWalletMode(wallet_mode_hot);
-    }
+    // if (nowWallet.isColdWalletMode) {
+    //   updateWalletMode(wallet_mode_cold);
+    //   await setWalletMode(wallet_mode_cold);
+    // } else {
+    //   updateWalletMode(wallet_mode_hot);
+    //   await setWalletMode(wallet_mode_hot);
+    // }
+    updateWalletMode(nowWallet.isColdWalletMode);
     updateMyWallet(nowWallet);
     // console.log("nowWallet", JSON.stringify(wallets));
 
@@ -193,7 +198,8 @@ export default function WalletsPage() {
   }
 
   async function userAddWallet() {
-    navigate("AddWalletPage");
+    // navigate("AddWalletPage");
+    setShowAddWallet(true);
   }
 
   const AccountListItem = ({ data, parentIndex }) => {
@@ -310,7 +316,7 @@ export default function WalletsPage() {
             style={{ width: 36, height: 36 }}
           />
           <View style={{ marginLeft: 10 }}>
-            <Text>Add account</Text>
+            <Text>{t("m_add_account")}</Text>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -444,13 +450,13 @@ export default function WalletsPage() {
                 },
               ]}
             >
-              Edit
+              {t("o_wallet_edit")}
             </Text>
           </TouchableWithoutFeedback>
         </View>
         <View style={metaStyles.verMarginContainer}>
           <Text style={{ textAlign: "center", color: "#666666", fontSize: 16 }}>
-            Total Assests
+            {t("o_total_assets")}
           </Text>
 
           <Text
@@ -507,14 +513,13 @@ export default function WalletsPage() {
                     { fontSize: 16 },
                   ]}
                 >
-                  Add Wallet
+                  {t("m_add_wallet")}
                 </Text>
               </View>
             </View>
           </TouchableWithoutFeedback>
 
           {/* 修改钱包 */}
-
           <Modal transparent={true} visible={isShowEditWallet}>
             <TouchableWithoutFeedback
               onPress={() => {
@@ -777,6 +782,92 @@ export default function WalletsPage() {
                         Confirm
                       </Text>
                     </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </View>
+          </Modal>
+
+          <Modal visible={isShowAddWallet} transparent={true}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  borderRadius: 10,
+                  marginHorizontal: 30,
+                  padding: 30,
+                }}
+              >
+                <View style={{ flexDirection: "row" }}>
+                  <Text style={metaStyles.largeDefaultLittleText}>
+                    {t("s_add_wallet_type_title")}
+                  </Text>
+
+                  <View style={{ flex: 1 }} />
+
+                  <CloseView
+                    event={() => {
+                      setShowAddWallet(false);
+                    }}
+                  />
+                </View>
+
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    setShowAddWallet(false);
+                    navigate("AddWalletPage");
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      marginTop: 30,
+                      alignItems: "center",
+                      height: 50,
+                    }}
+                  >
+                    <Text style={{ color: "#333333", fontSize: 18 }}>
+                      {t("s_line_wallet")}
+                    </Text>
+
+                    <View style={{ flex: 1 }} />
+
+                    <Image
+                      source={require("../../image/list_icon_ins.png")}
+                      style={{ width: 20, height: 20 }}
+                    />
+                  </View>
+                </TouchableWithoutFeedback>
+
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    setShowAddWallet(false);
+                    navigate("AddColdWalletPage");
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      height: 50,
+                    }}
+                  >
+                    <Text style={{ color: "#333333", fontSize: 18 }}>
+                    {t("s_cold_wallet")}
+                    </Text>
+
+                    <View style={{ flex: 1 }} />
+
+                    <Image
+                      source={require("../../image/list_icon_ins.png")}
+                      style={{ width: 20, height: 20 }}
+                    />
                   </View>
                 </TouchableWithoutFeedback>
               </View>

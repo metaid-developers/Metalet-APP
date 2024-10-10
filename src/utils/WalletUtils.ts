@@ -17,6 +17,7 @@ import {
   net_wallet_network_key,
   wallet_mode_key,
   wallet_mode_cold,
+  wallet_mode_observer,
 } from "./AsyncStorageUtil";
 import MetaletWallet from "../wallet/MetaletWallet";
 import { removeTrailingZeros } from "./StringUtils";
@@ -155,14 +156,44 @@ export async function setWalletNetwork(walletNet: string) {
   await AsyncStorageUtil.setItem(net_wallet_network_key, walletNet);
 }
 
-export async function isColdWalletMode() {
-  const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
-  if (mode && wallet_mode_cold === mode) {
+export async function isObserverWalletMode() {
+  // const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
+  const wallet = await getStorageCurrentWallet();
+  if (wallet.isColdWalletMode == wallet_mode_observer) {
     return true;
   } else {
     return false;
   }
+  // if (mode && wallet_mode_cold === mode) {
+  //   return true;
+  // } else {
+  //   return false;
+  // }
 }
+export async function isColdWalletMode() {
+  // const mode = await AsyncStorageUtil.getItem(wallet_mode_key);
+  const wallet = await getStorageCurrentWallet();
+  if (wallet.isColdWalletMode == wallet_mode_observer) {
+    return true;
+  } else {
+    return false;
+  }
+  // if (mode && wallet_mode_cold === mode) {
+  //   return true;
+  // } else {
+  //   return false;
+  // }
+}
+
+export async function getWalletMode() {
+  const wallet = await getStorageCurrentWallet();
+  return wallet.isColdWalletMode;
+}
+
+// export async function getWalletModeTest() {
+//   const wallet = await getStorageCurrentWallet();
+//   return wallet.isColdWalletModeTest;
+// }
 
 export async function setWalletMode(mode: string) {
   await AsyncStorageUtil.setItem(wallet_mode_key, mode);
@@ -244,7 +275,7 @@ export async function openBrowser(link: string) {
     const supported = await Linking.canOpenURL(link);
     if (supported) {
       console.log("openBrowser", link);
-      
+
       await Linking.openURL(link);
     } else {
       console.log(`Don't know how to open this URL: ${link}`);

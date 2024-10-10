@@ -19,7 +19,7 @@ import {
 import { FeedBean, FeedBtcObject } from "@/types/btcfeed";
 import { inputNormalBgColor, themeColor } from "@/constant/Constants";
 import { useData } from "@/hooks/MyProvider";
-import { ScriptType } from "@metalet/utxo-wallet-service";
+import { ScriptType, SignType } from "@metalet/utxo-wallet-service";
 import { getBtcUtxos, getInscriptionUtxo, getMetaPin } from "@/queries/utxos";
 import { getRandomID, goToWebScan, parseToSpace } from "@/utils/WalletUtils";
 import { broadcastBtc, fetchBtcFeed } from "@/api/metaletservice";
@@ -93,17 +93,25 @@ export default function PinNftTransferPage({ route }) {
       };
 
       const utxos = await getBtcUtxos(btcAddress, needRawTx);
-      const { fee, rawTx, cost } = metaletWallet.currentBtcWallet.sendBRC20(
-        inputAddress,
-        [utxo],
-        parseFloat(feed),
-        utxos
-      );
+      // const { fee, rawTx, cost } = metaletWallet.currentBtcWallet.sendBRC20(
+      //   inputAddress,
+      //   [utxo],
+      //   parseFloat(feed),
+      //   utxos
+      // );
 
-      if (rawTx) {
-        console.log("rawTx", rawTx);
+      const { fee, rawTx: _rawTx } = metaletWallet.currentBtcWallet!.signTx(SignType.Transfer, {
+        recipient: inputAddress,
+        transferUTXOs: [utxo],
+        feeRate:  parseFloat(feed)!,
+        utxos,
+      })
+
+
+      if (_rawTx) {
+        console.log("rawTx", _rawTx);
         setfee(parseToSpace(fee.toString()));
-        setRawTx(rawTx);
+        setRawTx(_rawTx);
         setConfirmDailogState(true);
       }
     } catch (e) {
