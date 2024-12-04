@@ -7,10 +7,10 @@ import { Psbt, payments, networks, Transaction } from "bitcoinjs-lib";
 
 if (!(Buffer.alloc(1).subarray(0, 1) instanceof Buffer)) {
   Buffer.prototype.subarray = function (...args: [number?, number?]): Buffer {
-    const result = Uint8Array.prototype.subarray.apply(this, args)
-    Object.setPrototypeOf(result, Buffer.prototype)
-    return result as Buffer
-  }
+    const result = Uint8Array.prototype.subarray.apply(this, args);
+    Object.setPrototypeOf(result, Buffer.prototype);
+    return result as Buffer;
+  };
 }
 
 const toXOnly = (pubKey: Buffer) =>
@@ -53,7 +53,7 @@ export async function process({
 }): Promise<string> {
   const psbtNetwork = await getBtcNetwork();
   const wallet = await getCurrentWallet(Chain.BTC);
-  const pubkey = wallet.getPublicKey().toString('hex');
+  const pubkey = wallet.getPublicKey().toString("hex");
 
   if (!options) {
     options = { toSignInputs: undefined, autoFinalized: true };
@@ -88,7 +88,11 @@ export async function process({
   //   psbt.signInput(v.index, keyPair, v.sighashTypes)
   // })
   for (let i = 0; i < options.toSignInputs.length; i++) {
-    const keyPair = wallet.getSigner(options!.toSignInputs![i].treehash);
+    // const keyPair = wallet.getSigner(options!.toSignInputs![i].treehash);
+
+    const keyPair = wallet.getSigner({
+      treeHash: options!.toSignInputs![i].treehash,
+    });
     const v = options.toSignInputs[i];
     psbt.signInput(v.index, keyPair, v.sighashTypes);
   }
@@ -107,7 +111,7 @@ const formatOptionsToSignInputs = async (
   options?: SignPsbtOptions
 ) => {
   const wallet = await getCurrentWallet(Chain.BTC);
-  const pubkey = wallet.getPublicKey().toString('hex');
+  const pubkey = wallet.getPublicKey().toString("hex");
   const btcAddress = wallet.getAddress();
   const account = { pubkey, address: btcAddress };
 

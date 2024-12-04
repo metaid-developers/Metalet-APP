@@ -7,6 +7,7 @@ import {
   wallets_key,
   CurrentWalletIDKey,
 } from "@/utils/AsyncStorageUtil";
+import { getStorageCurrentWallet } from "@/utils/WalletUtils";
 
 const storage = createStorage();
 
@@ -141,4 +142,22 @@ export function getCurrentWallet<T extends Chain>(chain: T): WalletMap[T] {
     return useWalletStore.getState().btcWallet;
   }
   throw new Error(`Chain ${chain} is not supported`);
+}
+
+
+export async function getActiveWallet() {
+  // const currentWalletId = await getCurrentWalletId()
+  // if (!currentWalletId) {
+  //   throw new Error('currentWalletId id not found')
+  // }
+  // const wallets = await getV3EncryptedWallets()
+  // if (!wallets.length) {
+  //   throw new Error('wallets not found')
+  // }
+  // let wallet = wallets.find((wallet) => wallet.id === currentWalletId)
+  // if (!wallet) {
+  //   throw new Error('wallets not found')
+  // }
+  const wallet = await getStorageCurrentWallet()
+  return wallet
 }

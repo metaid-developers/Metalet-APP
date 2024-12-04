@@ -32,7 +32,7 @@ export default function AssetsMvcDetailPage({ route }) {
   const [noticeContent, setNoticeContent] = useState("Successful");
   const [isShowNotice, setIsShowNotice] = useState(false);
   const { metaletWallet, updateMetaletWallet } = useData();
-  const { t }=useTranslation();
+  const { t } = useTranslation();
   const { walletMode, updateWalletMode } = useData();
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function AssetsMvcDetailPage({ route }) {
 
     if (mvcActivityListData.length == 0) {
       console.log("mvcActivityListData.length == 0");
-      
+
       let record: MvcActivityRecord = {
         flag: "1",
         address: "1",
@@ -82,7 +82,6 @@ export default function AssetsMvcDetailPage({ route }) {
       isIncome = false;
     }
 
-  
     return (
       <View>
         {item.address != "1" ? (
@@ -117,7 +116,7 @@ export default function AssetsMvcDetailPage({ route }) {
               </Text>
               <Text style={metaStyles.grayTextSmall66}>
                 {/* {formatTime(item.time)} */}
-                {formatTime(item.time * 1000)}
+                {item.time <= 0 ? "--" : formatTime(item.time * 1000)}
               </Text>
             </View>
 
@@ -173,7 +172,7 @@ export default function AssetsMvcDetailPage({ route }) {
           >
             <Image
               source={require("../../../image/assert_record_nodata_icon.png")}
-              style={{ width: 38, height: 53,marginTop: 100  }}
+              style={{ width: 38, height: 53, marginTop: 100 }}
             />
 
             <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
@@ -208,7 +207,7 @@ export default function AssetsMvcDetailPage({ route }) {
             fontWeight: "bold",
           }}
         >
-          {metaletWallet.currentMvcBalance } SPACE
+          {metaletWallet.currentMvcBalance} SPACE
         </Text>
 
         <Text
@@ -221,7 +220,6 @@ export default function AssetsMvcDetailPage({ route }) {
           }}
         >
           ${metaletWallet.currentSpaceAssert}
-          
         </Text>
 
         <View
@@ -231,50 +229,51 @@ export default function AssetsMvcDetailPage({ route }) {
             alignItems: "center",
           }}
         >
-        
-        <TouchableWithoutFeedback
-        onPress={()=>{
-          if(walletMode==wallet_mode_observer){
-            ToastView({ text: "come soon", type: "info" });
-            return;
-          }
-          navigate("SendSpacePage");
-        }}
-        >
-        <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: "#F3F3FF",
-              borderRadius: 30,
-              paddingVertical: 20,
-              paddingHorizontal: 30,
-              alignItems: "center",
-              justifyContent: "center",
-              width: "40%",
+          <TouchableWithoutFeedback
+            onPress={() => {
+              if (walletMode == wallet_mode_observer) {
+                ToastView({ text: "come soon", type: "info" });
+                return;
+              }
+              navigate("SendSpacePage");
             }}
           >
-            <Image
-              source={require("../../../image/assert_send_icon.png")}
-              style={{ width: 15, height: 15 }}
-            />
-
-            <Text
+            <View
               style={{
-                color: themeColor,
-                textAlign: "center",
-                marginLeft: 10,
-                lineHeight: 20,
-                fontSize: 18,
+                flexDirection: "row",
+                backgroundColor: "#F3F3FF",
+                borderRadius: 30,
+                paddingVertical: 20,
+                paddingHorizontal: 30,
+                alignItems: "center",
+                justifyContent: "center",
+                width: "40%",
               }}
             >
-              {t("h_send")}
-            </Text>
-          </View>
-        </TouchableWithoutFeedback>
+              <Image
+                source={require("../../../image/assert_send_icon.png")}
+                style={{ width: 15, height: 15 }}
+              />
 
-          <TouchableWithoutFeedback onPress={() => {
-            navigate('ReceivePage',{myCoinType:'SPACE'})
-          }}>
+              <Text
+                style={{
+                  color: themeColor,
+                  textAlign: "center",
+                  marginLeft: 10,
+                  lineHeight: 20,
+                  fontSize: 18,
+                }}
+              >
+                {t("h_send")}
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
+
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigate("ReceivePage", { myCoinType: "SPACE" });
+            }}
+          >
             <View
               style={{
                 flexDirection: "row",
@@ -302,7 +301,7 @@ export default function AssetsMvcDetailPage({ route }) {
                   fontSize: 18,
                 }}
               >
-                  {t("h_receive")}
+                {t("h_receive")}
               </Text>
             </View>
           </TouchableWithoutFeedback>

@@ -69,9 +69,6 @@ export function caculateOneBtcFtMrc20Value(
   // const ftPriceData = await fetchMvcFtPrice();
   const mvcPrices = ftPriceData.data.priceInfo;
 
-  
-  
-
   for (let i = 0; i < tokens.length; i++) {
     const tokenSymbol = tokens[i].tick.toLocaleUpperCase();
     const quantity = parseFloat(tokens[i].balance);
@@ -80,10 +77,9 @@ export function caculateOneBtcFtMrc20Value(
     if (checkID in mvcPrices) {
       const price = mvcPrices[checkID];
       const assert = price * quantity;
-      total += price * quantity*btcPrice;
+      total += price * quantity * btcPrice;
     }
   }
-
 
   return total.toFixed(2);
 }
@@ -101,6 +97,11 @@ export async function caculateMvcAndBtcAssert(
   const spacePrice = assertPrice.data.priceInfo.space;
 
   const spaceBalanceData = await fetchSpaceBalance(mvcAddrss);
+
+  if (spaceBalanceData == null) {
+    return balance;
+  }
+
   const spaceSumBalance = parseFloat(
     parseToSpace(
       (spaceBalanceData.confirmed + spaceBalanceData.unconfirmed).toString()
@@ -134,13 +135,13 @@ export async function caculateMvcAndBtcAssert(
   const ftPriceMrc20Data = await fetchMrc20Price();
   const simData = await fetchMrc20List(network, btcAddress);
   if (simData) {
-    
-    const assertFt = caculateOneBtcFtMrc20Value(simData.data.list, ftPriceMrc20Data,btcPrice);
+    const assertFt = caculateOneBtcFtMrc20Value(
+      simData.data.list,
+      ftPriceMrc20Data,
+      btcPrice
+    );
     assertSum = toFloorNum(parseFloat(assertFt) + assertSum, 2);
   }
-
-
-
 
   balance.sumAssert = assertSum.toFixed(2);
   // console.log("assert" + JSON.stringify(balance));

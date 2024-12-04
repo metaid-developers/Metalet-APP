@@ -23,7 +23,9 @@ import * as SignBTCMessage from "./lib/authorize/btc/sign-message";
 import * as MRC20Deploy from "./lib/authorize/btc/mrc20-deploy";
 import * as MRC20Mint from "./lib/authorize/btc/mrc20-mint";
 import * as MRC20Transfer from "./lib/authorize/btc/mrc20-transfer";
+import * as TransferNFT from "./lib/authorize/btc/transfer-nft";
 
+import * as ECDH from "./common/ecdh";
 function doNothing() {}
 
 export default {
@@ -218,6 +220,24 @@ export default {
     descriptions: [],
     estimate: doNothing,
     process: MRC20Mint.process,
+    needEstimated: false,
+    component: lazy(() => import("../components/ComponentA")),
+  },
+  TransferNFT: {
+    name: "TransferNFT",
+    title: "Transfer NFT",
+    descriptions: [],
+    estimate: doNothing,
+    process: TransferNFT.process,
+    needEstimated: false,
+    component: lazy(() => import("../components/ComponentA")),
+  },
+  ECDH: {
+    name: "ECDH",
+    title: "ECDH",
+    descriptions: ["ECDH"],
+    process: ECDH.process,
+    estimate: doNothing,
     needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },

@@ -527,7 +527,7 @@ export default function InscribeFirstPage({ route }) {
     // console.log(btcAddress);
     // console.log(inputAmount)
     const fileName = `{"p":"brc-20","op":"transfer","tick":"${brc20.ticker}","amt":"${inputAmount}"}`;
-    // console.log(JSON.stringify(fileName));
+    console.log(JSON.stringify(fileName));
 
     if (parseFloat(inputAmount) <= 0) {
       return;

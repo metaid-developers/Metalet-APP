@@ -101,12 +101,12 @@ export default function WelcomeWalletPage(props) {
         style={styles.img}
       />
       {/* { marginTop: 15 }, */}
-      <Text style={[{ fontWeight: "bold" }, { fontSize: 22 }]}>
+      <Text style={[{ fontWeight: "bold" ,marginTop:20}, { fontSize: 22 }]}>
         {t("w_welcome_title")}
       </Text>
 
       {/* <View style={{ flex: 1 }} /> */}
-      <View style={{ height: 15 }} />
+      <View style={{ height: 30 }} />
       <RoundSimButton
         title={t("m_import_wallet")}
         event={async () => {
@@ -139,7 +139,7 @@ export default function WelcomeWalletPage(props) {
         textColor="white"
       />
       <View style={{ height: 10 }} />
-      <RoundSimButton
+      {/* <RoundSimButton
         title={"Cold Wallet"}
         event={async () => {
           // props.navigation.navigate("TabNavigator",{screen: "Home"});
@@ -160,7 +160,7 @@ export default function WelcomeWalletPage(props) {
           // }
         }}
         textColor="white"
-      />
+      /> */}
 
       <View style={{ height: 15 }} />
       <Text style={metaStyles.grayText99}>{t("w_welcome_notice")}</Text>

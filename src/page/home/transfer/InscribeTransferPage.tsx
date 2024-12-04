@@ -29,7 +29,7 @@ import {
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import * as Clipboard from "expo-clipboard";
 import { navigate } from "@/base/NavigationService";
-import { broadcastBtc, fetchBrc20InscribeCommit } from "@/api/metaletservice";
+import { fetchBrc20InscribeCommit } from "@/api/metaletservice";
 import { useData } from "@/hooks/MyProvider";
 import { InscribeResultData } from "@/api/type/Inscribe";
 import { Chain } from "@metalet/utxo-wallet-service";
@@ -137,6 +137,7 @@ export default function InscribeTransferPage({ route }) {
               title={"Confirm"}
               textColor="#fff"
               event={() => {
+                setConfirmDialogState(false);
                 navigate("InscribeSuccessPage", { fileName: fileName });
               }}
               roundStytle={{ marginTop: 20 }}

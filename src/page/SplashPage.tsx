@@ -62,6 +62,7 @@ export default function SplashPage(props) {
   const { needRefreshApp, updateNeedRefreshApp } = useData();
   let needRefresh = true;
 
+
   useEffect(() => {
     try {
       needRefresh = true;
@@ -182,13 +183,16 @@ export default function SplashPage(props) {
         updateIsShowPay(1);
       }
     } else {
+      // iavc 比当前版本大 1 
       const check: UpdateData = await fetchCheckUpgrade("ios");
       console.log(JSON.stringify(check));
-      const codeVersion = check.data.ios;
+      // const showCode = check.data.iavc;
       const showCode = check.data.iavc;
       console.log("showCode", showCode);
       if (parseFloat(buildNumber) >= showCode) {
         updateIsShowPay(0);
+        console.log("no GO");
+        
       } else {
         updateIsShowPay(1);
       }

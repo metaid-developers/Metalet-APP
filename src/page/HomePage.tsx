@@ -159,6 +159,8 @@ export default function HomePage({ navigation }) {
 
     changeLanguage();
 
+
+
     // 立即调用一次获取数据
     // fetchData();
     // 设置轮询，每隔5秒获取一次数据
@@ -229,17 +231,19 @@ export default function HomePage({ navigation }) {
   }
 
   async function checkUpgrade() {
-    // AsyncStorageUtil.clear();
+    //android 更新跟当前的应用的Code 保持一致即可
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
-      // console.log(JSON.stringify(check));
-      const codeVersion = check.data.version_code;
+      console.log(JSON.stringify(check));
+      // const codeVersion = check.data.version_code;
+      const codeVersion = 36;
       // setUpdateUrl(check.data.url);
       setUpdateUrl(check.data.apkUrl);
       if (codeVersion > versionCode) {
         setUpdate(true);
       }
     } else {
+      // 36
       const check: UpdateData = await fetchCheckUpgrade("ios");
       // console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;

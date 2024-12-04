@@ -88,6 +88,7 @@ export async function estimate({
   revealTxs: TxDetail[];
   options?: { noBroadcast: boolean };
 }> {
+  console.log("inscribe 方法");
   const wallet = await getCurrentWallet(Chain.BTC);
   const address = wallet.getAddress();
   const utxos = await getBtcUtxos(
@@ -95,6 +96,7 @@ export async function estimate({
     wallet.getScriptType() === ScriptType.P2PKH,
     true
   );
+  console.log("inscribe 方法11111");
   const metaIdPinUnspentOutputsObj = await getMetaIdPinUnspentOutputsObj();
   const metaIdPinUnspentOutputs = metaIdPinUnspentOutputsObj[address] || [];
   const btcUnspentOutputs = utxos.map(
@@ -108,40 +110,48 @@ export async function estimate({
       utxo.confirmed ||
       metaIdPinUnspentOutputs.includes(`${utxo.txId}:${utxo.outputIndex}`)
   );
-  const { commitTx, revealTxs } = wallet.signTx(SignType.INSCRIBE_METAIDPIN, {
-    utxos,
-    feeRate,
-    metaidDataList,
-    service,
-  });
+  console.log("inscribe 方法222221");
+  // try {
+    const { commitTx, revealTxs } = wallet.signTx(SignType.INSCRIBE_METAIDPIN, {
+      utxos,
+      feeRate,
+      metaidDataList,
+      service,
+    });
+    console.log("inscribe 方法333");
 
-  const commitCost =
-    utxos.reduce((acc, utxo) => acc + utxo.satoshis, 0) -
-    commitTx.txOutputs
-      .filter((out) => out.address === address)
-      .reduce((acc, out) => acc + out.value, 0);
+    const commitCost =
+      utxos.reduce((acc, utxo) => acc + utxo.satoshis, 0) -
+      commitTx.txOutputs
+        .filter((out) => out.address === address)
+        .reduce((acc, out) => acc + out.value, 0);
 
-  const revealCost = revealTxs.reduce(
-    (acc, revealTx) =>
-      acc + revealTx.txInputs.reduce((acc, out) => acc + out.value, 0),
-    0
-  );
+    const revealCost = revealTxs.reduce(
+      (acc, revealTx) =>
+        acc + revealTx.txInputs.reduce((acc, out) => acc + out.value, 0),
+      0
+    );
 
-  const totalCost =
-    commitCost -
-    metaidDataList.filter((metaidData) => metaidData.revealAddr === address)
-      .length *
-      revealOutValue;
+    const totalCost =
+      commitCost -
+      metaidDataList.filter((metaidData) => metaidData.revealAddr === address)
+        .length *
+        revealOutValue;
 
-  return {
-    feeRate,
-    commitTx,
-    revealTxs,
-    commitCost,
-    revealCost,
-    totalCost,
-    options,
-  };
+    return {
+      feeRate,
+      commitTx,
+      revealTxs,
+      commitCost,
+      revealCost,
+      totalCost,
+      options,
+    };
+  // } catch (e) {
+  //   return {
+  //    e
+  //   };
+  // }
 }
 
 export async function process({

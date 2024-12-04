@@ -79,7 +79,7 @@ const actions = {
   saveBase64Image: { action: "saveBase64Image", type: "query" }
 };
 
-const metalet = { btc: {}, token: {} };
+const metalet = { btc: {}, token: {} ,common: {} };
 
 Object.keys(actions).forEach((key) => {
   metalet[key] = async function (params) {
@@ -115,6 +115,20 @@ const btcKeys = {
 Object.keys(btcKeys).forEach((type) => {
   btcKeys[type].forEach((item) => {
     metalet.btc[item.name] = async function (params) {
+      return await postMessage(item.action, type, params);
+    };
+  });
+});
+
+const commonKeys = {
+  authorize: [
+    { name: "ecdh", action: "ECDH" },
+  ],
+};
+
+Object.keys(commonKeys).forEach((type) => {
+  commonKeys[type].forEach((item) => {
+    metalet.common[item.name] = async function (params) {
       return await postMessage(item.action, type, params);
     };
   });

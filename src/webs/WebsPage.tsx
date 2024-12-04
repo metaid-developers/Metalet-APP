@@ -24,6 +24,7 @@ import { CircleAvatarLetter, LoadingModal, ToastView } from "@/constant/Widget";
 import { LinearGradient } from "expo-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { inputNormalBgColor, litterWhittleBgColor } from "@/constant/Constants";
+import * as ECDH from "@/webs/actions/common/ecdh";
 
 interface Message {
   host: string;
@@ -69,20 +70,25 @@ export default function WebsPage(props) {
   }, []);
 
   const onError = ({ nativeEvent }) => {
+    console.log("webView 加载错误信息");
+
     console.log("onError", nativeEvent);
   };
 
   const handlerMessage = async (
     message: Message & { type: string; data: unknown }
   ) => {
-    // console.log("handlerMessage", message);
+    console.log("handlerMessage", message);
 
     if (message.type === "Console") {
       console.info(`[Console] ${JSON.stringify(message.data)}`);
       return;
     }
-    const [actionName, actionType] = message.action.split("-");
+    let [actionName, actionType] = message.action.split("-");
 
+    if (actionName === "ECDH") {
+      actionType = "query";
+    }
     // if (actionName === "Transfer") {
     //   console.log("message", message);
     // }
@@ -119,6 +125,10 @@ export default function WebsPage(props) {
           if (message && message.nonce) {
             console.log("data11111111: ", message.nonce);
 
+            if(actionName=="ECDH"){
+              console.log("处理的结果是： "+JSON.stringify(data));
+            }
+
             postMessage(
               JSON.stringify({
                 data,
@@ -148,33 +158,68 @@ export default function WebsPage(props) {
     setModalVisible(false);
   };
 
+  const errorAction = async (errorMessage) => {
+    postMessage(
+      JSON.stringify({
+        nonce: actionMsg.nonce,
+        data: {
+          status:errorMessage,
+          info:errorMessage
+        },
+      })
+    );
+    setModalVisible(false);
+  };
+
   const confirmAction = async () => {
     try {
+      // const resutl = ECDH.process({
+      //   path: "m/100'/0'/0'/0/0",
+      //   externalPubKey:
+      //     "04782a9b4046f88a8fd717ed4bdf632aca5bcef29b7547506c2a58aef2e47fbc5ad87e7796361773c5deb511eb26e6c65819aabb1d2272aa3a1bd4a1d0107935d6",
+      // });
+
+      // console.log("creatorPubkey：" + (await resutl).creatorPubkey);
+      // console.log("ecdhPubKey ：" + (await resutl).ecdhPubKey);
+      // console.log("externalPubKey：" + (await resutl).externalPubKey);
+      // console.log("sharedSecret：" + (await resutl).sharedSecret);
+
       const [actionName, actionType] = actionMsg.action.split("-");
       console.log("actionName ", actionName);
 
       if (actionType === ActionType.Authorize && needEstimated) {
         const data = metaidComponentRef.current.getEstimatedData();
+
         const { nextComponent, estimate } = actionDispatcher(
           actionName,
           ActionType.Authorize
         );
         console.log(" 设置参数完成：", data);
 
-        const params = await estimate(data);
+        try {
+          const params = await estimate(data);
 
-        setNeedEstimated(false);
-        setComponentInfo({ component: nextComponent, params });
-        console.log("params 设置参数完成：", params);
-        setIsShowLoading(false);
+          setNeedEstimated(false);
+          setComponentInfo({ component: nextComponent, params });
+          console.log("params 设置参数完成：", params);
+          setIsShowLoading(false);
+        } catch (e) {
+          console.log("调用报错" + e);
+          setModalVisible(false);
+          ToastView({ text: e.toString(), type: "error", time: 3000 });
+          // cancelAction();
+          errorAction(e.toString())
+          throw(e.toString())
+        }
       } else {
+        console.log("进行下一步处理");
         const { process } = actionDispatcher(
           actionName,
           actionType as ActionType
         );
         // console.log("confirmAction params", componentInfo.params);
         const data = await process(componentInfo.params, actionMsg.host);
-        console.log("confirmAction data", data);
+        // console.log("confirmAction data", data);
         setIsShowLoading(false);
         postMessage(
           JSON.stringify({

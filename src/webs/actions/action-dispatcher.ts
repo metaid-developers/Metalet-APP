@@ -37,6 +37,8 @@ const actionDispatcher = <T extends ActionType>(
   actionType: T
 ): ActionDispatcherReturnType<T> => {
   if (actionType === ActionType.Query) {
+    console.log(1111);
+    
     return queryActions[actionName] as ActionDispatcherReturnType<T>;
   } else if (actionType === ActionType.Authorize) {
     console.log("authorizeActions11111 ", authorizeActions[actionName]);

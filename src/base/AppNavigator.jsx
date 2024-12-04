@@ -90,6 +90,8 @@ import AddColdWalletPage from "@/page/wallet/AddColdWalletPage";
 import ReceiveColdPage from "@/page/receive/ReceiveColdPage";
 import ColdAssetWalletPage from "@/page/settings/ColdAssetWalletPage";
 import CongratulationsColdPage from "@/page/CongratulationsColdPage";
+import BtcMRC721Page from "@/page/BtcMRC721Page";
+import BtcNftMRC721DetailPage from "@/page/home/BtcNftMRC721DetailPage";
 
 ////////
 
@@ -228,6 +230,9 @@ const StackNavigator = () => (
       name="CongratulationsColdPage"
       component={CongratulationsColdPage}
     />
+    <Stack.Screen name="BtcMRC721Page" component={BtcMRC721Page} />
+    <Stack.Screen name="BtcNftMRC721DetailPage" component={BtcNftMRC721DetailPage} />
+    
   </Stack.Navigator>
 );
 
@@ -298,7 +303,7 @@ const TabNavigator = () => {
         },
       })}
     >
-      {(walletMode == wallet_mode_hot ||walletMode == undefined )&& (
+      {(walletMode == wallet_mode_hot || walletMode == undefined) && (
         <Tab.Screen headerShown={false} name="HomePage" component={HomePage} />
       )}
 
@@ -311,11 +316,11 @@ const TabNavigator = () => {
       )}
 
       {/* <Tab.Screen name="PlazaPage" component={PlazaPage} /> */}
-      {(walletMode == wallet_mode_hot||walletMode == undefined )&& isShowPay == showPayCode && (
-        <Tab.Screen name="DiscoverPage" component={DiscoverPage} />
-      )}
+      {(walletMode == wallet_mode_hot || walletMode == undefined) &&
+        isShowPay == showPayCode && (
+          <Tab.Screen name="DiscoverPage" component={DiscoverPage} />
+        )}
       <Tab.Screen name="SettingsPage" component={SettingsPage} />
-
     </Tab.Navigator>
   );
 };

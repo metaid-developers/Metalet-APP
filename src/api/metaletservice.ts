@@ -27,7 +27,8 @@ import { Mrc20RecordData } from "./type/Mrc20RecordData";
 import { t } from "i18next";
 import { TxIdData } from "./type/TxId";
 import { MvcActivityRecord } from "@/types/mvcrecord";
-import { RootDataObject, RootDataObject2 } from "./type/RootDataObject";
+import { RootDataObject, RootDataObject2, RootDataObject3 } from "./type/RootDataObject";
+import { PINsBean } from "./type/PINsBean";
 
 // export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
@@ -60,6 +61,8 @@ export async function fetchMvcActivityComfird(
     false,
     { net: network, address: address }
   );
+  console.log("fetchMvcActivityComfird", result);
+  
   const data = result.data.list as MvcActivityRecord[];
   return data;
 }
@@ -142,17 +145,21 @@ export async function fetchMvcFtBalance(address: string): Promise<MvcFtData[]> {
   //   true
   // );
   // return data;
-
-  const network = await getWalletNetwork(Chain.BTC);
-  const result: RootDataObject2 = await get(
-    BASE_METALET_URL +
-      BASE_METALET_V4_URL +
-      "/address/contract/ft/balance-list",
-    false,
-    { net: network, address: address }
-  );
-  const data = result.data.list as MvcFtData[];
-  return data;
+  try {
+    const network = await getWalletNetwork(Chain.BTC);
+    const result: RootDataObject2 = await get(
+      BASE_METALET_URL +
+        BASE_METALET_V4_URL +
+        "/address/contract/ft/balance-list",
+      false,
+      { net: network, address: address }
+    );
+    const data = result.data.list as MvcFtData[];
+    return data;
+  } catch (error) {
+    console.log("error fetchMvcFtBalance", error);
+    return null;
+  }
 }
 
 // 9. MVC nft data
@@ -198,6 +205,8 @@ export async function broadcastBtc(hex: string): Promise<{
     net: network,
     rawTx: hex,
   });
+  console.log("broadcastBtc----", data);
+
   return data;
   // return { code: 1,message: "string", processingTime: 1,data: "string"};
 }
@@ -210,7 +219,6 @@ export async function fetchMvcFtPrice(): Promise<MvcFtPriceData> {
   );
   return data;
 }
-
 
 // balance
 //12.space balance
@@ -228,6 +236,8 @@ export async function fetchSpaceBalance(
     false,
     { net: network, address: address }
   );
+  console.log("fetchSpaceBalance", data);
+  
   const dataMvcBalance: SpaceBalance = data.data as SpaceBalance;
 
   return dataMvcBalance;
@@ -305,20 +315,27 @@ export async function fetchBrc20InscribePre(
   net: string,
   filename: string
 ): Promise<PreInscribeData> {
+  const requestData = {
+    feeRate,
+    files: [
+      {
+        filename,
+        dataURL: Buffer.from(filename).toString("base64"),
+      },
+    ],
+    net,
+    inscriptionOutValue: 546,
+    receiveAddress,
+  };
+  console.log("fetchBrc20InscribePre 请求参数： ", requestData);
+
   const data: PreInscribeData = await post(
-    BASE_METALET_URL + "/wallet-api/v3/inscribe/pre",
-    {
-      feeRate,
-      files: [
-        {
-          filename,
-          dataURL: Buffer.from(filename).toString("base64"),
-        },
-      ],
-      net,
-      receiveAddress,
-    }
+    // BASE_METALET_URL + "/wallet-api/v3/inscribe/pre",
+    BASE_METALET_URL + "/wallet-api/v4/btc/ordinal/inscribe/pre",
+    requestData
   );
+  console.log("fetchBrc20InscribePre 铭刻预览数据： ", data);
+
   return data;
 }
 
@@ -330,8 +347,13 @@ export async function fetchBrc20InscribeCommit(
   net: string,
   rawTx: string
 ): Promise<InscribeResultData> {
+  console.log("fetchBrc20InscribeCommit 请求参数： ", orderId);
+  console.log("fetchBrc20InscribeCommit rawTx: ", rawTx);
+  console.log("fetchBrc20InscribeCommit net: ", net);
+
   const data: InscribeResultData = await post(
-    BASE_METALET_URL + "/wallet-api/v3/inscribe/commit",
+    // BASE_METALET_URL + "/wallet-api/v3/inscribe/commit",
+    BASE_METALET_URL + "/wallet-api/v4/btc/ordinal/inscribe/commit",
     {
       version,
       orderId,
@@ -341,6 +363,8 @@ export async function fetchBrc20InscribeCommit(
       // addressType:1
     }
   );
+  console.log("fetchBrc20InscribeCommit 铭刻提交数据： ", data);
+
   return data;
 }
 
@@ -434,14 +458,25 @@ export async function fetchMvcNftSerList(
   return data;
 }
 
-
-
-
-
-
-
-export async function checkHasNetWork(){
+export async function checkHasNetWork() {
   const check: UpdateData = await fetchCheckUpgrade("android");
   console.log(JSON.stringify(check));
-  return false;  
+  return false;
+}
+
+
+// 25.mvc nft Ser List
+export async function fetchPINsList(
+  address: string,
+): Promise<PINsBean[]> {
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject3 = await get(
+    BASE_METALET_URL + "/wallet-api/v3/address/pins",
+    false,
+    { net: network, address:address,cnt: true, cursor: 0, size: 1000 }
+  );
+  const data: PINsBean[] = result.data.list;
+  // console.log("长度："+data.length);
+  
+  return data;
 }

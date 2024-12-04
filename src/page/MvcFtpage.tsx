@@ -86,14 +86,18 @@ export default function MvcFtPage() {
     
 
     let list = [];
-    for (let i = 0; i < ftdata.length; i++) {
-      const ftItem: MvcFtData = ftdata[i];
-      const assertFt = caculateOneFtValue([ftItem], ftPriceData);
-      ftItem.assetPrice = assertFt;
-      // console.log("ftItem.assetPrice",ftItem.assetPrice);
-      list.push(ftItem);
+    if (ftdata != null) {
+      for (let i = 0; i < ftdata.length; i++) {
+        const ftItem: MvcFtData = ftdata[i];
+        const assertFt = caculateOneFtValue([ftItem], ftPriceData);
+          ftItem.assetPrice = assertFt;
+          // console.log("ftItem.assetPrice",ftItem.assetPrice);
+          list.push(ftItem);
+       
+      }
+  
     }
-
+   
     // console.log(ftdata);
 
     if (list) {

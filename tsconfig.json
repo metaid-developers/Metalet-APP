@@ -5,7 +5,8 @@
     "jsx": "react-native",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+     "types": ["node"]
   },
   "extends": "expo/tsconfig.base"
 }

@@ -13,7 +13,18 @@ export interface RootDataObject2 {
 }
 
 interface MvcApiResponse {
-      list: Object;
+  list: Object;
+}
+
+export interface RootDataObject3 {
+  code: number;
+  message: string;
+  processingTime: number;
+  data: ApiResponse;
+}
+
+interface ApiResponse {
+  list: [];
 }
 
 // interface Data {

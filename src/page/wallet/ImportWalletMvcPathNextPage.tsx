@@ -25,6 +25,13 @@ import { eventBus, refreshHomeLoadingEvent } from "../../utils/EventBus";
 import { navigate } from "../../base/NavigationService";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getCurrentMvcWallet } from "@/wallet/wallet";
+import {
+  getStorageCurrentWallet,
+  getWalletNetwork,
+  setCurrentStorageWallet,
+} from "@/utils/WalletUtils";
+import { AddressType, MvcWallet } from "@metalet/utxo-wallet-service";
+import { mvc } from "meta-contract";
 
 const storage = createStorage();
 
@@ -32,8 +39,10 @@ export default function ImportWalletMvcPathNextPage({ route }) {
   const { netWork, updateNetWork } = useData();
   const [selectMvcNetWork, setSelectMvcNetWork] = useState(true);
   const [selectBtcNetWork, setSelectBtcNetWork] = useState(true);
+  const { mvcPath, updateMvcPath } = useData();
 
   const [mvcAddress, setMvcAddress] = useState("");
+  const [value, setValue] = useState("");
 
   const { isDefault } = route.params;
   console.log(isDefault);
@@ -102,7 +111,8 @@ export default function ImportWalletMvcPathNextPage({ route }) {
               <Text style={metaStyles.defaultText}>m/44'/</Text>
               <TextInput
                 placeholder="236"
-                // keyboardType="numeric"
+                keyboardType="numeric"
+                value={value}
                 style={{
                   borderRadius: 5,
                   backgroundColor: semiTransparentGray,
@@ -112,8 +122,31 @@ export default function ImportWalletMvcPathNextPage({ route }) {
                   paddingVertical: 2,
                   marginHorizontal: 5,
                 }}
-                onChangeText={(text) => {
-                  // setmvcPath(text);
+                onChangeText={async (text) => {
+                  const numericValue = text.replace(/[^0-9]/g, "");
+                  if (numericValue.length > 0) {
+                    setValue(numericValue);
+                    updateMvcPath(numericValue);
+                    const walletBean = await getStorageCurrentWallet();
+                    await setCurrentStorageWallet(
+                      walletBean,
+                      parseInt(numericValue)
+                    );
+  
+                    const network = await getWalletNetwork();
+
+                    const mvcWallet = new MvcWallet({
+                      network: network == "mainnet" ? "mainnet" : "testnet",
+                      mnemonic: walletBean.mnemonic,
+                      addressIndex: walletBean.accountsOptions[0].addressIndex,
+                      addressType: AddressType.LegacyMvc,
+                      coinType: parseInt(numericValue),
+                    });
+                    const mvcSetAddress = mvcWallet.getAddress();
+                    setMvcAddress(mvcSetAddress);
+                    console.log(mvcWallet.getPath());
+                    console.log("当前的地址是：", mvcWallet.getAddress());
+                  }
                 }}
               />
               <Text style={metaStyles.defaultText}>'/0'</Text>

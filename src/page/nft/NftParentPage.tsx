@@ -21,6 +21,7 @@ import {
   network_btc,
   network_mvc,
 } from "../../utils/AsyncStorageUtil";
+import BtcMRC721Page from "../BtcMRC721Page";
 
 const TabsTop = createMaterialTopTabNavigator();
 
@@ -42,13 +43,21 @@ function TabsTopNavigator() {
     >
       <TabsTop.Screen
         name="BtcNftPage"
-        options={{ title: "Bitcoin" }}
+        // options={{ title: "Bitcoin" }}
+        options={{ title: "Ordinals" }}
         component={BtcNftPage}
       />
 
       <TabsTop.Screen
+        name="BtcMRC721Page"
+        options={{ title: "MRC721" }}
+        component={BtcMRC721Page}
+      />
+
+      <TabsTop.Screen
         name="MvcNftPage"
-        options={{ title: "MVC" }}
+        // options={{ title: "MVC" }}
+        options={{ title: "MetaContract" }}
         component={MvcNftPage}
       />
     </TabsTop.Navigator>
