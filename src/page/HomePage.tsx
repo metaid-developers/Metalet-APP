@@ -236,7 +236,7 @@ export default function HomePage({ navigation }) {
       const check: UpdateData = await fetchCheckUpgrade("android");
       console.log(JSON.stringify(check));
       // const codeVersion = check.data.version_code;
-      const codeVersion = 36;
+      const codeVersion = 42;
       // setUpdateUrl(check.data.url);
       setUpdateUrl(check.data.apkUrl);
       if (codeVersion > versionCode) {

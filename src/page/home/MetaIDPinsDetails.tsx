@@ -47,8 +47,8 @@ export default function MetaIDPinsDetails({ route }) {
                     width: 150,
                     marginTop: 10,
                     marginRight: 10,
-                    paddingHorizontal: 10,
-                    paddingVertical: 10,
+                    // paddingHorizontal: 10,
+                    // paddingVertical: 10,
                     alignItems: "center",
                     justifyContent: "center",
                     borderColor: inputNormalBgColor,
@@ -61,6 +61,8 @@ export default function MetaIDPinsDetails({ route }) {
                       flex: 1,
                       justifyContent: "center",
                       alignItems: "center",
+                      borderRadius: 5,
+                      overflow: "hidden",
                     }}
                   >
                     <View style={{ flex: 1 }}></View>
@@ -76,6 +78,8 @@ export default function MetaIDPinsDetails({ route }) {
                           marginTop: 3,
                           // backgroundColor: 'rgba(23, 26, 255, 0.1)',
                           borderRadius: 5,
+                          marginRight: 5,
+                          marginBottom: 5,
                         }}
                       >
                         <Text

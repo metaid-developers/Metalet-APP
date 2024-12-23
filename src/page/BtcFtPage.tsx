@@ -111,6 +111,7 @@ export default function BtcFtPage() {
 
     //price
     const ftPriceData = await fetchMrc20Price();
+    
     const assertPrice = await fetchAssetsPrice();
     const btcPrice = assertPrice.data.priceInfo.btc;
 

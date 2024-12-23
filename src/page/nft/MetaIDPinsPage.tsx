@@ -121,36 +121,37 @@ export default function MetaIDPinsPage() {
           navigate("MetaIDPinsDetails", { nftDetail: item });
         }}
       >
-
         {item.contentTypeDetect.includes("image") ? (
           <View
-          style={{
-            backgroundColor: item.contentTypeDetect.includes("image")
-              ? "#fff"
-              : "#171AFF",
-            borderRadius: 8,
-            height: width / 4,
-            width: width / 4,
-            marginTop: 10,
-            marginRight: 10,
-            paddingHorizontal: 10,
-            paddingVertical: 10,
-            borderBlockColor: "#171AFF",
-            borderWidth: 1,
-            borderColor: inputNormalBgColor,
-          }}
-        > 
-         <ImageBackground
-            source={{ uri: item.content }} // 替换为你的图片路径
             style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
+              backgroundColor: item.contentTypeDetect.includes("image")
+                ? "#fff"
+                : "#171AFF",
+              borderRadius: 8,
+              height: width / 4,
+              width: width / 4,
+              marginTop: 10,
+              marginRight: 10,
+              // paddingHorizontal: 10,
+              // paddingVertical: 10,
+              // borderBlockColor: "#171AFF",
+              borderWidth: 1,
+              borderColor: inputNormalBgColor,
             }}
           >
-             <View style={{ flex: 1 }}></View>
+            <ImageBackground
+              source={{ uri: item.content }} // 替换为你的图片路径
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 5,
+                overflow: "hidden",
+              }}
+            >
+              <View style={{ flex: 1 }}></View>
 
-             <View style={{ flexDirection: "row" ,marginBottom:2}}>
+              <View style={{ flexDirection: "row", marginBottom: 2 }}>
                 <View style={{ flex: 1 }} />
                 <View
                   style={{
@@ -161,6 +162,8 @@ export default function MetaIDPinsPage() {
                     marginTop: 3,
                     // backgroundColor: 'rgba(23, 26, 255, 0.1)',
                     borderRadius: 5,
+                    marginRight: 5,
+                    marginBottom: 5,
                   }}
                 >
                   <Text
@@ -175,9 +178,8 @@ export default function MetaIDPinsPage() {
                   </Text>
                 </View>
               </View>
-          </ImageBackground>
-        </View>
-         
+            </ImageBackground>
+          </View>
         ) : (
           <View
             style={{

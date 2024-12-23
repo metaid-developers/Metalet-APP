@@ -77,7 +77,8 @@ export function caculateOneBtcFtMrc20Value(
     if (checkID in mvcPrices) {
       const price = mvcPrices[checkID];
       const assert = price * quantity;
-      total += price * quantity * btcPrice;
+      // total += price * quantity * btcPrice;
+      total += price * quantity ;
     }
   }
 

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Metalet",
     "slug": "Metalet",
-    "version": "3.2.0",
+    "version": "3.2.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,16 +13,13 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "buildNumber": "36",
+      "buildNumber": "42",
       "supportsTablet": true,
       "bundleIdentifier": "com.metalet.swallet",
-      "usesPushNotifications": false,
-      "usesNonExemptEncryption": false,
       "infoPlist": {
         "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
         "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
-      },
-      "provisioningProfilePath": "./metaletswalletpro.mobileprovision"  
+      }
     },
     "androidStatusBar": {
       "backgroundColor": "#ffffff",
@@ -35,7 +32,7 @@
       },
       "package": "com.metalet.utxowallet",
       "icon": "./assets/icon.png",
-      "versionCode": 40,
+      "versionCode": 42,
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
@@ -52,7 +49,6 @@
         "projectId": "db161169-c641-419c-998d-583ff238ecd7"
       }
     },
-
     "plugins": [
       [
         "expo-camera",
@@ -63,5 +59,6 @@
         }
       ]
     ]
+    
   }
 }

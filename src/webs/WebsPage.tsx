@@ -123,12 +123,6 @@ export default function WebsPage(props) {
 
         if (data !== undefined) {
           if (message && message.nonce) {
-            console.log("data11111111: ", message.nonce);
-
-            if(actionName=="ECDH"){
-              console.log("处理的结果是： "+JSON.stringify(data));
-            }
-
             postMessage(
               JSON.stringify({
                 data,
