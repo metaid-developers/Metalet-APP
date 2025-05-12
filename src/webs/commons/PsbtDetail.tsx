@@ -47,33 +47,112 @@ export default ({ psbtHex, symbol, visible, close }) => {
 
   return (
     <Modal animationType="slide" visible={visible}>
-      <SafeAreaView className="p-4 space-y-2">
-        <View className="relative h-8 w-full flex flex-row items-center justify-center">
+      <SafeAreaView style={{ padding: 16 }}>
+        <View
+          style={{
+            position: "relative", // relative
+            height: 32, // h-8 (32px)
+            width: "100%", // w-full (100% width)
+            flexDirection: "row", // flex-row (horizontal layout)
+            justifyContent: "center", // justify-center (horizontal centering)
+            alignItems: "center", // items-center (vertical centering)
+          }}
+        >
           <TouchableOpacity
             onPress={close}
-            className="shadow p-3 rounded-full flex items-center justify-center  absolute left-0"
+            style={{
+              position: "absolute", // absolute
+              left: 0, // left-0
+              padding: 12, // p-3 (12px)
+              borderRadius: 50, // rounded-full (圆形边框)
+              flexDirection: "row", // flex (启用弹性布局)
+              justifyContent: "center", // justify-center (水平居中)
+              alignItems: "center", // items-center (垂直居中)
+              elevation: 5, // shadow (适用于 Android)
+              shadowColor: "#000", // 阴影的颜色（iOS）
+              shadowOffset: { width: 0, height: 2 }, // 阴影偏移（iOS）
+              shadowOpacity: 0.2, // 阴影透明度（iOS）
+              shadowRadius: 3, // 阴影的模糊半径（iOS）
+            }}
           >
-            <ChevronLeftIcon className="w-3.5 h-3.5 text-gray-primary" />
+            <ChevronLeftIcon
+              style={{
+                width: 14, // w-3.5 (14px)
+                height: 14, // h-3.5 (14px)
+              }}
+            />
           </TouchableOpacity>
-          <Text className="text-center leading-8">Transaction Details</Text>
+          <Text
+            style={{
+              textAlign: "center", // text-center (水平居中)
+              lineHeight: 32, // leading-8 (行高为32px)
+            }}
+          >
+            Transaction Details
+          </Text>
         </View>
 
         <ScrollView>
-          <View className="flex flex-row items-center justify-center w-full gap-2 p-2">
-            <View className="flex bg-sky-50 border-2 border-sky-300 border-dashed py-2 px-1 rounded-lg flex-1">
-              <Text className="text-center text-sm text-sky-900">Inputs</Text>
-              <View className="mt-2 space-y-2 text-xs">
+          <View
+            style={{
+              flexDirection: "row", // flex-row (水平方向排列)
+              justifyContent: "center", // justify-center (水平居中)
+              alignItems: "center", // items-center (垂直居中)
+              width: "100%", // w-full (宽度100%)
+              padding: 8, // p-2 (内边距8px)
+            }}
+          >
+            <View
+              style={{
+                flex: 1, // flex-1 (占满剩余空间)
+                backgroundColor: "#E0F7FA", // bg-sky-50 (浅蓝色背景)
+                borderWidth: 2, // border-2 (边框宽度为2px)
+                borderColor: "#81D4FA", // border-sky-300 (较深的蓝色边框)
+                borderStyle: "dashed", // border-dashed (虚线边框)
+                paddingVertical: 8, // py-2 (上下内边距为8px)
+                paddingHorizontal: 4, // px-1 (左右内边距为4px)
+                borderRadius: 8, // rounded-lg (较大圆角)
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center", // text-center (水平居中)
+                  fontSize: 14, // text-sm (字体大小为14px)
+                  color: "#0c4a6e",
+                }}
+              >
+                Inputs
+              </Text>
+              <View style={{ marginTop: 8 }}>
                 {inputs.map((input, index) => (
                   <View
-                    className="border-2 border-sky-300 bg-sky-300 rounded p-1 space-y-2"
+                    style={{
+                      borderWidth: 2,
+                      borderColor: "#81D4FA",
+                      backgroundColor: "#81D4FA",
+                      borderRadius: 8,
+                      padding: 4,
+                      marginBottom: 8,
+                    }}
                     key={index}
                   >
                     <Text>Address</Text>
-                    <Text className="text-xs text-gray-500 break-all">
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        color: "#6B7280",
+                      }}
+                    >
                       {prettifyAddress(input.address, 4)}
                     </Text>
-                    <Text className="mt-2">Amount</Text>
-                    <Text className="text-xs text-gray-500 break">
+                    <Text style={{ marginTop: 8 }}>Amount</Text>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        color: "#6B7280",
+                        flexWrap: "wrap",
+                      }}
+                    >
                       {prettifyBalance(input.amount, symbol)}
                     </Text>
                   </View>
@@ -81,22 +160,68 @@ export default ({ psbtHex, symbol, visible, close }) => {
               </View>
             </View>
 
-            <ChevronDoubleRightIcon className="w-3.5 h-3.5 text-black-primary" />
+            <ChevronDoubleRightIcon
+              style={{
+                width: 14, // w-3.5 (3.5 * 4px = 14px)
+                height: 14, // h-3.5 (3.5 * 4px = 14px)
+                backgroundColor: "#000", // text-black-primary (Assumed black color)
+                borderRadius: 7, // Making it circular
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            />
 
-            <View className="flex bg-sky-50 border-2 border-teal-300 border-dashed py-2 px-1 rounded-lg flex-1">
-              <Text className="text-center text-sm text-teal-900">Outputs</Text>
-              <View className="mt-2 space-y-2 text-xs">
+            <View
+              style={{
+                backgroundColor: "#E0F7FA", // bg-sky-50 (light sky color)
+                borderWidth: 2,
+                borderColor: "#4DB6AC", // border-teal-300 (teal color)
+                borderStyle: "dashed",
+                paddingVertical: 8, // py-2 (vertical padding 8px)
+                paddingHorizontal: 4, // px-1 (horizontal padding 4px)
+                borderRadius: 8, // rounded-lg (large rounded corners)
+                width: "100%", // flex-1 (take up full available width)
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center", // text-center
+                  fontSize: 14, // text-sm
+                  color: "#00695C", // text-teal-900 (teal color)
+                }}
+              >
+                Outputs
+              </Text>
+              <View style={{ marginTop: 8 }}>
                 {outputs.map((output, index) => (
                   <View
-                    className="border-2 border-teal-300 bg-teal-100 rounded p-1 space-y-2"
+                    style={{
+                      borderWidth: 2, // border-2
+                      borderColor: "#4DB6AC", // border-teal-300 (teal color)
+                      backgroundColor: "#B2DFDB", // bg-teal-100 (light teal color)
+                      borderRadius: 8, // rounded
+                      padding: 4, // p-1 (padding 4px)
+                      marginBottom: 8, // space-y-2 (vertical space between elements)
+                    }}
                     key={index}
                   >
                     <Text>Address</Text>
-                    <Text className="text-xs text-gray-500 break-all">
+                    <Text
+                      style={{
+                        fontSize: 12, // text-xs
+                        color: "#6B7280", // text-gray-500 (gray color)
+                      }}
+                    >
                       {prettifyAddress(output.address, 4)}
                     </Text>
-                    <Text className="mt-2">Amount</Text>
-                    <Text className="text-xs text-gray-500 break">
+                    <Text style={{ marginTop: 8 }}>Amount</Text>
+                    <Text
+                      style={{
+                        fontSize: 12, // text-xs
+                        color: "#6B7280", // text-gray-500 (gray color)
+                        flexWrap: "wrap", // break (word wrapping behavior)
+                      }}
+                    >
                       {prettifyBalance(output.amount, symbol)}
                     </Text>
                   </View>

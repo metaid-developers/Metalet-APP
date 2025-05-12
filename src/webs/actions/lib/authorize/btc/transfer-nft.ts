@@ -24,7 +24,7 @@ export async function process({
 
   const nftManager = new NftManager({
     network: network as API_NET,
-    apiTarget: API_TARGET.CYBER3,
+    apiTarget: API_TARGET.METALET,
     purse: privateKey,
   })
 

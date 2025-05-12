@@ -22,14 +22,14 @@ import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
 import QRCode from "react-native-qrcode-svg";
 import PasswordPay from "react-native-password-pay";
-import { Camera, CameraType} from "expo-camera";
 import { verifyPassword } from "../utils/WalletUtils";
 import { wallet_password_key, createStorage } from "../utils/AsyncStorageUtil";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import { verifyPassword } from "../utils/WalletUtils";
-import { CameraView } from 'expo-camera/next';
+// import { CameraView } from 'expo-camera/next';
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
+import { Camera, CameraView } from "expo-camera";
 
 const storage = createStorage();
 
@@ -561,7 +561,6 @@ export const CircleAvatarLetter = ({
   widthC = 50,
   heightC = 50,
 }) => {
-  
   return (
     <View
       style={{
@@ -597,8 +596,7 @@ export const VerifyModal = ({
   eventCancel = () => {},
 }) => {
   const [inputText, setInputText] = useState("");
-  const { t }=useTranslation();
-
+  const { t } = useTranslation();
 
   return (
     <Modal transparent={true} visible={isShow}>
@@ -617,7 +615,7 @@ export const VerifyModal = ({
             borderRadius: 10,
             paddingHorizontal: 20,
             paddingVertical: 30,
-            marginHorizontal:20
+            marginHorizontal: 20,
           }}
         >
           <View style={{ flexDirection: "row" }}>
@@ -639,7 +637,7 @@ export const VerifyModal = ({
           </View>
 
           <Text style={{ marginTop: 20, color: "#666", fontSize: 14 }}>
-          {t("o_verify_password_notice")}
+            {t("o_verify_password_notice")}
           </Text>
           {/* 
           <View
@@ -682,7 +680,7 @@ export const VerifyModal = ({
                   // await AsyncStorageUtil.getItem(wallet_password_key);
                   // const isPassword = await verifyPassword(value);
                   console.log("输入的密码：", passwordLocal);
-                  if(passwordLocal == undefined){
+                  if (passwordLocal == undefined) {
                     navigate("SetPasswordPage", { type: "change" });
                   }
                   if (passwordLocal == value) {
@@ -690,7 +688,7 @@ export const VerifyModal = ({
                   } else {
                     console.log("Password Error");
                     eventCancel();
-                    ToastView({text:"Password Error",type:'error'})
+                    ToastView({ text: "Password Error", type: "error" });
                     // Toast.show({
                     //   type: 'error',
                     //   text1: 'password error',
@@ -853,11 +851,11 @@ export const QRScanner = ({ handleScan }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <TitleBar/>
+      <TitleBar />
       {showCamera && hasPermission && (
         // <Camera
         //   style={{ flex: 1 }}
-        //   type={CameraType.back}
+        //   // type={CameraType.back}
         //   ref={(ref) => setCameraRef(ref)}
         //   // 扫描二维码时触发的回调函数
         //   onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
@@ -866,15 +864,15 @@ export const QRScanner = ({ handleScan }) => {
         //   }}
         // />
         <CameraView
-        style={{ flex: 1 }}
-        // type={CameraType.back}
-        ref={(ref) => setCameraRef(ref)}
-        // 扫描二维码时触发的回调函数
-        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barcodeScannerSettings={{
-          barcodeTypes: ['qr']
-        }}
-      />
+          style={{ flex: 1 }}
+          // type={CameraType.back}
+          ref={(ref) => setCameraRef(ref)}
+          // 扫描二维码时触发的回调函数
+          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+          barcodeScannerSettings={{
+            barcodeTypes: ["qr"],
+          }}
+        />
       )}
     </View>
   );
@@ -933,15 +931,13 @@ export const BaseView = ({ hasTitle = true, titleText = "", ChildView }) => {
   );
 };
 
-
 //17.simple notice
-export const ToastView=({text,time=2000,type="info"})=>{
+export const ToastView = ({ text, time = 2000, type = "info" }) => {
   Toast.show({
     type,
     text1: text,
     visibilityTime: time,
     autoHide: true,
-    position: 'top',
+    position: "top",
   });
-}
-
+};

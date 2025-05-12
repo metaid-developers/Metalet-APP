@@ -19,7 +19,6 @@ import {
   wallet_password_key,
   wallets_key,
 } from "../utils/AsyncStorageUtil";
-
 import {
   AddressType,
   Chain,
@@ -113,7 +112,7 @@ export default function SplashPage(props) {
 
     if (walletBean && account) {
       updateMyWallet(walletBean);
-      console.log("walletBean", walletBean);
+      // console.log("walletBean", walletBean);
 
       const isCold = await getWalletMode();
       // const isColdTest = await getWalletModeTest();
@@ -183,7 +182,7 @@ export default function SplashPage(props) {
         updateIsShowPay(1);
       }
     } else {
-      // iavc 比当前版本大 1 
+      // iavc 比当前版本大 1 为下一次更新的版本号
       const check: UpdateData = await fetchCheckUpgrade("ios");
       console.log(JSON.stringify(check));
       // const showCode = check.data.iavc;

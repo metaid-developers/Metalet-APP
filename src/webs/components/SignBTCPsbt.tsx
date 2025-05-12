@@ -8,20 +8,11 @@ export default ({ children, params: { psbtHex } }) => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View className="space-y-2">
+      <View style={{
+        marginBottom: 8
+      }}>
         {children ? children : null}
-        {/* <TouchableOpacity onPress={() => setVisible(true)}>
-          <Text className="underline decoration-primary-blue text-gray-700 px-4 py-2 mx-auto decoration underline-offset-4 hover:underline-offset-2 transition-all duration-300">
-            View Transaction Details
-          </Text>
-        </TouchableOpacity> */}
-
-        {/* <PsbtDetail
-          symbol="BTC"
-          psbtHex={psbtHex}
-          visible={visible}
-          close={() => setVisible(false)}
-        /> */}
+       
       </View>
     </SafeAreaView>
   );

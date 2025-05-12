@@ -22,6 +22,7 @@ import {
   network_mvc,
 } from "../../utils/AsyncStorageUtil";
 import BtcMRC721Page from "../BtcMRC721Page";
+import BtcMRC721RePage from "../BtcMRC721RePage";
 
 const TabsTop = createMaterialTopTabNavigator();
 
@@ -49,9 +50,11 @@ function TabsTopNavigator() {
       />
 
       <TabsTop.Screen
-        name="BtcMRC721Page"
+        // name="BtcMRC721Page"
+        name="BtcMRC721RePage"
         options={{ title: "MRC721" }}
-        component={BtcMRC721Page}
+        // component={BtcMRC721Page}
+        component={BtcMRC721RePage}
       />
 
       <TabsTop.Screen

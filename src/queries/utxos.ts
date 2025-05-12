@@ -2,7 +2,7 @@ import { getNetwork } from "@/lib/network";
 import { fetchBtcTxHex } from "./transaction";
 import { Chain } from "@metalet/utxo-wallet-service";
 import { getWalletNetwork } from "@/utils/WalletUtils";
-import { mvcApi, mempoolApi, metaletApiV3, metaletApiV4 } from "./request";
+import {  mempoolApi, metaletApiV3, metaletApiV4 } from "./request";
 import { getSafeUtxos } from "@/lib/utxo";
 
 export interface UTXO {
@@ -122,7 +122,7 @@ const fetchMVCUtxos = async (address: string, useUnconfirmed = true): Promise<Mv
     flag,
   })
 
-  console.log("utxo 结果："+JSON.stringify(list));
+  // console.log("utxo 结果："+JSON.stringify(list));
   
 
   while (hasMore) {
@@ -148,7 +148,7 @@ const fetchMVCUtxos = async (address: string, useUnconfirmed = true): Promise<Mv
     }
   }
 
-  console.log('allUtxos 返回数据：', JSON.stringify(allUtxos));
+  // console.log('allUtxos 返回数据：', JSON.stringify(allUtxos));
   
   return allUtxos
 }
@@ -264,6 +264,8 @@ export async function getMetaPin(pinId: string, needRawTx: boolean = false): Pro
     net,
     pinId,
   })
+  console.log('metaIdPin', metaIdPin);
+  
   if (needRawTx) {
     const txId = metaIdPin.output.split(':')[0]
     metaIdPin.rawTx = await fetchBtcTxHex(txId)

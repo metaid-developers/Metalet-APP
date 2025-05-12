@@ -25,15 +25,15 @@ export async function process({
   const chianWallet = await getCurrentWallet(Chain.MVC);
   const purse = chianWallet.getPrivateKey();
   const address = chianWallet.getAddress();
-  const apiHost = await getApiHost();
+  // const apiHost = await getApiHost();
 
-  const wallet = new Wallet(purse, network, FEEB, API_TARGET.CYBER3, apiHost);
+  const wallet = new Wallet(purse, network, FEEB, API_TARGET.METALET);
   const ftManager = new FtManager({
     network,
-    apiTarget: API_TARGET.CYBER3,
+    apiTarget: API_TARGET.METALET,
     purse,
     feeb: FEEB,
-    apiHost,
+    // apiHost,
   });
 
   // 串行执行

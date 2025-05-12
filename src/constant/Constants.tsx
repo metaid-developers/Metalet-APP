@@ -154,7 +154,7 @@ export const metaStyles = StyleSheet.create({
     backgroundColor:'#ffffff',
     // backgroundColor: semiTransparentGray,
     borderWidth:1,
-    borderColor:'red',
+    borderColor:"#171AFF",
     // padding:10,
     fontSize: 14,
     color: "#333333",
@@ -187,7 +187,8 @@ export const metaStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    marginHorizontal:20, marginVertical:20,
+    marginHorizontal:20, 
+    marginVertical:20,
   },
 
   //bg
@@ -204,6 +205,7 @@ export const themeColor = "#171AFF";
 export const inputNormalBgColor = 'rgba(191, 194, 204, 0.5)';
 export const litterWhittleBgColor = '#F5F7F9';
 export const grayNormalColor = '#909399';
+export const normalColor = '#303133';
 export let showPayCode = 1;  //1:real 0:sim
 
 export function setShowPayCode(code: number) {

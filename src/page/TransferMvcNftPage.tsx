@@ -53,7 +53,7 @@ export default function TransferMvcNftPage({ route }) {
     const nftManager = new NftManager({
       // network: API_NET.MAIN,
       network:network === "mainnet" ? API_NET.MAIN : API_NET.TEST,
-      apiTarget: API_TARGET.CYBER3,
+      apiTarget: API_TARGET.METALET,
       purse: privateKey,
     });
     const transferRes = await nftManager

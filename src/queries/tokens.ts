@@ -1,5 +1,7 @@
-import { mvcApi } from "./request";
+import { getWalletNetwork } from "@/utils/WalletUtils";
+import { metaletApiV4 } from "./request";
 import { SymbolTicker } from "@/lib/asset-symbol";
+import { PageResult } from "./types";
 
 export type Token = {
   codeHash: string;
@@ -15,15 +17,26 @@ export type Token = {
   unconfirmedString: string;
 };
 
-export const fetchTokens = async (address: string): Promise<Token[]> => {
-  const tokens: any = await mvcApi(
-    `/contract/ft/address/${address}/balance`
-  ).get();
+export const fetchTokens = async (address: string,codehash?: string, genesis?: string): Promise<Token[]> => {
+ 
 
-  return tokens.map((token: any) => {
-    // 将codeHash改为小写
-    token.codehash = token.codeHash;
-    delete token.codeHash;
-    return token;
-  });
+  const network = await getWalletNetwork();
+
+  const { list: tokens } = await metaletApiV4<PageResult<Token>>(`/mvc/address/contract/ft/balance-list`).get({
+    network,
+    address,
+    genesis,
+    codehash,
+  })
+  return tokens;
+  // const tokens: any = await mvcApi(
+    // `/contract/ft/address/${address}/balance`
+  // ).get();
+
+  // return tokens.map((token: any) => {
+  //   // 将codeHash改为小写
+  //   token.codehash = token.codeHash;
+  //   delete token.codeHash;
+  //   return token;
+  // });
 };

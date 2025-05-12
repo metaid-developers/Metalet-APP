@@ -78,7 +78,7 @@ export function caculateOneBtcFtMrc20Value(
       const price = mvcPrices[checkID];
       const assert = price * quantity;
       // total += price * quantity * btcPrice;
-      total += price * quantity ;
+      total += price * quantity;
     }
   }
 
@@ -96,7 +96,10 @@ export async function caculateMvcAndBtcAssert(
   let isMain = network === "mainnet" ? true : false;
   const btcPrice = assertPrice.data.priceInfo.btc;
   const spacePrice = assertPrice.data.priceInfo.space;
-
+  const time1=new Date().getTime();
+  //当前时间毫秒数
+  // console.log("开始计算：",time1);
+  
   const spaceBalanceData = await fetchSpaceBalance(mvcAddrss);
 
   if (spaceBalanceData == null) {
@@ -145,6 +148,8 @@ export async function caculateMvcAndBtcAssert(
   }
 
   balance.sumAssert = assertSum.toFixed(2);
+  // console.log("计算完成返回的时间差是：",new Date().getTime()-time1);
+  
   // console.log("assert" + JSON.stringify(balance));
   return balance;
 }

@@ -58,27 +58,59 @@ const Estimator = forwardRef(
     };
 
     return (
-      <View className="space-y-2">
+      <View style={{ marginBottom: 8 }}>
         {children ? children : null}
         {Object.values(metaidDataObj).map((metaidDataList, index) => (
-          <View key={index} className="flex flex-col items-center gap-y-2">
-            <Text className="w-full">
+          <View
+            key={index}
+            style={{
+              flexDirection: "column", // flex-col
+              alignItems: "center", // items-center
+              gap: 8, // gap-y-2 (vertical gap of 8px between items)
+            }}
+          >
+            <Text
+              style={{
+                width: "100%",
+              }}
+            >
               operation: {metaidDataList[0].operation}
             </Text>
-            <View className="flex flex-row flex-wrap items-start w-full">
+            <View
+              style={{
+                flexDirection: "row", // flex-row
+                flexWrap: "wrap", // flex-wrap
+                alignItems: "flex-start", // items-start
+                width: "100%", // w-full
+              }}
+            >
               {metaidDataList.map((metaidData, index) =>
                 metaidData.body ? (
                   metaidData.contentType?.includes("image") ? (
-                    <View className="w-1/3 p-1" key={index}>
+                    <View
+                      style={{
+                        width: "33.33%", // w-1/3 (1/3 of the width)
+                        padding: 4,
+                      }}
+                      key={index}
+                    >
                       <Image
-                        className="w-full aspect-square object-cover rounded-md"
+                        style={{
+                          width: "100%", // full width
+                          height: undefined, // maintain aspect ratio
+                          aspectRatio: 1, // aspect-square
+                          borderRadius: 8, // rounded-md
+                          resizeMode: "cover", // object-cover
+                        }}
                         source={{
                           uri: `data:image/jpeg;base64,${metaidData.body}`,
                         }}
                       />
                     </View>
                   ) : (
-                    <Text key={index} className="text-sm break-all w-full">
+                    <Text key={index}style={{
+                      fontSize: 14, // text-sm
+                    }}>
                       {metaidData.body}
                     </Text>
                   )

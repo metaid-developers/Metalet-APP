@@ -1,5 +1,6 @@
 import { lazy } from "react";
 import * as Pay from "./lib/authorize/pay";
+import * as SignPartialTx from "./lib/authorize/signPartialTx"
 import * as Merge from "./lib/authorize/merge";
 import * as Connect from "./lib/authorize/connect";
 import * as Transfer from "./lib/authorize/transfer";
@@ -10,6 +11,8 @@ import * as EciesDecrypt from "./lib/authorize/ecies-decrypt";
 import * as EciesEncrypt from "./lib/authorize/ecies-encrypt";
 import * as TransferToken from "./lib/authorize/transfer-token";
 import * as SwitchNetwork from "./lib/authorize/switch-network";
+import * as UnlockP2PKHInput from "./lib/authorize/unlockP2PKHInput";
+
 import * as SignTransaction from "./lib/authorize/sign-transaction";
 import * as SignTransactions from "./lib/authorize/sign-transactions";
 
@@ -101,6 +104,14 @@ export default {
     needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
+  UnlockP2PKHInput: {
+    name: 'Sign a Transaction',
+    title: 'Sign a Transactiont',
+    description: ['Sign a transaction with my wallet'],
+    process: UnlockP2PKHInput.process,
+    estimate: doNothing,
+    closeAfterProcess: true,
+  },
   Pay: {
     name: "Pay",
     title: "Pay for transactions",
@@ -108,6 +119,15 @@ export default {
       "Third party apps create functional transaction(s), and ask Metalet to pay for them.",
     ],
     process: Pay.process,
+    estimate: doNothing,
+    needEstimated: false,
+    component: lazy(() => import("../components/ComponentA")),
+  },
+  SignPartialTx: {
+    name: "SignPartialTx",
+    title: 'Partial Transaction Signing',
+    descriptions: ['Sign transactions with specified UTXOs'],
+    process: SignPartialTx.process,
     estimate: doNothing,
     needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
@@ -241,4 +261,4 @@ export default {
     needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
   },
-} as { [key: string]: AuthorizeAction };
+} as unknown as { [key: string]: AuthorizeAction };

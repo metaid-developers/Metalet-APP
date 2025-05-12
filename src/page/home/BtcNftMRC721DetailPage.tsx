@@ -105,7 +105,16 @@ export default function BtcNftMRC721DetailPage({ route }) {
                 { textAlign: "center" },
               ]}
             >
-              #{nftDetail.number}
+              #{nftDetail.itemPinNumber}
+            </Text>
+
+            <Text
+              style={[
+                metaStyles.largeDefaultLittleText,
+                { textAlign: "center" },
+              ]}
+            >
+              {nftDetail.name}
             </Text>
 
             {walletMode != wallet_mode_observer && (
@@ -114,12 +123,12 @@ export default function BtcNftMRC721DetailPage({ route }) {
                   onPress={() => {
                     // navigate("BtcNftTransferPage",{type:"brc20",nftDetail:nftDetail})
 
-                    if (nftDetail.status == 0) {
+                    // if (nftDetail.status == 0) {
                       navigate("PinNftTransferPage", {
                         type: "pin",
                         nftDetail: nftDetail,
                       });
-                    }
+                    // }
                   }}
                 >
                   <View
@@ -141,7 +150,8 @@ export default function BtcNftMRC721DetailPage({ route }) {
                         fontSize: 16,
                       }}
                     >
-                      {nftDetail.status == 0 ? "Transfer" : "Pending"}
+                      {/* {nftDetail.status == 0 ? "Transfer" : "Pending"} */}
+                      Transfer
                     </Text>
                   </View>
                 </TouchableWithoutFeedback>
@@ -193,7 +203,7 @@ export default function BtcNftMRC721DetailPage({ route }) {
                     width: "50%",
                   }}
                 >
-                  {nftDetail.id}
+                  {nftDetail.itemPinId}
                 </Text>
               </View>
 
@@ -244,7 +254,7 @@ export default function BtcNftMRC721DetailPage({ route }) {
                     textAlign: "right",
                   }}
                 >
-                  {nftDetail.outputValue}
+                  {nftDetail.outValue}
                 </Text>
               </View>
 
@@ -260,7 +270,8 @@ export default function BtcNftMRC721DetailPage({ route }) {
 
                 <TouchableWithoutFeedback
                   onPress={() => {
-                    openLink(nftDetail.preview);
+                    // openLink(nftDetail.preview);
+                    openLink(nftDetail.showImage);
                   }}
                 >
                   <Text
@@ -276,12 +287,12 @@ export default function BtcNftMRC721DetailPage({ route }) {
                       textDecorationLine: "underline",
                     }}
                   >
-                    {nftDetail.preview}
+                    {nftDetail.showImage}
                   </Text>
                 </TouchableWithoutFeedback>
               </View>
 
-              <View
+              {/* <View
                 style={{
                   flexDirection: "row",
                   marginTop: 20,
@@ -312,9 +323,9 @@ export default function BtcNftMRC721DetailPage({ route }) {
                     {nftDetail.content}
                   </Text>
                 </TouchableWithoutFeedback>
-              </View>
+              </View> */}
 
-              <View
+              {/* <View
                 style={{
                   flexDirection: "row",
                   marginTop: 20,
@@ -339,7 +350,7 @@ export default function BtcNftMRC721DetailPage({ route }) {
                 >
                   {nftDetail.contentLength}
                 </Text>
-              </View>
+              </View> */}
 
               <View
                 style={{
@@ -393,7 +404,7 @@ export default function BtcNftMRC721DetailPage({ route }) {
                 </Text>
               </View> */}
 
-              <View
+              {/* <View
                 style={{
                   flexDirection: "row",
                   marginTop: 20,
@@ -418,7 +429,7 @@ export default function BtcNftMRC721DetailPage({ route }) {
                 >
                   {nftDetail.genesisTransaction}
                 </Text>
-              </View>
+              </View> */}
             </View>
           </View>
         </ScrollView>

@@ -45,11 +45,11 @@ connector.connect = async function (accountId, host, logo?: string) {
 
 connector.isConnected = async function (accountId, host) {
   const connections = await getConnections();
-  console.log("connections", JSON.stringify(connections));
+  // console.log("connections", JSON.stringify(connections));
 
   const accountConnections = connections[accountId] || {};
-  console.log("accountConnections----", JSON.stringify(accountConnections));
-  console.log("accountConnections[host] ", JSON.stringify(accountConnections[host]));
+  // console.log("accountConnections----", JSON.stringify(accountConnections));
+  // console.log("accountConnections[host] ", JSON.stringify(accountConnections[host]));
   
   
   return !!accountConnections[host];

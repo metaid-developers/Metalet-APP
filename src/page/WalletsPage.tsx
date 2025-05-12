@@ -73,7 +73,6 @@ export default function WalletsPage() {
   const [isShowAddWallet, setShowAddWallet] = useState(false);
 
   // let changeWallet:WalletBean;
-
   const storage = createStorage();
 
   async function getWalletData() {
@@ -82,6 +81,7 @@ export default function WalletsPage() {
 
     const wallets = await getWalletBeans();
     setWalletList(wallets);
+    
   }
 
   useEffect(() => {

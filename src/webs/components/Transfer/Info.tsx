@@ -59,9 +59,12 @@ const Info = forwardRef(
     });
 
     return (
-      <View className="space-y-2">
+      <View style={{ marginBottom: 8 }}>
         {children ? children : null}
-        <Table borderStyle={{ borderWidth: 2, borderColor: "#c8e1ff" }}>
+        <Table
+          style={{}}
+          borderStyle={{ borderWidth: 2, borderColor: "#c8e1ff" }}
+        >
           <Row
             style={styles.head}
             textStyle={styles.text}

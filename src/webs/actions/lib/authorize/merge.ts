@@ -11,7 +11,7 @@ export async function process() {
   const purse = chainWallet.getPrivateKey();
   const apiHost = await getApiHost();
 
-  const wallet = new Wallet(purse, network, FEEB, API_TARGET.CYBER3, apiHost);
+  const wallet = new Wallet(purse, network, FEEB, API_TARGET.METALET, apiHost);
 
   type TransferResult = {
     id: number;

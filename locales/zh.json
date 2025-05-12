@@ -111,5 +111,10 @@
   "p_set_new_password": "新密码",
   "p_set_password_about": "(6位数字密码)",
   "p_set_password_notice": "需要注意的是，我们不会保留您的密码，因此，如果您忘记了密码，您需要重置钱包并重新导入它以建立一个新的密码。",
-  "p_set_confirm_password": "再次确认"
+  "p_set_confirm_password": "再次确认",
+  "n_web_response_notice": "您即将访问第三方网站，请确保该链接安全且可靠，避免造成资产损失。同时，你接受你对第三方网站的任何使用将受限于第三方网站的条款并受其约束。你同意对于你使用第三方网让所导致的任何损失、损害及任何其他后果，Metalet 钱包及关联方不承担任何 责任。",
+  "n_web_response_title": "跳转提示",
+  "n_web_response_confirm": "下次打开第三方网站无需提示"
+  
+
 }

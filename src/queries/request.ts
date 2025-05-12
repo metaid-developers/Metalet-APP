@@ -165,13 +165,23 @@ export const metaletApiV3 = <T>(path: string) => {
   };
 };
 
-export const metaletApiV4 = <T>(path: string) => {
+// export const metaletApiV4 = <T>(path: string) => {
+//   const metaletHost = METALET_HOST + '/wallet-api/v4'
+//   return {
+//     get: (params?: OptionParams) =>
+//       metaletV3Request<T>(`${metaletHost}${path}`, { method: 'GET', params, withCredential: true }),
+//     post: (data?: OptionData) =>
+//       metaletV3Request<T>(`${metaletHost}${path}`, { method: 'POST', data, withCredential: true }),
+//   }
+// }
+
+export const metaletApiV4 = <T>(path: string, options?: Partial<RequestOption>) => {
   const metaletHost = METALET_HOST + '/wallet-api/v4'
   return {
     get: (params?: OptionParams) =>
-      metaletV3Request<T>(`${metaletHost}${path}`, { method: 'GET', params, withCredential: true }),
+      metaletV3Request<T>(`${metaletHost}${path}`, { method: 'GET', params, withCredential: true, ...options }),
     post: (data?: OptionData) =>
-      metaletV3Request<T>(`${metaletHost}${path}`, { method: 'POST', data, withCredential: true }),
+      metaletV3Request<T>(`${metaletHost}${path}`, { method: 'POST', data, withCredential: true, ...options }),
   }
 }
 

@@ -81,9 +81,9 @@ export default function PinNftTransferPage({ route }) {
       const needRawTx =
         metaletWallet.currentBtcWallet.getScriptType() === ScriptType.P2PKH;
       // const utxo = await getInscriptionUtxo(nftDetail.inscriptionId, needRawTx);
-      console.log("nft", nftDetail.id);
+      console.log("nft", nftDetail);
 
-      const metaPin = await getMetaPin(nftDetail.id, needRawTx);
+      const metaPin = await getMetaPin(nftDetail.itemPinId, needRawTx);
       const [txId, outputIndex] = metaPin.output.split(":");
       const utxo = {
         txId,
@@ -634,8 +634,8 @@ export default function PinNftTransferPage({ route }) {
                         width: 120,
                         marginTop: 10,
                         marginRight: 10,
-                        paddingHorizontal: 10,
-                        paddingVertical: 10,
+                        // paddingHorizontal: 10,
+                        // paddingVertical: 10,
                         alignItems: "center",
                         justifyContent: "center",
                         borderColor: inputNormalBgColor,
@@ -648,6 +648,8 @@ export default function PinNftTransferPage({ route }) {
                           flex: 1,
                           justifyContent: "center",
                           alignItems: "center",
+                          borderRadius: 5,
+                          overflow: "hidden",
                         }}
                       >
                         <View style={{ flex: 1 }}></View>
@@ -663,6 +665,8 @@ export default function PinNftTransferPage({ route }) {
                               marginTop: 3,
                               // backgroundColor: 'rgba(23, 26, 255, 0.1)',
                               borderRadius: 5,
+                              marginRight: 5,
+                              marginBottom: 5,
                             }}
                           >
                             <Text
@@ -788,8 +792,8 @@ export default function PinNftTransferPage({ route }) {
                   width: 150,
                   marginTop: 10,
                   marginRight: 10,
-                  paddingHorizontal: 10,
-                  paddingVertical: 10,
+                  // paddingHorizontal: 10,
+                  // paddingVertical: 10,
                   alignItems: "center",
                   justifyContent: "center",
                   borderColor: inputNormalBgColor,
@@ -802,6 +806,8 @@ export default function PinNftTransferPage({ route }) {
                     flex: 1,
                     justifyContent: "center",
                     alignItems: "center",
+                    borderRadius: 5,
+                    overflow: "hidden",
                   }}
                 >
                   <View style={{ flex: 1 }}></View>
@@ -817,6 +823,8 @@ export default function PinNftTransferPage({ route }) {
                         marginTop: 3,
                         // backgroundColor: 'rgba(23, 26, 255, 0.1)',
                         borderRadius: 5,
+                        marginRight: 5,
+                        marginBottom: 5,
                       }}
                     >
                       <Text

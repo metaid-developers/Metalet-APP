@@ -7,7 +7,7 @@ import {
   Modal,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { BaseView, Line, RoundSimButton, TitleBar } from "@/constant/Widget";
+import { BaseView, Line, RoundSimButton, TitleBar, ToastView } from "@/constant/Widget";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WalletBean } from "@/bean/WalletBean";
 import { getCurrentAccountID, getWalletBeans } from "@/utils/WalletUtils";
@@ -15,6 +15,9 @@ import { navigate } from "@/base/NavigationService";
 import { metaStyles, themeColor } from "@/constant/Constants";
 import { AsyncStorageUtil, wallets_key } from "@/utils/AsyncStorageUtil";
 import { useTranslation } from "react-i18next";
+import * as Clipboard from "expo-clipboard";
+import Toast from "react-native-toast-message";
+
 
 export default function BackupPage() {
   let [walletList, setWalletList] = useState<WalletBean[]>([]);
@@ -31,7 +34,7 @@ export default function BackupPage() {
     const currentAccountID = await getCurrentAccountID();
     const wallets = await getWalletBeans();
     // setWalletList(wallets);
-    const filterWallets=wallets.filter(item=>item.mnemonic!="1");
+    const filterWallets = wallets.filter((item) => item.mnemonic != "1");
     setWalletList(filterWallets);
   }
 
@@ -105,7 +108,7 @@ export default function BackupPage() {
             }}
           >
             <Text style={[metaStyles.defaultText18, { textAlign: "center" }]}>
-             {t("s_backup_wallet_title")}
+              {t("s_backup_wallet_title")}
             </Text>
 
             <Line />
@@ -116,6 +119,26 @@ export default function BackupPage() {
             <Text style={[metaStyles.defaultText, { marginTop: 20 }]}>
               {walletBackUp}
             </Text>
+
+            <TouchableWithoutFeedback onPress={()=>{
+              setIsShowBackUp(false)
+               Clipboard.setString(walletBackUp);
+               ToastView({ text: "Copy Successful" });
+            }}>
+               <View style={{ flexDirection: "row" ,alignItems:'center',marginTop: 20 }}>
+              <Text style={[metaStyles.grayTextdefault66,]}>
+                Copy Mnemonic
+              </Text>
+
+              <Image
+                source={require("../../../image/meta_copy_icon.png")}
+                style={{ width: 15, height: 15, marginLeft: 5 }}
+              />
+            </View>
+
+            </TouchableWithoutFeedback>
+
+           
 
             <Text style={[metaStyles.grayTextdefault66, { marginTop: 20 }]}>
               MVC Derivation Path

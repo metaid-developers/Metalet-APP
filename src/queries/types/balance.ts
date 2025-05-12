@@ -3,6 +3,13 @@ export interface Balance {
   confirmed: number
   unconfirmed: number
 }
+export interface MVCBalance {
+  address: string
+  confirmed: number
+  unconfirmed: number
+  utxoCount: number
+}
+
 
 export interface BRC20Balance extends Balance {
   availableBalance: number

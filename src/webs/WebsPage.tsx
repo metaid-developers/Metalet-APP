@@ -19,12 +19,23 @@ import {
   ScrollView,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  TextInput,
+  Keyboard,
 } from "react-native";
 import { CircleAvatarLetter, LoadingModal, ToastView } from "@/constant/Widget";
 import { LinearGradient } from "expo-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
-import { inputNormalBgColor, litterWhittleBgColor } from "@/constant/Constants";
+import {
+  inputNormalBgColor,
+  litterWhittleBgColor,
+  metaStyles,
+  themeColor,
+} from "@/constant/Constants";
 import * as ECDH from "@/webs/actions/common/ecdh";
+import { useTranslation } from "react-i18next";
+import { Line } from "react-native-svg";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AsyncStorageUtil, no_notice_key } from "@/utils/AsyncStorageUtil";
 
 interface Message {
   host: string;
@@ -38,6 +49,7 @@ interface Message {
 export default function WebsPage(props) {
   const webViewRef = useRef(null);
   const [uri, setURI] = useState("");
+  const [uriReady, setReadyURI] = useState("");
   const [icon, setIcon] = useState("");
   const [host, setHost] = useState("");
   const [actionName, setActionName] = useState("");
@@ -45,6 +57,7 @@ export default function WebsPage(props) {
   const [actionMsg, setActionMsg] = useState<Message>();
   const [modalVisible, setModalVisible] = useState(false);
   const [needEstimated, setNeedEstimated] = useState(false);
+  const [isFocusEdit, setIsFocusEdit] = useState(false);
   const [componentInfo, setComponentInfo] = useState<{
     params: Record<string, unknown>;
     component: ComponentType<{
@@ -59,16 +72,28 @@ export default function WebsPage(props) {
   } | null>(null);
 
   const [isShowLoading, setIsShowLoading] = useState(false);
+  const [isShowWebNotice, setIsShowWebNotice] = useState(false);
+  const { t } = useTranslation();
+  const [isAgree, setIsAgree] = useState(false);
 
   useEffect(() => {
     if (!props.route.params?.url) {
       navigate("DiscoverPage");
     } else {
       setURI(props.route.params.url);
+      setReadyURI(props.route.params.url);
       setIcon(props.route.params.icon);
     }
+    initData();
   }, []);
 
+  async function initData() {
+    const isShowNotice = await AsyncStorageUtil.getItem(no_notice_key);
+    // const isShowNotice = false;
+    console.log("isShowNotice", isShowNotice);
+
+    setIsAgree(isShowNotice);
+  }
   const onError = ({ nativeEvent }) => {
     console.log("webView 加载错误信息");
 
@@ -78,13 +103,15 @@ export default function WebsPage(props) {
   const handlerMessage = async (
     message: Message & { type: string; data: unknown }
   ) => {
-    console.log("handlerMessage", message);
+    // console.log("handlerMessage", JSON.stringify(message));
 
     if (message.type === "Console") {
       console.info(`[Console] ${JSON.stringify(message.data)}`);
       return;
     }
     let [actionName, actionType] = message.action.split("-");
+    // console.log("actionName", actionName);
+    // console.log("actionType", actionType);
 
     if (actionName === "ECDH") {
       actionType = "query";
@@ -97,11 +124,11 @@ export default function WebsPage(props) {
       message.params.icon = message.icon;
     }
 
-    setActionMsg(message);
     actionMsg2 = message;
 
     if (actionType === ActionType.Authorize) {
       // console.log("message", message);
+      setActionMsg(message);
       setModalVisible(true);
       if (message.icon) {
         setIcon(message.icon);
@@ -113,6 +140,10 @@ export default function WebsPage(props) {
       setComponentInfo({ component, params: message.params });
       setDescriptions(descriptions);
       setNeedEstimated(needEstimated);
+
+      // console.log("actionDispatcher", JSON.stringify(actionDispatcher(actionName, actionType)));
+
+      // console.log("params", JSON.stringify(message.params));
     } else if (actionType === ActionType.Query) {
       console.log("query1111 :", actionName);
 
@@ -120,6 +151,8 @@ export default function WebsPage(props) {
         const { process } = actionDispatcher(actionName, ActionType.Query);
 
         const data = await process(message.params, message.host);
+
+        // console.log("query :", data);
 
         if (data !== undefined) {
           if (message && message.nonce) {
@@ -157,8 +190,8 @@ export default function WebsPage(props) {
       JSON.stringify({
         nonce: actionMsg.nonce,
         data: {
-          status:errorMessage,
-          info:errorMessage
+          status: errorMessage,
+          info: errorMessage,
         },
       })
     );
@@ -188,7 +221,6 @@ export default function WebsPage(props) {
           actionName,
           ActionType.Authorize
         );
-        console.log(" 设置参数完成：", data);
 
         try {
           const params = await estimate(data);
@@ -202,18 +234,17 @@ export default function WebsPage(props) {
           setModalVisible(false);
           ToastView({ text: e.toString(), type: "error", time: 3000 });
           // cancelAction();
-          errorAction(e.toString())
-          throw(e.toString())
+          errorAction(e.toString());
+          throw e.toString();
         }
       } else {
-        console.log("进行下一步处理");
+        console.log("进行下一步处理", actionName);
         const { process } = actionDispatcher(
           actionName,
           actionType as ActionType
         );
         // console.log("confirmAction params", componentInfo.params);
         const data = await process(componentInfo.params, actionMsg.host);
-        // console.log("confirmAction data", data);
         setIsShowLoading(false);
         postMessage(
           JSON.stringify({
@@ -232,170 +263,349 @@ export default function WebsPage(props) {
   };
 
   const postMessage = async (message: unknown) => {
-    console.log("postMessage", message);
+    // console.log("postMessage", message);
 
     webViewRef.current.postMessage(message);
   };
 
+  const handleNavigationStateChange = (navState) => {
+    setReadyURI(navState.url);
+    setURI(navState.url);
+  };
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <LoadingModal
-        isShow={isShowLoading}
-        isCancel={true}
-        event={() => {
-          setIsShowLoading(false);
-        }}
-      />
-      <Modal animationType="slide" visible={modalVisible}>
-        {/* <View className="w-screen h-screen flex flex-col items-center px-4"> */}
-        <SafeAreaView
-          style={{ flex: 1, margin: Platform.OS === "ios" ? 30 : 0 }}
-        >
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+        setIsFocusEdit(false);
+      }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <LoadingModal
+          isShow={isShowLoading}
+          isCancel={true}
+          event={() => {
+            setIsShowLoading(false);
+          }}
+        />
+        <Modal animationType="slide" visible={modalVisible}>
+          <SafeAreaView
+            style={{ flex: 1, margin: Platform.OS === "ios" ? 30 : 0 }}
+          >
+            <View
+              style={{
+                flex: 1,
+                margin: 20,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 20,
+                }}
+              >
+                <MaskedView
+                  style={{
+                    flexDirection: "row",
+                    height: 60,
+                  }}
+                  maskElement={
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        textAlign: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      AUTHORIZE
+                    </Text>
+                  }
+                >
+                  <LinearGradient
+                    colors={["#6CE5F7", "#1F2CFF"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{ flex: 1 }}
+                  />
+                </MaskedView>
+              </View>
+
+              {icon ? (
+                <Image
+                  source={{ uri: icon }}
+                  style={{ width: 80, height: 80, borderRadius: 10 }}
+                />
+              ) : (
+                <CircleAvatarLetter
+                  widthC={70}
+                  heightC={70}
+                  letterStr={host[0] || ""}
+                />
+              )}
+
+              <Text
+                style={{
+                  fontSize: 14, // text-sm ≈ 14px
+                  color: "#6B7280", // text-gray-500 ≈ #6B7280
+                  paddingVertical: 24, // py-6 ≈ 24px
+                }}
+              >
+                {`${host} would like to:`}
+              </Text>
+
+              <ScrollView
+                style={{
+                  overflow: "scroll", // overflow-y-auto -> overflow: 'scroll' for vertical scrolling
+                  borderRadius: 8, // rounded-lg -> rounded large (8px)
+                  backgroundColor: "#F9FAFB", // bg-gray-50 -> light gray (#F9FAFB)
+                  width: "100%", // w-full -> full width
+                }}
+              >
+                <View
+                  style={{
+                    padding: 16, // p-4 -> padding of 16px
+                    gap: 8, // space-y-2 -> vertical space between elements (2 * 4px = 8px)
+                  }}
+                >
+                  {componentInfo
+                    ? createElement(
+                        componentInfo.component,
+                        {
+                          params: componentInfo.params,
+                          ref: needEstimated ? metaidComponentRef : undefined,
+                        },
+                        <View style={{ gap: 8 }}>
+                          <Text style={{ fontSize: 16 }}>{actionName}</Text>
+                          {descriptions.map((description, index) => (
+                            <View
+                              key={index}
+                              style={{
+                                flexDirection: "row",
+                                gap: 4,
+                                width: "100%",
+                              }}
+                            >
+                              <CheckBadgeIcon
+                                style={{ width: 24, height: 24, marginTop: -2 }}
+                              />
+                              <Text style={{ flex: 1 }}>{description}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      )
+                    : null}
+                </View>
+              </ScrollView>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingTop: 24, // pt-6 对应 24px
+                  paddingBottom: 48, // pb-12 对应 48px
+                  width: "100%",
+                  gap: 8, // gap-2 对应 8px
+                }}
+              >
+                <Pressable
+                  onPress={cancelAction}
+                  style={{
+                    width: 120, // w-[120px] 对应 120px
+                    borderRadius: 24, // rounded-3xl 通常对应的边角圆度是 24px
+                    backgroundColor: "#ADD8E6", // bg-blue-light 对应的浅蓝色 (可以根据具体颜色修改)
+                    paddingVertical: 16, // py-4 对应的上下内边距是 16px
+                  }}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center", // text-center 对应 `textAlign: 'center'`
+                      fontSize: 12, // text-sm 对应字体大小，通常为 12px
+                      color: "#1E40AF", // text-blue-primary 对应的蓝色 (#1E40AF) 可以根据你的设计系统修改
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    setIsShowLoading(true);
+                    confirmAction();
+                  }}
+                  style={{
+                    width: 120, // w-[120px] 对应的宽度
+                    borderRadius: 30, // rounded-3xl 对应的圆角，通常为 30px
+                    backgroundColor: "#1E40AF", // bg-blue-primary 对应的蓝色背景 (#1E40AF) 可以根据你的设计系统修改
+                    paddingVertical: 16, // py-4 对应的垂直内边距，通常为 16px
+                  }}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center", // text-center 对应的文本居中
+                      fontSize: 12, // text-sm 对应的小字体，通常为 12px
+                      color: "white", // text-white 对应的白色字体
+                    }}
+                  >
+                    {needEstimated ? "Next" : "Confirm"}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </SafeAreaView>
+        </Modal>
+
+        <Modal visible={isShowWebNotice} transparent={true}>
           <View
             style={{
               flex: 1,
-              margin: 20,
+              backgroundColor: "rgba(0,0,0,0.5)",
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            {/* <Text className="text-blue-primary text-2xl tracking-wide py-6">
-            AUTHORIZE
-          </Text> */}
-
             <View
               style={{
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 20,
+                backgroundColor: "#fff",
+                borderRadius: 10,
+                paddingHorizontal: 30,
+                paddingTop: 25,
+                marginHorizontal: 20,
+                paddingBottom: 15,
+                height: "45%",
+                width: "80%",
               }}
             >
-              <MaskedView
+              <Text
+                style={[
+                  metaStyles.largeDefaultLittleText,
+                  { textAlign: "center" },
+                ]}
+              >
+                {t("n_web_response_title")}
+              </Text>
+              <Line />
+              {/* metaStyles.defaultText, */}
+              <ScrollView>
+                <Text
+                  style={[
+                    {
+                      color: "#333333",
+                      fontSize: 16,
+                      lineHeight: 22,
+                      marginTop: 15,
+                    },
+                  ]}
+                >
+                  {t("n_web_response_notice")}
+                </Text>
+              </ScrollView>
+
+              <View
                 style={{
                   flexDirection: "row",
-                  height: 60,
+                  alignItems: "center",
+                  marginTop: 15,
+                  marginBottom: 20,
                 }}
-                maskElement={
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      textAlign: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      fontWeight: "bold",
+              >
+                {isAgree ? (
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      setIsAgree(false);
+                      AsyncStorageUtil.setItem(no_notice_key, false);
                     }}
                   >
-                    AUTHORIZE
-                  </Text>
-                }
-              >
-                <LinearGradient
-                  colors={["#6CE5F7", "#1F2CFF"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={{ flex: 1 }}
-                />
-              </MaskedView>
-            </View>
-            {/* FIXME: color unwork */}
-            {/* <Text className="bg-gradient-to-r from-teal-primary to-blue-primary bg-clip-text text-transparent text-lg tracking-wide">
-            AUTHORIZE
-          </Text> */}
-            {icon ? (
-              // <Image source={{ uri: icon }} className="w-24 h-24 rounded-lg" />
-              <Image
-                source={{ uri: icon }}
-                style={{ width: 80, height: 80, borderRadius: 10 }}
-              />
-            ) : (
-              <CircleAvatarLetter
-                widthC={70}
-                heightC={70}
-                letterStr={host[0] || ""}
-              />
-              // <Text className="w-24 h-24 rounded-full bg-blue-primary flex items-center justify-center">
-              //   {host[0] || ""}
-              // </Text>
-            )}
+                    <Image
+                      source={require("../../image/metalet_wallet_check_select.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  </TouchableWithoutFeedback>
+                ) : (
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      setIsAgree(true);
+                      AsyncStorageUtil.setItem(no_notice_key, true);
+                    }}
+                  >
+                    <Image
+                      source={require("../../image/metalet_wallet_check_normal_icom.png")}
+                      style={{ width: 20, height: 20, marginRight: 10 }}
+                    />
+                  </TouchableWithoutFeedback>
+                )}
 
-            <Text className="text-sm text-gray-500 py-6">
-              {`${host} would like to:`}
-            </Text>
-
-            <ScrollView className="overflow-y-auto rounded-lg bg-gray-50 text-sm w-full">
-              <View className="p-4 space-y-2">
-                {componentInfo
-                  ? createElement(
-                      componentInfo.component,
-                      {
-                        params: componentInfo.params,
-                        ref: needEstimated ? metaidComponentRef : undefined,
-                      },
-                      <View className="space-y-2">
-                        <Text className="text-base">{actionName}</Text>
-                        {descriptions.map((description, index) => (
-                          <View
-                            key={index}
-                            className="flex flex-row gap-x-0.5 w-full"
-                          >
-                            <CheckBadgeIcon className="w-6 h-6 -mt-0.5" />
-                            <Text className="flex-1">{description}</Text>
-                          </View>
-                        ))}
-                      </View>
-                    )
-                  : null}
+                {/* <Image  style={{width:15}} source={require("../../image/metalet_wallet_check_normal_icom.png")} /> */}
+                <Text style={[metaStyles.defaultText, { marginTop: 0 }]}>
+                  {t("n_web_response_confirm")}
+                </Text>
               </View>
-            </ScrollView>
+              <View
+                style={{ flexDirection: "row", justifyContent: "space-around" }}
+              >
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    setIsShowWebNotice(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      metaStyles.largeDefaultLittleText,
+                      { textAlign: "center", color: themeColor },
+                    ]}
+                  >
+                    {t("c_cancel")}
+                  </Text>
+                </TouchableWithoutFeedback>
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    setIsShowWebNotice(false);
+                    setURI(uriReady);
+                    console.log("uriReady", uriReady);
+                    console.log("uri", uri);
+                    setIsFocusEdit(false);
 
-            <View className="flex flex-row items-center justify-center pt-6 pb-12 w-full gap-2">
-              <Pressable
-                onPress={cancelAction}
-                className="w-[120px] rounded-3xl bg-blue-light py-4"
-              >
-                <Text className="text-center text-sm text-blue-primary">
-                  Cancel
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  setIsShowLoading(true);
-                  confirmAction();
-                }}
-                className="w-[120px] rounded-3xl bg-blue-primary py-4"
-              >
-                <Text className="text-center text-sm text-white">
-                  {needEstimated ? "Next" : "Confirm"}
-                </Text>
-              </Pressable>
+                    Keyboard.dismiss();
+
+                    if (webViewRef.current) webViewRef.current.reload();
+                  }}
+                >
+                  <Text
+                    style={[
+                      metaStyles.largeDefaultLittleText,
+                      { textAlign: "center", color: themeColor },
+                    ]}
+                  >
+                    {t("c_confirm")}
+                  </Text>
+                </TouchableWithoutFeedback>
+              </View>
             </View>
           </View>
-        </SafeAreaView>
-      </Modal>
+        </Modal>
 
-      {/* className="flex flex-row items-center px-2.5 gap-x-2 h-14 py-2" */}
-      <View
-        style={{
-          flexDirection: "row",
-          padding: 10,
-          alignItems: "center",
-          backgroundColor: "#fff",
-        }}
-      >
-        {/* className="bg-[#E5EAEE] px-[18px] h-full leading-10 grow rounded-[60px]" */}
-        {/* <Text  style={{backgroundColor:'#E5EAEE',flex:1,padding:10,borderRadius:10, overflow: 'hidden',}}> */}
-
-        <TouchableWithoutFeedback
-          onPress={() => {
-            if (webViewRef.current) webViewRef.current.goBack();
+        <View
+          style={{
+            flexDirection: "row",
+            padding: 10,
+            alignItems: "center",
+            backgroundColor: "#fff",
           }}
         >
-          <Image
-            source={require("../../image/meta_back_icon.png")}
-            style={{ width: 22, height: 22 }}
-          />
-        </TouchableWithoutFeedback>
-        <Text
+          <TouchableWithoutFeedback
+            onPress={() => {
+              if (webViewRef.current) webViewRef.current.goBack();
+            }}
+          >
+            <Image
+              source={require("../../image/meta_back_icon.png")}
+              style={{ width: 22, height: 22 }}
+            />
+          </TouchableWithoutFeedback>
+          {/* <Text
           style={{
             backgroundColor: litterWhittleBgColor,
             flex: 1,
@@ -406,53 +616,156 @@ export default function WebsPage(props) {
           numberOfLines={1}
         >
           {uri}
-        </Text>
+        </Text> */}
 
-        <TouchableOpacity
-          onPress={() => {
-            if (webViewRef.current) webViewRef.current.reload();
-          }}
-          className="border border-[#E7E7E7] rounded-full w-8 h-8 flex items-center justify-center"
-          style={{ marginLeft: 5 }}
-        >
-          <Image
+          <TextInput
+            style={{
+              backgroundColor: litterWhittleBgColor,
+              flex: 1,
+              padding: 10,
+              borderRadius: 10,
+              overflow: "hidden",
+            }}
+            numberOfLines={1}
+            value={uriReady}
+            onFocus={() => {
+              // setFeedModeType(feedModeCustom);
+              setIsFocusEdit(true);
+            }}
+            onChangeText={(text) => setReadyURI(text)}
+          />
+
+          <TouchableOpacity
+            onPress={() => {
+              if (isFocusEdit == false) {
+                if (webViewRef.current) webViewRef.current.reload();
+              } else {
+                console.log("uriReady进入加载");
+                setIsFocusEdit(false);
+                Keyboard.dismiss();
+
+                if (isAgree) {
+                  setURI(uriReady);
+                  if (webViewRef.current) webViewRef.current.reload();
+                } else {
+                  setIsShowWebNotice(true);
+                }
+
+                // if (uriReady.trim()) {
+                //   const newUrl = uriReady.trim();
+                //   // 检查是否需要添加协议头
+                //   if (!newUrl.startsWith('http://') && !newUrl.startsWith('https://')) {
+                //     setURI(`https://${newUrl}`); // 默认使用 https
+                //   } else {
+                //     setURI(newUrl);
+                //   }
+                // }
+                // setURI("https://ai.com");
+                // Keyboard.dismiss();
+                // setIsFocusEdit(false);
+              }
+            }}
+            style={{
+              borderWidth: 1, // 设置边框宽度为1
+              borderColor: "#E7E7E7", // 设置边框颜色为 #E7E7E7
+              borderRadius: 50, // 圆形边角，h和w的大小决定了其形状
+              width: 32, // 对应 w-8，8 * 4px = 32px
+              height: 32, // 对应 h-8，8 * 4px = 32px
+              flexDirection: "row", // 使用 flex 排列元素
+              alignItems: "center", // 垂直居中对齐
+              justifyContent: "center",
+              marginLeft: 5, // 水平居中对齐
+            }}
+          >
+            {isFocusEdit === true ? (
+              <Image
+                source={require("../../image/meta_search_icon.png")}
+                style={{ width: 16, height: 16 }}
+              />
+            ) : (
+              <Image
+                source={require("../../image/icon_refresh.png")}
+                style={{ width: 16, height: 16 }}
+              />
+            )}
+            {/* <Image
             source={require("../../image/icon_refresh.png")}
             style={{ width: 16, height: 16 }}
-          />
-        </TouchableOpacity>
+          /> */}
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => goBack()}
-          className="border border-[#E7E7E7] rounded-full w-8 h-8 flex items-center justify-center"
-          style={{ marginLeft: 5 }}
-        >
-          <CloseIcon className="text-black-primary w-2.5 h-2.5" />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            onPress={() => {
+              goBack();
+            }}
+            style={{
+              marginLeft: 5,
+              borderWidth: 1, // 设置边框宽度为1
+              borderColor: "#E7E7E7", // 设置边框颜色为 #E7E7E7
+              borderRadius: 50, // 圆形边角，h和w的大小决定了其形状
+              width: 32, // 对应 w-8，8 * 4px = 32px
+              height: 32, // 对应 h-8，8 * 4px = 32px
+              flexDirection: "row", // 使用 flex 排列元素
+              alignItems: "center", // 垂直居中对齐
+              justifyContent: "center", // 水平居中对齐
+            }}
+          >
+            {/* <CloseIcon
+              style={{
+                width: 10, // 对应 w-2.5，2.5 * 4px = 10px
+                height: 10, // 对应 h-2.5，2.5 * 4px = 10px
+                backgroundColor: "#000", // 设置背景色为黑色
+                borderRadius: 5, // 使其成为圆形，宽高相等时用半径的一半
+              }}
+            /> */}
 
-      {Platform.OS === "web" ? (
-        <View className="w-full h-full flex flex-col items-center justify-center">
-          <Text className="mb-4">GetWebView does not support on web</Text>
-          <Button onPress={() => setModalVisible(true)} title="Show Modal" />
+            <Image
+              source={require("../../image/metalet_close_big_icon.png")}
+              style={{ width: 13, height: 13 }}
+            />
+          </TouchableOpacity>
         </View>
-      ) : (
-        <WebView
-          ref={webViewRef}
-          source={{ uri }}
-          useWebKit={true}
-          onError={onError}
-          allowFileAccess={true}
-          javaScriptEnabled={true}
-          injectedJavaScript={injectedJavaScript}
-          domStorageEnabled={true}
-          javaScriptCanOpenWindowsAutomatically={true}
-          onMessage={(e) => {
-            handlerMessage(JSON.parse(e.nativeEvent.data));
-          }}
-          userAgent={Platform.OS ? "Metalet-iOS" : "Metalet-Android"}
-          androidHardwareAccelerationDisabled={true}
-        />
-      )}
-    </SafeAreaView>
+
+        {Platform.OS === "web" ? (
+          <View
+            style={{
+              flex: 1, // 设置占据父容器的全部空间
+              justifyContent: "center", // 垂直居中
+              alignItems: "center", // 水平居中
+              width: "100%", // 设置宽度为100%
+              height: "100%", // 设置高度为100%
+            }}
+          >
+            <Text style={{ marginBottom: 16 }}>
+              GetWebView does not support on web
+            </Text>
+            <Button onPress={() => setModalVisible(true)} title="Show Modal" />
+          </View>
+        ) : (
+          <WebView
+            style={{ flex: 1 }}
+            ref={webViewRef}
+            source={{ uri }}
+            useWebKit={true}
+            onError={onError}
+            allowFileAccess={true}
+            javaScriptEnabled={true}
+            injectedJavaScript={injectedJavaScript}
+            domStorageEnabled={true}
+            scrollEnabled={true}
+            nestedScrollEnabled={true}
+            cacheEnabled={true}
+            // cacheMode="LOAD_CACHE_ELSE_NETWORK"
+            javaScriptCanOpenWindowsAutomatically={true}
+            onMessage={(e) => {
+              handlerMessage(JSON.parse(e.nativeEvent.data));
+            }}
+            userAgent={Platform.OS ? "Metalet-iOS" : "Metalet-Android"}
+            androidHardwareAccelerationDisabled={true}
+            onNavigationStateChange={handleNavigationStateChange}
+          />
+        )}
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }

@@ -76,6 +76,7 @@ export const CurrentWalletIDKey = "CurrentWalletID_key";
 export const CurrentAccountIDKey = "CurrentAccountID_key";
 
 export const net_wallet_network_key = "net_network_key";
+export const no_notice_key="no_notice_key"
 
 export const wallet_mode_key = "wallet_mode_key";
 export const wallet_mode_cold = "cold";

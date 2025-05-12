@@ -92,6 +92,9 @@ import ColdAssetWalletPage from "@/page/settings/ColdAssetWalletPage";
 import CongratulationsColdPage from "@/page/CongratulationsColdPage";
 import BtcMRC721Page from "@/page/BtcMRC721Page";
 import BtcNftMRC721DetailPage from "@/page/home/BtcNftMRC721DetailPage";
+import BtcMRC721RePage from "@/page/BtcMRC721RePage";
+import Mrc721NftListPage from "@/page/Mrc721NftListPage";
+import ShowBuzzPage from "@/page/home/ShowBuzzPage";
 
 ////////
 
@@ -231,8 +234,13 @@ const StackNavigator = () => (
       component={CongratulationsColdPage}
     />
     <Stack.Screen name="BtcMRC721Page" component={BtcMRC721Page} />
-    <Stack.Screen name="BtcNftMRC721DetailPage" component={BtcNftMRC721DetailPage} />
-    
+    <Stack.Screen name="BtcMRC721RePage" component={BtcMRC721RePage} />
+    <Stack.Screen
+      name="BtcNftMRC721DetailPage"
+      component={BtcNftMRC721DetailPage}
+    />
+    <Stack.Screen name="Mrc721NftListPage" component={Mrc721NftListPage} />
+    <Stack.Screen name="ShowBuzzPage" component={ShowBuzzPage} />
   </Stack.Navigator>
 );
 

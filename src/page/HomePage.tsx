@@ -159,8 +159,6 @@ export default function HomePage({ navigation }) {
 
     changeLanguage();
 
-
-
     // 立即调用一次获取数据
     // fetchData();
     // 设置轮询，每隔5秒获取一次数据
@@ -235,15 +233,14 @@ export default function HomePage({ navigation }) {
     if (platformNow === "android") {
       const check: UpdateData = await fetchCheckUpgrade("android");
       console.log(JSON.stringify(check));
-      // const codeVersion = check.data.version_code;
-      const codeVersion = 42;
+      const codeVersion = check.data.version_code;
       // setUpdateUrl(check.data.url);
       setUpdateUrl(check.data.apkUrl);
       if (codeVersion > versionCode) {
         setUpdate(true);
       }
     } else {
-      // 36
+      // 36 codeVersion改为当前版本
       const check: UpdateData = await fetchCheckUpgrade("ios");
       // console.log(JSON.stringify(check));
       const codeVersion = check.data.version_code;
@@ -273,6 +270,13 @@ export default function HomePage({ navigation }) {
       nowBtcAddress = nowBtcWallet.getAddress();
     }
 
+    const sumBalance = await AsyncStorageUtil.getItemDefault(
+      nowBtcAddress,
+      "0.0"
+    );
+    // console.log("sumBalance-------------", sumBalance);
+    updateCurrentSumBalance(sumBalance);
+
     const showbalance: ShowBalance = await caculateMvcAndBtcAssert(
       nowMvcAddress,
       nowBtcAddress
@@ -287,7 +291,11 @@ export default function HomePage({ navigation }) {
     updateSpaceBalance(showbalance.spaceBalance);
     updateSetBtcBalance(showbalance.btcBalance);
 
-    updateCurrentSumBalance(showbalance.sumAssert);
+    if (sumBalance == "0.0") {
+      updateCurrentSumBalance(showbalance.sumAssert);
+    }
+    
+    AsyncStorageUtil.setItem(nowBtcAddress, showbalance.sumAssert);
     updateMetaletWallet(metaletWallet);
   };
   //初始化所有钱包

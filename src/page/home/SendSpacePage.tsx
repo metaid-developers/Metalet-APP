@@ -86,7 +86,7 @@ export default function SendSpacePage() {
       priviteKey,
       network === "mainnet" ? API_NET.MAIN : API_NET.TEST,
       1,
-      API_TARGET.CYBER3
+      API_TARGET.METALET
       // API_TARGET.MVC
     );
 

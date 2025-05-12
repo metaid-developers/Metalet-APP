@@ -3,7 +3,11 @@ import { Text, View } from "react-native";
 
 export default ({ children, ...params }) => {
   return (
-    <View className="space-y-2">
+    <View
+      style={{
+        marginBottom: 8,
+      }}
+    >
       {children ? children : null}
       {/* <Text>{JSON.stringify(params)}</Text> */}
     </View>

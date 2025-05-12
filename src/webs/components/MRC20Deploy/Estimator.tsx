@@ -11,41 +11,71 @@ export default ({
     Clipboard.setStringAsync(text);
   };
   return (
-    <View className="space-y-2">
+    <View
+      style={{
+        marginBottom: 8,
+      }}
+    >
       {children ? children : null}
-      <View className="flex flex-row items-center justify-between">
-        <Text className="text-gray-primary">Commit Cost</Text>
+      <View
+        style={{
+          flexDirection: "row", // flex-row
+          alignItems: "center", // items-center
+          justifyContent: "space-between", // justify-between
+        }}
+      >
+        <Text
+          style={{
+            color: "#9CA3AF",
+          }}
+        >
+          Commit Cost
+        </Text>
         <Text>{commitCost / 1e8} BTC</Text>
       </View>
-      <View className="flex flex-row items-center justify-between">
-        <Text className="text-gray-primary">Reveal Cost</Text>
+      <View
+        style={{
+          flexDirection: "row", // flex-row
+          alignItems: "center", // items-center
+          justifyContent: "space-between", // justify-between
+        }}
+      >
+        <Text style={{ color: "#9CA3AF" }}>Reveal Cost</Text>
         <Text>{revealCost / 1e8} BTC</Text>
       </View>
-      <View className="flex flex-row items-center justify-between">
-        <Text className="text-gray-primary">Total Cost</Text>
+      <View
+        style={{
+          flexDirection: "row", // flex-row
+          alignItems: "center", // items-center
+          justifyContent: "space-between", // justify-between
+        }}
+      >
+        <Text
+          style={{
+            color: "#9CA3AF",
+          }}
+        >
+          Total Cost
+        </Text>
         <Text>{totalCost / 1e8} BTC</Text>
       </View>
-      <View className="flex flex-row items-center justify-between">
-        <Text className="text-gray-primary">Fee Rate</Text>
+      <View
+        style={{
+          flexDirection: "row", // flex-row
+          alignItems: "center", // items-center
+          justifyContent: "space-between", // justify-between
+        }}
+      >
+        <Text
+          style={{
+            color: "#9CA3AF",
+          }}
+        >
+          Fee Rate
+        </Text>
         <Text>{feeRate} sat/vB</Text>
       </View>
-      {/* <View className="flex flex-row items-center justify-between">
-        <Text className="text-gray-primary">CommitTx</Text>
-        <TouchableOpacity onPress={() => copyToClipboard(commitTx.rawTx)}>
-          <CopyIcon className="w-5 h-5 text-gray-primary" />
-        </TouchableOpacity>
-      </View> */}
-      {/* {revealTxs.map((revealTx, i) => (
-        <View
-          key={revealTx.txId}
-          className="flex flex-row items-center justify-between"
-        >
-          <Text className="text-gray-primary">RevealTx{i + 1}</Text>
-          <TouchableOpacity onPress={() => copyToClipboard(revealTx.rawTx)}>
-            <CopyIcon className="w-5 h-5 text-gray-primary" />
-          </TouchableOpacity>
-        </View>
-      ))} */}
+     
     </View>
   );
 };

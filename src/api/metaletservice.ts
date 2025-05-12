@@ -27,8 +27,14 @@ import { Mrc20RecordData } from "./type/Mrc20RecordData";
 import { t } from "i18next";
 import { TxIdData } from "./type/TxId";
 import { MvcActivityRecord } from "@/types/mvcrecord";
-import { RootDataObject, RootDataObject2, RootDataObject3 } from "./type/RootDataObject";
+import {
+  RootDataObject,
+  RootDataObject2,
+  RootDataObject3,
+} from "./type/RootDataObject";
 import { PINsBean } from "./type/PINsBean";
+import { Mrc721ItemBean } from "./type/Mrc721ItemBean";
+import { Mrc721SerListBean } from "./type/Mrc721SerListBean";
 
 // export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
@@ -62,7 +68,7 @@ export async function fetchMvcActivityComfird(
     { net: network, address: address }
   );
   console.log("fetchMvcActivityComfird", result);
-  
+
   const data = result.data.list as MvcActivityRecord[];
   return data;
 }
@@ -183,6 +189,7 @@ export async function fetchMvcNftBalance(
     false,
     { net: network, address: address, detailCount: 3 }
   );
+
   const data = result.data.list as MvcNftListObject[];
   return data;
 
@@ -237,7 +244,7 @@ export async function fetchSpaceBalance(
     { net: network, address: address }
   );
   console.log("fetchSpaceBalance", data);
-  
+
   const dataMvcBalance: SpaceBalance = data.data as SpaceBalance;
 
   return dataMvcBalance;
@@ -437,7 +444,6 @@ export async function fetchMrc20Price(): Promise<MvcFtPriceData> {
     false,
     { net: network }
   );
-
   return data;
 }
 
@@ -464,19 +470,49 @@ export async function checkHasNetWork() {
   return false;
 }
 
-
 // 25.mvc nft Ser List
-export async function fetchPINsList(
-  address: string,
-): Promise<PINsBean[]> {
+export async function fetchPINsList(address: string): Promise<PINsBean[]> {
   const network = await getWalletNetwork(Chain.BTC);
   const result: RootDataObject3 = await get(
     BASE_METALET_URL + "/wallet-api/v3/address/pins",
     false,
-    { net: network, address:address,cnt: true, cursor: 0, size: 1000 }
+    { net: network, address: address, cnt: true, cursor: 0, size: 1000 }
   );
   const data: PINsBean[] = result.data.list;
   // console.log("长度："+data.length);
-  
+
   return data;
 }
+
+// 26.mvc nft Ser List2
+export async function fetchMRC721sList(address: string): Promise<Mrc721SerListBean[]> {
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject3 = await get(
+    BASE_METALET_URL + "/wallet-api/v4/man/mrc721/address/collection-list",
+    false,
+    { net: network, address: address, cursor: 0, size: 1000 }
+  );
+
+
+  
+  const data: Mrc721SerListBean[] = result.data.list;
+  // console.log("长度："+data.length);
+
+  return data;
+}
+
+
+// 26.mvc nft Ser List2
+export async function fetchMRC721ItemList(address: string,pinId:string,size:number): Promise<Mrc721ItemBean[]> {
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject3 = await get(
+    BASE_METALET_URL + "/wallet-api/v4/man/mrc721/address/collection/item-list",
+    false,
+    { net: network, address: address, pinId:pinId,cursor: 0, size: size }
+  );
+  
+  const data: Mrc721ItemBean[] = result.data.list;
+  // console.log("长度："+data.length);
+  return data;
+}
+

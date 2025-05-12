@@ -76,6 +76,9 @@ const actions = {
   transfer: { action: "Transfer", type: "authorize" },
   signMessage: { action: "SignMessage", type: "authorize" },
   pay: { action: "Pay", type: "authorize" },
+  unlockP2PKHInput: { action: "unlockP2PKHInput", type: "authorize" },
+  signPartialTx: { action: "SignPartialTx", type: "authorize" },
+  getMvcBalance: { action: "GetBalance", type: "query" },
   saveBase64Image: { action: "saveBase64Image", type: "query" }
 };
 

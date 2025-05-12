@@ -24,7 +24,7 @@ export async function process({
 
   const ftManager = new FtManager({
     network,
-    apiTarget: API_TARGET.CYBER3,
+    apiTarget: API_TARGET.METALET,
     purse,
     feeb: FEEB,
     apiHost,
@@ -77,7 +77,7 @@ export async function estimate({
 
   const ftManager = new FtManager({
     network,
-    apiTarget: API_TARGET.CYBER3,
+    apiTarget: API_TARGET.METALET,
     purse,
     feeb: FEEB,
     apiHost,

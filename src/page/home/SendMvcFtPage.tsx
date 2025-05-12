@@ -115,7 +115,7 @@ export default function SendMvcFtPage({ route }) {
     const ftManager = new FtManager({
       network: network === "mainnet" ? API_NET.MAIN : API_NET.TEST,
       purse: privateKey,
-      apiTarget: API_TARGET.CYBER3,
+      apiTarget: API_TARGET.METALET,
       // apiTarget: API_TARGET.MVC,
     });
 
@@ -496,7 +496,7 @@ export default function SendMvcFtPage({ route }) {
             >
               <TextInput
                 placeholder={t("c_receive_address")}
-                // value={inputAddress}
+                value={inputAddress}
                 onChangeText={(text) => {
                   setInputAddress(text);
                   if (text.length > 0 && inputAmount.length > 0) {

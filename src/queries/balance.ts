@@ -2,13 +2,19 @@ import Decimal from "decimal.js";
 import { getNetwork } from "@/lib/network";
 import { UNISAT_ENABLED } from "@/lib/config";
 import { Chain } from "@metalet/utxo-wallet-service";
-import { metaletApiV3, mvcApi, unisatApi } from "./request";
-import { Balance, BitcoinBalance, BTCBalance } from "./types/balance";
+import { metaletApiV3, metaletApiV4, unisatApi } from "./request";
+import { Balance, BitcoinBalance, BTCBalance, MVCBalance } from "./types/balance";
+import { getWalletNetwork } from "@/utils/WalletUtils";
 
 export const fetchSpaceBalance = async (address: string): Promise<Balance> => {
-  const balance = await mvcApi<Omit<Balance, "total">>(
-    `/address/${address}/balance`
-  ).get();
+  // const balance = await mvcApi<Omit<Balance, "total">>(
+  //   `/address/${address}/balance`
+  // ).get();
+  const net = await getWalletNetwork  ()
+  const balance = await metaletApiV4<MVCBalance>('/mvc/address/balance-info', { withCredential: false }).get({
+    net,
+    address,
+  })
   return {
     confirmed: balance.confirmed,
     unconfirmed: balance.unconfirmed,
