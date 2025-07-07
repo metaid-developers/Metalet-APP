@@ -8,6 +8,7 @@ import { type MvcUtxo, fetchUtxos } from "@/queries/utxos";
 import { getActiveWalletOnlyAccount, getCurrentWallet } from "./wallet";
 import { DERIVE_MAX_DEPTH, FEEB, P2PKH_UNLOCK_SIZE } from "@/lib/config";
 import { UnlockP2PKHInputParams } from "@/webs/actions/lib/authorize/unlockP2PKHInput";
+import { getDefaultMVCTRate } from "@/queries/transaction";
 
 function getMvcRootPath() {
   const wallet = getCurrentWallet(Chain.MVC);
@@ -529,13 +530,19 @@ export const payTransactions = async (
     txComposer: string;
     message?: string;
   }[],
-  hasMetaid: boolean = false
+  hasMetaid: boolean = false,
+  feeb?: number
 ) => {
   const network = await getNetwork();
   const wallet = await getCurrentWallet(Chain.MVC);
   const activeWallet = await getActiveWalletOnlyAccount();
   // const password = await getPassword()
   const address = wallet.getAddress();
+
+  if (!feeb) {
+    feeb = await getDefaultMVCTRate();
+  }
+  console.log("当前 Using MVC fee rate:", feeb);
   let usableUtxos = ((await fetchUtxos(Chain.MVC, address)) as MvcUtxo[]).map(
     (u) => {
       return {
@@ -633,11 +640,10 @@ export const payTransactions = async (
       0
     );
     const currentSize = tx.toBuffer().length;
-    const currentFee = FEEB * currentSize;
+    const currentFee = feeb * currentSize;
     const difference = totalOutput - totalInput + currentFee;
 
-    const pickedUtxos = pickUtxo(usableUtxos, difference);
-    
+    const pickedUtxos = pickUtxo(usableUtxos, difference, feeb);
 
     // append inputs
     for (let i = 0; i < pickedUtxos.length; i++) {
@@ -655,7 +661,7 @@ export const payTransactions = async (
       });
     }
 
-    const changeIndex = txComposer.appendChangeOutput(addressObj, FEEB);
+    const changeIndex = txComposer.appendChangeOutput(addressObj, feeb);
     const changeOutput = txComposer.getOutput(changeIndex);
 
     // sign
@@ -741,66 +747,76 @@ export const payTransactions = async (
 
 export const payTransactionsWithUtxos = async (
   toPayTransactions: {
-    txComposer: string
-    message?: string
+    txComposer: string;
+    message?: string;
   }[],
   utxos: {
-    txId: string
-    outputIndex: number
-    satoshis: number
-    address: string
-    height: number
+    txId: string;
+    outputIndex: number;
+    satoshis: number;
+    address: string;
+    height: number;
   }[],
   signType: number = mvc.crypto.Signature.SIGHASH_ALL,
   hasMetaid: boolean = false
 ) => {
   if (toPayTransactions.length !== utxos.length) {
-    throw new Error('The number of transactions must match the number of UTXOs')
+    throw new Error(
+      "The number of transactions must match the number of UTXOs"
+    );
   }
 
-  const network = await getNetwork()
-  const wallet = await getCurrentWallet(Chain.MVC)
-  const activeWallet = await getActiveWalletOnlyAccount()
+  const network = await getNetwork();
+  const wallet = await getCurrentWallet(Chain.MVC);
+  const activeWallet = await getActiveWalletOnlyAccount();
   // const password = await getPassword()
-  const address = wallet.getAddress()
+  const address = wallet.getAddress();
 
-  const txids = new Map<string, string>()
+  const txids = new Map<string, string>();
   toPayTransactions.forEach(({ txComposer: txComposerSerialized }) => {
-    const txid = TxComposer.deserialize(txComposerSerialized).getTxId()
-    txids.set(txid, txid)
-  })
+    const txid = TxComposer.deserialize(txComposerSerialized).getTxId();
+    txids.set(txid, txid);
+  });
 
-  const payedTransactions = []
+  const payedTransactions = [];
   for (let i = 0; i < toPayTransactions.length; i++) {
-    const toPayTransaction = toPayTransactions[i]
-    const currentUtxo = utxos[i]
-    const currentTxid = TxComposer.deserialize(toPayTransaction.txComposer).getTxId()
+    const toPayTransaction = toPayTransactions[i];
+    const currentUtxo = utxos[i];
+    const currentTxid = TxComposer.deserialize(
+      toPayTransaction.txComposer
+    ).getTxId();
 
-    const txComposer = TxComposer.deserialize(toPayTransaction.txComposer)
-    const tx = txComposer.tx
+    const txComposer = TxComposer.deserialize(toPayTransaction.txComposer);
+    const tx = txComposer.tx;
 
-    const inputs = tx.inputs
-    const existingInputsLength = tx.inputs.length
+    const inputs = tx.inputs;
+    const existingInputsLength = tx.inputs.length;
     for (let i = 0; i < inputs.length; i++) {
       if (!inputs[i].output) {
-        throw new Error('The output of every input of the transaction must be provided')
+        throw new Error(
+          "The output of every input of the transaction must be provided"
+        );
       }
     }
 
     if (hasMetaid) {
-      const { messages: metaIdMessages, outputIndex } = await parseLocalTransaction(tx)
+      const { messages: metaIdMessages, outputIndex } =
+        await parseLocalTransaction(tx);
 
       if (outputIndex !== null) {
-        let replaceFound = false
-        const prevTxids = Array.from(txids.keys())
+        let replaceFound = false;
+        const prevTxids = Array.from(txids.keys());
 
         for (let i = 0; i < metaIdMessages.length; i++) {
           for (let j = 0; j < prevTxids.length; j++) {
-            if (typeof metaIdMessages[i] !== 'string') continue
+            if (typeof metaIdMessages[i] !== "string") continue;
 
             if (metaIdMessages[i].includes(prevTxids[j])) {
-              replaceFound = true
-              metaIdMessages[i] = (metaIdMessages[i] as string).replace(prevTxids[j], txids.get(prevTxids[j])!)
+              replaceFound = true;
+              metaIdMessages[i] = (metaIdMessages[i] as string).replace(
+                prevTxids[j],
+                txids.get(prevTxids[j])!
+              );
             }
           }
         }
@@ -809,76 +825,77 @@ export const payTransactionsWithUtxos = async (
           const opReturnOutput = new mvc.Transaction.Output({
             script: mvc.Script.buildSafeDataOut(metaIdMessages),
             satoshis: 0,
-          })
-          tx.outputs[outputIndex] = opReturnOutput
+          });
+          tx.outputs[outputIndex] = opReturnOutput;
         }
       }
     }
 
-    const addressObj = new mvc.Address(address, network)
+    const addressObj = new mvc.Address(address, network);
 
     txComposer.appendP2PKHInput({
       address: addressObj,
       txId: currentUtxo.txId,
       outputIndex: currentUtxo.outputIndex,
       satoshis: currentUtxo.satoshis,
-    })
+    });
 
-    const mneObj = mvc.Mnemonic.fromString(activeWallet.mnemonic,)
-    const hdpk = mneObj.toHDPrivateKey('', network)
+    const mneObj = mvc.Mnemonic.fromString(activeWallet.mnemonic);
+    const hdpk = mneObj.toHDPrivateKey("", network);
 
-    const rootPath = await getMvcRootPath()
-    const basePrivateKey = hdpk.deriveChild(rootPath)
-    const rootPrivateKey = mvc.PrivateKey.fromWIF(wallet.getPrivateKey())
+    const rootPath = await getMvcRootPath();
+    const basePrivateKey = hdpk.deriveChild(rootPath);
+    const rootPrivateKey = mvc.PrivateKey.fromWIF(wallet.getPrivateKey());
 
-    const toUsePrivateKeys = new Map<number, mvc.PrivateKey>()
+    const toUsePrivateKeys = new Map<number, mvc.PrivateKey>();
     for (let i = 0; i < existingInputsLength; i++) {
-      const input = txComposer.getInput(i)
-      const prevTxId = input.prevTxId.toString('hex')
+      const input = txComposer.getInput(i);
+      const prevTxId = input.prevTxId.toString("hex");
       if (txids.has(prevTxId)) {
-        input.prevTxId = Buffer.from(txids.get(prevTxId)!, 'hex')
+        input.prevTxId = Buffer.from(txids.get(prevTxId)!, "hex");
       }
 
       const inputAddress = mvc.Address.fromString(
         input.output!.script.toAddress().toString(),
-        network === 'regtest' ? 'testnet' : network
-      ).toString()
-      let deriver = 0
-      let toUsePrivateKey: mvc.PrivateKey | undefined = undefined
+        network === "regtest" ? "testnet" : network
+      ).toString();
+      let deriver = 0;
+      let toUsePrivateKey: mvc.PrivateKey | undefined = undefined;
       while (deriver < DERIVE_MAX_DEPTH) {
-        const childPk = basePrivateKey.deriveChild(0).deriveChild(deriver)
-        const childAddress = childPk.publicKey.toAddress(network === 'regtest' ? 'testnet' : network).toString()
+        const childPk = basePrivateKey.deriveChild(0).deriveChild(deriver);
+        const childAddress = childPk.publicKey
+          .toAddress(network === "regtest" ? "testnet" : network)
+          .toString();
 
         if (childAddress === inputAddress.toString()) {
-          toUsePrivateKey = childPk.privateKey
-          break
+          toUsePrivateKey = childPk.privateKey;
+          break;
         }
 
-        deriver++
+        deriver++;
       }
 
       if (!toUsePrivateKey) {
-        throw new Error(`Cannot find the private key of index #${i} input`)
+        throw new Error(`Cannot find the private key of index #${i} input`);
       }
 
-      toUsePrivateKeys.set(i, toUsePrivateKey)
+      toUsePrivateKeys.set(i, toUsePrivateKey);
     }
 
     toUsePrivateKeys.forEach((privateKey, index) => {
-      txComposer.unlockP2PKHInput(privateKey, index, signType)
-    })
+      txComposer.unlockP2PKHInput(privateKey, index, signType);
+    });
 
-    txComposer.unlockP2PKHInput(rootPrivateKey, existingInputsLength, signType)
+    txComposer.unlockP2PKHInput(rootPrivateKey, existingInputsLength, signType);
 
-    const txid = txComposer.getTxId()
-    txids.set(currentTxid, txid)
+    const txid = txComposer.getTxId();
+    txids.set(currentTxid, txid);
 
-    payedTransactions.push(txComposer.serialize())
+    payedTransactions.push(txComposer.serialize());
   }
 
-  return payedTransactions
-}
-
+  return payedTransactions;
+};
 
 type SA_utxo = {
   txId: string;
@@ -887,9 +904,9 @@ type SA_utxo = {
   address: string;
   height: number;
 };
-function pickUtxo(utxos: SA_utxo[], amount: number) {
+function pickUtxo(utxos: SA_utxo[], amount: number, feeb: number) {
   // amount + 2 outputs + buffer
-  let requiredAmount = amount + 34 * 2 * FEEB + 100;
+  let requiredAmount = amount + 34 * 2 * feeb + 100;
 
   if (requiredAmount <= 0) {
     return [];
@@ -910,7 +927,7 @@ function pickUtxo(utxos: SA_utxo[], amount: number) {
     .sort(() => Math.random() - 0.5);
   const unconfirmedUtxos = utxos
     .filter((utxo) => {
-      return utxo.height <=0;
+      return utxo.height <= 0;
     })
     .sort(() => Math.random() - 0.5);
 
@@ -919,7 +936,7 @@ function pickUtxo(utxos: SA_utxo[], amount: number) {
   for (let utxo of confirmedUtxos) {
     current += utxo.satoshis;
     // add input fee
-    requiredAmount += FEEB * P2PKH_UNLOCK_SIZE;
+    requiredAmount += feeb * P2PKH_UNLOCK_SIZE;
     candidateUtxos.push(utxo);
     if (current > requiredAmount) {
       return candidateUtxos;
@@ -928,7 +945,7 @@ function pickUtxo(utxos: SA_utxo[], amount: number) {
   for (let utxo of unconfirmedUtxos) {
     current += utxo.satoshis;
     // add input fee
-    requiredAmount += FEEB * P2PKH_UNLOCK_SIZE;
+    requiredAmount += feeb * P2PKH_UNLOCK_SIZE;
     candidateUtxos.push(utxo);
     if (current > requiredAmount) {
       return candidateUtxos;
@@ -971,27 +988,27 @@ export function decrypt(encryptedText: string, password: string) {
   });
   const decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
   return decryptedStr.toString();
-  
 }
-
 
 export const unlockP2PKHInput = async (params: UnlockP2PKHInputParams) => {
-  const network = await getNetwork()
-  const wallet = await getCurrentWallet(Chain.MVC)
-  const rootPrivateKey = mvc.PrivateKey.fromWIF(wallet.getPrivateKey())
-  const payedTransactions: string[] = []
+  const network = await getNetwork();
+  const wallet = await getCurrentWallet(Chain.MVC);
+  const rootPrivateKey = mvc.PrivateKey.fromWIF(wallet.getPrivateKey());
+  const payedTransactions: string[] = [];
   params.transaction.forEach((tx) => {
     const { txComposer: txComposerSerialized, toSignInputs } = tx;
-    const txComposer = TxComposer.deserialize(txComposerSerialized)
-    console.log('txComposer', txComposer)
+    const txComposer = TxComposer.deserialize(txComposerSerialized);
+    console.log("txComposer", txComposer);
     toSignInputs.forEach((inputIndex) => {
       txComposer.unlockP2PKHInput(
-        new mvc.PrivateKey(rootPrivateKey, network === 'mainnet' ? 'mainnet' : 'testnet'),
+        new mvc.PrivateKey(
+          rootPrivateKey,
+          network === "mainnet" ? "mainnet" : "testnet"
+        ),
         inputIndex
-      )
-    })
-    payedTransactions.push(txComposer.serialize())
-  })
-  return payedTransactions
-}
-
+      );
+    });
+    payedTransactions.push(txComposer.serialize());
+  });
+  return payedTransactions;
+};

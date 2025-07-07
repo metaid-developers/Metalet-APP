@@ -170,7 +170,7 @@ export async function fetchMvcFtBalance(address: string): Promise<MvcFtData[]> {
 
 // 9. MVC nft data
 export async function fetchMvcNftBalance(
-  address: string
+  address: string,cursor?: number
 ): Promise<MvcNftListObject[]> {
   // const network = await getWalletNetwork(Chain.BTC);
   // const url =
@@ -187,9 +187,12 @@ export async function fetchMvcNftBalance(
       BASE_METALET_V4_URL +
       "/address/contract/nft/summary-list",
     false,
-    { net: network, address: address, detailCount: 3 }
+    // { net: network, address: address, detailCount: 3 }
+    { net: network, address: address, detailCount: 3 ,size:5,cursor: cursor || 0}
   );
 
+  // console.log("fetchMvcNftBalance----", JSON.stringify(result));
+  
   const data = result.data.list as MvcNftListObject[];
   return data;
 
@@ -485,7 +488,9 @@ export async function fetchPINsList(address: string): Promise<PINsBean[]> {
 }
 
 // 26.mvc nft Ser List2
-export async function fetchMRC721sList(address: string): Promise<Mrc721SerListBean[]> {
+export async function fetchMRC721sList(
+  address: string
+): Promise<Mrc721SerListBean[]> {
   const network = await getWalletNetwork(Chain.BTC);
   const result: RootDataObject3 = await get(
     BASE_METALET_URL + "/wallet-api/v4/man/mrc721/address/collection-list",
@@ -493,26 +498,37 @@ export async function fetchMRC721sList(address: string): Promise<Mrc721SerListBe
     { net: network, address: address, cursor: 0, size: 1000 }
   );
 
-
-  
   const data: Mrc721SerListBean[] = result.data.list;
   // console.log("长度："+data.length);
 
   return data;
 }
 
-
 // 26.mvc nft Ser List2
-export async function fetchMRC721ItemList(address: string,pinId:string,size:number): Promise<Mrc721ItemBean[]> {
+export async function fetchMRC721ItemList(
+  address: string,
+  pinId: string,
+  size: number
+): Promise<Mrc721ItemBean[]> {
   const network = await getWalletNetwork(Chain.BTC);
   const result: RootDataObject3 = await get(
     BASE_METALET_URL + "/wallet-api/v4/man/mrc721/address/collection/item-list",
     false,
-    { net: network, address: address, pinId:pinId,cursor: 0, size: size }
+    { net: network, address: address, pinId: pinId, cursor: 0, size: size }
   );
-  
+
   const data: Mrc721ItemBean[] = result.data.list;
   // console.log("长度："+data.length);
   return data;
 }
 
+//27.mvc feeb
+export async function fetchMvcFeed(): Promise<FeedBtcObject> {
+  const network = await getWalletNetwork(Chain.BTC);
+  const data = await get(
+    BASE_METALET_URL + "/wallet-api/v4/mvc/fee/summary",
+    false,
+    { net: network }
+  );
+  return data;
+}

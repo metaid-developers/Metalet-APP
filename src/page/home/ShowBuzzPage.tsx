@@ -575,7 +575,7 @@ export default function ShowBuzzPage() {
         console.log("调用报错" + e);
       }
     } else {
-      console.log("进行下一步处理");
+      // console.log("进行下一步处理");
       BuzzBtcConfirm();
     }
   }

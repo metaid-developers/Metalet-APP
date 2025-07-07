@@ -22,7 +22,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useData } from "../hooks/MyProvider";
 import { eventBus, refreshMvcFtEvent } from "../utils/EventBus";
 import { getCurrentMvcWallet } from "../wallet/wallet";
-import { getStorageCurrentWallet, isObserverWalletMode,  } from "@/utils/WalletUtils";
+import {
+  getStorageCurrentWallet,
+  isObserverWalletMode,
+} from "@/utils/WalletUtils";
 import { wallet_mode_cold } from "@/utils/AsyncStorageUtil";
 import { MvcNftListObject } from "@/api/type/MvcNftData";
 import { fetchMvcNftBalance } from "@/api/metaletservice";
@@ -33,6 +36,8 @@ export default function MvcNftPage(props) {
   const { accountIndex, updateAccountIndex } = useData();
   const { mvcAddress, updateMvcAddress } = useData();
   const { walletMode, updateWalletMode } = useData();
+  const [cursor, setCursor] = useState(0);
+  let pageSize = 5;
 
   useEffect(() => {
     refresh();
@@ -48,6 +53,23 @@ export default function MvcNftPage(props) {
     // } else {
     // if (walletMode == wallet_mode_cold) {
     const isCold = await isObserverWalletMode();
+    if (isCold) {
+      const wallet = await getStorageCurrentWallet();
+      getMvcNft(wallet.coldAddress, true);
+    } else {
+      const mvcWallet = await getCurrentMvcWallet();
+      getMvcNft(mvcWallet.getAddress(), true);
+    }
+    // }
+  }
+
+  async function loadMore() {
+    // if (mvcAddress) {
+    // getMvcNft(mvcAddress);
+    // } else {
+    // if (walletMode == wallet_mode_cold) {
+    const isCold = await isObserverWalletMode();
+
     if (isCold) {
       const wallet = await getStorageCurrentWallet();
       getMvcNft(wallet.coldAddress);
@@ -67,7 +89,7 @@ export default function MvcNftPage(props) {
     }, [])
   );
 
-  async function getMvcNft(address: string) {
+  async function getMvcNft(address: string, isRefresh: boolean = false) {
     //  const nftList=await fetchMvcNftBalance(address);
     //  console.log("nftList",nftList);
 
@@ -84,18 +106,37 @@ export default function MvcNftPage(props) {
       //   );
 
       // console.log("data 获取的NFT 数据： ", JSON.stringify(data));
+      // if (isRefresh == false) {
+      // }
 
-      const data: MvcNftListObject[] = await fetchMvcNftBalance(address);
+      const data: MvcNftListObject[] = await fetchMvcNftBalance(
+        address,
+        cursor
+      );
 
+      // console.log("data 获取的NFT 数据： ", JSON.stringify(data));
       // if (data.data.results.items !==undefined&&data.data.results.items != null) {
-      if (data !== undefined && data != null) {
+      if (data !== undefined && data != null && data.length > 0) {
         // setNftList(data.data.results.items);
-        // console.log('有数据刷新');
-        setNftList(data);
+        // console.log("有数据刷新");
+        // setNftList(data);
+        if (isRefresh) {
+          // console.log("isRefresh", isRefresh);
+          setNftList(data);
+          setCursor(5);
+        } else {
+          setNftList((prevList) => [...prevList, ...data]);
+          setCursor(cursor + 5);
+        }
+        // console.log("data", data);
+
         // setBtcFtList([...data.data.list]);
       } else {
         // console.log('无有数据刷新');
-        setNftList([]);
+        if (isRefresh) {
+          setNftList([]);
+        }
+        //
       }
     } catch (e) {
       console.log("getMvcNft error ", e);
@@ -200,8 +241,9 @@ export default function MvcNftPage(props) {
             renderItem={ListItem}
             refreshing={false}
             onRefresh={() => {
-              getMvcNft(mvcAddress);
+              getMvcNft(mvcAddress, true);
             }}
+            onEndReached={loadMore}
           />
         </View>
       )}

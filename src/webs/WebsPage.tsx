@@ -145,7 +145,7 @@ export default function WebsPage(props) {
 
       // console.log("params", JSON.stringify(message.params));
     } else if (actionType === ActionType.Query) {
-      console.log("query1111 :", actionName);
+      // console.log("query1111 :", actionName);
 
       try {
         const { process } = actionDispatcher(actionName, ActionType.Query);
@@ -212,7 +212,7 @@ export default function WebsPage(props) {
       // console.log("sharedSecret：" + (await resutl).sharedSecret);
 
       const [actionName, actionType] = actionMsg.action.split("-");
-      console.log("actionName ", actionName);
+      // console.log("actionName ", actionName);
 
       if (actionType === ActionType.Authorize && needEstimated) {
         const data = metaidComponentRef.current.getEstimatedData();
@@ -227,7 +227,7 @@ export default function WebsPage(props) {
 
           setNeedEstimated(false);
           setComponentInfo({ component: nextComponent, params });
-          console.log("params 设置参数完成：", params);
+          // console.log("params 设置参数完成：", params);
           setIsShowLoading(false);
         } catch (e) {
           console.log("调用报错" + e);
@@ -238,7 +238,7 @@ export default function WebsPage(props) {
           throw e.toString();
         }
       } else {
-        console.log("进行下一步处理", actionName);
+        // console.log("进行下一步处理", actionName);
         const { process } = actionDispatcher(
           actionName,
           actionType as ActionType
@@ -246,6 +246,8 @@ export default function WebsPage(props) {
         // console.log("confirmAction params", componentInfo.params);
         const data = await process(componentInfo.params, actionMsg.host);
         setIsShowLoading(false);
+        // console.log("process ：", data);
+        
         postMessage(
           JSON.stringify({
             data,

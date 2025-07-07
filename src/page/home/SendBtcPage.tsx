@@ -992,7 +992,7 @@ export default function SendBtcPage() {
                   {t("c_pending")}
                 </Text>
                 <Text style={{ color: "#999", fontSize: 14 }}>
-                  {btcBalance.pinsBalance} BTC
+                  {btcBalance.pendingBalance} BTC
                 </Text>
               </View>
               <View

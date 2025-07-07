@@ -48,25 +48,21 @@ export default function BtcMRC721RePage() {
   const [ismany, setIsmany] = useState(0);
 
   useEffect(() => {
-    console.log("点击刷新1111");
     refresh();
   }, []);
 
   useEffect(() => {
-    console.log("点击刷新22222");
     refresh();
   }, [btcAddress]);
 
   useFocusEffect(
     useCallback(() => {
-      console.log("点击刷新3333");
       refresh();
     }, [btcAddress])
   );
 
   async function refresh() {
     if (btcAddress) {
-      console.log("点击刷新4444");
       getBtcNftData(btcAddress);
     } else {
       const isCold = await isObserverWalletMode();

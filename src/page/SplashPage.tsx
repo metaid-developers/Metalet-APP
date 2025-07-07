@@ -61,11 +61,10 @@ export default function SplashPage(props) {
   const { needRefreshApp, updateNeedRefreshApp } = useData();
   let needRefresh = true;
 
-
   useEffect(() => {
     try {
       needRefresh = true;
-      console.log("initDataBase", "自主刷新"+needRefreshApp);
+      console.log("initDataBase", "自主刷新" + needRefreshApp);
       checkUpgrade();
       initDataBase();
       needRefresh = false;
@@ -117,7 +116,7 @@ export default function SplashPage(props) {
       const isCold = await getWalletMode();
       // const isColdTest = await getWalletModeTest();
       // console.log("isColdTest", isColdTest);
-      
+
       // if (isCold == wallet_mode_hot||isCold==undefined||isCold==null||isCold=="") {
       //   const btcWallet = await getCurrentBtcWallet();
       //   const mvcWallet = await getCurrentMvcWallet();
@@ -127,8 +126,7 @@ export default function SplashPage(props) {
       //   updateMetaletWallet(metaletWallet);
       //   updateWalletMode(wallet_mode_hot);
       // } else
-      
-      
+
       if (isCold == wallet_mode_cold) {
         const btcWallet = await getCurrentBtcWallet();
         const mvcWallet = await getCurrentMvcWallet();
@@ -139,7 +137,7 @@ export default function SplashPage(props) {
         updateWalletMode(wallet_mode_cold);
       } else if (isCold == wallet_mode_observer) {
         updateWalletMode(wallet_mode_observer);
-      }else{
+      } else {
         const btcWallet = await getCurrentBtcWallet();
         const mvcWallet = await getCurrentMvcWallet();
         let metaletWallet = new MetaletWallet();
@@ -176,11 +174,12 @@ export default function SplashPage(props) {
       const check: UpdateData = await fetchCheckUpgrade("android");
       console.log(JSON.stringify(check));
       const showCode = check.data.aavc;
-      if (versionCode >= showCode) {
-        updateIsShowPay(0);
-      } else {
-        updateIsShowPay(1);
-      }
+      updateIsShowPay(1);
+      // if (versionCode >= showCode) {
+      //   updateIsShowPay(0);
+      // } else {
+      //   updateIsShowPay(1);
+      // }
     } else {
       // iavc 比当前版本大 1 为下一次更新的版本号
       const check: UpdateData = await fetchCheckUpgrade("ios");
@@ -191,7 +190,6 @@ export default function SplashPage(props) {
       if (parseFloat(buildNumber) >= showCode) {
         updateIsShowPay(0);
         console.log("no GO");
-        
       } else {
         updateIsShowPay(1);
       }

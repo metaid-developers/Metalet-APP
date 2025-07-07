@@ -4,6 +4,7 @@ import { getApiHost } from "@/queries/hosts";
 import { getCurrentWallet } from "@/lib/wallet";
 import { Chain } from "@metalet/utxo-wallet-service";
 import { API_NET, API_TARGET, FtManager, Wallet, mvc } from "meta-contract";
+import { getDefaultMVCTRate } from "@/queries/transaction";
 
 export type Receiver = {
   address: string;
@@ -17,9 +18,11 @@ export type TransferTask = {
 export async function process({
   tasks,
   broadcast = true,
+  feeb,
 }: {
   tasks: TransferTask[];
   broadcast?: boolean;
+  feeb?: number;
 }) {
   const network: API_NET = (await getNetwork()) as API_NET;
   const chianWallet = await getCurrentWallet(Chain.MVC);
@@ -27,12 +30,16 @@ export async function process({
   const address = chianWallet.getAddress();
   // const apiHost = await getApiHost();
 
-  const wallet = new Wallet(purse, network, FEEB, API_TARGET.METALET);
+   if (!feeb) {
+    feeb = await getDefaultMVCTRate()
+  }
+
+  const wallet = new Wallet(purse, network, feeb, API_TARGET.APIMVC);
   const ftManager = new FtManager({
     network,
-    apiTarget: API_TARGET.METALET,
+    apiTarget: API_TARGET.APIMVC,
     purse,
-    feeb: FEEB,
+    feeb,
     // apiHost,
   });
 
