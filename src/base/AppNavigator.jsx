@@ -36,7 +36,6 @@ import FtParentPage from "../page/nft/FtParentPage";
 import SelectReceivePage from "../page/receive/SelectReceivePage";
 import ReceivePage from "../page/receive/ReceivePage";
 import WebsPage from "../webs/WebsPage";
-import DiscoverPage from "@/webs/DiscoverPage";
 import AssetsMvcDetailPage from "../page/home/AssetsMvcDetailPage";
 import AssetsBtcDetailPage from "../page/home/AssetsBtcDetailPage";
 import SendSelectAssertPage from "../page/home/SendSelectAssertPage";
@@ -95,6 +94,9 @@ import BtcNftMRC721DetailPage from "@/page/home/BtcNftMRC721DetailPage";
 import BtcMRC721RePage from "@/page/BtcMRC721RePage";
 import Mrc721NftListPage from "@/page/Mrc721NftListPage";
 import ShowBuzzPage from "@/page/home/ShowBuzzPage";
+import DappsPage from "@/webs/DappsPage";
+import DiscoverPage from "@/webs/DiscoverPage";
+import SmallPayAutoPage from "@/page/safe/SmallPayAutoPage";
 
 ////////
 
@@ -241,6 +243,8 @@ const StackNavigator = () => (
     />
     <Stack.Screen name="Mrc721NftListPage" component={Mrc721NftListPage} />
     <Stack.Screen name="ShowBuzzPage" component={ShowBuzzPage} />
+    <Stack.Screen name="DappsPage" component={DappsPage} />
+    <Stack.Screen name="SmallPayAutoPage" component={SmallPayAutoPage} />
   </Stack.Navigator>
 );
 
@@ -269,7 +273,7 @@ const TabNavigator = () => {
                 style={metaStyles.tabImage}
               />
             );
-          } else if (route.name === "DiscoverPage") {
+          } else if (route.name === "DappsPage") {
             icon = focused ? (
               <Image
                 source={require("../../image/me_plaza_select_tab.png")}
@@ -326,7 +330,7 @@ const TabNavigator = () => {
       {/* <Tab.Screen name="PlazaPage" component={PlazaPage} /> */}
       {(walletMode == wallet_mode_hot || walletMode == undefined) &&
         isShowPay == showPayCode && (
-          <Tab.Screen name="DiscoverPage" component={DiscoverPage} />
+          <Tab.Screen name="DappsPage" component={DappsPage} />
         )}
       <Tab.Screen name="SettingsPage" component={SettingsPage} />
     </Tab.Navigator>

@@ -71,6 +71,12 @@ export const walllet_address_type_key = "walllet_address_type";
 
 export const wallet_password_key = "wallet_password";
 
+
+//allow app
+export const settings_allow_small_pay_key = "settings_allow_small_pay_key";
+
+
+
 // current
 export const CurrentWalletIDKey = "CurrentWalletID_key";
 export const CurrentAccountIDKey = "CurrentAccountID_key";

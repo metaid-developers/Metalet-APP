@@ -35,6 +35,7 @@ import {
 import { PINsBean } from "./type/PINsBean";
 import { Mrc721ItemBean } from "./type/Mrc721ItemBean";
 import { Mrc721SerListBean } from "./type/Mrc721SerListBean";
+import { DappListBean } from "./type/DappListBean";
 
 // export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
@@ -527,6 +528,19 @@ export async function fetchMvcFeed(): Promise<FeedBtcObject> {
   const network = await getWalletNetwork(Chain.BTC);
   const data = await get(
     BASE_METALET_URL + "/wallet-api/v4/mvc/fee/summary",
+    false,
+    { net: network }
+  );
+  return data;
+}
+
+
+
+//28.dapps
+export async function fetchDappList(): Promise<DappListBean> {
+  const network = await getWalletNetwork(Chain.BTC);
+  const data = await get(
+    BASE_METALET_URL + "/wallet-api/v3/dapp/list",
     false,
     { net: network }
   );

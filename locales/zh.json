@@ -32,20 +32,24 @@
   "s_terms_of_service": "服务条款",
   "s_privacy_policy": "隐私政策",
   "s_official": "前往官网查看更多信息",
-  "s_cold_wallet":"冷钱包",
-  "s_cold_asset_notice":"创建观察者钱包提示",
-  "s_cold_wallet_notice":"1.在离线手机上创建或恢复钱包。\n2.使用另外一台链接网络的手机安装钱包并扫描离线手机的首页资产中的二维码，以创建仅观察钱包。\n3.观察者钱包暂时仅查看资产和接收资产。如需转移可将钱包导入在线钱包即可。",
-  "s_cold_guide_asset":"1.打开在线的链接网络的Metalet钱包；\n2.在设置中找到冷钱包模块；\n3.点击扫一扫图标，扫描本页二维码，即可创建观察者钱包，可在观察钱包中查看冷钱包中的资产。", 
+  "s_cold_wallet": "冷钱包",
+  "s_cold_asset_notice": "创建观察者钱包提示",
+  "s_cold_wallet_notice": "1.在离线手机上创建或恢复钱包。\n2.使用另外一台链接网络的手机安装钱包并扫描离线手机的首页资产中的二维码，以创建仅观察钱包。\n3.观察者钱包暂时仅查看资产和接收资产。如需转移可将钱包导入在线钱包即可。",
+  "s_cold_guide_asset": "1.打开在线的链接网络的Metalet钱包；\n2.在设置中找到冷钱包模块；\n3.点击扫一扫图标，扫描本页二维码，即可创建观察者钱包，可在观察钱包中查看冷钱包中的资产。",
   "s_add_wallet_type_title": "选择创建钱包类型",
   "s_line_wallet": "在线钱包",
-  "s_add_cold_wallet":"添加冷钱包",
-   "s_cold_asset":"资产",
-   "s_cold_mode":"冷钱包模式",
-   "s_cold_receive_notice":"仅支持接收BTC和MVC网络资产。",
-   "s_cold_use_guide":"冷钱包使用指南",
-   "s_cold_observer_wallet_mode":"观察者钱包模式",
-
-
+  "s_add_cold_wallet": "添加冷钱包",
+  "s_cold_asset": "资产",
+  "s_cold_mode": "冷钱包模式",
+  "s_cold_receive_notice": "仅支持接收BTC和MVC网络资产。",
+  "s_cold_use_guide": "冷钱包使用指南",
+  "s_cold_observer_wallet_mode": "观察者钱包模式",
+  "s_small_payment_auto_approve": "小额免确认支付",
+  "s_small_pay_notice": "启用后，授权Web3应用程序可以自动提交Gas费用低于指定金额（默认为10,000 Sats）的交易，无需您的确认。此功能可增强您使用可信Web3应用程序的体验。",
+  "s_small_enabled":"启用",
+  "s_small_allow":"允许批准的应用",
+  "s_small_allow_max":"允许最大自动审批金额",
+  "s_small_allow_apps":"批准程序",
 
 
   "c_select_asset": "选择资产",
@@ -79,7 +83,6 @@
   "o_wallet_edit": "编辑",
   "o_select_network": "选择网络",
   "o_all_networks": "所有网络",
-  
 
   "b_transferable": "可转账",
   "b_available": "可用的",
@@ -115,6 +118,4 @@
   "n_web_response_notice": "您即将访问第三方网站，请确保该链接安全且可靠，避免造成资产损失。同时，你接受你对第三方网站的任何使用将受限于第三方网站的条款并受其约束。你同意对于你使用第三方网让所导致的任何损失、损害及任何其他后果，Metalet 钱包及关联方不承担任何 责任。",
   "n_web_response_title": "跳转提示",
   "n_web_response_confirm": "下次打开第三方网站无需提示"
-  
-
 }

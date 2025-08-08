@@ -46,7 +46,6 @@ export default function MvcFtPage() {
   const { walletMode, updateWalletMode } = useData();
 
   // let mvcAddress;
-
   useEffect(() => {
     refresh();
   }, []);

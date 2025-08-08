@@ -43,6 +43,12 @@
   "s_cold_receive_notice": " Only supports receiving Bitcoin And Mvc network assets.",
   "s_cold_use_guide": "Use Cold Wallet Guide",
   "s_cold_observer_wallet_mode": "Observer wallet mode",
+  "s_small_payment_auto_approve": "Small Payment Auto-Approve",
+  "s_small_pay_notice": "When Enabled, Authorized Web3 Applications Can Automatically Submit Transactions With Gas Fees Below A Specified Amount (Defaulting To 10,000 Sats) Without Your Confirmation. This Feature Enhances Your Experience With Trusted Web3 Applications.",
+  "s_small_enabled":"Enabled",
+  "s_small_allow":"Allow Approved Apps",
+  "s_small_allow_max":"Allow Maximum Auto-Approve Amount",
+  "s_small_allow_apps":"Approved Apps",
 
   "c_select_asset": "Select Asset",
   "c_receive_address": "Receipt's Address",

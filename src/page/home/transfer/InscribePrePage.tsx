@@ -7,6 +7,7 @@ import {
   Line,
   RoundSimButton,
   TitleBar,
+  ToastView,
 } from "@/constant/Widget";
 import { getBtcBrc20Icon } from "@/utils/AssertUtils";
 import { litterWhittleBgColor, metaStyles } from "@/constant/Constants";
@@ -107,7 +108,9 @@ export default function InscribePrePage({ route }) {
               marginTop: 20,
             }}
           >
-            <Text style={{ color: "#666", fontSize: 14 }}>{t("b_network_fee")}</Text>
+            <Text style={{ color: "#666", fontSize: 14 }}>
+              {t("b_network_fee")}
+            </Text>
             <Text style={{ color: "#999", fontSize: 14 }}>{netFee} BTC</Text>
           </View>
 
@@ -118,7 +121,9 @@ export default function InscribePrePage({ route }) {
               marginTop: 20,
             }}
           >
-            <Text style={{ color: "#666", fontSize: 14 }}>{t("b_need_amount")}</Text>
+            <Text style={{ color: "#666", fontSize: 14 }}>
+              {t("b_need_amount")}
+            </Text>
             <Text style={{ color: "#999", fontSize: 14 }}>
               {parseToSpace(inscribePre.needAmount)} BTC
             </Text>
@@ -197,40 +202,56 @@ export default function InscribePrePage({ route }) {
     //   // navigate('InscribeTransferPage',{transRes: result})
     // }
 
-    const result = await sendBtcTransaction(
-      address,
-      payAddress,
-      // sendAmount,
-      inscribePre.needAmount,
-      feedRate
+    console.log("sendTransactionPre address", address);
+    console.log("sendTransactionPre payAddress", payAddress);
+    console.log(
+      "sendTransactionPre inscribePre.needAmount",
+      inscribePre.needAmount
     );
+    console.log("sendTransactionPre feedRate", feedRate);
 
-    const transfer: BtcTransferBean = {
-      psbt: "",
-      fee: parseFloat(result.fee),
-      txInputs: result.txInputs,
-      txOutputs: result.txOutputs,
-      rawTx: result.rawTx,
-      // cost: result.cost,
-      cost: (
-        parseFloat(result.fee) + parseFloat(inscribePre.needAmount)
-      ).toString(),
-    };
+    try {
+      const result = await sendBtcTransaction(
+        address,
+        payAddress,
+        // sendAmount,
+        inscribePre.needAmount,
+        feedRate
+      );
+      console.log("sendBtcTransaction result", JSON.stringify(result));
 
-    const fee = parseFloat(result.fee);
-    setNetFee(parseToSpace(fee.toString()));
-    setTotal(
-      parseToSpace(
-        (parseFloat(result.fee) + parseFloat(inscribePre.needAmount)).toString()
-      )
-    );
+      const transfer: BtcTransferBean = {
+        psbt: "",
+        fee: parseFloat(result.fee),
+        txInputs: result.txInputs,
+        txOutputs: result.txOutputs,
+        rawTx: result.rawTx,
+        // cost: result.cost,
+        cost: (
+          parseFloat(result.fee) + parseFloat(inscribePre.needAmount)
+        ).toString(),
+      };
 
-    if (result.rawTx) {
-      setTransferRes(transfer);
-      // setRawTx(result.rawTx)
-      // navigate('InscribeTransferPage',{transRes: result})
+      const fee = parseFloat(result.fee);
+      setNetFee(parseToSpace(fee.toString()));
+      setTotal(
+        parseToSpace(
+          (
+            parseFloat(result.fee) + parseFloat(inscribePre.needAmount)
+          ).toString()
+        )
+      );
+
+      if (result.rawTx) {
+        setTransferRes(transfer);
+        // setRawTx(result.rawTx)
+        // navigate('InscribeTransferPage',{transRes: result})
+      }
+
+      console.log("result", JSON.stringify(result));
+    } catch (error) {
+      ToastView({ text: error, type: "info" });
+      console.error("Error in sendTransactionPre:", error);
     }
-
-    // console.log("result", JSON.stringify(result));
   }
 }

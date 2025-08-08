@@ -85,7 +85,7 @@ export default function SetPasswordPage({ route }) {
         if (type == "create") {
           setIsShowLoading(true);
           const { btcWallet, mvcWallet, walletBean } =
-            await createMetaletWallet(10001,wallet_mode_hot);
+            await createMetaletWallet(10001, wallet_mode_hot);
           const wallets = await getStorageWallets();
           const hasNoWallets = await isNoStorageWallet();
 
@@ -167,10 +167,10 @@ export default function SetPasswordPage({ route }) {
             {t("p_set_password")}
           </Text>
           <Text style={[metaStyles.smallDefaultText, { marginTop: 20 }]}>
-           {t("p_set_password_notice")}
+            {t("p_set_password_notice")}
           </Text>
           <Text style={[metaStyles.defaultText, { marginTop: 30 }]}>
-           {t("p_set_new_password")}
+            {t("p_set_new_password")}
             <Text style={{ color: "#666" }}>{t("p_set_password_about")}</Text>
           </Text>
 
@@ -309,28 +309,21 @@ export default function SetPasswordPage({ route }) {
             </TouchableWithoutFeedback>
           </View>
 
-          <View>
-            <Text
-              numberOfLines={6}
-              style={[
-                { paddingVertical: 20, height: 135, textAlignVertical: "top" },
-              ]}
-            />
-          </View>
-
           <View style={{ flex: 1 }}></View>
 
           <RoundSimButton
             title={t("c_confirm")}
             textColor="white"
             event={() => {
-               if (type == "create_cold_wallet"){
+              if (type == "create_cold_wallet") {
                 navigate("AddColdWalletPage");
-              }else{
+              } else {
                 OpenModal();
               }
             }}
           />
+
+          <View style={{ flex: 1 }}></View>
         </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Metalet",
     "slug": "Metalet",
-    "version": "3.4.0",
+    "version": "3.4.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,16 +11,13 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "buildNumber": "72",
+      "buildNumber": "78",
       "supportsTablet": true,
       "bundleIdentifier": "com.metalet.swallet",
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
-        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone",
+        "NSCameraUsageDescription": "Used to scan QR codes to quickly import wallet addresses and complete transfers.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -35,7 +32,7 @@
       },
       "package": "com.metalet.utxowallet",
       "icon": "./assets/icon.png",
-      "versionCode": 72,
+      "versionCode": 76,
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
@@ -58,9 +55,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-          "recordAudioAndroid": true
+          "cameraPermission": "Used to scan QR codes to quickly import wallet addresses and complete transfers."
         }
       ],
       [

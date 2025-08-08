@@ -24,7 +24,6 @@ import {
   normalColor,
   themeColor,
 } from "@/constant/Constants";
-import { VIEWPORT_DEFAULT_HOTKEY } from "@tamagui/toast/types/ToastViewport";
 import { RoundSimButton, ToastView } from "@/constant/Widget";
 import { useState } from "react";
 import { t, use } from "i18next";

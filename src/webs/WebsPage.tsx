@@ -2,7 +2,7 @@ import WebView from "react-native-webview";
 import { ActionType } from "./actions/types";
 import { injectedJavaScript } from "./inject";
 import CloseIcon from "@/components/icons/CloseIcon";
-import { createElement, ComponentType } from "react";
+import { createElement, ComponentType, useCallback } from "react";
 import actionDispatcher from "./actions/action-dispatcher";
 import React, { useEffect, useRef, useState } from "react";
 import { navigate, goBack } from "@/base/NavigationService";
@@ -21,6 +21,7 @@ import {
   TouchableWithoutFeedback,
   TextInput,
   Keyboard,
+  BackHandler,
 } from "react-native";
 import { CircleAvatarLetter, LoadingModal, ToastView } from "@/constant/Widget";
 import { LinearGradient } from "expo-linear-gradient";
@@ -36,6 +37,7 @@ import { useTranslation } from "react-i18next";
 import { Line } from "react-native-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AsyncStorageUtil, no_notice_key } from "@/utils/AsyncStorageUtil";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface Message {
   host: string;
@@ -47,6 +49,7 @@ interface Message {
 }
 
 export default function WebsPage(props) {
+  const [canGoBack, setCanGoBack] = useState(false);
   const webViewRef = useRef(null);
   const [uri, setURI] = useState("");
   const [uriReady, setReadyURI] = useState("");
@@ -78,15 +81,51 @@ export default function WebsPage(props) {
 
   useEffect(() => {
     if (!props.route.params?.url) {
-      navigate("DiscoverPage");
+      navigate("DappsPage");
     } else {
       setURI(props.route.params.url);
       setReadyURI(props.route.params.url);
       setIcon(props.route.params.icon);
     }
     initData();
+
+    // const backHandler = BackHandler.addEventListener(
+    //   "hardwareBackPress",
+    //   () => {
+    //     console.log("WebView back button pressed");
+    //     if (webViewRef.current) {
+    //       webViewRef.current.goBack();
+    //       return true; // 阻止直接退出 App
+    //     }
+    //     return false; // 执行默认返回
+    //   }
+    // );
+
+    // return () => backHandler.remove();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (canGoBack && webViewRef.current) {
+           console.log("Back button pressed on focused screen11111111111");
+          webViewRef.current.goBack();
+          return true; // 阻止直接退出 App
+        } else {
+           console.log("Back button pressed on focused screen222222");
+          goBack();
+        }
+        console.log("Back button pressed on focused screen");
+        // return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+      return () => subscription.remove();
+    }, [canGoBack])
+  );
   async function initData() {
     const isShowNotice = await AsyncStorageUtil.getItem(no_notice_key);
     // const isShowNotice = false;
@@ -126,7 +165,11 @@ export default function WebsPage(props) {
 
     actionMsg2 = message;
 
+    // console.log("actionMsg2 执行111 ", JSON.stringify(actionMsg2));
+
     if (actionType === ActionType.Authorize) {
+      // console.log("actionMsg2 执行222 " + actionName);
+
       // console.log("message", message);
       setActionMsg(message);
       setModalVisible(true);
@@ -136,10 +179,18 @@ export default function WebsPage(props) {
       setHost(message.host);
       const { title, descriptions, component, needEstimated } =
         actionDispatcher(actionName, actionType);
+      // console.log(
+      //   "actionMsg2 执行333 ",
+      //   title,
+      //   descriptions,
+      //   component,
+      //   needEstimated
+      // );
       setActionName(title);
       setComponentInfo({ component, params: message.params });
       setDescriptions(descriptions);
       setNeedEstimated(needEstimated);
+      // console.log("actionMsg2 执行333");
 
       // console.log("actionDispatcher", JSON.stringify(actionDispatcher(actionName, actionType)));
 
@@ -238,23 +289,33 @@ export default function WebsPage(props) {
           throw e.toString();
         }
       } else {
-        // console.log("进行下一步处理", actionName);
-        const { process } = actionDispatcher(
-          actionName,
-          actionType as ActionType
-        );
-        // console.log("confirmAction params", componentInfo.params);
-        const data = await process(componentInfo.params, actionMsg.host);
-        setIsShowLoading(false);
-        // console.log("process ：", data);
-        
-        postMessage(
-          JSON.stringify({
-            data,
-            nonce: actionMsg.nonce,
-          })
-        );
-        setModalVisible(false);
+        try {
+          // console.log("进行下一步处理", actionName);
+          const { process } = actionDispatcher(
+            actionName,
+            actionType as ActionType
+          );
+          // console.log("confirmAction params", componentInfo.params);
+          const data = await process(componentInfo.params, actionMsg.host);
+          setIsShowLoading(false);
+          // console.log("process ：", data);
+          // console.log("confirmAction data", data);
+
+          postMessage(
+            JSON.stringify({
+              data,
+              nonce: actionMsg.nonce,
+            })
+          );
+          setModalVisible(false);
+        } catch (e) {
+          console.log("调用报错" + e);
+          setModalVisible(false);
+          ToastView({ text: e.toString(), type: "error", time: 3000 });
+          // cancelAction();
+          errorAction(e.toString());
+          throw e.toString();
+        }
       }
     } catch (e) {
       setIsShowLoading(false);
@@ -271,6 +332,8 @@ export default function WebsPage(props) {
   };
 
   const handleNavigationStateChange = (navState) => {
+    console.log("handleNavigationStateChange", navState.canGoBack);
+    setCanGoBack(navState.canGoBack);
     setReadyURI(navState.url);
     setURI(navState.url);
   };
@@ -382,7 +445,7 @@ export default function WebsPage(props) {
                         },
                         <View style={{ gap: 8 }}>
                           <Text style={{ fontSize: 16 }}>{actionName}</Text>
-                          {descriptions.map((description, index) => (
+                          {(descriptions || []).map((description, index) => (
                             <View
                               key={index}
                               style={{

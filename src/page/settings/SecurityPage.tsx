@@ -10,6 +10,8 @@ export default function SecurityPage() {
   const [isShowVerify, setIsShowVerify] = useState(false);
   const { t } = useTranslation();
 
+  const [isShowVerify2, setIsShowVerify2] = useState(false);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <VerifyModal
@@ -20,6 +22,17 @@ export default function SecurityPage() {
         event={() => {
           setIsShowVerify(false);
           navigate("SetPasswordPage", { type: "change" });
+        }}
+      />
+
+      <VerifyModal
+        isShow={isShowVerify2}
+        eventCancel={() => {
+          setIsShowVerify2(false);
+        }}
+        event={() => {
+          setIsShowVerify2(false);
+          navigate("SmallPayAutoPage");
         }}
       />
 
@@ -41,7 +54,33 @@ export default function SecurityPage() {
               }}
             >
               <Text style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}>
-               {t("s_change_password")}
+                {t("s_change_password")}
+              </Text>
+              <View style={{ flex: 1 }} />
+
+              <Image
+                source={require("../../../image/list_icon_ins.png")}
+                style={{ width: 20, height: 20, marginTop: 5 }}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+
+          <TouchableWithoutFeedback
+            onPress={async () => {
+              setIsShowVerify2(true);
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 20,
+                marginTop: 10,
+              }}
+            >
+              <Text style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}>
+                {t("s_small_payment_auto_approve")}
               </Text>
               <View style={{ flex: 1 }} />
 

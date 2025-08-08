@@ -1,6 +1,6 @@
 import { lazy } from "react";
 import * as Pay from "./lib/authorize/pay";
-import * as SignPartialTx from "./lib/authorize/signPartialTx"
+import * as SignPartialTx from "./lib/authorize/signPartialTx";
 import * as Merge from "./lib/authorize/merge";
 import * as Connect from "./lib/authorize/connect";
 import * as Transfer from "./lib/authorize/transfer";
@@ -16,7 +16,6 @@ import * as UnlockP2PKHInput from "./lib/authorize/unlockP2PKHInput";
 import * as SignTransaction from "./lib/authorize/sign-transaction";
 import * as SignTransactions from "./lib/authorize/sign-transactions";
 
-
 // // BTC
 import * as Inscribe from "./lib/authorize/btc/inscribe";
 import * as ConnectBTC from "./lib/authorize/btc/connect";
@@ -27,6 +26,7 @@ import * as MRC20Deploy from "./lib/authorize/btc/mrc20-deploy";
 import * as MRC20Mint from "./lib/authorize/btc/mrc20-mint";
 import * as MRC20Transfer from "./lib/authorize/btc/mrc20-transfer";
 import * as TransferNFT from "./lib/authorize/btc/transfer-nft";
+import * as MRC20TransferWithInscribe from "./lib/authorize/btc/mrc20-transfer-with-inscribe";
 
 import * as ECDH from "./common/ecdh";
 function doNothing() {}
@@ -105,9 +105,9 @@ export default {
     component: lazy(() => import("../components/ComponentA")),
   },
   UnlockP2PKHInput: {
-    name: 'Sign a Transaction',
-    title: 'Sign a Transactiont',
-    description: ['Sign a transaction with my wallet'],
+    name: "Sign a Transaction",
+    title: "Sign a Transactiont",
+    description: ["Sign a transaction with my wallet"],
     process: UnlockP2PKHInput.process,
     estimate: doNothing,
     closeAfterProcess: true,
@@ -125,8 +125,8 @@ export default {
   },
   SignPartialTx: {
     name: "SignPartialTx",
-    title: 'Partial Transaction Signing',
-    descriptions: ['Sign transactions with specified UTXOs'],
+    title: "Partial Transaction Signing",
+    descriptions: ["Sign transactions with specified UTXOs"],
     process: SignPartialTx.process,
     estimate: doNothing,
     needEstimated: false,
@@ -233,6 +233,17 @@ export default {
     process: MRC20Transfer.process,
     needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
+  },
+  MRC20TransferWithInscribe: {
+    name: "MRC20TransferWithInscribe",
+    title: "MRC20 Transfer",
+    description: [],
+    // description: ['MRC20 Transfer with Inscribe'],
+    process: MRC20TransferWithInscribe.process,
+    estimate: doNothing,
+    needEstimated: false,
+    component: lazy(() => import("../components/ComponentA")),
+    // closeAfterProcess: true,
   },
   MRC20Mint: {
     name: "MRC20Mint",
