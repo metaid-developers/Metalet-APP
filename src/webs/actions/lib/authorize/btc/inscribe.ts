@@ -111,6 +111,11 @@ export async function estimate({
       metaIdPinUnspentOutputs.includes(`${utxo.txId}:${utxo.outputIndex}`)
   );
   console.log("inscribe 方法222221");
+
+  console.log("inscribe utxos", utxos);
+  console.log("inscribe feeRate", feeRate);
+  console.log("inscribe metaidDataList", metaidDataList);
+  console.log("inscribe service", service);
   // try {
     const { commitTx, revealTxs } = wallet.signTx(SignType.INSCRIBE_METAIDPIN, {
       utxos,

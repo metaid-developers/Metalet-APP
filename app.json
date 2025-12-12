@@ -2,7 +2,7 @@
   "expo": {
     "name": "Metalet",
     "slug": "Metalet",
-    "version": "3.4.3",
+    "version": "3.5.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -13,7 +13,7 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "buildNumber": "78",
+      "buildNumber": "95",
       "supportsTablet": true,
       "bundleIdentifier": "com.metalet.swallet",
       "infoPlist": {
@@ -31,8 +31,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.metalet.utxowallet",
-      "icon": "./assets/icon.png",
-      "versionCode": 76,
+      "versionCode": 95,
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",

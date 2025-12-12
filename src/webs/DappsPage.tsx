@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { metaStyles } from "@/constant/Constants";
 import { METALET_WALLET_PREFIX } from "@/queries/hosts";
-import { navigate } from "@/base/NavigationService";
+import { navigate, navigatePush } from "@/base/NavigationService";
 import { Recommend } from "@/api/type/DappListBean";
 import { fetchDappList } from "@/api/metaletservice";
 
@@ -32,7 +32,7 @@ export default function DappsPage() {
     setMarketList([...dappList.data.classify.MarketPlace]);
     setMetaSoList([...dappList.data.classify.MetaSo]);
     setToolsList([...dappList.data.classify.Tools]);
-    console.log("DappsPage dappList: ", JSON.stringify(dappList));
+    // console.log("DappsPage dappList: ", JSON.stringify(dappList));
   }
   const ListItem = ({ index, item }) => {
     return (
@@ -45,7 +45,7 @@ export default function DappsPage() {
           marginTop: 20,
         }}
         onPress={() => {
-          navigate("WebsPage", {
+          navigatePush("WebsPage", {
             url: item.url,
             icon: `${METALET_WALLET_PREFIX}${item.icon}`,
           });
@@ -56,7 +56,7 @@ export default function DappsPage() {
             flexDirection: "row",
             alignItems: "center",
             gap: 8,
-            marginTop: 5,
+            marginTop: 13,
           }}
         >
           <Image
@@ -122,40 +122,50 @@ export default function DappsPage() {
             gap: 10,
           }}
         >
-          <View style={{ flex: 1 }}>
-            <Image
-              style={{
-                width: "100%",
-                aspectRatio: 1,
-                borderRadius: 16,
-              }}
-              source={{
-                uri: `${METALET_WALLET_PREFIX}${topList?.[0]?.recover}`,
-              }}
-            />
-            <View
-              style={{
-                backgroundColor: "#0F0503",
-                height: 50,
-                width: "100%",
-                position: "absolute",
-                bottom: 0,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingHorizontal: 8, // px-2 ≈ 8px
-                borderBottomLeftRadius: 16, // 2xl ≈ 16px
-                borderBottomRightRadius: 16,
-              }}
-            >
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  {topList?.[0]?.name}
-                </Text>
-                <Text style={{ color: "white", fontSize: 12 }}>{topList?.[0]?.desc}</Text>
-              </View>
+          <TouchableWithoutFeedback
+            style={{ flex: 1 }}
+            onPress={() => {
+              navigate("WebsPage", {
+                url: topList?.[0]?.url,
+              });
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Image
+                style={{
+                  width: "100%",
+                  aspectRatio: 1,
+                  borderRadius: 16,
+                }}
+                source={{
+                  uri: `${METALET_WALLET_PREFIX}${topList?.[0]?.recover}`,
+                }}
+              />
+              <View
+                style={{
+                  backgroundColor: "#0F0503",
+                  height: 50,
+                  width: "100%",
+                  position: "absolute",
+                  bottom: 0,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 8, // px-2 ≈ 8px
+                  borderBottomLeftRadius: 16, // 2xl ≈ 16px
+                  borderBottomRightRadius: 16,
+                }}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                    {topList?.[0]?.name}
+                  </Text>
+                  <Text style={{ color: "white", fontSize: 12 }}>
+                    {topList?.[0]?.desc}
+                  </Text>
+                </View>
 
-              {/* <Image
+                {/* <Image
                 style={{
                   width: 30, // w-12 → 12 * 4 = 48
                   height: 30, // h-12 → 48
@@ -167,49 +177,60 @@ export default function DappsPage() {
                   uri: "https://www.metalet.space/wallet-api/v3/dapp/icon/icon-orders-exchange.png",
                 }}
               /> */}
-             
-            </View>
-          </View>
-
-          <View style={{ flex: 1 }}>
-            <Image
-              style={{
-                width: "100%",
-                aspectRatio: 1,
-                borderRadius: 16,
-              }}
-              source={{
-                uri: `${METALET_WALLET_PREFIX}${topList?.[1]?.recover}`,
-              }}
-            />
-            <View
-              style={{
-                backgroundColor: "#382EA8",
-                height: 50,
-                width: "100%",
-                position: "absolute",
-                bottom: 0,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingHorizontal: 8, // px-2 ≈ 8px
-                borderBottomLeftRadius: 16, // 2xl ≈ 16px
-                borderBottomRightRadius: 16,
-              }}
-            >
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: "white", fontWeight: "bold" }}>
-                  {topList?.[1]?.name}
-                </Text>
-                <Text style={{ color: "white", fontSize: 12 }}>{topList?.[1]?.desc}</Text>
               </View>
-              {/* <Image
+            </View>
+          </TouchableWithoutFeedback>
+
+          <TouchableWithoutFeedback
+            style={{ flex: 1 }}
+            onPress={() => {
+              navigate("WebsPage", {
+                url: topList?.[1]?.url,
+              });
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Image
+                style={{
+                  width: "100%",
+                  aspectRatio: 1,
+                  borderRadius: 16,
+                }}
+                source={{
+                  uri: `${METALET_WALLET_PREFIX}${topList?.[1]?.recover}`,
+                }}
+              />
+              <View
+                style={{
+                  backgroundColor: "#382EA8",
+                  height: 50,
+                  width: "100%",
+                  position: "absolute",
+                  bottom: 0,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 8, // px-2 ≈ 8px
+                  borderBottomLeftRadius: 16, // 2xl ≈ 16px
+                  borderBottomRightRadius: 16,
+                }}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                    {topList?.[1]?.name}
+                  </Text>
+                  <Text style={{ color: "white", fontSize: 12 }}>
+                    {topList?.[1]?.desc}
+                  </Text>
+                </View>
+                {/* <Image
                 source={{
                   uri: `${METALET_WALLET_PREFIX}${"/v3/dapp/icon/recover-octopus.png"}`,
                 }}
               /> */}
+              </View>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </View>
 
         <ScrollView

@@ -127,6 +127,9 @@ export async function caculateMvcAndBtcAssert(
   const btcAssert = toFloorNum(btcPrice * parseFloat(btcBalance), 2);
   balance.btcAssert = isMain ? btcAssert.toString() : "0.0";
   let assertSum = toFloorNum(spaceAssert + btcAssert, 2);
+  balance.btcNa=(btcBalanceData.data.balance-btcBalanceData.data.safeBalance).toFixed(8);
+  balance.btcSafeBalance=btcBalanceData.data.safeBalance.toFixed(8);
+
   const ftPriceData = await fetchMvcFtPrice();
 
   const ftdata = await fetchMvcFtBalance(mvcAddrss);

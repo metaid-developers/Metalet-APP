@@ -27,6 +27,7 @@ import * as MRC20Mint from "./lib/authorize/btc/mrc20-mint";
 import * as MRC20Transfer from "./lib/authorize/btc/mrc20-transfer";
 import * as TransferNFT from "./lib/authorize/btc/transfer-nft";
 import * as MRC20TransferWithInscribe from "./lib/authorize/btc/mrc20-transfer-with-inscribe";
+import * as AutoPayment from "./auto-payment";
 
 import * as ECDH from "./common/ecdh";
 function doNothing() {}
@@ -39,7 +40,7 @@ export default {
     process: Connect.process,
     estimate: doNothing,
     needEstimated: false,
-    component: lazy(() => import("../components/ComponentA")),
+    component: lazy(() => import("../components/ConnectComPonent")),
   },
   Disconnect: {
     name: "Disconnect",
@@ -49,6 +50,15 @@ export default {
     estimate: doNothing,
     needEstimated: false,
     component: lazy(() => import("../components/ComponentA")),
+  },
+    AutoPayment: {
+    name: "AutoPayment",
+    title: "Requesting Approval for Auto-Payment",
+    descriptions: ["AutoPayment"],
+    process: AutoPayment.process,
+    estimate: doNothing,
+    needEstimated: false,
+    component: lazy(() => import("../components/AutoPayment")),
   },
   SwitchNetwork: {
     name: "SwitchNetwork",
@@ -106,11 +116,13 @@ export default {
   },
   UnlockP2PKHInput: {
     name: "Sign a Transaction",
-    title: "Sign a Transactiont",
+    title: "Sign a Transaction",
     description: ["Sign a transaction with my wallet"],
     process: UnlockP2PKHInput.process,
     estimate: doNothing,
-    closeAfterProcess: true,
+    needEstimated: false,
+    component: lazy(() => import("../components/ComponentA")),
+    // closeAfterProcess: true,
   },
   Pay: {
     name: "Pay",

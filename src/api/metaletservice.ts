@@ -247,7 +247,6 @@ export async function fetchSpaceBalance(
     false,
     { net: network, address: address }
   );
-  console.log("fetchSpaceBalance", data);
 
   const dataMvcBalance: SpaceBalance = data.data as SpaceBalance;
 
@@ -539,6 +538,7 @@ export async function fetchMvcFeed(): Promise<FeedBtcObject> {
 //28.dapps
 export async function fetchDappList(): Promise<DappListBean> {
   const network = await getWalletNetwork(Chain.BTC);
+  console.log("fetchDappList: ", network);
   const data = await get(
     BASE_METALET_URL + "/wallet-api/v3/dapp/list",
     false,

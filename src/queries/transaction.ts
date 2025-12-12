@@ -41,14 +41,14 @@ export const getDefaultMVCTRate = async (): Promise<number> => {
     const feeRes = await getMVCTRate()
     if (feeRes.list.length) {
       const fastRate = feeRes.list.find((rate) => rate.title === 'Fast')
-      console.log('Using default MVC fee rate 1111费率:', fastRate)
+      // console.log('Using default MVC fee rate 1111费率:', fastRate)
       return fastRate ? fastRate.feeRate : FEEB // Return fast rate or default fee
     }
   } catch (error) {
     console.error('Error fetching MVC fee rate:', error)
   }
   
-  console.log('Using default MVC fee rate 费率:', FEEB)
+  // console.log('Using default MVC fee rate 费率:', FEEB)
   return FEEB // Default fee rate in case of error
 }
 export const useBTCRateQuery = (options?: { enabled: boolean }) => {

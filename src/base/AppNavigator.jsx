@@ -97,6 +97,9 @@ import ShowBuzzPage from "@/page/home/ShowBuzzPage";
 import DappsPage from "@/webs/DappsPage";
 import DiscoverPage from "@/webs/DiscoverPage";
 import SmallPayAutoPage from "@/page/safe/SmallPayAutoPage";
+import ToolkitPage from "@/page/settings/ToolkitPage";
+import MergeFtPage from "@/page/settings/MergeFtPage";
+import MergeSpacePage from "@/page/settings/MergeSpacePage";
 
 ////////
 
@@ -245,6 +248,9 @@ const StackNavigator = () => (
     <Stack.Screen name="ShowBuzzPage" component={ShowBuzzPage} />
     <Stack.Screen name="DappsPage" component={DappsPage} />
     <Stack.Screen name="SmallPayAutoPage" component={SmallPayAutoPage} />
+    <Stack.Screen name="ToolkitPage" component={ToolkitPage} />
+    <Stack.Screen name="MergeFtPage" component={MergeFtPage} />
+    <Stack.Screen name="MergeSpacePage" component={MergeSpacePage} />
   </Stack.Navigator>
 );
 

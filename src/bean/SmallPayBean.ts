@@ -1,5 +1,4 @@
 export type SmallPayBean = {
-  id: string;
-  name: string;
-  address: string;
+  logo: string;
+  host: string;
 };

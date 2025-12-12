@@ -46,6 +46,11 @@ import { createMetaletWallet } from "../../wallet/wallet";
 import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
 import { SmallPayBean } from "@/bean/SmallPayBean";
+import {
+  AutoPaymentAmountKey,
+  AutoPaymentListKey,
+  EnabledAutoPaymentKey,
+} from "@/webs/actions/auto-payment";
 
 const storage = createStorage();
 
@@ -77,32 +82,39 @@ export default function SmallPayAutoPage({ route }) {
 
   useEffect(() => {
     // console.log("mytype", type);
-
     getSmallPayData();
   }, []);
 
   async function getSmallPayData() {
     console.log("smallPayBeanList111");
+    const isEndabled = await storage.get(EnabledAutoPaymentKey, {
+      defaultValue: true,
+    });
+    setEnabled(isEndabled);
+    console.log("isEndabled:", isEndabled);
 
-    const smallPayList = await AsyncStorageUtil.getItem(
-      settings_allow_small_pay_key
-    );
+    const payAmount = await storage.get(AutoPaymentAmountKey, {
+      defaultValue: 10000,
+    });
+
+    setValueAgain(payAmount.toString());
+
+    const smallPayList = await AsyncStorageUtil.getItem(AutoPaymentListKey);
 
     console.log("smallPayBeanList111", smallPayList);
 
     if (smallPayList == null || smallPayList.length == 0) {
-      let smallPayBean = {
-        id: "1",
-        name: "Show.now",
-        address: "MVC Address",
-      };
-      smallPayBeanList.push(smallPayBean);
-      setSmallPayBeanList([...smallPayBeanList]);
-      await AsyncStorageUtil.setItem(
-        settings_allow_small_pay_key,
-        smallPayBeanList
-      );
-      console.log("smallPayBeanList", smallPayBeanList);
+      // let smallPayBean = {
+      //   logo: "1",
+      //   host: "Show.now",
+      // };
+      // smallPayBeanList.push(smallPayBean);
+      // setSmallPayBeanList([...smallPayBeanList]);
+      // await AsyncStorageUtil.setItem(
+      //   settings_allow_small_pay_key,
+      //   smallPayBeanList
+      // );
+      // console.log("smallPayBeanList", smallPayBeanList);
     } else {
       console.log("smallPayBeanList2222");
       setSmallPayBeanList([...smallPayList]);
@@ -110,25 +122,22 @@ export default function SmallPayAutoPage({ route }) {
   }
 
   async function addSmallPayData() {
-    console.log("smallPayBeanList111");
+    // console.log("smallPayBeanList111");
+    // const smallPayList = await AsyncStorageUtil.getItem(AutoPaymentListKey);
+    // console.log("smallPayBeanList111", smallPayList);
 
-    const smallPayList = await AsyncStorageUtil.getItem(
-      settings_allow_small_pay_key
-    );
+    // let smallPayBean = {
+    //   logo: "1",
+    //   host: "Show.now",
+    // };
 
-    console.log("smallPayBeanList111", smallPayList);
+    // smallPayBeanList.push(smallPayBean);
+    // setSmallPayBeanList([...smallPayBeanList]);
+    // await AsyncStorageUtil.setItem(AutoPaymentListKey, smallPayBeanList);
 
-    let smallPayBean = {
-      id: "1",
-      name: "Show.now",
-      address: "MVC Address",
-    };
-    smallPayBeanList.push(smallPayBean);
-    setSmallPayBeanList([...smallPayBeanList]);
-    await AsyncStorageUtil.setItem(
-      settings_allow_small_pay_key,
-      smallPayBeanList
-    );
+    await storage.set(AutoPaymentAmountKey, valueAgain);
+    goBack();
+
     console.log("smallPayBeanList", smallPayBeanList);
   }
 
@@ -151,7 +160,7 @@ export default function SmallPayAutoPage({ route }) {
           }}
         >
           <Text style={{ marginLeft: 10, color: "#303133", fontSize: 16 }}>
-            {item.name}
+            {item.host}
           </Text>
           <View style={{ flex: 1 }} />
           {item.isBackUp == false && (
@@ -163,10 +172,17 @@ export default function SmallPayAutoPage({ route }) {
               <Text style={{ fontSize: 13, color: "red" }}>Not backed up</Text>
             </View>
           )}
-          <Image
-            source={require("../../../image/metalet_delete_icon.png")}
-            style={{ width: 15, height: 15, marginTop: 5 }}
-          />
+          <TouchableWithoutFeedback onPress={ async() => {
+            smallPayBeanList.splice(index, 1);
+            setSmallPayBeanList([...smallPayBeanList]);
+            await storage.set(AutoPaymentListKey, smallPayBeanList);
+            // ShowNotice();
+          }}>
+            <Image
+              source={require("../../../image/metalet_delete_icon.png")}
+              style={{ width: 15, height: 15, marginTop: 5 }}
+            />
+          </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
     );
@@ -217,8 +233,9 @@ export default function SmallPayAutoPage({ route }) {
             </View>
 
             <TouchableWithoutFeedback
-              onPress={() => {
+              onPress={async () => {
                 setEnabled(!isEnabled);
+                await storage.set(EnabledAutoPaymentKey, !isEnabled);
               }}
             >
               <Image

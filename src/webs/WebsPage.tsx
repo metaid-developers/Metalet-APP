@@ -36,8 +36,17 @@ import * as ECDH from "@/webs/actions/common/ecdh";
 import { useTranslation } from "react-i18next";
 import { Line } from "react-native-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AsyncStorageUtil, no_notice_key } from "@/utils/AsyncStorageUtil";
+import {
+  AsyncStorageUtil,
+  createStorage,
+  no_notice_key,
+} from "@/utils/AsyncStorageUtil";
 import { useFocusEffect } from "@react-navigation/native";
+import {
+  AutoPaymentAdd,
+  AutoPaymentAmountKey,
+  AutoPaymentListKey,
+} from "./actions/auto-payment";
 
 interface Message {
   host: string;
@@ -51,7 +60,8 @@ interface Message {
 export default function WebsPage(props) {
   const [canGoBack, setCanGoBack] = useState(false);
   const webViewRef = useRef(null);
-  const [uri, setURI] = useState("");
+  const url = props.route.params.url;
+  const [uri, setURI] = useState(url);
   const [uriReady, setReadyURI] = useState("");
   const [icon, setIcon] = useState("");
   const [host, setHost] = useState("");
@@ -78,14 +88,24 @@ export default function WebsPage(props) {
   const [isShowWebNotice, setIsShowWebNotice] = useState(false);
   const { t } = useTranslation();
   const [isAgree, setIsAgree] = useState(false);
+  const storage = createStorage();
 
+  
   useEffect(() => {
+    console.log(
+      "WebsPage useEffect读取到的初始化传入链接： ",
+      props.route.params.url
+    );
     if (!props.route.params?.url) {
+    // if (!url) {
       navigate("DappsPage");
     } else {
-      setURI(props.route.params.url);
-      setReadyURI(props.route.params.url);
+      // if (props.route.url && props.route.params.url !== uri) {
+     if (url && url !== uri) {
+      setURI(props.route.params?.url);
+      setReadyURI(props.route.params?.url);
       setIcon(props.route.params.icon);
+    }
     }
     initData();
 
@@ -100,19 +120,20 @@ export default function WebsPage(props) {
     //     return false; // 执行默认返回
     //   }
     // );
-
     // return () => backHandler.remove();
-  }, []);
+
+  // }, []);
+   }, [url]);
 
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
         if (canGoBack && webViewRef.current) {
-           console.log("Back button pressed on focused screen11111111111");
+          console.log("Back button pressed on focused screen11111111111");
           webViewRef.current.goBack();
           return true; // 阻止直接退出 App
         } else {
-           console.log("Back button pressed on focused screen222222");
+          console.log("Back button pressed on focused screen222222");
           goBack();
         }
         console.log("Back button pressed on focused screen");
@@ -200,6 +221,7 @@ export default function WebsPage(props) {
 
       try {
         const { process } = actionDispatcher(actionName, ActionType.Query);
+        // console.log("query2222 :", actionName, message.params, message.host);
 
         const data = await process(message.params, message.host);
 
@@ -263,7 +285,7 @@ export default function WebsPage(props) {
       // console.log("sharedSecret：" + (await resutl).sharedSecret);
 
       const [actionName, actionType] = actionMsg.action.split("-");
-      // console.log("actionName ", actionName);
+      console.log("actionName ", actionName);
 
       if (actionType === ActionType.Authorize && needEstimated) {
         const data = metaidComponentRef.current.getEstimatedData();
@@ -281,7 +303,7 @@ export default function WebsPage(props) {
           // console.log("params 设置参数完成：", params);
           setIsShowLoading(false);
         } catch (e) {
-          console.log("调用报错" + e);
+          console.log("调用报错是铭刻：" + e);
           setModalVisible(false);
           ToastView({ text: e.toString(), type: "error", time: 3000 });
           // cancelAction();
@@ -296,10 +318,9 @@ export default function WebsPage(props) {
             actionType as ActionType
           );
           // console.log("confirmAction params", componentInfo.params);
+          // console.log("actionName 执行4444 ", componentInfo.params);
           const data = await process(componentInfo.params, actionMsg.host);
           setIsShowLoading(false);
-          // console.log("process ：", data);
-          // console.log("confirmAction data", data);
 
           postMessage(
             JSON.stringify({
@@ -337,6 +358,10 @@ export default function WebsPage(props) {
     setReadyURI(navState.url);
     setURI(navState.url);
   };
+
+    if (! props.route.params.url) {
+    return <View><Text>Loading...</Text></View>;
+  }
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -632,9 +657,7 @@ export default function WebsPage(props) {
                     console.log("uriReady", uriReady);
                     console.log("uri", uri);
                     setIsFocusEdit(false);
-
                     Keyboard.dismiss();
-
                     if (webViewRef.current) webViewRef.current.reload();
                   }}
                 >
@@ -820,14 +843,19 @@ export default function WebsPage(props) {
             scrollEnabled={true}
             nestedScrollEnabled={true}
             cacheEnabled={true}
+            onLoadStart={() => console.log("WebView start")}
+            onLoadEnd={() => console.log("WebView end")}
             // cacheMode="LOAD_CACHE_ELSE_NETWORK"
             javaScriptCanOpenWindowsAutomatically={true}
             onMessage={(e) => {
               handlerMessage(JSON.parse(e.nativeEvent.data));
             }}
-            userAgent={Platform.OS ? "Metalet-iOS" : "Metalet-Android"}
-            androidHardwareAccelerationDisabled={true}
+            userAgent={
+              Platform.OS === "ios" ? "Metalet-iOS" : "Metalet-Android"
+            }
+            androidHardwareAccelerationDisabled={false}
             onNavigationStateChange={handleNavigationStateChange}
+             originWhitelist={['*']}
           />
         )}
       </SafeAreaView>

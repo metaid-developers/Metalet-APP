@@ -13,6 +13,8 @@ export type SpaceBalance = {
     btcBalance:string="";
     btcAssert:string="";
     sumAssert:string="";
+    btcNa:string="";
+    btcSafeBalance:string="";
   }
 
 

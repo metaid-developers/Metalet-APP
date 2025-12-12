@@ -29,7 +29,7 @@
   "s_version": "Version",
   "s_terms_of_service": "Terms of Service",
   "s_privacy_policy": "Privacy Policy",
-  "s_official": "Go to the official website to learn move.",
+  "s_official": "Go to the official website to learn more.",
   "s_cold_wallet": "Cold Wallet",
   "s_cold_guide:": " Cold Wallet Guide:",
   "s_cold_wallet_notice": "1.Create or restore a wallet on an offline phone.\n2.Use another phone connected to the internet to install the wallet and scan the QR code on the asset page of the offline phone to create a watch-only wallet.\n3.The watch-only wallet can currently only view assets. To make transfers, you can import the wallet into an online wallet.",
@@ -45,10 +45,10 @@
   "s_cold_observer_wallet_mode": "Observer wallet mode",
   "s_small_payment_auto_approve": "Small Payment Auto-Approve",
   "s_small_pay_notice": "When Enabled, Authorized Web3 Applications Can Automatically Submit Transactions With Gas Fees Below A Specified Amount (Defaulting To 10,000 Sats) Without Your Confirmation. This Feature Enhances Your Experience With Trusted Web3 Applications.",
-  "s_small_enabled":"Enabled",
-  "s_small_allow":"Allow Approved Apps",
-  "s_small_allow_max":"Allow Maximum Auto-Approve Amount",
-  "s_small_allow_apps":"Approved Apps",
+  "s_small_enabled": "Enabled",
+  "s_small_allow": "Allow Approved Apps",
+  "s_small_allow_max": "Allow Maximum Auto-Approve Amount",
+  "s_small_allow_apps": "Approved Apps",
 
   "c_select_asset": "Select Asset",
   "c_receive_address": "Receipt's Address",
@@ -90,6 +90,8 @@
   "b_preview": "Preview",
   "b_need_amount": "Need Amount",
   "b_network_fee": "Network Fee",
+  "b_btc_notice": "Each PIN, MRC20, and BRC20 on BTC requires 546 satoshis. To ensure the security of these assets and prevent them from being spent, the Metalet wallet will mark these satoshis as unavailable, meaning that the occupied satoshis cannot be used normally within the Metalet wallet.",
+  "b_detail": "Notice",
 
   "m_edit_name": "Edit Name",
   "m_wallet_name": "Wallet Name",
@@ -116,5 +118,6 @@
   "p_set_password_notice": " It's important to note that we do not retain your password, thus if it is forgotten, you will need to reset your wallet and re-import it to establish a new one.",
   "n_web_response_notice": "You are about to visit a third party website, please ensure that the link is secure and reliable to avoid asset loss. At the same time, you accept that any use of the third party website by you will be subject to and governed by the terms of the third party Website. You agree that Metalet Wallet and its affiliates shall not be liable for any loss, damage or any other consequences arising from your use of the Third Party Website.",
   "n_web_response_title": "Jump prompt",
-  "n_web_response_confirm":"Don't warn again"
+  "n_web_response_confirm": "Don't warn again",
+  "s_toolkit":"Toolkit"
 }

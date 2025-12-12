@@ -90,6 +90,7 @@ export default function SecurityPage() {
               />
             </View>
           </TouchableWithoutFeedback>
+
         </View>
       </View>
     </SafeAreaView>

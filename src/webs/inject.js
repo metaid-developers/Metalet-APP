@@ -76,10 +76,18 @@ const actions = {
   transfer: { action: "Transfer", type: "authorize" },
   signMessage: { action: "SignMessage", type: "authorize" },
   pay: { action: "Pay", type: "authorize" },
-  unlockP2PKHInput: { action: "unlockP2PKHInput", type: "authorize" },
+  unlockP2PKHInput: { action: "UnlockP2PKHInput", type: "authorize" },
   signPartialTx: { action: "SignPartialTx", type: "authorize" },
   getMvcBalance: { action: "GetBalance", type: "query" },
-  saveBase64Image: { action: "saveBase64Image", type: "query" }
+  saveBase64Image: { action: "SaveBase64Image", type: "query" },
+  smallPay: { action: "SmallPay", type: "query" },
+  autoPaymentStatus: { action: "AutoPaymentStatus", type: "query" },
+  autoPayment: { action: "AutoPayment", type: "authorize" },
+  getPKHByPath:{ action: "GetPKHByPath", type: "query" },
+  signTransaction:{ action: "SignTransaction", type: "authorize" },
+  eciesDecrypt:{ action: "EciesDecrypt", type: "query" },
+  eciesEncrypt:{ action: "EciesEncrypt", type: "query" },
+
 };
 
 const metalet = { btc: {}, token: {} ,common: {} };
@@ -157,13 +165,14 @@ metalet.on = () => {};
 metalet.removeListener = () => {};
 
 window.metaidwallet = metalet;
+console.log('window.metaidwallet is:', metalet);
 
-// const consoleLog = (type, log) => window.ReactNativeWebView.postMessage(JSON.stringify({'type': 'Console', 'data': {'type': type, 'log': log}}));
-// console = {
-//   log: (log) => consoleLog('log', log),
-//   debug: (log) => consoleLog('debug', log),
-//   info: (log) => consoleLog('info', log),
-//   warn: (log) => consoleLog('warn', log),
-//   error: (log) => consoleLog('error', log),
-// };
+const consoleLog = (type, log) => window.ReactNativeWebView.postMessage(JSON.stringify({'type': 'Console', 'data': {'type': type, 'log': log}}));
+console = {
+  log: (log) => consoleLog('log', log),
+  debug: (log) => consoleLog('debug', log),
+  info: (log) => consoleLog('info', log),
+  warn: (log) => consoleLog('warn', log),
+  error: (log) => consoleLog('error', log),
+};
 `;

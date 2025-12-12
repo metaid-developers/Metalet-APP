@@ -25,6 +25,8 @@ class MetaletWallet {
   currentBtcBalance: string="0.00";
   currentSpaceAssert: string="0.00";
   currentBtcAssert: string="0.00";
+  currentBtcNa: string="0.00";
+  currentBtcSafeBalance: string="0.00";
 
   currentMVCPrice: number=0;
   currentBtcPrice: number=0;

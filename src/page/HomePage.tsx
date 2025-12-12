@@ -286,6 +286,9 @@ export default function HomePage({ navigation }) {
     metaletWallet.currentSumAssert = showbalance.sumAssert;
     metaletWallet.currentBtcAssert = showbalance.btcAssert;
     metaletWallet.currentSpaceAssert = showbalance.spaceAssert;
+    metaletWallet.currentBtcNa = showbalance.btcNa;
+    metaletWallet.currentBtcSafeBalance = showbalance.btcSafeBalance;
+
 
     // console.log("metaletWallet 余额刷新 ", metaletWallet.currentMvcBalance);
     updateSpaceBalance(showbalance.spaceBalance);

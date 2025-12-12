@@ -14,7 +14,29 @@ export type TransferTask = {
   genesis?: string;
   codehash?: string;
   receivers: Receiver[];
+  metaidData?: any;
 };
+
+
+function buildOpReturnV2(metaidData: any): any {
+  const res1 = ['metaid', metaidData.operation];
+  const res2 = [];
+  if (metaidData.operation !== 'init') {
+    res2.push(metaidData.path!);
+    res2.push(metaidData?.encryption ?? '0');
+    res2.push(metaidData?.version ?? '1.0.0');
+    res2.push(metaidData?.contentType ?? 'text/plain;utf-8');
+
+    const body = !metaidData.body
+      ? undefined
+      : Buffer.isBuffer(metaidData.body)
+        ? metaidData.body
+        : Buffer.from(metaidData.body, metaidData?.encoding ?? 'utf-8');
+    res2.push(body);
+  }
+  return [...res1, ...res2];
+}
+
 export async function process({
   tasks,
   broadcast = true,
@@ -89,6 +111,7 @@ export async function process({
           noBroadcast: !broadcast,
           // ftUtxos: foundFt ? [foundFt] : undefined,
           utxos: theUtxo ? [theUtxo] : undefined,
+           opreturnData: task.metaidData ? buildOpReturnV2(task.metaidData) : undefined,
         });
       const routeCheckTxid = routeCheckTx.id;
       results.push({

@@ -92,6 +92,8 @@
   "b_preview": "预览",
   "b_need_amount": "所需费用",
   "b_network_fee": "网络费用",
+  "b_btc_notice": "每一个PIN、MRC20和BRC20在BTC上都需占用546聪。为了这些资产的安全和不被花掉，Metalet 钱包会将这些聪标记为不可用，在Metalet钱包里暂时不能正常使用这些被占用的聪",
+  "b_detail": "提示" ,
 
   "m_edit_name": "编辑名称",
   "m_wallet_name": "钱包名称",
@@ -117,5 +119,6 @@
   "p_set_confirm_password": "再次确认",
   "n_web_response_notice": "您即将访问第三方网站，请确保该链接安全且可靠，避免造成资产损失。同时，你接受你对第三方网站的任何使用将受限于第三方网站的条款并受其约束。你同意对于你使用第三方网让所导致的任何损失、损害及任何其他后果，Metalet 钱包及关联方不承担任何 责任。",
   "n_web_response_title": "跳转提示",
-  "n_web_response_confirm": "下次打开第三方网站无需提示"
+  "n_web_response_confirm": "下次打开第三方网站无需提示",
+  "s_toolkit":"工具箱"
 }

@@ -9,6 +9,8 @@ import * as VerifySignature from "./lib/query/verify-signature";
 import * as GetTokenBalance from "./lib/query/get-token-balance";
 import * as GetXPublicKey from "./lib/query/get-extended-public-key";
 import * as PreviewTransaction from "./lib/query/preview-transaction";
+import * as GetPKHByPath from './lib/query/get-pkh-by-path';
+
 // import * as Listen from '../lib/actions/listen'
 
 // // BTC
@@ -22,6 +24,9 @@ import * as GetBTCAddressType from "./lib/query/btc/get-address-type";
 import * as AddSafeUtxo from "./lib/query/btc/add-safe-utxo";
 import * as SaveBase64Image from "./lib/query/save-picture";
 import * as ECDH from "./common/ecdh";
+import  * as SmallPay from "./small-pay";
+import  * as autoPaymentStatus from "./auto-payment-status";
+import  * as StorageChunk from "./lib/query/storage-chunk";
 
 export default {
   // Listen,
@@ -36,6 +41,8 @@ export default {
   VerifySignature,
   PreviewTransaction,
   SaveBase64Image,
+  AutoPaymentStatus: autoPaymentStatus,
+
 
   // BTC
   PushPsbt,
@@ -49,6 +56,9 @@ export default {
 
   //common
   ECDH,
+  SmallPay:SmallPay,
+  GetPKHByPath
+  // StorageChunk
 
   
 

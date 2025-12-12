@@ -1,3 +1,4 @@
+import { StackActions } from "@react-navigation/native";
 import React from "react";
 import Toast from "react-native-toast-message";
 
@@ -14,6 +15,15 @@ export function navigate(routeName, myObject?) {
   if (_navigator) {
     // 对于react-navigation v5+
     _navigator.navigate(routeName, myObject);
+  } else {
+    console.warn("Can't navigate without a navigator!");
+  }
+}
+
+
+export function navigatePush(routeName, params?: object) {
+  if (_navigator) {
+    _navigator.dispatch(StackActions.push(routeName, params));
   } else {
     console.warn("Can't navigate without a navigator!");
   }
