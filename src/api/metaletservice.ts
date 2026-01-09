@@ -41,6 +41,8 @@ import { DappListBean } from "./type/DappListBean";
 export const BASE_MVC_API_URL_TESTNET = "https://testnet.mvcapi.com";
 export const BASE_METALET_URL = "https://www.metalet.space";
 export const BASE_METALET_V4_URL = "/wallet-api/v4/mvc";
+export const BASE_METALET_V4_DOGE_URL = '/wallet-api/v4/doge';
+
 
 //资产价格
 export const BALANCE_PRICE_URL = BASE_METALET_URL + "/wallet-api/v3/coin/price";
@@ -68,7 +70,7 @@ export async function fetchMvcActivityComfird(
     false,
     { net: network, address: address }
   );
-  console.log("fetchMvcActivityComfird", result);
+  // console.log("fetchMvcActivityComfird", result);
 
   const data = result.data.list as MvcActivityRecord[];
   return data;
@@ -546,3 +548,44 @@ export async function fetchDappList(): Promise<DappListBean> {
   );
   return data;
 }
+
+
+
+
+
+// balance
+//12.doge balance
+export async function fetchDogeBalance(address: string): Promise<SpaceBalance> {
+  const network = await getWalletNetwork();
+
+  const data: RootDataObject = await get(
+    BASE_METALET_URL + BASE_METALET_V4_DOGE_URL + '/address/balance-info',
+    false,
+    { net: network, address: address },
+  );
+
+  const dataMvcBalance: SpaceBalance = data.data as SpaceBalance;
+
+  return dataMvcBalance;
+}
+
+
+export async function fetchDogeActivity(address: string, isConfirm: boolean) {
+  // const data = await get(
+  //   BASE_MVC_API_URL + "/address/" + address + "/tx",
+  //   false,
+  //   { confirm: isConfirm }
+  // );
+  // return data;
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject2 = await get(
+    BASE_METALET_URL + BASE_METALET_V4_DOGE_URL + '/address/tx-list',
+    false,
+    { net: network, address: address },
+  );
+  console.log('fetchMvcActivityComfird', result);
+
+  const data = result.data.list as MvcActivityRecord[];
+  return data;
+}
+

@@ -43,6 +43,7 @@ import {
   wallet_mode_hot,
   wallet_language_key,
   wallet_mode_observer,
+  network_doge,
 } from "../utils/AsyncStorageUtil";
 import { AddressType, Chain } from "@metalet/utxo-wallet-service";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
@@ -80,6 +81,9 @@ import MetaIDPage from "./nft/MetaIDPage";
 import { BtcHotWallet } from "@metalet/utxo-wallet-sdk";
 import i18n from "@/language/i18n";
 import { useTranslation } from "react-i18next";
+import { getDogeCoinWallet } from "@/wallet/DogeCoinWallet";
+import { usePollingController } from './wallet/usePollingController';
+
 
 const storage = createStorage();
 
@@ -95,6 +99,8 @@ export default function HomePage({ navigation }) {
   const { walletMode, updateWalletMode } = useData();
   const { spaceBalance, updateSpaceBalance } = useData();
   const { btcBalance, updateSetBtcBalance } = useData();
+  const { dogeBalance, updateDogeBalance } = useData();
+
   // const [sumBalance, setSumBalance] = useState<string>("0.0");
   const { currentSumBalance, updateCurrentSumBalance } = useData();
 
@@ -139,6 +145,11 @@ export default function HomePage({ navigation }) {
   const { isShowPay, updateIsShowPay } = useData();
   const { t } = useTranslation(); // 获取翻译函数
 
+  const { dogeAddress, updateDogeAddress } = useData();
+  const { start, stop } = usePollingController();
+
+
+
   // "package": "com.metalet.utxowallet",
   // "package": "com.utxo.wallet",
 
@@ -168,6 +179,7 @@ export default function HomePage({ navigation }) {
 
     // 清除定时器，防止内存泄漏
     // return () => clearInterval(intervalId);
+     return () => stop();
   }, []);
 
   useEffect(() => {
@@ -289,10 +301,14 @@ export default function HomePage({ navigation }) {
     metaletWallet.currentBtcNa = showbalance.btcNa;
     metaletWallet.currentBtcSafeBalance = showbalance.btcSafeBalance;
 
+    metaletWallet.currentDogeAssert = showbalance.dogeAssert;
+    metaletWallet.currentDogeBalance = showbalance.dogeBalance;
 
     // console.log("metaletWallet 余额刷新 ", metaletWallet.currentMvcBalance);
     updateSpaceBalance(showbalance.spaceBalance);
     updateSetBtcBalance(showbalance.btcBalance);
+        updateDogeBalance(showbalance.dogeBalance);
+
 
     if (sumBalance == "0.0") {
       updateCurrentSumBalance(showbalance.sumAssert);
@@ -314,6 +330,7 @@ export default function HomePage({ navigation }) {
       setuserAvater(nowAccount.defaultAvatarColor);
       updateMvcAddress(nowWallet.coldAddress);
       updateBtcAddress(nowWallet.coldAddress);
+      
 
       //init HotWallet
       const publicKey = nowWallet.coldPublicKey;
@@ -346,6 +363,8 @@ export default function HomePage({ navigation }) {
 
       const nowWallet = await getStorageCurrentWallet();
       const nowAccount = await getCurrentWalletAccount();
+      const nowDogeWallet = await getDogeCoinWallet();
+
 
       setWalletName(nowWallet.name);
       setaccountName(nowAccount.name);
@@ -372,9 +391,13 @@ export default function HomePage({ navigation }) {
       updateMvcAddress(mvcWallet.getAddress());
       // console.log('address mvc : ',mvcWallet.getAddress())
       updateBtcAddress(currentBtcWallet.getAddress());
+      updateDogeAddress(nowDogeWallet.getAddress());
+
 
       metaletWallet.currentBtcWallet = currentBtcWallet;
       metaletWallet.currentMvcWallet = mvcWallet;
+      metaletWallet.currentDogeWallet = nowDogeWallet;
+
       metaletWallet.btcLegacyWallet = btcLegacyWallet;
       metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
       metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
@@ -387,7 +410,11 @@ export default function HomePage({ navigation }) {
       setCurrentWallet({ btcWallet: btcWalletWebs, mvcWallet: mvcWalletWebs });
 
       updateMetaletWallet(metaletWallet);
-      getShowBalance();
+      // getShowBalance();
+        start(() => {
+        console.log('轮询获取余额---立刻执行一次');
+        getShowBalance();
+      }, 15000);
     }
   }
 
@@ -975,6 +1002,67 @@ export default function HomePage({ navigation }) {
                 </TouchableWithoutFeedback>
               </View>
 
+                 <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: 20,
+                  marginHorizontal: 10,
+                  alignItems: 'center',
+                }}
+              >
+                <Image
+                  source={require('../../image/doge_logo.png')}
+                  style={{ width: 35, height: 35, marginLeft: 20 }}
+                />
+
+                <View style={{ marginLeft: 10, flex: 1 }}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>DOGE</Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        marginLeft: 5,
+                        backgroundColor: '#F5F7F9',
+                        paddingHorizontal: 5,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 5,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: '#666',
+                          fontSize: 10,
+                          textAlign: 'center',
+                        }}
+                      >
+                        DOGE
+                      </Text>
+                    </View>
+                  </View>
+                  <Text
+                    style={{ marginTop: 5, fontSize: 10, color: '#666' }}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {dogeAddress}
+                  </Text>
+                </View>
+
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    const dogeAddress = await metaletWallet.currentDogeWallet.getAddress();
+                    ShowNotice(dogeAddress);
+                  }}
+                >
+                  <Image
+                    source={require('../../image/meta_copy_icon.png')}
+                    style={{ width: 20, height: 20, marginRight: 10 }}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+
+
               {/* over */}
             </View>
           </View>
@@ -1088,6 +1176,20 @@ export default function HomePage({ navigation }) {
               />
             </TouchableWithoutFeedback>
           )}
+
+
+           {netWork == network_doge && (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                navigate('NetWorkPage');
+              }}
+            >
+              <Image
+                source={require('../../image/doge_logo.png')}
+                style={{ width: 24, height: 24 }}
+              />
+            </TouchableWithoutFeedback>
+          )}
           <Image
             source={require("../../image/meta_last_icon.png")}
             style={{ width: 8, height: 6, marginLeft: 5 }}
@@ -1174,6 +1276,8 @@ export default function HomePage({ navigation }) {
                   navigate("SendBtcPage");
                 } else if (netWork == network_all) {
                   navigate("SendSelectAssertPage");
+                }  else if (netWork == network_doge) {
+                  navigate('SendDogePage');
                 }
               }}
             >
@@ -1196,6 +1300,8 @@ export default function HomePage({ navigation }) {
                   navigate("ReceivePage", { myCoinType: "SPACE" });
                 } else if (netWork == network_btc) {
                   navigate("ReceivePage", { myCoinType: "BTC" });
+                }else if (netWork == network_doge) {
+                  navigate('ReceivePage', { myCoinType: 'DOGE' });
                 } else if (netWork == network_all) {
                   navigate("SelectReceivePage");
                 }
@@ -1296,6 +1402,8 @@ export default function HomePage({ navigation }) {
           {netWork == network_btc && <MyTabs02 />}
 
           {netWork == network_mvc && <MyTabs03 />}
+
+            {netWork == network_doge && <MyTabs03 />}
         </View>
       </View>
       {/* </ImageBackground> */}

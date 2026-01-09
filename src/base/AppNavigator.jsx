@@ -100,6 +100,9 @@ import SmallPayAutoPage from "@/page/safe/SmallPayAutoPage";
 import ToolkitPage from "@/page/settings/ToolkitPage";
 import MergeFtPage from "@/page/settings/MergeFtPage";
 import MergeSpacePage from "@/page/settings/MergeSpacePage";
+import AssetsDogeDetailPage from "@/page/home/AssetsDogeDetailPage";
+import SendDogePage from "@/page/home/SendDogePage";
+import SendDogeSuccessPage from "@/page/home/SendDogeSuccessPage";
 
 ////////
 
@@ -251,6 +254,9 @@ const StackNavigator = () => (
     <Stack.Screen name="ToolkitPage" component={ToolkitPage} />
     <Stack.Screen name="MergeFtPage" component={MergeFtPage} />
     <Stack.Screen name="MergeSpacePage" component={MergeSpacePage} />
+    <Stack.Screen name="AssetsDogeDetailPage" component={AssetsDogeDetailPage} />
+    <Stack.Screen name="SendDogePage" component={SendDogePage} />
+    <Stack.Screen name="SendDogeSuccessPage" component={SendDogeSuccessPage} />
   </Stack.Navigator>
 );
 

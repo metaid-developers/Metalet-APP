@@ -46,7 +46,11 @@ type GlobalContext = {
   walletLanguage,
   updateWalletLanguage,
   needRefreshApp,
-  updateNeedRefreshApp
+  updateNeedRefreshApp,
+  dogeAddress;
+  updateDogeAddress;
+  dogeBalance;
+  updateDogeBalance;
 };
 
 const UserContext = createContext<GlobalContext>(undefined);
@@ -163,11 +167,23 @@ export const UserProvider = ({ children }) => {
     setBtcSameAsMvcAddress(newData);
   };
 
+    const [dogeAddress, setDogeAddress] = useState('');
+  const updateDogeAddress = (newData) => {
+    setDogeAddress(newData);
+  };
+    const [dogeBalance, setDogeBalance] = useState('');
+  const updateDogeBalance = (newData) => {
+    setDogeBalance(newData);
+  };
+
+
   
   const [walletLanguage,setWalletLanguage] = useState("en");
   const updateWalletLanguage = (newData) => {
     setWalletLanguage(newData);
   };
+
+
 
 
   const [needRefreshApp, setNeedRefreshApp] = useState("123");
@@ -215,7 +231,11 @@ export const UserProvider = ({ children }) => {
     walletLanguage,
     updateWalletLanguage,
     needRefreshApp,
-    updateNeedRefreshApp
+    updateNeedRefreshApp,
+     dogeAddress,
+    updateDogeAddress,
+     dogeBalance,
+    updateDogeBalance,
 
   };
 

@@ -14,6 +14,7 @@ import {
   network_key,
   network_mvc,
   createStorage,
+  network_doge,
 } from "../../utils/AsyncStorageUtil";
 import { eventBus, refreshHomeLoadingEvent } from "../../utils/EventBus";
 import { navigate } from "../../base/NavigationService";
@@ -32,6 +33,7 @@ export default function ImportWalletNetWorkPage(props) {
   const { netWork, updateNetWork } = useData();
   const [selectMvcNetWork, setSelectMvcNetWork] = useState(true);
   const [selectBtcNetWork, setSelectBtcNetWork] = useState(true);
+  const [selectDogeNetWork, setSelectDogeNetWork] = useState(true);
 
   const [isShowLoading, setIsShowLoading] = useState(false);
   const { mvcPath, updateMvcPath } = useData();
@@ -43,19 +45,41 @@ export default function ImportWalletNetWorkPage(props) {
   const {t}=useTranslation();
 
   async function changeNetwork() {
-    if (selectBtcNetWork == false && selectMvcNetWork == false) {
-      return;
-    }
-    if (selectBtcNetWork && selectMvcNetWork == false) {
+    // if (selectBtcNetWork == false && selectMvcNetWork == false) {
+    //   return;
+    // }
+    // if (selectBtcNetWork && selectMvcNetWork == false) {
+    //   await storage.set(network_key, network_btc);
+    //   updateNetWork(network_btc);
+    // } else if (selectMvcNetWork && selectBtcNetWork == false) {
+    //   await storage.set(network_key, network_mvc);
+    //   updateNetWork(network_mvc);
+    // }  else if (selectMvcNetWork && selectBtcNetWork == false) {
+    //   await storage.set(network_key, network_doge);
+    //   updateNetWork(network_doge);
+    // } 
+    
+    // else  {
+    //   await storage.set(network_key, network_all);
+    //   updateNetWork(network_all);
+    // }
+
+
+    if (selectBtcNetWork==true && selectMvcNetWork==false && selectDogeNetWork==false) {
       await storage.set(network_key, network_btc);
       updateNetWork(network_btc);
-    } else if (selectMvcNetWork && selectBtcNetWork == false) {
+    }else if (selectMvcNetWork==true && selectBtcNetWork==false && selectDogeNetWork==false) {
       await storage.set(network_key, network_mvc);
       updateNetWork(network_mvc);
-    } else if (selectBtcNetWork && selectMvcNetWork) {
+    }else if (selectDogeNetWork==true && selectBtcNetWork==false && selectMvcNetWork==false) {
+      await storage.set(network_key, network_doge);
+      updateNetWork(network_doge);
+    }else  {
       await storage.set(network_key, network_all);
       updateNetWork(network_all);
     }
+
+
 
     const walletBean = await getStorageCurrentWallet();
     const seed = metaletWallet.currentBtcWallet.getSeed();
@@ -139,7 +163,7 @@ export default function ImportWalletNetWorkPage(props) {
               {selectBtcNetWork && (
                 <Image
                   source={require("../../../image/wallets_select_icon.png")}
-                  style={{ padding: 8, width: 15, height: 15 }}
+                  style={{  width: 15, height: 15 }}
                 />
               )}
             </View>
@@ -201,7 +225,70 @@ export default function ImportWalletNetWorkPage(props) {
               {selectMvcNetWork && (
                 <Image
                   source={require("../../../image/wallets_select_icon.png")}
-                  style={{ padding: 8, width: 15, height: 15 }}
+                  style={{  width: 15, height: 15 }}
+                />
+              )}
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+
+
+  <View
+          style={[
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              marginHorizontal: 20,
+              marginVertical: 10,
+              backgroundColor: "#F5F7F9",
+              borderRadius: 10,
+              padding: 10,
+            },
+          ]}
+        >
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setSelectDogeNetWork(!selectDogeNetWork);
+              // changeNetwork(network_mvc);
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginHorizontal: 20,
+                marginVertical: 10,
+              }}
+            >
+              <Image
+                source={require("../../../image/doge_logo.png")}
+                style={{ width: 30, height: 30 }}
+              />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={metaStyles.defaultText}> DOGE</Text>
+                <View
+                  style={{
+                    marginTop: 3,
+                    backgroundColor: "rgba(247, 147, 26, 0.2)",
+                    borderRadius: 10,
+                    width: 90,
+                    alignItems: "center",
+                    paddingVertical: 2,
+                    marginLeft: 5,
+                  }}
+                >
+                  <Text style={{ fontSize: 8, color: "#FF981C" }}>
+                    Bitcoin sidechain{" "}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ flex: 1 }} />
+
+              {selectDogeNetWork && (
+                <Image
+                  source={require("../../../image/wallets_select_icon.png")}
+                  style={{  width: 15, height: 15 }}
                 />
               )}
             </View>

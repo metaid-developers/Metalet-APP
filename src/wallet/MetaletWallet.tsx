@@ -1,11 +1,14 @@
 import { BtcHotWallet } from "@metalet/utxo-wallet-sdk";
 import { BtcWallet, MvcWallet } from "@metalet/utxo-wallet-service";
+import { DogeCoinWallet } from "./DogeCoinWallet";
 
 class MetaletWallet {
   //当前钱包部分
   id: string;
   currentMvcWallet: MvcWallet;
   currentBtcWallet: BtcWallet;
+  currentDogeWallet: DogeCoinWallet;
+
    
   //cold Wallet
   currentBtcColdWallet: BtcHotWallet;
@@ -27,6 +30,9 @@ class MetaletWallet {
   currentBtcAssert: string="0.00";
   currentBtcNa: string="0.00";
   currentBtcSafeBalance: string="0.00";
+    currentDogeAssert: string = '0.00';
+  currentDogeBalance: string = '0.00';
+
 
   currentMVCPrice: number=0;
   currentBtcPrice: number=0;

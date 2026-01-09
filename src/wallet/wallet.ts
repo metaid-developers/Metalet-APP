@@ -149,10 +149,11 @@ export async function createMetaletWallet(mvcPath,walletMode:string): Promise<{
   mvcWallet: MvcWallet;
   walletBean: WalletBean;
 }> {
+  console.log("createMetaletWallet mvcPath:", wordlist);
   const mnemonic = bip39.generateMnemonic(wordlist);
   console.log(mnemonic);
 
-  //wallet
+  //wallet 
   let walletName;
   let walletID = Math.random().toString(36).substr(2, 8);
   let wallet_addressType = AddressType.SameAsMvc;

@@ -2,6 +2,7 @@ import { BtcFtBean, Mrc20Data } from "@/bean/BtcFtBean";
 import {
   fetchAssetsPrice,
   fetchBtcBalance,
+  fetchDogeBalance,
   fetchIcons,
   fetchMrc20List,
   fetchMrc20Price,
@@ -14,6 +15,7 @@ import { MvcFtData } from "../api/type/MvcFtData";
 import { MvcFtPriceData } from "../api/type/Price";
 import { formatToDecimal, getWalletNetwork, parseToSpace } from "./WalletUtils";
 import { Brc20, IcoinsData } from "@/api/type/IcoinsData";
+import { getDogeCoinWallet } from "@/wallet/DogeCoinWallet";
 
 // FT
 export function caculateOneFtValue(
@@ -97,6 +99,8 @@ export async function caculateMvcAndBtcAssert(
   const btcPrice = assertPrice.data.priceInfo.btc;
   const spacePrice = assertPrice.data.priceInfo.space;
   const time1=new Date().getTime();
+    const dogePrice = 0;
+
   //当前时间毫秒数
   // console.log("开始计算：",time1);
   
@@ -114,6 +118,22 @@ export async function caculateMvcAndBtcAssert(
   balance.spaceBalance = spaceSumBalance;
   const spaceAssert = toFloorNum(spacePrice * parseFloat(spaceSumBalance), 2);
   balance.spaceAssert = isMain ? spaceAssert.toFixed(2) : "0.0";
+
+
+
+
+  const dogeAddress=await (await getDogeCoinWallet()).getAddress();
+  const dogeBalanceData = await fetchDogeBalance(dogeAddress);
+
+  const dogeSumBalance = parseFloat(
+    parseToSpace((dogeBalanceData.confirmed + dogeBalanceData.unconfirmed).toString()),
+  ).toString();
+  balance.dogeBalance = dogeSumBalance;
+  const dogeAssert = toFloorNum(dogePrice * parseFloat(dogeSumBalance), 2);
+  balance.dogeAssert = isMain ? dogeAssert.toFixed(2) : '0.0';
+
+
+
 
   const btcBalanceData = await fetchBtcBalance(btcAddress);
   if (btcBalanceData.data == null) {

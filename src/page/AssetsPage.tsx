@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   network_all,
   network_btc,
+  network_doge,
   network_mvc,
 } from "../utils/AsyncStorageUtil";
 import { useData } from "../hooks/MyProvider";
@@ -263,6 +264,65 @@ export default function AssetsPage() {
           </TouchableWithoutFeedback>
         )}
 
+
+          {netWork == network_doge && (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              // navigate("ReceivePage",{myCoinType:'SPACE'});
+              navigate('AssetsDogeDetailPage', { myCoinType: 'DOGE' });
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 30,
+                alignItems: 'center',
+              }}
+            >
+              <Image
+                source={require('../../image/doge_logo.png')}
+                style={{ width: 45, height: 45 }}
+              />
+              <View style={{ marginLeft: 12 }}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>DOGE</Text>
+
+                <View style={{ marginLeft: 0 }}>
+                  <View
+                    style={{
+                      marginTop: 3,
+                      backgroundColor: 'rgba(247, 147, 26, 0.2)',
+                      borderRadius: 10,
+                      alignItems: 'center',
+                      paddingVertical: 2,
+                      paddingHorizontal: 5,
+                    }}
+                  >
+                    <Text style={{ fontSize: 8, color: '#FF981C' }}>Bitcoin sidechain </Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={{ flex: 1 }} />
+
+              <View>
+                <Text style={{ color: '#333', fontSize: 16, textAlign: 'right' }}>
+                  {metaletWallet.currentDogeBalance!} DOGE{' '}
+                </Text>
+                <Text
+                  style={{
+                    color: '#666',
+                    fontSize: 14,
+                    marginTop: 10,
+                    textAlign: 'right',
+                  }}
+                >
+                  ${metaletWallet.currentDogeAssert}
+                </Text>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        )}
+
         {netWork == network_all && (
           <TouchableWithoutFeedback
             onPress={() => {
@@ -434,6 +494,65 @@ export default function AssetsPage() {
                   }}
                 >
                   ${metaletWallet.currentSpaceAssert}
+                </Text>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        )}
+
+
+           {netWork == network_all  && (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              // navigate("ReceivePage",{myCoinType:'SPACE'});
+              navigate('AssetsDogeDetailPage', { myCoinType: 'DOGE' });
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 30,
+                alignItems: 'center',
+              }}
+            >
+              <Image
+                source={require('../../image/doge_logo.png')}
+                style={{ width: 45, height: 45 }}
+              />
+              <View style={{ marginLeft: 12 }}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>DOGE</Text>
+
+                <View style={{ marginLeft: 0 }}>
+                  <View
+                    style={{
+                      marginTop: 3,
+                      backgroundColor: 'rgba(247, 147, 26, 0.2)',
+                      borderRadius: 10,
+                      alignItems: 'center',
+                      paddingVertical: 2,
+                      paddingHorizontal: 5,
+                    }}
+                  >
+                    <Text style={{ fontSize: 8, color: '#FF981C' }}>Bitcoin sidechain </Text>
+                  </View>
+                </View>
+              </View>
+
+              <View style={{ flex: 1 }} />
+
+              <View>
+                <Text style={{ color: '#333', fontSize: 16, textAlign: 'right' }}>
+                  {metaletWallet.currentDogeBalance!} DOGE{' '}
+                </Text>
+                <Text
+                  style={{
+                    color: '#666',
+                    fontSize: 14,
+                    marginTop: 10,
+                    textAlign: 'right',
+                  }}
+                >
+                  ${metaletWallet.currentDogeAssert}
                 </Text>
               </View>
             </View>
