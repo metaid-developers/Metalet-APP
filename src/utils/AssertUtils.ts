@@ -158,16 +158,21 @@ export async function caculateMvcAndBtcAssert(
     assertSum = toFloorNum(parseFloat(assertFt) + assertSum, 2);
   }
 
-  //mrc20 list
-  const ftPriceMrc20Data = await fetchMrc20Price();
-  const simData = await fetchMrc20List(network, btcAddress);
-  if (simData) {
-    const assertFt = caculateOneBtcFtMrc20Value(
-      simData.data.list,
-      ftPriceMrc20Data,
-      btcPrice
-    );
-    assertSum = toFloorNum(parseFloat(assertFt) + assertSum, 2);
+  // MRC20 is an add-on asset query. Do not let its API failures block base balances.
+  try {
+    const simData = await fetchMrc20List(network, btcAddress);
+    const mrc20List = simData?.data?.list;
+    if (Array.isArray(mrc20List) && mrc20List.length > 0) {
+      const ftPriceMrc20Data = await fetchMrc20Price();
+      const assertFt = caculateOneBtcFtMrc20Value(
+        mrc20List,
+        ftPriceMrc20Data,
+        btcPrice
+      );
+      assertSum = toFloorNum(parseFloat(assertFt) + assertSum, 2);
+    }
+  } catch (error) {
+    console.log("error fetchMrc20List", error);
   }
 
   balance.sumAssert = assertSum.toFixed(2);
