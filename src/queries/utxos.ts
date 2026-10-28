@@ -243,6 +243,9 @@ export async function getBtcUtxos(
     } else {
       // utxos = await getSafeUtxos(address, utxos)
     }
+  // ≤1000 聪的小额 UTXO 是 MRC20/Pin 铭文载体，不可作为普通 BTC 花费；
+  // 服务端对未确认载体的铭文标记有窗口期，客户端按金额兜底（与服务端 btcMinSpendableSatoshi 同一规则）
+  utxos = utxos.filter((utxo) => utxo.satoshis > 1000)
   if (needRawTx) {
     for (let utxo of utxos) {
       utxo.rawTx = await fetchBtcTxHex(utxo.txId);
