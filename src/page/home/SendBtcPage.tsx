@@ -1058,6 +1058,14 @@ export default function SendBtcPage() {
                     return;
                   }
 
+                  if (parseToSat(inputAmount) <= 1000) {
+                    ToastView({
+                      text: "Amount must be greater than 0.00001 BTC (1000 sats)",
+                      type: "error",
+                    });
+                    return;
+                  }
+
                   if (walletMode === wallet_mode_cold) {
                     sendColdBtc();
                   } else {
